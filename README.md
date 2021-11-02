@@ -1,5 +1,5 @@
 # climR-pnw
-An R package for fast downscaling of global climate model data in the Pacific Northwest
+An R package for downscaled global climate model normals in the Pacific Northwest
 
 Copyright 2021 Province of British Columbia
 
