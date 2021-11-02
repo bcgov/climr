@@ -1,6 +1,8 @@
 # climR-pnw
 An R package for downscaled global climate model normals in the Pacific Northwest
 
+[![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](<Redirect-URL>)
+
 Copyright 2021 Province of British Columbia
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
