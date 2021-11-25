@@ -116,7 +116,7 @@ for(gcm in gcms){
             years <- if(substr(names(r),1,1)[1]=="X") substr(names(r),2,5) else substr(names(r),1,4)
             
             proj <- mean(r[[which(years%in%startyear:endyear)]])
-            if(startyear==2001) proj <- (proj*6 + mean(get(paste("ref", monthcodes[m], sep=".")))*14)/20 #combine with historical run for 2001-2020 period
+            if(startyear==2001) proj <- (proj*6 + mean(get(paste("hist", monthcodes[m], sep=".")))*14)/20 #combine with historical run for 2001-2020 period
             
             assign(paste("proj", monthcodes[m], sep="."), if(run.proj==runs.proj[1]) proj else brick(c(get(paste("proj", monthcodes[m], sep=".")), proj)))
             
