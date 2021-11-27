@@ -1,0 +1,27 @@
+Package: climRpnw
+Title: Downscaling of global climate data for Central-Western North America
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Bruno", "Tremblay", email = "bruno@boostao.ca", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-2945-356X")),
+    person("Francois", "Bornais", email = "francois@boostao.ca", role = c("aut")),
+    person(family = "Province of British Columbia", role = c("cph", "fnd")))
+Description: This package replicate the basic approach of ClimateNA (climatena.ca),
+    but with (1) improved speed, (2) cloud delivery, and (3) programmatic access via R.
+    A simple downscaling method is used to bias-correct low-resolution (~100km) global
+    climate model anomalies to high-resolution (2km) maps of historical climate, with
+    further elevation adjustment to user-specified elevation grids/points based on
+    empirical lapse rates (local relationship of climate to elevation) of the 2km
+    climate maps. Elevation-adjusted monthly values of basic climate elements
+    (temperature and precipitation) are then used to estimate derived variables
+    (e.g., degree-days) based on published equations and parameters from 2016 Wang et al.
+License: Apache License (== 2)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+LinkingTo: 
+    Rcpp,
+    RcppEigen
+Imports: 
+    Rcpp,
+    RcppEigen
