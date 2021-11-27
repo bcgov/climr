@@ -1,7 +1,10 @@
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/bcgov/climR-pnw/workflows/R-CMD-check/badge.svg)](https:/ithub.com/bcgov/climR-pnw/actions)
+[![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](<Redirect-URL>)
+<!-- badges: end -->
+
 # climR-pnw
 An R package for downscaled global climate model normals in the Pacific Northwest
-
-[![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](<Redirect-URL>)
 
 Copyright 2021 Province of British Columbia
 

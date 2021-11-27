@@ -1,0 +1,7 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^inputs$
+^scripts$
+^\.git
+^\.github$
+^\.httr-oauth$
