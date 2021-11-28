@@ -1,6 +1,6 @@
 
 
-#TODO: what should we do when k is missing? (DD<0)
+#TODO: what should we do when k is missing? (DD<0) (issue#13)
 calc_DD_m <- function(tm, k, a, b, t0, beta, c){
 
   DD_m <- c + beta * tm
