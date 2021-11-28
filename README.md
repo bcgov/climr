@@ -1,5 +1,4 @@
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/bcgov/climR-pnw/workflows/R-CMD-check/badge.svg)](https:/ithub.com/bcgov/climR-pnw/actions)
 [![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](<Redirect-URL>)
 <!-- badges: end -->
 
