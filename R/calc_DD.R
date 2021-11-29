@@ -1,11 +1,10 @@
 
-
-#TODO: what should we do when k is missing? (DD<0) (issue#13)
 calc_DD_m <- function(tm, k, a, b, t0, beta, c){
 
   DD_m <- c + beta * tm
   
-  gt_k <- which(tm > k)
+  #when k is missing Tm will always be above the negative temperatures used for k 
+  gt_k <- which(is.na(k) | tm > k)
   
   DD_m[gt_k] <- a[gt_k]/(1 + exp(-(tm[gt_k] - t0[gt_k])/b[gt_k]))
   
@@ -89,7 +88,6 @@ calc_DD_below_18 <- function(m, tm){
             )
 }
 
-#TODO What's the difference between All and The Rest
 
 #' Calculate Degree-Day Above 18 (DD>18)
 #'
