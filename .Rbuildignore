@@ -5,3 +5,4 @@
 ^\.git
 ^\.github$
 ^\.httr-oauth$
+^data-raw$
