@@ -161,7 +161,7 @@ for(gcm in gcms){
 gcm <- "GFDL-ESM4"
 element <- "tasmin"
 test <- brick(paste("inputs/gcmData/gcmData", gcm, element, "nc", sep="."))
-index <- read.csv(paste("inputs/gcmIndex", gcm, element, "csv", sep="."), )
+index <- read.csv(paste("inputs/gcmData/gcmIndex", gcm, element, "csv", sep="."), )
 names(test) <- index[,-1]
 test
 # names(test)
