@@ -10,6 +10,7 @@ calc_DD_m <- function(tm, k, a, b, t0, beta, c){
   
   # replace NA and negative values
   DD_m[which(is.na(DD_m)|DD_m < 0)] <- 0
+
   DD_m
   
 }

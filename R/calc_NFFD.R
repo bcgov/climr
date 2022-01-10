@@ -11,11 +11,11 @@
 #' 
 calc_NFFD <- function(m, tm) {
   
-  match_lines <- match(m, param$nffd$Month)
+  match_lines <- match(m, param$NFFD$Month)
   
-  a <- param$nffd$a[match_lines]
-  b <- param$nffd$b[match_lines]
-  t0 <- param$nffd$T0[match_lines]
+  a <- param$NFFD$a[match_lines]
+  b <- param$NFFD$b[match_lines]
+  t0 <- param$NFFD$T0[match_lines]
   
   a/(1 + exp(-(tm - t0)/b))
 }
