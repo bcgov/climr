@@ -5,9 +5,10 @@ setClass("basepoints", slots = c(
     historical = "character",
     future = "character"))
 
-setGeneric("downscale", function(x) {x})
+setGeneric("downscale", function(latitude, longitude, elevation, historical, future) {latitude})
 
 method.skeleton("downscale", "basepoint")
 
-setMethod("downscale", signature = c(numeric(), numeric(), numeric(), character(), character()))
-downscale <- function(latitude, longitude, elevation, )
+setMethod("downscale", signature = c(latitude = "numeric", longitude = "numeric", 
+                                     elevation = "numeric", historical = "character", future = "character"), 
+          function(latitude, longitude, elevation, historical, future){latitude})
