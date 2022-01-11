@@ -16,7 +16,7 @@ library(data.table)
 bc_tasmax <- raster::brick("../../../climR-data/BC/tasmax_mClimMean_PRISM_historical_19710101-20001231.nc")
 bc_tasmin <- raster::brick("../../../climR-data/BC/tasmin_mClimMean_PRISM_historical_19710101-20001231.nc")
 bc_pr <- raster::brick("../../../climR-data/BC/pr_mClimMean_PRISM_historical_19710101-20001231.nc")
-mat <- raster::brick("C:/Users/nicol/OneDrive/Documents/GitHub/climR-data/BC/map_1961-1990.tif")
+mat <- raster::brick("../../../climR-data/BC/map_1961-1990.tif")
 rat <- subset(mat, 1)
 pal <- colorNumeric(c("#0C2C84", "#41B6C4", "#FFFFCC"), values(rat),
                     na.color = "transparent")
