@@ -37,14 +37,14 @@ shinyUI(
           br(),
           br(),
           br(),
-          box(
-            title = "Seasonal Variables",
-            width = 12,
-            DTOutput(outputId = "seasonal_dt")
-          ),
-          br(),
-          br(),
-          br(),
+          # box(
+          #   title = "Seasonal Variables",
+          #   width = 12,
+          #   DTOutput(outputId = "seasonal_dt")
+          # ),
+          # br(),
+          # br(),
+          # br(),
           tabBox(
             title = "Monthly Variables",
             side = 'right',

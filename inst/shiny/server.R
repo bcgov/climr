@@ -26,8 +26,8 @@ iris_dt[, month := 1:12]
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
   
-  downscale_clim_info <- reactive({
-    xy_coords <- cbind(c(input$longitude), input$latitude)
+  downscale_monthly <- reactive({
+    xy_coords <- coord()
     bilinear_values <- lapply(list(pr = bc_pr,
                                    tasmin = bc_tasmin,
                                    tasmax = bc_tasmax),
@@ -51,8 +51,13 @@ shinyServer(function(input, output, session) {
     return(monthly_values[ , lapply(.SD, function(x) round(x, 1))])
   })
   
+  downscale_annualy <- reactive({
+    return(downscale_monthly()[ , lapply(.SD, function(x) round(mean(x),1))][ , -1])
+  })
+  
+  
   output$annual_dt <- renderDT({
-    datatable(iris_dt[1],
+    datatable(downscale_annualy(),
               rownames = FALSE,
               options=list(iDisplayLength=1,
                            bLengthChange=0,
@@ -66,21 +71,21 @@ shinyServer(function(input, output, session) {
               )
   })
   
-  output$seasonal_dt <- renderDT({
-    datatable(iris_dt[1],
-              rownames = FALSE,
-              options=list(iDisplayLength=1,
-                           bLengthChange=0,
-                           bFilter=0,
-                           bInfo=0,
-                           bPaginate = 0,
-                           initComplete = JS("function(settings, json) {$(this.api().table().header()).css({'background-color' : '#3c8dbc', 'color' : 'white'});}")
-                           )
-    )
-  })
+  # output$seasonal_dt <- renderDT({
+  #   datatable(iris_dt[1],
+  #             rownames = FALSE,
+  #             options=list(iDisplayLength=1,
+  #                          bLengthChange=0,
+  #                          bFilter=0,
+  #                          bInfo=0,
+  #                          bPaginate = 0,
+  #                          initComplete = JS("function(settings, json) {$(this.api().table().header()).css({'background-color' : '#3c8dbc', 'color' : 'white'});}")
+  #                          )
+  #   )
+  # })
 
   output$monthly_dt <- renderDT({
-    datatable(downscale_clim_info(),
+    datatable(downscale_monthly(),
               rownames = FALSE,
               options=list(iDisplayLength=12,
                            bLengthChange=0,
@@ -96,9 +101,9 @@ shinyServer(function(input, output, session) {
 
   monthly_plots <- list()
   i <- 1
-    for (variable in names(downscale_clim_info())) {
-      if (class(downscale_clim_info()[[variable]]) == "numeric" & variable != "month") {
-        monthly_plots[[i]] <- plot_ly(x = downscale_clim_info()[["month"]], y = downscale_clim_info()[[variable]], type = 'scatter', mode = 'lines+markers', name = variable)
+    for (variable in names(downscale_monthly())) {
+      if (class(downscale_monthly()[[variable]]) == "numeric" & variable != "month") {
+        monthly_plots[[i]] <- plot_ly(x = downscale_monthly()[["month"]], y = downscale_monthly()[[variable]], type = 'scatter', mode = 'lines+markers', name = variable)
         i <- i + 1
       }
      
@@ -112,17 +117,26 @@ shinyServer(function(input, output, session) {
       addRasterImage(rat, colors = pal, opacity = 0.8) |>
       addLegend(pal = pal, values = values(rat),
                 title = "mat_1961-1990") |>
-      setView(lng = -125.222385126562, lat = 54.2914890653002, zoom = 6)
+      setView(lng = -125.222385126562, lat = 54.2914890653002, zoom = 6) |>
+      addMarkers(lng = -115.02, lat = 48.98)
   })
   
   map_proxy <- leafletProxy("map")
   
   observeEvent(input$map_click, {
     click <- input$map_click
-    map_proxy |> clearMarkers()
-    map_proxy |> addMarkers(lng = click$lng, lat = click$lat)
+
     updateNumericInput(session, "latitude", value = click$lat)
     updateNumericInput(session, "longitude", value = click$lng)
+  })
+  
+  coord <- reactive({
+    cbind(input$longitude, input$latitude)
+  })
+  
+  observeEvent(coord(), {
+    map_proxy |> clearMarkers()
+    map_proxy |> addMarkers(lng = coord()[1], lat = coord()[2])
   })
   
 
