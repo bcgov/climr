@@ -108,10 +108,11 @@ shinyServer(function(input, output, session) {
   
   
   output$map <- renderLeaflet({
-    leaflet() %>% addTiles() %>%
-      addRasterImage(rat, colors = pal, opacity = 0.8) %>%
+    leaflet() |> addTiles() |>
+      addRasterImage(rat, colors = pal, opacity = 0.8) |>
       addLegend(pal = pal, values = values(rat),
-                title = "mat_1961-1990")
+                title = "mat_1961-1990") |>
+      setView(lng = -125.222385126562, lat = 54.2914890653002, zoom = 6)
   })
   
   map_proxy <- leafletProxy("map")
