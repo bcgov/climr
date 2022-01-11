@@ -12,7 +12,11 @@ library(DT)
 library(raster) 
 library(data.table)
 
-mat <- raster::brick("C:/Users/nicol/OneDrive/Documents/GitHub/climR-data/BC/mat_1961-1990.tif")
+
+bc_tasmax <- raster::brick("../../../climR-data/BC/tasmax_mClimMean_PRISM_historical_19710101-20001231.nc")
+bc_tasmin <- raster::brick("../../../climR-data/BC/tasmin_mClimMean_PRISM_historical_19710101-20001231.nc")
+bc_pr <- raster::brick("../../../climR-data/BC/pr_mClimMean_PRISM_historical_19710101-20001231.nc")
+mat <- raster::brick("C:/Users/nicol/OneDrive/Documents/GitHub/climR-data/BC/map_1961-1990.tif")
 rat <- subset(mat, 1)
 pal <- colorNumeric(c("#0C2C84", "#41B6C4", "#FFFFCC"), values(rat),
                     na.color = "transparent")
@@ -21,6 +25,31 @@ iris_dt <- as.data.table(iris)[1:12]
 iris_dt[, month := 1:12]
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
+  
+  downscale_clim_info <- reactive({
+    xy_coords <- cbind(c(input$longitude), input$latitude)
+    bilinear_values <- lapply(list(pr = bc_pr,
+                                   tasmin = bc_tasmin,
+                                   tasmax = bc_tasmax),
+                              raster:::.bilinearValue,
+                              xyCoords = xy_coords)
+    monthly_values <- lapply(bilinear_values, t)
+    monthly_values <- data.table(month = 1:12,
+                                 monthly_values$pr,
+                                 monthly_values$tasmin,
+                                 monthly_values$tasmax)
+    setnames(monthly_values, c("month", "pr", "tasmin", "tasmax"))
+    set(monthly_values, j = "Tavg", value = (monthly_values$tasmin + monthly_values$tasmax )/2)
+    set(monthly_values, j = "DD_below_0", value = calc_DD_below_0(monthly_values$month, tm = monthly_values$Tavg))
+    set(monthly_values, j = "DD_above_5", value = calc_DD_above_5(monthly_values$month, tm = monthly_values$Tavg, region = "West"))
+    set(monthly_values, j = "DD_below_18", value = calc_DD_below_18(monthly_values$month, tm = monthly_values$Tavg))
+    set(monthly_values, j = "DD_above_18", value = calc_DD_above_18(monthly_values$month, tm = monthly_values$Tavg, region = "The rest"))
+    set(monthly_values, j = "RH", value = calc_RH(monthly_values$tasmin, monthly_values$tasmax))
+    set(monthly_values, j = "RH", value = calc_RH(monthly_values$tasmin, monthly_values$tasmax))
+    set(monthly_values, j = "NFFD", value = calc_NFFD(1:12, tm = monthly_values$tasmin))
+    set(monthly_values, j = "PAS", value = calc_PAS(1:12, tm = monthly_values$tasmin))
+    return(monthly_values[ , lapply(.SD, function(x) round(x, 1))])
+  })
   
   output$annual_dt <- renderDT({
     datatable(iris_dt[1],
@@ -51,7 +80,7 @@ shinyServer(function(input, output, session) {
   })
 
   output$monthly_dt <- renderDT({
-    datatable(iris_dt,
+    datatable(downscale_clim_info(),
               rownames = FALSE,
               options=list(iDisplayLength=12,
                            bLengthChange=0,
@@ -64,14 +93,15 @@ shinyServer(function(input, output, session) {
   })
   
   output$monthly_subplot <- renderPlotly({
+
   monthly_plots <- list()
   i <- 1
-    for (variable in names(iris_dt)) {
-      if (class(iris_dt[[variable]]) == "numeric" & variable != "month") {
-        monthly_plots[[i]] <- plot_ly(x = iris_dt[["month"]], y = iris_dt[[variable]], type = 'scatter', mode = 'lines+markers', name = variable)
-          
+    for (variable in names(downscale_clim_info())) {
+      if (class(downscale_clim_info()[[variable]]) == "numeric" & variable != "month") {
+        monthly_plots[[i]] <- plot_ly(x = downscale_clim_info()[["month"]], y = downscale_clim_info()[[variable]], type = 'scatter', mode = 'lines+markers', name = variable)
+        i <- i + 1
       }
-      i <- i + 1
+     
     }
   subplot(monthly_plots, nrows = 4)
   })
@@ -84,11 +114,12 @@ shinyServer(function(input, output, session) {
                 title = "mat_1961-1990")
   })
   
+  map_proxy <- leafletProxy("map")
   
   observeEvent(input$map_click, {
     click <- input$map_click
-    leafletProxy("map") |> clearMarkers()
-    leafletProxy("map") |> addMarkers(lng = click$lng, lat = click$lat)
+    map_proxy |> clearMarkers()
+    map_proxy |> addMarkers(lng = click$lng, lat = click$lat)
     updateNumericInput(session, "latitude", value = click$lat)
     updateNumericInput(session, "longitude", value = click$lng)
   })
