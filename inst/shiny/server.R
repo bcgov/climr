@@ -117,7 +117,7 @@ shinyServer(function(input, output, session) {
       addRasterImage(rat, colors = pal, opacity = 0.8) |>
       addLegend(pal = pal, values = values(rat),
                 title = "mat_1961-1990") |>
-      setView(lng = -125.222385126562, lat = 54.2914890653002, zoom = 6) |>
+      setView(lng = -125.222385126562, lat = 54.2914890653002, zoom = 5) |>
       addMarkers(lng = -115.02, lat = 48.98)
   })
   
