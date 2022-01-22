@@ -11,10 +11,10 @@
 #' 
 calc_PAS <- function(m, tm) {
   
-  match_lines <- match(m, param$pas$Month)
+  match_lines <- match(m, param$PAS$Month)
   
-  b <- param$pas$b[match_lines]
-  t0 <- param$pas$T0[match_lines]
+  b <- param$PAS$b[match_lines]
+  t0 <- param$PAS$T0[match_lines]
   
   1/(1 + exp(-(tm - t0)/b))
 }
