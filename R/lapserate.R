@@ -1,64 +1,9 @@
-if (!requireNamespace("raster", quietly = TRUE)) {
-  install.packages("raster")
-}
-
-if (!requireNamespace("parallel", quietly = TRUE)) {
-  install.packages("parallel")
-}
-
-library(raster)
-library(parallel)
-
-# This is going to be ~slow, optimizations will be done in C/C++
-# once we validate and if required. Although there isn't much to
-# be optimized beside multithreading it.
-
-# lapse rate ----
-
-dem <- raster::raster("./inputs/digitalElevationModel/dem2_WNA.asc")
-
-# do it for all 36 variables
-targets <- list(
-  Tmax01 = raster::raster("./inputs/Normal_1961_1990MP/Tmax01.asc"),
-  Tmax02 = raster::raster("./inputs/Normal_1961_1990MP/Tmax02.asc"),
-  Tmax03 = raster::raster("./inputs/Normal_1961_1990MP/Tmax03.asc"),
-  Tmax04 = raster::raster("./inputs/Normal_1961_1990MP/Tmax04.asc"),
-  Tmax05 = raster::raster("./inputs/Normal_1961_1990MP/Tmax05.asc"),
-  Tmax06 = raster::raster("./inputs/Normal_1961_1990MP/Tmax06.asc"),
-  Tmax07 = raster::raster("./inputs/Normal_1961_1990MP/Tmax07.asc"),
-  Tmax08 = raster::raster("./inputs/Normal_1961_1990MP/Tmax08.asc"),
-  Tmax09 = raster::raster("./inputs/Normal_1961_1990MP/Tmax09.asc"),
-  Tmax10 = raster::raster("./inputs/Normal_1961_1990MP/Tmax10.asc"),
-  Tmax11 = raster::raster("./inputs/Normal_1961_1990MP/Tmax11.asc"),
-  Tmax12 = raster::raster("./inputs/Normal_1961_1990MP/Tmax12.asc"),
-  Tmin01 = raster::raster("./inputs/Normal_1961_1990MP/Tmin01.asc"),
-  Tmin02 = raster::raster("./inputs/Normal_1961_1990MP/Tmin02.asc"),
-  Tmin03 = raster::raster("./inputs/Normal_1961_1990MP/Tmin03.asc"),
-  Tmin04 = raster::raster("./inputs/Normal_1961_1990MP/Tmin04.asc"),
-  Tmin05 = raster::raster("./inputs/Normal_1961_1990MP/Tmin05.asc"),
-  Tmin06 = raster::raster("./inputs/Normal_1961_1990MP/Tmin06.asc"),
-  Tmin07 = raster::raster("./inputs/Normal_1961_1990MP/Tmin07.asc"),
-  Tmin08 = raster::raster("./inputs/Normal_1961_1990MP/Tmin08.asc"),
-  Tmin09 = raster::raster("./inputs/Normal_1961_1990MP/Tmin09.asc"),
-  Tmin10 = raster::raster("./inputs/Normal_1961_1990MP/Tmin10.asc"),
-  Tmin11 = raster::raster("./inputs/Normal_1961_1990MP/Tmin11.asc"),
-  Tmin12 = raster::raster("./inputs/Normal_1961_1990MP/Tmin12.asc"),
-  PPT01  = raster::raster("./inputs/Normal_1961_1990MP/PPT01.asc"),
-  PPT02  = raster::raster("./inputs/Normal_1961_1990MP/PPT02.asc"),
-  PPT03  = raster::raster("./inputs/Normal_1961_1990MP/PPT03.asc"),
-  PPT04  = raster::raster("./inputs/Normal_1961_1990MP/PPT04.asc"),
-  PPT05  = raster::raster("./inputs/Normal_1961_1990MP/PPT05.asc"),
-  PPT06  = raster::raster("./inputs/Normal_1961_1990MP/PPT06.asc"),
-  PPT07  = raster::raster("./inputs/Normal_1961_1990MP/PPT07.asc"),
-  PPT08  = raster::raster("./inputs/Normal_1961_1990MP/PPT08.asc"),
-  PPT09  = raster::raster("./inputs/Normal_1961_1990MP/PPT09.asc"),
-  PPT10  = raster::raster("./inputs/Normal_1961_1990MP/PPT10.asc"),
-  PPT11  = raster::raster("./inputs/Normal_1961_1990MP/PPT11.asc"),
-  PPT12  = raster::raster("./inputs/Normal_1961_1990MP/PPT12.asc")
-)
-
 # Recycle the borders of matrix to expand the matrix by one cell in each directions
 # It will help later when we use the offset method.
+#' @param mat A matrix to recycle borders from.
+#' @param nr The number of rows in the matrix.
+#' @param nc The number of columns in the matrix.
+#' @noRd
 recycle_borders <- function(mat, nr, nc) {
   
   res <- matrix(nrow = nr + 2L, ncol = nc + 2L)
@@ -93,6 +38,7 @@ recycle_borders <- function(mat, nr, nc) {
 # This returns a single matrix containing the sums of matching row, cell
 # in the list of matrices.
 #' @param x A list of matrices of the same dimensions
+#' @noRd
 Σ <- function(x) {
   Reduce(`+`, x)
 }
@@ -102,6 +48,7 @@ recycle_borders <- function(mat, nr, nc) {
 #' @param x A list of matrices of the same dimensions.
 #' @param y A list of matrices of the same dimensions as x and the same
 #' length as x.
+#' @noRd
 Π <- function(x, y) {
   mapply(`*`, x, y, SIMPLIFY = FALSE)
 }
@@ -111,6 +58,7 @@ recycle_borders <- function(mat, nr, nc) {
 #' @param x A list of matrices of the same dimensions.
 #' @param y A list of matrices of the same dimensions as x and the same
 #' length as x.
+#' @noRd
 Δ <- function(x, y) {
   mapply(`-`, x, y, SIMPLIFY = FALSE)
 }
@@ -119,6 +67,7 @@ recycle_borders <- function(mat, nr, nc) {
 # matrix, row, cell
 #' @param x A list of matrices.
 #' @param exp A numeric vector of length 1.
+#' @noRd
 sup <- function(x, exp) {
   lapply(x, `^`, exp)
 }
@@ -127,6 +76,7 @@ sup <- function(x, exp) {
 # a pre-calculated β matrix.
 #' @param x A list of matrices of the same dimensions.
 #' @param β A matrix of the same dimensions as a matrix in x.
+#' @noRd
 fitted <- function(x, β) {
   lapply(x, function(x) x*β)
 }
@@ -137,6 +87,7 @@ fitted <- function(x, β) {
 #' @param mat A matrix previously ran through `recycle_borders`
 #' @param nr The number of rows in the original matrix used by `recycle_borders`
 #' @param nc The number of columns in the original matrix used by `recycle_borders`
+#' @noRd
 deltas <- function(mat, nr, nc) {
   ref <- mat[c(-1L,-(nr+2L)), c(-1L,-(nc+2L))]
   return(
@@ -153,7 +104,7 @@ deltas <- function(mat, nr, nc) {
   )
 }
 
-# Lapse rate computation
+#' Lapse rate computation
 #' @param dem A digital elevation model rasterLayer.
 #' @param targets A list of target raster Layers to compute lapse rates for.
 #' @param replace_NaN A boolean. Should NaN lapse rates be replaced by zeros. Default to TRUE.
@@ -168,6 +119,9 @@ deltas <- function(mat, nr, nc) {
 #' R² = mss / (mss + rss)
 #' Lapse rate = βR²
 #' @return Lapse rate values.
+#' @import raster
+#' @importFrom parallel detectCores mclapply
+#' @export
 lapse_rate <- function(dem, targets, replace_NaN = TRUE, as_raster = FALSE, use_parallel = FALSE) {
   
   if (!all(vapply(targets, raster::compareRaster, logical(1), dem))) {
@@ -185,7 +139,7 @@ lapse_rate <- function(dem, targets, replace_NaN = TRUE, as_raster = FALSE, use_
   # Number of surrounding cells
   n <- length(x)
   # Sums of x squared
-  sum_xx <- Σ(Π(x,x))
+  sum_xx <- Σ(sup(x,2))
   
   # For the lapse rate, x is the elevation, and y is the target
   lapse_rate_redux <- function(target, x, nr, nc, n, sum_xx, replace_NaN, as_raster) {
@@ -207,7 +161,7 @@ lapse_rate <- function(dem, targets, replace_NaN = TRUE, as_raster = FALSE, use_
     # We can combine the resulting matrices to get the
     # coefficient of determination and multiply by β
     lapse_rate <- β * mss / (mss + rss)
-  
+    
     if (isTRUE(replace_NaN)) {
       lapse_rate[is.nan(lapse_rate)] <- 0L  
     }
@@ -218,7 +172,7 @@ lapse_rate <- function(dem, targets, replace_NaN = TRUE, as_raster = FALSE, use_
       attr(lapse_rate, "extent") <- attr(dem, "extent")
       # plot(lapse_rate)
     }
-  
+    
     return(lapse_rate)
     
   }
@@ -230,18 +184,11 @@ lapse_rate <- function(dem, targets, replace_NaN = TRUE, as_raster = FALSE, use_
     func <- lapply
   }
   
-  return(func(targets, lapse_rate_redux, x, nr, nc, n, sum_xx, replace_NaN, as_raster))
+  res <- func(targets, lapse_rate_redux, x, nr, nc, n, sum_xx, replace_NaN, as_raster)
+  if (length(targets) > 1 & isTRUE(as_raster)) {
+    res <- raster::brick(res)
+  }
   
-}
-
-lapse_rates <- lapse_rate(dem, targets, use_parallel = TRUE, as_raster = TRUE)
-
-for (r in seq_len(length(lapse_rates))) {
-  raster::writeRaster(
-    x = as.integer(lapse_rates[[r]] * 1000L),
-    filename = sprintf("./inputs/lapseRates/LRx1000_%s.asc", names(lapse_rates)[r]),
-    overwrite = TRUE,
-    format="ascii",
-    options=c("INTERLEAVE=BAND","COMPRESS=LZW")
-  )
+  return(res)
+  
 }

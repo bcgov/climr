@@ -1,14 +1,8 @@
-setClass("basepoints", slots = c(
-    latitude = "numeric",
-    longitude = "numeric",
-    elevation = "numeric",
-    historical = "character",
-    future = "character"))
-
-setGeneric("downscale", function(latitude, longitude, elevation, historical, future) {latitude})
-
-method.skeleton("downscale", "basepoint")
-
-setMethod("downscale", signature = c(latitude = "numeric", longitude = "numeric", 
-                                     elevation = "numeric", historical = "character", future = "character"), 
-          function(latitude, longitude, elevation, historical, future){latitude})
+downscale <- function(object, xy, dem, elev = NULL, lapse_rates = TRUE, extra = TRUE, dem = TRUE) {
+  res <- raster::extract(object, xy, method = "bilinear")
+  elev_delta <- elev - raster::extract(dem, xy, method = "simple")
+  lr <- elev_delta * raster::extract(lapse_rates, xy)
+  res+lr
+  # Compute derivatives
+}
+  
