@@ -1,11 +1,12 @@
 # Recycle the borders of matrix to expand the matrix by one cell in each directions
-# It will help later when we use the offset method.
+# It will help later with the offset approach.
 #' @param mat A matrix to recycle borders from.
 #' @param nr The number of rows in the matrix.
 #' @param nc The number of columns in the matrix.
 #' @noRd
 recycle_borders <- function(mat, nr, nc) {
   
+  # Instantiate an extended border representation
   res <- matrix(nrow = nr + 2L, ncol = nc + 2L)
   
   # Fill the representation starting with the original data in the center
@@ -44,7 +45,7 @@ recycle_borders <- function(mat, nr, nc) {
 }
 
 # This returns a list of matrices corresponding to the products of
-# individual matching row, cell from each x matrices and y matrices
+# individual corresponding cells from each x matrices and y matrices
 #' @param x A list of matrices of the same dimensions.
 #' @param y A list of matrices of the same dimensions as x and the same
 #' length as x.
@@ -54,7 +55,7 @@ recycle_borders <- function(mat, nr, nc) {
 }
 
 # This returns a list of matrices corresponding to the differences of
-# individual matching row, cell from each x matrices and y matrices
+# individual corresponding cells from each x matrices and y matrices
 #' @param x A list of matrices of the same dimensions.
 #' @param y A list of matrices of the same dimensions as x and the same
 #' length as x.
@@ -64,7 +65,7 @@ recycle_borders <- function(mat, nr, nc) {
 }
 
 # This returns a list of matrices after applying exponent `exp` to each
-# matrix, row, cell
+# matrix cells
 #' @param x A list of matrices.
 #' @param exp A numeric vector of length 1.
 #' @noRd
@@ -87,30 +88,44 @@ fitted <- function(x, β) {
 #' @param mat A matrix previously ran through `recycle_borders`
 #' @param nr The number of rows in the original matrix used by `recycle_borders`
 #' @param nc The number of columns in the original matrix used by `recycle_borders`
+#' @param NA_replace A boolean. Should NA delta results be replaced by zeros. Default to TRUE.
 #' @noRd
-deltas <- function(mat, nr, nc) {
+deltas <- function(mat, nr, nc, NA_replace = TRUE) {
+
+  # Reference values
   ref <- mat[c(-1L,-(nr+2L)), c(-1L,-(nc+2L))]
+  
+  # Surrounding values
+  res <- list(
+    northwest = NArep(mat[-(nr + 1L):-(nr + 2L), -(nc + 1L):-(nc + 2L)] - ref),
+    north     = NArep(mat[-(nr + 1L):-(nr + 2L), c(-1L,-(nc + 2L))] - ref),
+    northeast = NArep(mat[-(nr + 1L):-(nr + 2L), -1L:-2L] - ref),
+    east      = NArep(mat[c(-1L,-(nr + 2L)), -1L:-2L] - ref),
+    southeast = NArep(mat[-1L:-2L, -1L:-2L] - ref),
+    south     = NArep(mat[-1L:-2L, c(-1L,-(nc + 2L))] - ref),
+    southwest = NArep(mat[-1L:-2L, -(nc + 1L):-(nc + 2L)] - ref),
+    west      = NArep(mat[c(-1L,-(nr + 2L)), -(nc + 1L):-(nc + 2L)] - ref)
+  )
+  
+  # Replace NA/NaN by 0
+  # Only the deltas are replaced by 0.
+  NArep <- function(x) {
+    x[is.na(x)] <- 0L
+    return(x)
+  }
+  if (isTRUE(NA_replace)) {
+    res <- lapply(res, NArep)
+  }
   return(
-    list(
-      northwest = mat[-(nr + 1L):-(nr + 2L), -(nc + 1L):-(nc + 2L)] - ref,
-      north = mat[-(nr + 1L):-(nr + 2L), c(-1L,-(nc + 2L))] - ref,
-      northeast = mat[-(nr + 1L):-(nr + 2L), -1L:-2L] - ref,
-      east = mat[c(-1L,-(nr + 2L)), -1L:-2L] - ref,
-      southeast = mat[-1L:-2L, -1L:-2L] - ref,
-      south = mat[-1L:-2L, c(-1L,-(nc + 2L))] - ref,
-      southwest = mat[-1L:-2L, -(nc + 1L):-(nc + 2L)] - ref,
-      west = mat[c(-1L,-(nr + 2L)), -(nc + 1L):-(nc + 2L)] - ref
-    )
+    
   )
 }
 
 #' Lapse rate computation
-#' @param targets A list of target SpatRaster object to compute lapse rates for.
-#' @param dem A digital elevation model SpatRaster.
-#' @param replace_NaN A boolean. Should NaN lapse rates be replaced by zeros. Default to TRUE.
-#' @param use_parallel A boolean. Should parallel::mclapply be used. Default to FALSE.
-#' @param rasterize Return an object of the same class as targets and dem.
-#' with the same extend as the digital elevation model.
+#' @param target Target rasters to compute lapse rates for. Build with this package functions.
+#' @param NA_replace A boolean. Should NA lapse rate results be replaced by zeros. Default to TRUE.
+#' @param use_parallel A boolean. Should parallel::mclapply be used. Default to TRUE.
+#' @param rasterize Return an object of the same class category as target with the same extend.
 #' @details Formulas
 #' Simple linear regression without the intercept term
 #' β = Σxy / Σx²
@@ -119,110 +134,38 @@ deltas <- function(mat, nr, nc) {
 #' R² = mss / (mss + rss)
 #' Lapse rate = βR²
 #' @return Lapse rate values.
-#' @import terra
+#' @import terra raster
 #' @importFrom parallel detectCores mclapply
 #' @export
-setGeneric("lapse_rate",
-  def = function(targets, dem, replace_NaN = TRUE, use_parallel = FALSE, rasterize = TRUE) standardGeneric("lapse_rate")
-)
-
-#' @noRd
-#' @usage NULL
-lapse_rate_terra <- function(targets, dem, replace_NaN = TRUE, use_parallel = FALSE, rasterize = TRUE) {
+lapse_rate <- function(target, NA_replace = TRUE, use_parallel = TRUE, rasterize = TRUE) {
   
-  if (!all(vapply(targets, terra::compareGeom, logical(1), dem))) {
-    stop("Target SpatRaster do not share the same extent, number of rows and columns, projection, resolution and origin as the digital elevation model SpatRaster.")
+  # Make sure target was build using this package functions
+  if (attr(target, "builder") != "climRpnw") {
+    stop("Please use this package functions to create `target`. Read `?lapse_rate` for details.")
   }
   
-  # Compute everything related to the dem and independant of targets
-  x <- matrix(as.numeric(dem), byrow = TRUE, nrow = terra::nrow(dem))
-  nr <- terra::nrow(dem)
-  nc <- terra::ncol(dem)
-  # Expand and recycle borders
-  x <- recycle_borders(x, nr, nc)
-  # Compute surrounding cells deltas
-  x <- deltas(x, nr, nc)
-  # Number of surrounding cells
-  n <- length(x)
-  # Sums of x squared
-  sum_xx <- Σ(sup(x,2))
+  # Retrieve digital elevation model from attributes
+  dem <- attr(target, "dem")
+  # Transform target to list
+  target <- as_list(target)
   
-  # For the lapse rate, x is the elevation, and y is the target
-  lapse_rate_redux <- function(target, x, nr, nc, n, sum_xx, replace_NaN) {
-    
-    y <- matrix(as.numeric(target), byrow = TRUE, nrow = nr)
-    # Expand and recycle borders
-    y <- recycle_borders(y, nr, nc)
-    # Compute surrounding cells deltas
-    y <- deltas(y, nr, nc)
-    # This is the regression coefficient matrix
-    β <- Σ(Π(x,y)) / sum_xx
-    # We need the fitted values to compute the
-    # coefficient of determination
-    f <- fitted(x, β)
-    # We use the same approach as stats::summary.lm
-    # applied to a list matrices
-    mss <- Σ(sup(f,2))
-    rss <- Σ(sup(Δ(y,f),2))
-    # We can combine the resulting matrices to get the
-    # coefficient of determination and multiply by β
-    lapse_rate <- β * mss / (mss + rss)
-    
-    if (isTRUE(replace_NaN)) {
-      lapse_rate[is.nan(lapse_rate)] <- 0L  
-    }
-    
-    # And we can return the lapse rate
-    return(lapse_rate)
-    
-  }
-  
-  if (isTRUE(use_parallel)) {
-    options("mc.cores" = min(4L, parallel::detectCores(logical = FALSE) - 1L))
-    func <- parallel::mclapply
-  } else {
-    func <- lapply
-  }
-  
-  res <- func(targets, lapse_rate_redux, x, nr, nc, n, sum_xx, replace_NaN)
-  
-  if (isTRUE(rasterize)) {
-    res <- terra::rast(lapply(res, terra::rast, extent = terra::ext(dem)))
-  }
-  
-  return(res)
-  
-}
-
-#' @rdname lapse_rate
-#' @export
-setMethod("lapse_rate", signature("list", "SpatRaster"), lapse_rate_terra)
-
-#' @noRd
-#' @usage NULL
-lapse_rate_raster <- function(targets, dem, replace_NaN = TRUE, use_parallel = FALSE, rasterize = TRUE) {
-  
-  if (!all(vapply(targets, raster::compareRaster, logical(1), dem))) {
-    stop("Target SpatRaster do not share the same extent, number of rows and columns, projection, resolution and origin as the digital elevation model SpatRaster.")
-  }
-  
-  # Compute everything related to the dem and independant of targets
-  x <- as.matrix(dem)
+  # Compute everything related to the dem and independant of target
   nr <- nrow(dem)
   nc <- ncol(dem)
+  x <- as_matrix(dem)
   # Expand and recycle borders
   x <- recycle_borders(x, nr, nc)
   # Compute surrounding cells deltas
-  x <- deltas(x, nr, nc)
+  x <- deltas(x, nr, nc, NA_replace)
   # Number of surrounding cells
   n <- length(x)
   # Sums of x squared
   sum_xx <- Σ(sup(x,2))
   
   # For the lapse rate, x is the elevation, and y is the target
-  lapse_rate_redux <- function(target, x, nr, nc, n, sum_xx, replace_NaN) {
+  lapse_rate_redux <- function(r, x, nr, nc, n, sum_xx, NA_replace) {
     
-    y <- as.matrix(target)
+    y <- as_matrix(r)
     # Expand and recycle borders
     y <- recycle_borders(y, nr, nc)
     # Compute surrounding cells deltas
@@ -240,7 +183,7 @@ lapse_rate_raster <- function(targets, dem, replace_NaN = TRUE, use_parallel = F
     # coefficient of determination and multiply by β
     lapse_rate <- β * mss / (mss + rss)
     
-    if (isTRUE(replace_NaN)) {
+    if (isTRUE(NA_replace)) {
       lapse_rate[is.nan(lapse_rate)] <- 0L  
     }
     
@@ -250,24 +193,25 @@ lapse_rate_raster <- function(targets, dem, replace_NaN = TRUE, use_parallel = F
   }
   
   if (isTRUE(use_parallel)) {
-    options("mc.cores" = min(4L, parallel::detectCores(logical = FALSE) - 1L))
+    # Store current option value
+    cur_value <- getOption("mc.cores")
+    # Restore value on function exit
+    on.exit(options("mc.cores" = cur_value), add = TRUE)
+    # Set option value for the rest of the function execution
+    options("mc.cores" = parallel::detectCores(logical = FALSE) - 1L)
+    # Use parallel lapply
     func <- parallel::mclapply
   } else {
+    # Use regular lapply
     func <- lapply
   }
   
-  res <- func(targets, lapse_rate_redux, x, nr, nc, n, sum_xx, replace_NaN)
+  res <- func(target, lapse_rate_redux, x, nr, nc, n, sum_xx, NA_replace)
   
   if (isTRUE(rasterize)) {
-    res <- lapply(res, raster::raster)
-    raster::extent(res) <- raster::extent(res)
-    res <- raster::brick(res)
+    res <- to_raster(res, dem)
   }
   
   return(res)
   
 }
-
-#' @rdname lapse_rate
-#' @export
-setMethod("lapse_rate", signature("list", "RasterLayer"), lapse_rate_raster)
