@@ -8,7 +8,8 @@ dem <- terra::rast("./inputs/digitalElevationModel/dem2_WNA.asc")
 
 # do it for all 36 variables
 targets <- list(
-  Tmax01 = terra::rast("./inputs/Normal_1961_1990MP/Tmax01.asc"),
+  Tmax01 = terra::rast("./inputs/Normal_1961_1990MP/Tmax01.asc")
+  ,
   Tmax02 = terra::rast("./inputs/Normal_1961_1990MP/Tmax02.asc"),
   Tmax03 = terra::rast("./inputs/Normal_1961_1990MP/Tmax03.asc"),
   Tmax04 = terra::rast("./inputs/Normal_1961_1990MP/Tmax04.asc"),
@@ -46,7 +47,7 @@ targets <- list(
   PPT12  = terra::rast("./inputs/Normal_1961_1990MP/PPT12.asc")
 )
 
-object <- lapse_rate(targets, dem, use_parallel = TRUE, replace_NaN = FALSE, rasterize = TRUE)
+object_r <- lapse_rate(targets, dem, use_parallel = TRUE, rasterize = FALSE, replace_NaN = TRUE)
 
 
 # raster compare
@@ -55,7 +56,8 @@ dem <- raster::raster("./inputs/digitalElevationModel/dem2_WNA.asc")
 
 # do it for all 36 variables
 targets <- list(
-  Tmax01 = raster::raster("./inputs/Normal_1961_1990MP/Tmax01.asc"),
+  Tmax01 = raster::raster("./inputs/Normal_1961_1990MP/Tmax01.asc")
+  ,
   Tmax02 = raster::raster("./inputs/Normal_1961_1990MP/Tmax02.asc"),
   Tmax03 = raster::raster("./inputs/Normal_1961_1990MP/Tmax03.asc"),
   Tmax04 = raster::raster("./inputs/Normal_1961_1990MP/Tmax04.asc"),
@@ -93,7 +95,7 @@ targets <- list(
   PPT12  = raster::raster("./inputs/Normal_1961_1990MP/PPT12.asc")
 )
 
-object2 <- lapse_rate(targets, dem, use_parallel = TRUE, replace_NaN = FALSE, rasterize = TRUE)
+object2_r <- lapse_rate(targets, dem, use_parallel = TRUE, rasterize = FALSE, replace_NaN = TRUE)
 
 
 
@@ -106,3 +108,10 @@ terra::writeRaster(
   overwrite = TRUE,
   datatype = "FLT4S"
 )
+
+as.numeric(object_r[[1]][1:1260,1:1920][[1]])[c(1256703,1258622,1258624,1260543)]
+as.numeric(object2_r[[1]][1:1260,1:1920])[c(1256703,1258622,1258624,1260543)]
+as.numeric(t(object2[[1]][1:1260,1:1920]))[c(1256703,1258622,1258624,1260543)]
+
+as.numeric(t(dem_raster[1:1260,1:1920]))[c(1256703,1258622,1258624,1260543)]
+as.numeric(t(dem_terra[1:1260,1:1920]))[c(1256703,1258622,1258624,1260543)]
