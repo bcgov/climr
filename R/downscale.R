@@ -30,6 +30,7 @@ downscale <- function(xyz, historical, future = NULL, variables, grouping = c("m
   
 }
 
+setGeneric("extract_", def = function(x, pts, method, ...) standardGeneric("extract_"))
 
 # Extract from raster
 #' @noRd

@@ -18,6 +18,13 @@ cache_delete <- function() {
   unlink(cache_dir(), recursive = TRUE)
 }
 
+#' Check if package local cache exists
+#' @rdname cache
+#' @export
+cache_exists <- function() {
+  file.exists(cache_path())
+}
+
 #' List package local cache files
 #' @rdname cache
 #' @export
@@ -30,7 +37,7 @@ cache_list <- function() {
 #' @noRd
 cache_ask <- function() {
   # Only ask if cache does not already exists
-  if (!file.exists(cache_path())) {
+  if (!cache_exists()) {
     response <- utils::askYesNo("Is it ok to cache climRpnw raster files locally?")
     if (is.na(response)) {
       stop("Cancelled by user.", call. = FALSE)
