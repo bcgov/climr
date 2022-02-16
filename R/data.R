@@ -54,25 +54,19 @@ data_update <- function(quiet = interactive()) {
   gcm <- getOption("climRpnw.gcm.path", default = "inputs/gcmData")
   normal <- getOption("climRpnw.normal.path", default = "inputs/Normal_1961_1990MP")
   
-  tryCatch({
-    # Retrieve digital elevation models data
-    data_gh(files = content_get(org, repo, dem), quiet = quiet)
-    
-    # Retrieve gcm data
-    data_gh(files = content_get(org, repo, gcm), quiet = quiet)
-    
-    # Retrieve normal data
-    data_gh(files = content_get(org, repo, normal), quiet = quiet)
-    
-    return(TRUE)
-    
-  }, error = function(e) {
-    
-    warning("Could not complete data acquisition.\n", e)
-    
-    return(FALSE)
-    
-  })
+  # Retrieve digital elevation models file list
+  dem_files <- content_get(org, repo, dem)
+  
+  # Retrieve gcm file list
+  gcm_files <- content_get(org, repo, gcm)
+  
+  # Retrieve normal file list
+  normal_files <- content_get(org, repo, normal)
+  
+  # Do the actual download
+  data_gh(files = c(dem_files, gcm_files, normal_files), quiet = quiet)
+  
+  return(TRUE)
   
 }
 

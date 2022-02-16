@@ -1,7 +1,3 @@
-historical(target) <- function() {
-  
-}
-
 historical_build <- function(objects, dem) {
   #
   if (!all(vapply(target, compare_, logical(1), dem))) {
