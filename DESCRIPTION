@@ -25,4 +25,4 @@ Imports:
     parallel,
     data.table
 Depends: 
-    R (>= 2.10)
+    R (>= 4.0)

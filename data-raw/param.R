@@ -1,6 +1,6 @@
 library(data.table)
 
-base <- "inst/inputs/derivedVariables/optimizedParameterTables"
+base <- "data-raw/derivedVariables/optimizedParameterTables"
 
 param <- list(
   DD_lt_0 = fread(file = file.path(base, "param_DD_S1.csv")),
