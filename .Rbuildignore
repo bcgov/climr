@@ -6,3 +6,4 @@
 ^\.github$
 ^\.httr-oauth$
 ^data-raw$
+^OPPORTUNITY.md$
