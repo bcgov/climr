@@ -15,6 +15,9 @@ cache_path <- function() {
 #' @rdname cache
 #' @export
 cache_delete <- function() {
+  # Reset files list sha database
+  sha_delete()
+  # Remove cache directory
   unlink(cache_dir(), recursive = TRUE)
 }
 
