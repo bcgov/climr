@@ -10,10 +10,10 @@ downscale <- function(xyz, historical, future = NULL, variables, grouping = c("m
   res <- extract_(x = historical, pts = xyz[,1L:2L], method = "bilinear")
   
   # Compute lapse rates and cache for same session reprocessing
-  lapse_rates <- memoise::memoise(lapse_rate(historical))
+  lapse_rates <- lapse_rate(historical)
   
   # Compute elevation differences between provided points elevation and historical
-  elev_delta <- xyz[,3L] - extract_(x = attr(lapse_rates, "dem"), pts = xyz[,1L:2L], method = "simple")
+  elev_delta <- xyz[,3L] - extract_(x = attr(historical, "dem"), pts = xyz[,1L:2L], method = "simple")
   
   # Compute individual point lapse rate adjustments
   lr <- elev_delta * extract_(x = lapse_rates, pts = xyz[,1L:2L], method = "bilinear")
@@ -30,20 +30,7 @@ downscale <- function(xyz, historical, future = NULL, variables, grouping = c("m
   
 }
 
-setGeneric("extract_", def = function(x, pts, method, ...) standardGeneric("extract_"))
 
-# Extract from raster
-#' @noRd
-setMethod("extract_", signature(x = "Raster"), 
-  function(x, pts, method, ...) {
-    raster::extract(x = x, y = pts, method = method, ...)
-  }
-)
-setMethod("extract_", signature(x = "SpatRaster"), 
-  function(x, pts, method, ...) {
-    terra::extract(x = x, y = pts, method = method, ...)
-  }
-)
 
 
 
@@ -53,5 +40,5 @@ setMethod("extract_", signature(x = "SpatRaster"),
 
 # raster selection method that returns rasters
 
-library(data.table)
-system.file("inputs/", package = "climR-pnw")
+# library(data.table)
+# system.file("inputs/", package = "climR-pnw")

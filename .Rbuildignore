@@ -4,6 +4,7 @@
 ^scripts$
 ^\.git
 ^\.github$
+^vignettes/png$
 ^\.httr-oauth$
 ^data-raw$
 ^OPPORTUNITY.md$

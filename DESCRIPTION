@@ -23,6 +23,8 @@ Imports:
     terra,
     raster,
     parallel,
-    data.table
+    data.table,
+    gh,
+    methods
 Depends: 
     R (>= 4.0)
