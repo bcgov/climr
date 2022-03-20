@@ -4,7 +4,7 @@
 \alias{data_download}
 \title{Download file to data path}
 \usage{
-data_download(url, path, uid, quiet = interactive())
+data_download(url, path, uid, quiet = !interactive())
 }
 \arguments{
 \item{url}{A character. Remote file location}

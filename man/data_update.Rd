@@ -8,7 +8,8 @@ data_update(
   dem = getOption("climRpnw.dem.path", default = "inputs/digitalElevationModel"),
   gcm = getOption("climRpnw.gcm.path", default = "inputs/gcmData"),
   normal = getOption("climRpnw.normal.path", default = "inputs/Normal_1961_1990MP"),
-  quiet = interactive()
+  quiet = !interactive(),
+  ...
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ Default to option value "climRpnw.gcm.path" if set, or "inputs/gcmData".}
 Default to option value "climRpnw.normal.path" if set, or "inputs/Normal_1961_1990MP".}
 
 \item{quiet}{A logical. If \code{TRUE}, suppress status messages (if any), and the progress bar.}
+
+\item{...}{Others parameters such as \code{source} or \code{repo} for content getting functions.}
 }
 \description{
 Update external package data

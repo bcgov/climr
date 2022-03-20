@@ -6,6 +6,7 @@
 #' @return A list of elements, each with a `url`, a `path` relative
 #' to data path and a unique identifier `uid`.
 #' @rdname content_get
+#' @export
 content_get <- function(path, source = c("github"), ...) {
   source <- match.arg(source)
   if (source == "github") {
@@ -55,7 +56,6 @@ content_get_gh <- function(path,
 }
 
 #' @rdname content_get
-#' @export
 content_get_void <- function(...) {
   list(
     url = character(),
