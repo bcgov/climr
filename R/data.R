@@ -6,6 +6,7 @@
 #' @param normal A character. Relative path from the source root to base normal files folder.
 #' Default to option value "climRpnw.normal.path" if set, or "inputs/Normal_1961_1990MP".
 #' @param quiet A logical. If `TRUE`, suppress status messages (if any), and the progress bar.
+#' @param ... Others parameters such as `source` or `repo` for content getting functions.
 #' @details This package uses data that are too big to be included with sources.
 #' Instead, data is downloaded, optionally cached, when you need to run functions.
 #' @export
@@ -13,7 +14,8 @@ data_update <- function(
   dem = getOption("climRpnw.dem.path", default = "inputs/digitalElevationModel"),
   gcm = getOption("climRpnw.gcm.path", default = "inputs/gcmData"),
   normal = getOption("climRpnw.normal.path", default = "inputs/Normal_1961_1990MP"),
-  quiet = !interactive()) {
+  quiet = !interactive(),
+  ...) {
   
   # Reset options value if provided by user. They will be used to retrieve data by other functions.
   options("climRpnw.dem.path" = dem)
@@ -21,13 +23,13 @@ data_update <- function(
   options("climRpnw.normal.path" = normal)
   
   # Retrieve digital elevation models file list
-  dem_files <- content_get(path = dem)
+  dem_files <- content_get(path = dem, ...)
   
   # Retrieve gcm file list
-  gcm_files <- content_get(path = gcm)
+  gcm_files <- content_get(path = gcm, ...)
   
   # Retrieve normal file list
-  normal_files <- content_get(path = normal)
+  normal_files <- content_get(path = normal, ...)
   
   # Do the actual download of files
   data_get(files = c(dem_files, gcm_files, normal_files), quiet = quiet)

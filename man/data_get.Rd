@@ -4,7 +4,7 @@
 \alias{data_get}
 \title{Process a list of files.}
 \usage{
-data_get(files, quiet = interactive())
+data_get(files, quiet = !interactive())
 }
 \arguments{
 \item{files}{A list of files.}
