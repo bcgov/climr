@@ -36,20 +36,27 @@ content_get_gh <- function(path,
     .accept = "application/vnd.github.v3+json", .token = gh::gh_token()
   )
   
+  # When file is a subdirectory, get content inside, otherwise extract download_url, path and sha.
+  #
   # A sha value is a unique identifier that git uses to distinguish files and the content.
   # It is the results of applying a sha1 algorithm to the file content + metadata.
   # It is returned by the GitHub API and will be used in this package to manage files update.
   # This package use it as a uid for files.
-  res <- lapply(
-    res, 
-    function(file) {
-      c(
+  flag_for_removal <- integer()
+  for (i in seq_len(length(res))) {
+    file <- res[[i]]
+    if (file[["type"]] == "dir") {
+      res <- c(res, content_get_gh(file[["path"]], repo = repo, ref = ref))
+      flag_for_removal <- c(flag_for_removal, i)
+    } else {
+      res[[i]] <- c(
         url = file[["download_url"]],
         path = file[["path"]],
         uid = file[["sha"]]
       )
     }
-  )
+  }
+  res[flag_for_removal] <- NULL
   
   return(res)
   
