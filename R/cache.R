@@ -15,10 +15,10 @@ cache_path <- function() {
 #' @rdname cache
 #' @export
 cache_delete <- function() {
-  # Reset files list sha database
-  sha_delete()
+  # Reset files list uid database
+  uid_delete()
   # Remove cache directory
-  unlink(cache_dir(), recursive = TRUE)
+  unlink(cache_path(), recursive = TRUE)
 }
 
 #' Check if package local cache exists
