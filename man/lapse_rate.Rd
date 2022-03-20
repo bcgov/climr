@@ -2,45 +2,18 @@
 % Please edit documentation in R/lapserate.R
 \name{lapse_rate}
 \alias{lapse_rate}
-\alias{lapse_rate,list,SpatRaster-method}
-\alias{lapse_rate,list,RasterLayer-method}
 \title{Lapse rate computation}
 \usage{
-lapse_rate(
-  targets,
-  dem,
-  replace_NaN = TRUE,
-  use_parallel = FALSE,
-  rasterize = TRUE
-)
-
-\S4method{lapse_rate}{list,SpatRaster}(
-  targets,
-  dem,
-  replace_NaN = TRUE,
-  use_parallel = FALSE,
-  rasterize = TRUE
-)
-
-\S4method{lapse_rate}{list,RasterLayer}(
-  targets,
-  dem,
-  replace_NaN = TRUE,
-  use_parallel = FALSE,
-  rasterize = TRUE
-)
+lapse_rate(target, NA_replace = TRUE, use_parallel = TRUE, rasterize = TRUE)
 }
 \arguments{
-\item{targets}{A list of target SpatRaster object to compute lapse rates for.}
+\item{target}{Target rasters to compute lapse rates for. Build with this package functions.}
 
-\item{dem}{A digital elevation model SpatRaster.}
+\item{NA_replace}{A boolean. Should NA lapse rate results be replaced by zeros. Default to TRUE.}
 
-\item{replace_NaN}{A boolean. Should NaN lapse rates be replaced by zeros. Default to TRUE.}
+\item{use_parallel}{A boolean. Should parallel::mclapply be used. Default to TRUE.}
 
-\item{use_parallel}{A boolean. Should parallel::mclapply be used. Default to FALSE.}
-
-\item{rasterize}{Return an object of the same class as targets and dem.
-with the same extend as the digital elevation model.}
+\item{rasterize}{Return an object of the same class category as target with the same extend.}
 }
 \value{
 Lapse rate values.
