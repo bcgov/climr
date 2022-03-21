@@ -7,16 +7,16 @@
 downscale <- function(xyz, historical, future = NULL, variables, grouping = c("m", "s", "a")) {
   
   # Historical layer value extraction
-  res <- extract_(x = historical, pts = xyz[,1L:2L], method = "bilinear")
+  res <- terra::extract(x = historical, y = xyz[,1L:2L], method = "bilinear")
   
   # Compute lapse rates and cache for same session reprocessing
   lapse_rates <- lapse_rate(historical)
   
   # Compute elevation differences between provided points elevation and historical
-  elev_delta <- xyz[,3L] - extract_(x = attr(historical, "dem"), pts = xyz[,1L:2L], method = "simple")
+  elev_delta <- xyz[,3L] - terra::extract(x = attr(historical, "dem"), y = xyz[,1L:2L], method = "simple")
   
   # Compute individual point lapse rate adjustments
-  lr <- elev_delta * extract_(x = lapse_rates, pts = xyz[,1L:2L], method = "bilinear")
+  lr <- elev_delta * terra::extract(x = lapse_rates, y = xyz[,1L:2L], method = "bilinear")
   
   # Compute future differences between ...
   if (!is.null(future)) {

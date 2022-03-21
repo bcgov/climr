@@ -20,5 +20,7 @@ Degree-Day Above 5
 Calculate Degree-Day Above 5 (DD>5)
 }
 \examples{
+\dontrun{
 calc_DD_above_5(2, -14, "All")
+}
 }

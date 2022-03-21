@@ -6,7 +6,6 @@
 #' @return A list of elements, each with a `url`, a `path` relative
 #' to data path and a unique identifier `uid`.
 #' @rdname content_get
-#' @export
 content_get <- function(path, source = c("github"), ...) {
   source <- match.arg(source)
   if (source == "github") {
@@ -24,7 +23,6 @@ content_get <- function(path, source = c("github"), ...) {
 #' https://docs.github.com/en/rest/reference/repos#get-repository-content for details.
 #' @importFrom gh gh
 #' @rdname content_get
-#' @export
 content_get_gh <- function(path,
                            repo = getOption("climRpnw.gh.repo", default = "bcgov/climR-pnw"),
                            ref = NULL,

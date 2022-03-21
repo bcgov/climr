@@ -18,6 +18,7 @@ Frost-Free Period
 Calculate Frost-Free Period
 }
 \examples{
+\dontrun{
 calc_FFP(bFFP = 214.5964, eFFP = 265.4581)
-
+}
 }

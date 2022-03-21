@@ -4,10 +4,11 @@
 #' @param tmax_mean monthly mean maximum air temperature
 #'
 #' @return Relative Humidity
-#' @export
 #'
 #' @examples
+#' \dontrun{
 #' calc_RH(tmin_mean = 10, tmax_mean = 40)
+#' }
 calc_RH <- function(tmin_mean, tmax_mean) {
   
   es_tmin <- calc_es(tmin_mean)
