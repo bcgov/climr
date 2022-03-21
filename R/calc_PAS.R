@@ -4,11 +4,11 @@
 #' @param tm min temperature for that month
 #'
 #' @return Precipitation As Snow
-#' @export
 #'
 #' @examples
+#' \dontrun{
 #' calc_PAS(4, 2)
-#' 
+#' }
 calc_PAS <- function(m, tm) {
   
   match_lines <- match(m, param$PAS$Month)
