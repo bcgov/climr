@@ -9,11 +9,79 @@
 #' A value of 0 is `ensembleMean` only. Runs are included in the order they are found in the
 #' models data untile `max_run` is reached. Default to 0L.
 #' @return An object to use with `downscale`. A `SpatRaster` with, possibly, multiple layers.
+#' @details Will use raster package for now. Switch to terra methods once it gets better performance.
+#' See https://gis.stackexchange.com/questions/413105/terrarast-vs-rasterbrick-for-loading-in-nc-files.
+#' @importFrom raster brick stack
 #' @export
-gcm <- function(gcm = list_gcm(), ssp = list_ssp(), period = list_period() , max_run = 0L) {
+future <- function(gcm = list_gcm(), ssp = list_ssp(), period = list_period() , max_run = 0L) {
   
-  pattern <- paste0("(", paste0(gcm, collapse = "|"), ").*\\.nc$")
-  files <- list.files(file.path(data_path(), getOption("climRpnw.gcm.path")), recursive = TRUE, full.names = TRUE, pattern = pattern)
+  # Get relevant files
+  get_rel_files <- function(pattern) {
+    res <- lapply(
+      file.path(data_path(), getOption("climRpnw.gcm.path", default = "gcm"), gcm),
+      list.files, recursive = TRUE, full.names = TRUE, pattern = pattern
+    )
+    names(res) <- gcm
+    res
+  }
+  files_nc <- get_rel_files("\\.nc$")
+  files_csv <- get_rel_files("\\.csv$")
+  
+  # Check if we have non matching gcmIndex for gcmData
+  if (any(nomatch <- !gsub("\\.nc$", ".csv", gsub("Data", "Index", basename(unlist(files_nc)))) %in% basename(unlist(files_csv)))) {
+    stop("No gcmIndex match found for ", paste0(basename(files_nc)[which(nomatch)], collapse = ", "),".")
+  }
+  
+  # Load each file individually + select layers
+  process_one_gcm <- function(data, index) {
+    
+    bricks <- list()
+    
+    # Select runs + ensembleMean (since alphabetical sort, ensembleMean will be first element)
+    runs <- head(list_unique(index, 5L), max_run + 1L)
+    
+    # process one file
+    for (i in seq_len(length(index))) {
+      # Read in csv file with headers
+      values <- data.table::fread(index[i], header = TRUE)
+      # Always select reference
+      reference_lines <- which(grepl("_reference_", values[["x"]], fixed = TRUE))
+      # Select other layers
+      pattern <- paste0("(", paste0(ssp, collapse = "|"), ")_(", paste0(runs, collapse = "|"), ")_(", paste0(period, collapse = "|"), ")$")
+      match_lines <- which(grepl(pattern, values[["x"]]))
+      # Append to vector
+      lyrs <- as.integer(values[["V1"]])[c(reference_lines, match_lines)]
+      lyrs_names <- values[["x"]][c(reference_lines, match_lines)]
+      # Read data as brick
+      brick <- raster::brick(data[i])[[lyrs]]
+      # Rename layers
+      names(brick) <- lyrs_names
+      # Compute deltas
+      brick <- delta_to_reference(brick)
+      # Include in brick list
+      bricks <- append(bricks, brick)
+    }
+    
+    # Combine in one brick
+    one_gcm <- raster::brick(raster::stack(bricks))
+    
+    return(one_gcm)
+  }
+  
+  # Substract reference layers, only keep deltas, plus load in memory instead of disk
+  delta_to_reference <- function(layers) {
+    nm <- names(layers)
+    # Match each layer to a reference layer
+    matching_ref <- vapply(strsplit(nm, "_"), function(x) {grep(paste(paste0(x[1:3], collapse = "_"), "reference_", sep = "_"), nm)}, integer(1))
+    # Substract reference layer, this takes a few as all data have to be loaded in memory from disk
+    layers <- layers - layers[[matching_ref]]
+    # Return layers without the references
+    return(layers[[-unique(matching_ref)]])
+  }
+  
+  # Return a list of SpatRaster, one element for each model
+  return(mapply(process_one_gcm, files_nc, files_csv))
+  
 }
 
 #' Read and parse gcm models csv files
@@ -27,7 +95,7 @@ list_unique <- function(files, col_num) {
     # Read in csv file with headers
     values <- data.table::fread(file, header = TRUE)
     # Remove reference lines
-    values <- values[which(!grepl("_reference_", x, fixed = TRUE))]
+    values <- values[which(!grepl("_reference_", values[["x"]], fixed = TRUE)),]
     # Split and extract sub part of x according to col_num
     values <- vapply(strsplit(values[["x"]], "_"), `[`, character(length(col_num)), col_num)
     # In case we have more than one col_num, put them back together
@@ -48,13 +116,13 @@ list_unique <- function(files, col_num) {
 list_parse <- function(gcm, col_num = 1) {
   
   #Default pattern csv extension
-  pattern <- "csv$"
+  pattern <- "\\.csv$"
   
   # In case we need to filter gcm
   if (!missing(gcm)) {
     pattern <- paste0("(", paste0(gcm, collapse = "|"), ").*", pattern)
   }
-  files <- list.files(file.path(data_path(), getOption("climRpnw.gcm.path")), recursive = TRUE, full.names = TRUE, pattern = pattern)
+  files <- list.files(file.path(data_path(), getOption("climRpnw.gcm.path", default = "gcm")), recursive = TRUE, full.names = TRUE, pattern = pattern)
   
   # Extract all different unique values
   list_unique(files, col_num)
@@ -63,7 +131,7 @@ list_parse <- function(gcm, col_num = 1) {
 #' List available global circulation models
 #' @export
 list_gcm <- function() {
-  list.files(file.path(data_path(), getOption("climRpnw.gcm.path")))
+  list.files(file.path(data_path(), getOption("climRpnw.gcm.path", default = "gcm")))
 }
 
 #' List available shared socioeconomic pathways
