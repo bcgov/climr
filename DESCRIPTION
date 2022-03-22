@@ -26,6 +26,7 @@ Imports:
     parallel,
     data.table,
     gh,
-    methods
+    methods,
+    memoise
 Depends: 
     R (>= 4.0)

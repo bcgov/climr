@@ -15,6 +15,9 @@
 #' @export
 future <- function(gcm = list_gcm(), ssp = list_ssp(), period = list_period() , max_run = 0L) {
   
+  # Check if we have data, if not download some.
+  data_check()
+  
   # Get relevant files
   get_rel_files <- function(pattern) {
     res <- lapply(
@@ -73,14 +76,17 @@ future <- function(gcm = list_gcm(), ssp = list_ssp(), period = list_period() , 
     nm <- names(layers)
     # Match each layer to a reference layer
     matching_ref <- vapply(strsplit(nm, "_"), function(x) {grep(paste(paste0(x[1:3], collapse = "_"), "reference_", sep = "_"), nm)}, integer(1))
-    # Substract reference layer, this takes a few as all data have to be loaded in memory from disk
+    # Substract reference layer, this takes a few seconds as all data have to be loaded in memory from disk
     layers <- layers - layers[[matching_ref]]
     # Return layers without the references
     return(layers[[-unique(matching_ref)]])
   }
   
+  res <- mapply(process_one_gcm, files_nc, files_csv)
+  attr(res, "builder") <- "climRpnw" 
+  
   # Return a list of SpatRaster, one element for each model
-  return(mapply(process_one_gcm, files_nc, files_csv))
+  return(res)
   
 }
 

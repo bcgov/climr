@@ -129,6 +129,13 @@ data_delete <- function(ask = interactive()) {
   return(invisible(TRUE))
 }
 
+#' @noRd
+data_check <- function() {
+  if (!length(c(list_gcm(), list_dem(), list_normal()))) {
+    data_update()
+  }
+}
+
 #' List package local cache files
 #' @param subdirectory A character. A subdirectory of `data_path()`. Restrict listing to only
 #' this particular subdirectory. Use `getOption("climRpnw.dem.path")`,

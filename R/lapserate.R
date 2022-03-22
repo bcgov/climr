@@ -97,14 +97,14 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
   
   # Surrounding values
   res <- list(
-    northwest = NArep(mat[-(nr + 1L):-(nr + 2L), -(nc + 1L):-(nc + 2L)] - ref),
-    north     = NArep(mat[-(nr + 1L):-(nr + 2L), c(-1L,-(nc + 2L))] - ref),
-    northeast = NArep(mat[-(nr + 1L):-(nr + 2L), -1L:-2L] - ref),
-    east      = NArep(mat[c(-1L,-(nr + 2L)), -1L:-2L] - ref),
-    southeast = NArep(mat[-1L:-2L, -1L:-2L] - ref),
-    south     = NArep(mat[-1L:-2L, c(-1L,-(nc + 2L))] - ref),
-    southwest = NArep(mat[-1L:-2L, -(nc + 1L):-(nc + 2L)] - ref),
-    west      = NArep(mat[c(-1L,-(nr + 2L)), -(nc + 1L):-(nc + 2L)] - ref)
+    northwest = mat[-(nr + 1L):-(nr + 2L), -(nc + 1L):-(nc + 2L)] - ref,
+    north     = mat[-(nr + 1L):-(nr + 2L), c(-1L,-(nc + 2L))] - ref,
+    northeast = mat[-(nr + 1L):-(nr + 2L), -1L:-2L] - ref,
+    east      = mat[c(-1L,-(nr + 2L)), -1L:-2L] - ref,
+    southeast = mat[-1L:-2L, -1L:-2L] - ref,
+    south     = mat[-1L:-2L, c(-1L,-(nc + 2L))] - ref,
+    southwest = mat[-1L:-2L, -(nc + 1L):-(nc + 2L)] - ref,
+    west      = mat[c(-1L,-(nr + 2L)), -(nc + 1L):-(nc + 2L)] - ref
   )
   
   # Replace NA/NaN by 0
@@ -116,9 +116,8 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
   if (isTRUE(NA_replace)) {
     res <- lapply(res, NArep)
   }
-  return(
-    
-  )
+  
+  return(res)
 }
 
 #' Lapse rate computation
@@ -140,13 +139,14 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 lapse_rate <- function(target, NA_replace = TRUE, use_parallel = TRUE, rasterize = TRUE) {
   
   # Make sure target was build using this package functions
-  if (attr(target, "builder") != "climRpnw") {
+  if (!isTRUE(attr(target, "builder") == "climRpnw")) {
     stop("Please use this package functions to create `target`. Read `?lapse_rate` for details.")
   }
   
   # Retrieve digital elevation model from attributes
   dem <- attr(target, "dem")
-  # Transform target to list
+  # Transform target to list, capture names before
+  target_names <- names(target)
   target <- terra::as.list(target)
   
   # Compute everything related to the dem and independant of target
@@ -184,7 +184,7 @@ lapse_rate <- function(target, NA_replace = TRUE, use_parallel = TRUE, rasterize
     lapse_rate <- β * mss / (mss + rss)
     
     if (isTRUE(NA_replace)) {
-      lapse_rate[is.nan(lapse_rate)] <- 0L  
+      lapse_rate[is.na(lapse_rate)] <- 0L  
     }
     
     # And we can return the lapse rate
@@ -198,7 +198,7 @@ lapse_rate <- function(target, NA_replace = TRUE, use_parallel = TRUE, rasterize
     # Restore value on function exit
     on.exit(options("mc.cores" = cur_value), add = TRUE)
     # Set option value for the rest of the function execution
-    options("mc.cores" = parallel::detectCores(logical = FALSE) - 1L)
+    options("mc.cores" = parallel::detectCores()/2L)
     # Use parallel lapply
     func <- parallel::mclapply
   } else {
@@ -212,6 +212,14 @@ lapse_rate <- function(target, NA_replace = TRUE, use_parallel = TRUE, rasterize
     res <- terra::rast(lapply(res, terra::rast, extent = terra::ext(dem)))
   }
   
+  # Set names of lapse rates to match target
+  names(res) <- target_names
+  
   return(res)
   
 }
+
+#' Memoised version
+#' @inheritParams lapse_rate
+#' @importFrom memoise memoise
+lapse_rate_mem <- memoise::memoise(lapse_rate)

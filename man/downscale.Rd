@@ -6,22 +6,26 @@
 \usage{
 downscale(
   xyz,
-  historical,
-  future = NULL,
+  normal,
+  gcm = NULL,
   variables,
-  grouping = c("m", "s", "a")
+  grouping = c("m", "s", "a"),
+  use_cache = TRUE
 )
 }
 \arguments{
 \item{xyz}{A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).}
 
-\item{historical}{Reference historical climate variables rasters.}
+\item{normal}{Reference historical climate variables rasters.}
 
-\item{future}{Future climate variables rasters. Default to NULL.}
+\item{gcm}{Future climate variables rasters. Default to NULL.}
 
 \item{variables}{A character vector of variables to compute.}
 
 \item{grouping}{A character vector of variables grouping. Can be \code{m} (monthly), \code{s} (seasonal) or \code{a} (annual).}
+
+\item{use_cache}{A boolean. For lapse rate calculation, if \code{TRUE} and available,
+uses cached computation. If \code{FALSE}, recompute. Default to \code{TRUE}.}
 }
 \description{
 Downscale target rasters to points of interest
