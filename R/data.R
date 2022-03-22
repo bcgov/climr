@@ -11,9 +11,9 @@
 #' Instead, data is downloaded, optionally cached, when you need to run functions.
 #' @export
 data_update <- function(
-  dem = getOption("climRpnw.dem.path", default = "inputs/dem"),
-  gcm = getOption("climRpnw.gcm.path", default = "inputs/gcm"),
-  normal = getOption("climRpnw.normal.path", default = "inputs/normal"),
+  dem = getOption("climRpnw.dem.path", default = "dem"),
+  gcm = getOption("climRpnw.gcm.path", default = "gcm"),
+  normal = getOption("climRpnw.normal.path", default = "normal"),
   quiet = !interactive(),
   ...) {
   

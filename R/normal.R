@@ -5,14 +5,14 @@
 #' extent as the normal baseline. Can be obtained from `list_dem()`. Default to `list_dem()[1]`.
 #' @return A normal baseline to use with `downscale`. A `SpatRaster` with a `dem` attribute.
 #' @export
-normal <- function(normal = list_normal()[1], dem = list_dem()[1]) {
+baseline <- function(normal = list_normal()[1], dem = list_dem()[1]) {
   
   # Load dem first file
-  dir_dem <- file.path(data_path(), getOption("climRpnw.dem.path"), dem)
+  dir_dem <- file.path(data_path(), getOption("climRpnw.dem.path", default = "dem"), dem)
   dem <- terra::rast(list.files(dir_dem, full.names = TRUE)[1])
   
   # Load normal files
-  dir_normal <- file.path(data_path(), getOption("climRpnw.normal.path"), normal)
+  dir_normal <- file.path(data_path(), getOption("climRpnw.normal.path", default = "normal"), normal)
   normal <- terra::rast(list.files(dir_normal, full.names = TRUE))
   
   # All objects have to share the same extent for now
@@ -31,10 +31,10 @@ normal <- function(normal = list_normal()[1], dem = list_dem()[1]) {
 #' List available normal
 #' @export
 list_normal <- function() {
-  dirs <- list.files(file.path(data_path(), getOption("climRpnw.normal.path")))
+  dirs <- list.files(file.path(data_path(), getOption("climRpnw.normal.path", default = "normal")))
   for (dir in dirs) {
     # Check if all months for all three variables are there
-    files <- list.files(file.path(data_path(), getOption("climRpnw.normal.path"), dir))
+    files <- list.files(file.path(data_path(), getOption("climRpnw.normal.path", default = "normal"), dir))
     avail <- vapply(strsplit(files, split = ".", fixed = TRUE), `[`, character(1), 1)
     vars <- c("PPT", "Tmax", "Tmin")
     months <- sprintf("%02d", 1:12)
@@ -49,10 +49,10 @@ list_normal <- function() {
 #' List available digital elevation models
 #' @export
 list_dem <- function() {
-  dirs <- list.files(file.path(data_path(), getOption("climRpnw.dem.path")))
+  dirs <- list.files(file.path(data_path(), getOption("climRpnw.dem.path", default = "dem")))
   for (dir in dirs) {
     # Check if all months for all three variables are there
-    files <- list.files(file.path(data_path(), getOption("climRpnw.dem.path"), dir))
+    files <- list.files(file.path(data_path(), getOption("climRpnw.dem.path", default = "dem"), dir))
     avail <- vapply(strsplit(files, split = ".", fixed = TRUE), `[`, character(1), 1)
     if (length(avail) > 1) {
       warning(dir, " data is available, but multiple files found in subdirectory ", paste0(avail, collapse = ", "), ". Only the first one is loaded.")
