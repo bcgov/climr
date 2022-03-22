@@ -2,20 +2,20 @@
 % Please edit documentation in R/normal.R
 \name{normal}
 \alias{normal}
-\title{Create normal baseline}
+\title{Create normal baseline for \code{downscale}}
 \usage{
 normal(normal = list_normal()[1], dem = list_dem()[1])
 }
 \arguments{
-\item{normal}{A character. Name of the normal baseline to use. Can be obtained from
+\item{normal}{A character. Label of the normal baseline to use. Can be obtained from
 \code{list_normal()}. Default to \code{list_normal()[1]}.}
 
-\item{dem}{A character. Name of the digital elevation model to use. Must have the same
-extent as the baseline normal. Can be obtained from \code{list_dem()}. Default to \code{list_dem()[1]}.}
+\item{dem}{A character. Label of the digital elevation model to use. Must have the same
+extent as the normal baseline. Can be obtained from \code{list_dem()}. Default to \code{list_dem()[1]}.}
 }
 \value{
 A normal baseline to use with \code{downscale}. A \code{SpatRaster} with a \code{dem} attribute.
 }
 \description{
-Create normal baseline
+Create normal baseline for \code{downscale}
 }

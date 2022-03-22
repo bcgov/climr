@@ -101,12 +101,11 @@ data_path <- function() {
 #' Delete package local cache
 #' @param ask A boolean. Ask before deleting files. Default to `interactive()`.
 #' @export
-#' @rdname data_update
 data_delete <- function(ask = interactive()) {
   
   if (isTRUE(ask)) {
     response <- utils::askYesNo(
-      paste0("The following files will be deleted :\n", paste0(data_list(), collapse = "\n")),
+      paste0("The following files will be deleted :\n", paste0(list_data(), collapse = "\n")),
     )
     if (is.na(response)) {
       stop("Cancelled by user.", call. = FALSE)
@@ -135,8 +134,7 @@ data_delete <- function(ask = interactive()) {
 #' this particular subdirectory. Use `getOption("climRpnw.dem.path")`,
 #' `getOption("climRpnw.gcm.path")` or `getOption("climRpnw.normal.path")`.
 #' @export
-#' @rdname data_update
-data_list <- function(subdirectory) {
+list_data <- function(subdirectory) {
   dir <- data_path()
   if (!missing(subdirectory)) {
     dir <- file.path(dir, subdirectory)
