@@ -147,12 +147,12 @@ lapse_rate <- function(target, NA_replace = TRUE, use_parallel = TRUE, rasterize
   # Retrieve digital elevation model from attributes
   dem <- attr(target, "dem")
   # Transform target to list
-  target <- as_list(target)
+  target <- terra::as.list(target)
   
   # Compute everything related to the dem and independant of target
   nr <- nrow(dem)
   nc <- ncol(dem)
-  x <- as_matrix(dem)
+  x <- terra::as.matrix(dem, wide = TRUE)
   # Expand and recycle borders
   x <- recycle_borders(x, nr, nc)
   # Compute surrounding cells deltas
@@ -165,7 +165,7 @@ lapse_rate <- function(target, NA_replace = TRUE, use_parallel = TRUE, rasterize
   # For the lapse rate, x is the elevation, and y is the target
   lapse_rate_redux <- function(r, x, nr, nc, n, sum_xx, NA_replace) {
     
-    y <- as_matrix(r)
+    y <- terra::as.matrix(r, wide = TRUE)
     # Expand and recycle borders
     y <- recycle_borders(y, nr, nc)
     # Compute surrounding cells deltas
@@ -209,7 +209,7 @@ lapse_rate <- function(target, NA_replace = TRUE, use_parallel = TRUE, rasterize
   res <- func(target, lapse_rate_redux, x, nr, nc, n, sum_xx, NA_replace)
   
   if (isTRUE(rasterize)) {
-    res <- to_raster(res, dem)
+    res <- terra::rast(lapply(res, terra::rast, extent = terra::ext(dem)))
   }
   
   return(res)

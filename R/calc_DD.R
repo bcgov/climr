@@ -22,10 +22,11 @@ calc_DD_m <- function(tm, k, a, b, t0, beta, c){
 #' @param tm monthly mean temperature for the `m` month
 #'
 #' @return Degree-Day Below 0
-#' @export
 #'
 #' @examples
+#' \dontrun{
 #' calc_DD_below_0(2, -14)
+#' }
 calc_DD_below_0 <- function(m, tm){
   
   match_lines <- match(m, param$DD_lt_0$Month)
@@ -47,10 +48,11 @@ calc_DD_below_0 <- function(m, tm){
 #' @param region one of either "All", "West", "East"
 #'
 #' @return Degree-Day Above 5
-#' @export
 #'
 #' @examples
+#' \dontrun{
 #' calc_DD_above_5(2, -14, "All")
+#' }
 calc_DD_above_5 <- function(m, tm, region){
   
   region[m > 4 & m < 11] <- "All"
@@ -74,10 +76,11 @@ calc_DD_above_5 <- function(m, tm, region){
 #' @param tm monthly mean temperature for the `m` month
 #'
 #' @return Degree-Day Below 18
-#' @export
 #'
 #' @examples
+#' \dontrun{
 #' calc_DD_below_18(2, -14)
+#' }
 calc_DD_below_18 <- function(m, tm){
   
   match_lines <- match(m, param$DD_lt_18$Month)
@@ -100,11 +103,11 @@ calc_DD_below_18 <- function(m, tm){
 #' @param region one of either "All", "South west", "The rest"
 #'
 #' @return Degree-Day Above 18
-#' @export
 #'
 #' @examples
+#' \dontrun{
 #' calc_DD_above_18(2, -14, "All")
-#' 
+#' }
 calc_DD_above_18 <- function(m, tm, region){
   
   region[m > 5 & m < 9] <- "All"

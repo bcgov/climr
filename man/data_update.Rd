@@ -5,9 +5,9 @@
 \title{Update external package data}
 \usage{
 data_update(
-  dem = getOption("climRpnw.dem.path", default = "inputs/digitalElevationModel"),
-  gcm = getOption("climRpnw.gcm.path", default = "inputs/gcmData"),
-  normal = getOption("climRpnw.normal.path", default = "inputs/Normal_1961_1990MP"),
+  dem = getOption("climRpnw.dem.path", default = "inputs/dem"),
+  gcm = getOption("climRpnw.gcm.path", default = "inputs/gcm"),
+  normal = getOption("climRpnw.normal.path", default = "inputs/normal"),
   quiet = !interactive(),
   ...
 )

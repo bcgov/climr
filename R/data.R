@@ -83,9 +83,9 @@ data_download <- function(url, path, uid, quiet = !interactive()) {
 }
 
 #' Return current package data path
-#' @export
 #' @details If cache is used, return the cache path. Otherwise, it returns
 #' a temporary folder that will be used for this session only.
+#' @export
 data_path <- function() {
   use_cache <- getOption("climRpnw.session.cache.ask.response", default = cache_ask())
   if (use_cache) {
@@ -96,4 +96,48 @@ data_path <- function() {
     options("climRpnw.session.tmp.path" = path)
     return(path)
   }
+}
+
+#' Delete package local cache
+#' @param ask A boolean. Ask before deleting files. Default to `interactive()`.
+#' @export
+data_delete <- function(ask = interactive()) {
+  
+  if (isTRUE(ask)) {
+    response <- utils::askYesNo(
+      paste0("The following files will be deleted :\n", paste0(list_data(), collapse = "\n")),
+    )
+    if (is.na(response)) {
+      stop("Cancelled by user.", call. = FALSE)
+    } else if (!isTRUE(response)) {
+      return(invisible(FALSE))
+    }
+  }
+  
+  # Remove cache directory
+  unlink(data_path(), recursive = TRUE)
+  # Reset files list uid database
+  uid_delete()
+  # Unset options
+  options(
+    "climRpnw.session.tmp.path" = NULL,
+    "climRpnw.dem.path" = NULL,
+    "climRpnw.gcm.path" = NULL,
+    "climRpnw.normal.path" = NULL
+  )
+  
+  return(invisible(TRUE))
+}
+
+#' List package local cache files
+#' @param subdirectory A character. A subdirectory of `data_path()`. Restrict listing to only
+#' this particular subdirectory. Use `getOption("climRpnw.dem.path")`,
+#' `getOption("climRpnw.gcm.path")` or `getOption("climRpnw.normal.path")`.
+#' @export
+list_data <- function(subdirectory) {
+  dir <- data_path()
+  if (!missing(subdirectory)) {
+    dir <- file.path(dir, subdirectory)
+  }
+  list.files(dir, recursive = TRUE, full.names = TRUE)
 }

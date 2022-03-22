@@ -18,5 +18,7 @@ Degree-Day Below 18
 Calculate Degree-Day Below 18 (DD<18)
 }
 \examples{
+\dontrun{
 calc_DD_below_18(2, -14)
+}
 }

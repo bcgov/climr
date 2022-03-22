@@ -4,11 +4,11 @@
 #' @param tm min temperature for that month
 #'
 #' @return Number of Frost Free Days
-#' @export
 #' 
 #' @examples
+#' \dontrun{
 #' calc_NFFD(3, 2.05)
-#' 
+#' }
 calc_NFFD <- function(m, tm) {
   
   match_lines <- match(m, param$NFFD$Month)

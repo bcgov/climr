@@ -4,7 +4,6 @@
 #' @param td difference between the mean warmest monthly temperature and the mean coldest monthly temperature
 #'
 #' @return Extreme Minimum Temperature
-#' @export
 #'
 calc_EMT <- function(t_min_list, td) {
   
@@ -25,7 +24,6 @@ calc_EMT <- function(t_min_list, td) {
 #' @param td difference between the mean warmest monthly temperature and the mean coldest monthly temperature
 #'
 #' @return Extreme Maximum Temperature
-#' @export
 #'
 calc_EXT <- function(t_max_list, td) {
   
