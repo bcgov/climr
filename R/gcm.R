@@ -62,8 +62,8 @@ future <- function(gcm = list_gcm(), ssp = list_ssp(), period = list_period() , 
       bricks <- append(bricks, brick)
     }
     
-    # Combine in one brick
-    one_gcm <- raster::brick(raster::stack(bricks))
+    # Combine in one brick and turn into SpatRaster
+    one_gcm <- terra::rast(raster::brick(raster::stack(bricks)))
     
     return(one_gcm)
   }
