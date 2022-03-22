@@ -18,10 +18,11 @@ Day of the year on which the Frost-Free Period ends
 bFFP : Day of the year on which the Frost-Free Period ends
 }
 \examples{
+\dontrun{
 t_min_list <- list("1" = -35, "2" = -32, "3" = -25, "4" = -10, 
 "5" = -5, "6" = 3,  "7" = 15, "8" = 17, "9" = 10, "10" = -5,
 "11" = -20, "12" = -30)
 
 calc_eFFP(NFFD = 10, t_min_list = t_min_list)
-
+}
 }
