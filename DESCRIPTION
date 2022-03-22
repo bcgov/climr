@@ -22,6 +22,7 @@ RoxygenNote: 7.1.2
 Imports: 
     terra,
     raster,
+    ncdf4,
     parallel,
     data.table,
     gh,
