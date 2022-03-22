@@ -7,13 +7,18 @@
 #' @export
 baseline <- function(normal = list_normal()[1], dem = list_dem()[1]) {
   
+  # Check if we have data, if not download some.
+  data_check()
+  
   # Load dem first file
   dir_dem <- file.path(data_path(), getOption("climRpnw.dem.path", default = "dem"), dem)
-  dem <- terra::rast(list.files(dir_dem, full.names = TRUE)[1])
+  # + 0 force load to memory
+  dem <- terra::rast(list.files(dir_dem, full.names = TRUE)[1]) + 0
   
   # Load normal files
   dir_normal <- file.path(data_path(), getOption("climRpnw.normal.path", default = "normal"), normal)
-  normal <- terra::rast(list.files(dir_normal, full.names = TRUE))
+  # + 0 force load to memory
+  normal <- terra::rast(list.files(dir_normal, full.names = TRUE)) + 0
   
   # All objects have to share the same extent for now
   # This could be modified to process all the objects to adjust them to
@@ -24,6 +29,7 @@ baseline <- function(normal = list_normal()[1], dem = list_dem()[1]) {
   
   # Set dem as attribute to normal
   attr(normal, "dem") <- dem
+  attr(normal, "builder") <- "climRpnw"
   
   return(normal)
 }
