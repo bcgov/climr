@@ -1,8 +1,8 @@
-#' Create normal baseline
-#' @param normal A character. Name of the normal baseline to use. Can be obtained from
+#' Create normal baseline for `downscale`
+#' @param normal A character. Label of the normal baseline to use. Can be obtained from
 #' `list_normal()`. Default to `list_normal()[1]`.
-#' @param dem A character. Name of the digital elevation model to use. Must have the same
-#' extent as the baseline normal. Can be obtained from `list_dem()`. Default to `list_dem()[1]`.
+#' @param dem A character. Label of the digital elevation model to use. Must have the same
+#' extent as the normal baseline. Can be obtained from `list_dem()`. Default to `list_dem()[1]`.
 #' @return A normal baseline to use with `downscale`. A `SpatRaster` with a `dem` attribute.
 #' @export
 normal <- function(normal = list_normal()[1], dem = list_dem()[1]) {

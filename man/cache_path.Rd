@@ -2,20 +2,15 @@
 % Please edit documentation in R/cache.R
 \name{cache_path}
 \alias{cache_path}
-\alias{cache_exists}
 \title{Return package local cache path}
 \usage{
 cache_path()
-
-cache_exists()
 }
 \value{
 The full path of the package local cache.
 }
 \description{
 Return package local cache path
-
-Check if package local cache exists
 }
 \details{
 By default, it uses \code{tools::R_user_dir}. The cache location can be

@@ -2,7 +2,6 @@
 
 #' Return package local cache path
 #' @importFrom tools R_user_dir
-#' @rdname cache
 #' @details By default, it uses `tools::R_user_dir`. The cache location can be
 #' set using the `climRpnw.cache.path` option with `options("climRpnw.cache.path" = "your_path")`.
 #' @return The full path of the package local cache.
@@ -11,7 +10,6 @@ cache_path <- function() {
 }
 
 #' Check if package local cache exists
-#' @rdname cache
 cache_exists <- function() {
   file.exists(cache_path())
 }

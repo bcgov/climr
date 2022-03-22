@@ -2,8 +2,6 @@
 % Please edit documentation in R/data.R
 \name{data_update}
 \alias{data_update}
-\alias{data_delete}
-\alias{data_list}
 \title{Update external package data}
 \usage{
 data_update(
@@ -13,10 +11,6 @@ data_update(
   quiet = !interactive(),
   ...
 )
-
-data_delete(ask = interactive())
-
-data_list(subdirectory)
 }
 \arguments{
 \item{dem}{A character. Relative path from the source root to digital elevation model files folder.
@@ -31,19 +25,9 @@ Default to option value "climRpnw.normal.path" if set, or "inputs/Normal_1961_19
 \item{quiet}{A logical. If \code{TRUE}, suppress status messages (if any), and the progress bar.}
 
 \item{...}{Others parameters such as \code{source} or \code{repo} for content getting functions.}
-
-\item{ask}{A boolean. Ask before deleting files. Default to \code{interactive()}.}
-
-\item{subdirectory}{A character. A subdirectory of \code{data_path()}. Restrict listing to only
-this particular subdirectory. Use \code{getOption("climRpnw.dem.path")},
-\code{getOption("climRpnw.gcm.path")} or \code{getOption("climRpnw.normal.path")}.}
 }
 \description{
 Update external package data
-
-Delete package local cache
-
-List package local cache files
 }
 \details{
 This package uses data that are too big to be included with sources.
