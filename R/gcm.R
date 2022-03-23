@@ -12,6 +12,7 @@
 #' @details Will use raster package for now. Switch to terra methods once it gets better performance.
 #' See https://gis.stackexchange.com/questions/413105/terrarast-vs-rasterbrick-for-loading-in-nc-files.
 #' @importFrom raster brick stack
+#' @importFrom utils head
 #' @export
 future <- function(gcm = list_gcm(), ssp = list_ssp(), period = list_period() , max_run = 0L) {
   
@@ -21,7 +22,7 @@ future <- function(gcm = list_gcm(), ssp = list_ssp(), period = list_period() , 
   # Get relevant files
   get_rel_files <- function(pattern) {
     res <- lapply(
-      file.path(data_path(), getOption("climRpnw.gcm.path", default = "gcm"), gcm),
+      file.path(data_path(), getOption("climRpnw.gcm.path", default = "inputs/gcm"), gcm),
       list.files, recursive = TRUE, full.names = TRUE, pattern = pattern
     )
     names(res) <- gcm
@@ -41,7 +42,7 @@ future <- function(gcm = list_gcm(), ssp = list_ssp(), period = list_period() , 
     bricks <- list()
     
     # Select runs + ensembleMean (since alphabetical sort, ensembleMean will be first element)
-    runs <- head(list_unique(index, 5L), max_run + 1L)
+    runs <- utils::head(list_unique(index, 5L), max_run + 1L)
     
     # process one file
     for (i in seq_len(length(index))) {
@@ -128,7 +129,7 @@ list_parse <- function(gcm, col_num = 1) {
   if (!missing(gcm)) {
     pattern <- paste0("(", paste0(gcm, collapse = "|"), ").*", pattern)
   }
-  files <- list.files(file.path(data_path(), getOption("climRpnw.gcm.path", default = "gcm")), recursive = TRUE, full.names = TRUE, pattern = pattern)
+  files <- list.files(file.path(data_path(), getOption("climRpnw.gcm.path", default = "inputs/gcm")), recursive = TRUE, full.names = TRUE, pattern = pattern)
   
   # Extract all different unique values
   list_unique(files, col_num)
@@ -137,7 +138,7 @@ list_parse <- function(gcm, col_num = 1) {
 #' List available global circulation models
 #' @export
 list_gcm <- function() {
-  list.files(file.path(data_path(), getOption("climRpnw.gcm.path", default = "gcm")))
+  list.files(file.path(data_path(), getOption("climRpnw.gcm.path", default = "inputs/gcm")))
 }
 
 #' List available shared socioeconomic pathways

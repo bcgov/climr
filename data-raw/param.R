@@ -11,4 +11,7 @@ param <- list(
   PAS = fread(file = file.path(base, "param_PAS.csv"))
 )
 
+variables <- fread("data-raw/derivedVariables/Variables_ClimateBC.csv")
+
 usethis::use_data(param, overwrite = TRUE, internal = TRUE)
+usethis::use_data(variables, overwrite = TRUE, internal = FALSE)

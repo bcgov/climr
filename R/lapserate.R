@@ -133,7 +133,7 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 #' R² = mss / (mss + rss)
 #' Lapse rate = beta_coef * R²
 #' @return Lapse rate values.
-#' @import terra raster
+#' @importFrom terra as.list as.matrix ext
 #' @importFrom parallel detectCores mclapply
 #' @export
 lapse_rate <- function(target, NA_replace = TRUE, use_parallel = TRUE, rasterize = TRUE) {
@@ -147,7 +147,7 @@ lapse_rate <- function(target, NA_replace = TRUE, use_parallel = TRUE, rasterize
   dem <- attr(target, "dem")
   # Transform target to list, capture names before
   target_names <- names(target)
-  target <- terra::as.list(target)
+  target <- try(terra::as.list(target), silent = TRUE)
   
   # Compute everything related to the dem and independant of target
   nr <- nrow(dem)
