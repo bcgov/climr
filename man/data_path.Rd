@@ -4,7 +4,10 @@
 \alias{data_path}
 \title{Return current package data path}
 \usage{
-data_path()
+data_path(...)
+}
+\arguments{
+\item{...}{Other parameters for \code{cache_ask}.}
 }
 \description{
 Return current package data path
