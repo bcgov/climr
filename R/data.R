@@ -107,6 +107,7 @@ data_delete <- function(ask = interactive()) {
   if (isTRUE(ask)) {
     response <- utils::askYesNo(
       paste0("The following files will be deleted :\n", paste0(list_data(), collapse = "\n")),
+      prompts = c("Yes", "No", "Cancel")
     )
     if (is.na(response)) {
       stop("Cancelled by user.", call. = FALSE)
@@ -133,7 +134,10 @@ data_delete <- function(ask = interactive()) {
 #' @noRd
 data_check <- function() {
   if (!length(c(list_gcm(), list_dem(), list_normal()))) {
-    response <- utils::askYesNo("climRpnw could not find data to use for this package. Do you want to download it now?")
+    response <- utils::askYesNo(
+      "climRpnw could not find data to use for this package. Do you want to download it now?",
+      prompts = c("Yes", "No", "Cancel")
+    )
     if (!isTRUE(response)) {
       message("You can call `data_update()` whenever you want to obtain data.")
     } else {
