@@ -12,13 +12,17 @@
 #' @details Will use raster package for now. Switch to terra methods once it gets better performance.
 #' See https://gis.stackexchange.com/questions/413105/terrarast-vs-rasterbrick-for-loading-in-nc-files.
 #' @importFrom raster brick stack
+#' @importFrom utils head
 #' @export
 future <- function(gcm = list_gcm(), ssp = list_ssp(), period = list_period() , max_run = 0L) {
+  
+  # Check if we have data, if not download some.
+  data_check()
   
   # Get relevant files
   get_rel_files <- function(pattern) {
     res <- lapply(
-      file.path(data_path(), getOption("climRpnw.gcm.path", default = "gcm"), gcm),
+      file.path(data_path(), getOption("climRpnw.gcm.path", default = "inputs/gcm"), gcm),
       list.files, recursive = TRUE, full.names = TRUE, pattern = pattern
     )
     names(res) <- gcm
@@ -38,7 +42,7 @@ future <- function(gcm = list_gcm(), ssp = list_ssp(), period = list_period() , 
     bricks <- list()
     
     # Select runs + ensembleMean (since alphabetical sort, ensembleMean will be first element)
-    runs <- head(list_unique(index, 5L), max_run + 1L)
+    runs <- utils::head(list_unique(index, 5L), max_run + 1L)
     
     # process one file
     for (i in seq_len(length(index))) {
@@ -62,8 +66,8 @@ future <- function(gcm = list_gcm(), ssp = list_ssp(), period = list_period() , 
       bricks <- append(bricks, brick)
     }
     
-    # Combine in one brick
-    one_gcm <- raster::brick(raster::stack(bricks))
+    # Combine in one brick and turn into SpatRaster
+    one_gcm <- terra::rast(raster::brick(raster::stack(bricks)))
     
     return(one_gcm)
   }
@@ -73,14 +77,17 @@ future <- function(gcm = list_gcm(), ssp = list_ssp(), period = list_period() , 
     nm <- names(layers)
     # Match each layer to a reference layer
     matching_ref <- vapply(strsplit(nm, "_"), function(x) {grep(paste(paste0(x[1:3], collapse = "_"), "reference_", sep = "_"), nm)}, integer(1))
-    # Substract reference layer, this takes a few as all data have to be loaded in memory from disk
+    # Substract reference layer, this takes a few seconds as all data have to be loaded in memory from disk
     layers <- layers - layers[[matching_ref]]
     # Return layers without the references
     return(layers[[-unique(matching_ref)]])
   }
   
+  res <- mapply(process_one_gcm, files_nc, files_csv)
+  attr(res, "builder") <- "climRpnw" 
+  
   # Return a list of SpatRaster, one element for each model
-  return(mapply(process_one_gcm, files_nc, files_csv))
+  return(res)
   
 }
 
@@ -122,7 +129,7 @@ list_parse <- function(gcm, col_num = 1) {
   if (!missing(gcm)) {
     pattern <- paste0("(", paste0(gcm, collapse = "|"), ").*", pattern)
   }
-  files <- list.files(file.path(data_path(), getOption("climRpnw.gcm.path", default = "gcm")), recursive = TRUE, full.names = TRUE, pattern = pattern)
+  files <- list.files(file.path(data_path(), getOption("climRpnw.gcm.path", default = "inputs/gcm")), recursive = TRUE, full.names = TRUE, pattern = pattern)
   
   # Extract all different unique values
   list_unique(files, col_num)
@@ -131,7 +138,7 @@ list_parse <- function(gcm, col_num = 1) {
 #' List available global circulation models
 #' @export
 list_gcm <- function() {
-  list.files(file.path(data_path(), getOption("climRpnw.gcm.path", default = "gcm")))
+  list.files(file.path(data_path(), getOption("climRpnw.gcm.path", default = "inputs/gcm")))
 }
 
 #' List available shared socioeconomic pathways

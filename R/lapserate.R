@@ -40,7 +40,7 @@ recycle_borders <- function(mat, nr, nc) {
 # in the list of matrices.
 #' @param x A list of matrices of the same dimensions
 #' @noRd
-Σ <- function(x) {
+sum_matrix <- function(x) {
   Reduce(`+`, x)
 }
 
@@ -50,7 +50,7 @@ recycle_borders <- function(mat, nr, nc) {
 #' @param y A list of matrices of the same dimensions as x and the same
 #' length as x.
 #' @noRd
-Π <- function(x, y) {
+prod_matrix <- function(x, y) {
   mapply(`*`, x, y, SIMPLIFY = FALSE)
 }
 
@@ -60,7 +60,7 @@ recycle_borders <- function(mat, nr, nc) {
 #' @param y A list of matrices of the same dimensions as x and the same
 #' length as x.
 #' @noRd
-Δ <- function(x, y) {
+delta_matrix <- function(x, y) {
   mapply(`-`, x, y, SIMPLIFY = FALSE)
 }
 
@@ -74,12 +74,12 @@ sup <- function(x, exp) {
 }
 
 # This returns the fitted simple linear regression values using 
-# a pre-calculated β matrix.
+# a pre-calculated beta coefficient matrix.
 #' @param x A list of matrices of the same dimensions.
-#' @param β A matrix of the same dimensions as a matrix in x.
+#' @param beta_coef A matrix of the same dimensions as a matrix in x.
 #' @noRd
-fitted <- function(x, β) {
-  lapply(x, function(x) x*β)
+fitted <- function(x, beta_coef) {
+  lapply(x, function(x) x*beta_coef)
 }
 
 # This compute a list of matrices. Each matrix represents differences between
@@ -91,20 +91,20 @@ fitted <- function(x, β) {
 #' @param NA_replace A boolean. Should NA delta results be replaced by zeros. Default to TRUE.
 #' @noRd
 deltas <- function(mat, nr, nc, NA_replace = TRUE) {
-
+  
   # Reference values
   ref <- mat[c(-1L,-(nr+2L)), c(-1L,-(nc+2L))]
   
   # Surrounding values
   res <- list(
-    northwest = NArep(mat[-(nr + 1L):-(nr + 2L), -(nc + 1L):-(nc + 2L)] - ref),
-    north     = NArep(mat[-(nr + 1L):-(nr + 2L), c(-1L,-(nc + 2L))] - ref),
-    northeast = NArep(mat[-(nr + 1L):-(nr + 2L), -1L:-2L] - ref),
-    east      = NArep(mat[c(-1L,-(nr + 2L)), -1L:-2L] - ref),
-    southeast = NArep(mat[-1L:-2L, -1L:-2L] - ref),
-    south     = NArep(mat[-1L:-2L, c(-1L,-(nc + 2L))] - ref),
-    southwest = NArep(mat[-1L:-2L, -(nc + 1L):-(nc + 2L)] - ref),
-    west      = NArep(mat[c(-1L,-(nr + 2L)), -(nc + 1L):-(nc + 2L)] - ref)
+    northwest = mat[-(nr + 1L):-(nr + 2L), -(nc + 1L):-(nc + 2L)] - ref,
+    north     = mat[-(nr + 1L):-(nr + 2L), c(-1L,-(nc + 2L))] - ref,
+    northeast = mat[-(nr + 1L):-(nr + 2L), -1L:-2L] - ref,
+    east      = mat[c(-1L,-(nr + 2L)), -1L:-2L] - ref,
+    southeast = mat[-1L:-2L, -1L:-2L] - ref,
+    south     = mat[-1L:-2L, c(-1L,-(nc + 2L))] - ref,
+    southwest = mat[-1L:-2L, -(nc + 1L):-(nc + 2L)] - ref,
+    west      = mat[c(-1L,-(nr + 2L)), -(nc + 1L):-(nc + 2L)] - ref
   )
   
   # Replace NA/NaN by 0
@@ -116,9 +116,8 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
   if (isTRUE(NA_replace)) {
     res <- lapply(res, NArep)
   }
-  return(
-    
-  )
+  
+  return(res)
 }
 
 #' Lapse rate computation
@@ -128,26 +127,27 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 #' @param rasterize Return an object of the same class category as target with the same extend.
 #' @details Formulas
 #' Simple linear regression without the intercept term
-#' β = Σxy / Σx²
-#' mss = Σ(xβ)², sum of squared fitted values
-#' rss = Σε², sum of squared (y minus fitted), sum of absolute errors
+#' beta_coef = sum(xy) / sum(x²)
+#' mss = sum(x * beta_coef)², sum of squared fitted values
+#' rss = sum(ε²), sum of squared (y minus fitted), sum of absolute errors
 #' R² = mss / (mss + rss)
-#' Lapse rate = βR²
+#' Lapse rate = beta_coef * R²
 #' @return Lapse rate values.
-#' @import terra raster
+#' @importFrom terra as.list as.matrix ext
 #' @importFrom parallel detectCores mclapply
 #' @export
 lapse_rate <- function(target, NA_replace = TRUE, use_parallel = TRUE, rasterize = TRUE) {
   
   # Make sure target was build using this package functions
-  if (attr(target, "builder") != "climRpnw") {
+  if (!isTRUE(attr(target, "builder") == "climRpnw")) {
     stop("Please use this package functions to create `target`. Read `?lapse_rate` for details.")
   }
   
   # Retrieve digital elevation model from attributes
   dem <- attr(target, "dem")
-  # Transform target to list
-  target <- terra::as.list(target)
+  # Transform target to list, capture names before
+  target_names <- names(target)
+  target <- try(terra::as.list(target), silent = TRUE)
   
   # Compute everything related to the dem and independant of target
   nr <- nrow(dem)
@@ -160,7 +160,7 @@ lapse_rate <- function(target, NA_replace = TRUE, use_parallel = TRUE, rasterize
   # Number of surrounding cells
   n <- length(x)
   # Sums of x squared
-  sum_xx <- Σ(sup(x,2))
+  sum_xx <- sum_matrix(sup(x,2))
   
   # For the lapse rate, x is the elevation, and y is the target
   lapse_rate_redux <- function(r, x, nr, nc, n, sum_xx, NA_replace) {
@@ -171,20 +171,20 @@ lapse_rate <- function(target, NA_replace = TRUE, use_parallel = TRUE, rasterize
     # Compute surrounding cells deltas
     y <- deltas(y, nr, nc)
     # This is the regression coefficient matrix
-    β <- Σ(Π(x,y)) / sum_xx
+    beta_coef <- sum_matrix(prod_matrix(x,y)) / sum_xx
     # We need the fitted values to compute the
     # coefficient of determination
-    f <- fitted(x, β)
+    f <- fitted(x, beta_coef)
     # We use the same approach as stats::summary.lm
     # applied to a list matrices
-    mss <- Σ(sup(f,2))
-    rss <- Σ(sup(Δ(y,f),2))
+    mss <- sum_matrix(sup(f,2))
+    rss <- sum_matrix(sup(delta_matrix(y,f),2))
     # We can combine the resulting matrices to get the
-    # coefficient of determination and multiply by β
-    lapse_rate <- β * mss / (mss + rss)
+    # coefficient of determination and multiply by beta coefficient
+    lapse_rate <- beta_coef * mss / (mss + rss)
     
     if (isTRUE(NA_replace)) {
-      lapse_rate[is.nan(lapse_rate)] <- 0L  
+      lapse_rate[is.na(lapse_rate)] <- 0L  
     }
     
     # And we can return the lapse rate
@@ -198,7 +198,7 @@ lapse_rate <- function(target, NA_replace = TRUE, use_parallel = TRUE, rasterize
     # Restore value on function exit
     on.exit(options("mc.cores" = cur_value), add = TRUE)
     # Set option value for the rest of the function execution
-    options("mc.cores" = parallel::detectCores(logical = FALSE) - 1L)
+    options("mc.cores" = parallel::detectCores()/2L)
     # Use parallel lapply
     func <- parallel::mclapply
   } else {
@@ -212,6 +212,14 @@ lapse_rate <- function(target, NA_replace = TRUE, use_parallel = TRUE, rasterize
     res <- terra::rast(lapply(res, terra::rast, extent = terra::ext(dem)))
   }
   
+  # Set names of lapse rates to match target
+  names(res) <- target_names
+  
   return(res)
   
 }
+
+#' Memoised version
+#' @inheritParams lapse_rate
+#' @importFrom memoise memoise
+lapse_rate_mem <- memoise::memoise(lapse_rate)

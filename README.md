@@ -2,6 +2,51 @@
 [![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](<Redirect-URL>)
 <!-- badges: end -->
 
+# Install
+
+```r
+remotes::install_github("bcgov/climR-pnw")
+```
+
+# Usage
+
+```r
+# Retrieve package data
+data_update()
+
+# Provide or create a points dataframe (lon, lat, elev)
+xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
+
+# Create a baseline
+normal <- baseline()
+
+# Select GCM
+gcm <- future(
+  gcm = c("BCC-CSM2-MR", "CanESM5", "IPSL-CM6A-LR"),
+  ssp = c("ssp126", "ssp245"),
+  period = "2041_2060",
+  max_run = 3
+)
+
+# Use downscale
+results <- downscale(
+  xyz = xyz,
+  normal = normal,
+  gcm = gcm,
+  extra_variables = c("DD_0", "CMD")
+)
+
+# Details about available data
+list_data()
+list_dem()
+list_gcm()
+list_normal()
+list_period()
+list_ssp()
+list_variables()
+
+```
+
 # climR-pnw
 An R package for downscaled global climate model normals in the Pacific Northwest
 

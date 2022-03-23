@@ -4,16 +4,22 @@
 #' @param dem A character. Label of the digital elevation model to use. Must have the same
 #' extent as the normal baseline. Can be obtained from `list_dem()`. Default to `list_dem()[1]`.
 #' @return A normal baseline to use with `downscale`. A `SpatRaster` with a `dem` attribute.
+#' @importFrom terra rast compareGeom
 #' @export
 baseline <- function(normal = list_normal()[1], dem = list_dem()[1]) {
   
+  # Check if we have data, if not download some.
+  data_check()
+  
   # Load dem first file
-  dir_dem <- file.path(data_path(), getOption("climRpnw.dem.path", default = "dem"), dem)
-  dem <- terra::rast(list.files(dir_dem, full.names = TRUE)[1])
+  dir_dem <- file.path(data_path(), getOption("climRpnw.dem.path", default = "inputs/dem"), dem)
+  # + 0 force load to memory
+  dem <- terra::rast(list.files(dir_dem, full.names = TRUE)[1]) + 0
   
   # Load normal files
-  dir_normal <- file.path(data_path(), getOption("climRpnw.normal.path", default = "normal"), normal)
-  normal <- terra::rast(list.files(dir_normal, full.names = TRUE))
+  dir_normal <- file.path(data_path(), getOption("climRpnw.normal.path", default = "inputs/normal"), normal)
+  # + 0 force load to memory
+  normal <- terra::rast(list.files(dir_normal, full.names = TRUE)) + 0
   
   # All objects have to share the same extent for now
   # This could be modified to process all the objects to adjust them to
@@ -24,6 +30,7 @@ baseline <- function(normal = list_normal()[1], dem = list_dem()[1]) {
   
   # Set dem as attribute to normal
   attr(normal, "dem") <- dem
+  attr(normal, "builder") <- "climRpnw"
   
   return(normal)
 }
@@ -31,10 +38,10 @@ baseline <- function(normal = list_normal()[1], dem = list_dem()[1]) {
 #' List available normal
 #' @export
 list_normal <- function() {
-  dirs <- list.files(file.path(data_path(), getOption("climRpnw.normal.path", default = "normal")))
+  dirs <- list.files(file.path(data_path(), getOption("climRpnw.normal.path", default = "inputs/normal")))
   for (dir in dirs) {
     # Check if all months for all three variables are there
-    files <- list.files(file.path(data_path(), getOption("climRpnw.normal.path", default = "normal"), dir))
+    files <- list.files(file.path(data_path(), getOption("climRpnw.normal.path", default = "inputs/normal"), dir))
     avail <- vapply(strsplit(files, split = ".", fixed = TRUE), `[`, character(1), 1)
     vars <- c("PPT", "Tmax", "Tmin")
     months <- sprintf("%02d", 1:12)
@@ -49,10 +56,10 @@ list_normal <- function() {
 #' List available digital elevation models
 #' @export
 list_dem <- function() {
-  dirs <- list.files(file.path(data_path(), getOption("climRpnw.dem.path", default = "dem")))
+  dirs <- list.files(file.path(data_path(), getOption("climRpnw.dem.path", default = "inputs/dem")))
   for (dir in dirs) {
     # Check if all months for all three variables are there
-    files <- list.files(file.path(data_path(), getOption("climRpnw.dem.path", default = "dem"), dir))
+    files <- list.files(file.path(data_path(), getOption("climRpnw.dem.path", default = "inputs/dem"), dir))
     avail <- vapply(strsplit(files, split = ".", fixed = TRUE), `[`, character(1), 1)
     if (length(avail) > 1) {
       warning(dir, " data is available, but multiple files found in subdirectory ", paste0(avail, collapse = ", "), ". Only the first one is loaded.")
