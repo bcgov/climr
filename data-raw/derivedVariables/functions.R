@@ -1,6 +1,6 @@
 ## *** NFFD  ***
 
-nffd_param <- read.csv(file = "../optimizationTables/param_NFFD.csv", sep=',', header = TRUE)
+nffd_param <- read.csv(file = "data-raw/derivedVariables/optimizedParameterTables/param_NFFD.csv", sep=',', header = TRUE)
 
 # nffd: number of frost free days
 # m: month of the year
@@ -48,7 +48,7 @@ ffp <-function(effp,bffp) {
 }
 
 ## *** PAS ***
-pas_param <- read.csv(file = "../optimizationTables/param_PAS.csv", sep=',', header = TRUE)
+pas_param <- read.csv(file = "data-raw/derivedVariables/optimizedParameterTables/param_PAS.csv", sep=',', header = TRUE)
 
 # pas: precipitation as snow
 # m: month of the year
@@ -124,10 +124,10 @@ rh <- function(tmin_mean, tmax_mean) {
 }
 
 # *** DD ***
-dd_param_below_0 <- read.csv(file = "../optimizationTables/param_DD_S1.csv", sep=',', header = TRUE)
-dd_param_above_5 <- read.csv(file = "../optimizationTables/param_DD_S2.csv", sep=',', header = TRUE)
-dd_param_below_18 <- read.csv(file = "../optimizationTables/param_DD_S3.csv", sep=',', header = TRUE)
-dd_param_above_18 <- read.csv(file = "../optimizationTables/param_DD_S4.csv", sep=',', header = TRUE)
+dd_param_below_0 <- read.csv(file = "data-raw/derivedVariables/optimizedParameterTables/param_DD_S1.csv", sep=',', header = TRUE)
+dd_param_above_5 <- read.csv(file = "data-raw/derivedVariables/optimizedParameterTables/param_DD_S2.csv", sep=',', header = TRUE)
+dd_param_below_18 <- read.csv(file = "data-raw/derivedVariables/optimizedParameterTables/param_DD_S3.csv", sep=',', header = TRUE)
+dd_param_above_18 <- read.csv(file = "data-raw/derivedVariables/optimizedParameterTables/param_DD_S4.csv", sep=',', header = TRUE)
 
 dd <- function(m, tm) {
   

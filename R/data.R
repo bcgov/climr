@@ -75,7 +75,7 @@ data_download <- function(url, path, uid, quiet = !interactive()) {
     # Create directory if it does not already exist
     dir.create(dirname(outfile), recursive = TRUE, showWarnings = FALSE)
     # Download file
-    download.file(url = url, destfile = outfile, quiet = quiet)
+    download.file(url = url, destfile = outfile, quiet = quiet, mode = "wb")
     # Update uid db
     uid_update(path, uid)
   }
