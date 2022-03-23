@@ -21,7 +21,10 @@ cache_exists <- function() {
 cache_ask <- function(ask = interactive()) {
   # Only ask if cache does not already exists
   if (!cache_exists() && isTRUE(ask)) {
-    response <- utils::askYesNo("Is it ok to cache climRpnw raster files locally?")
+    response <- utils::askYesNo(
+      "Is it ok to cache climRpnw raster files locally?",
+      prompts = c("Yes", "No", "Cancel")
+    )
     if (is.na(response)) {
       stop("Cancelled by user.", call. = FALSE)
     } else {
