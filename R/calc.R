@@ -4,6 +4,21 @@
 #' @param grouping A character vector of variables grouping. Can be `m` (monthly), `s` (seasonal) or `a` (annual).
 append_calc <- function(dt, extra_variables, grouping) {
   
+  # Suffixes
+  s <- c("wt", "sp", "sm", "at")
+  m <- sprintf("%02d", 1:12)
+  
+  #Deal with default variables first
+  # if ("s" %in% grouping) {
+  #   set(dt, j = paste0("")
+  # }
+  if ("DD_0" %in% extra_variables) {
+    set(dt, j = paste0("DD_0_",m), value = {
+      lapply(1:12, function(x) {
+        calc_DD_below_0(x, dt[, rowMeans(.SD), .SDcols = sprintf("%s%02d", c("Tmin", "Tmax"), x)])
+      })
+    })
+  }
 }
 
 #' List climate variables
