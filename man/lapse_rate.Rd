@@ -24,9 +24,9 @@ Lapse rate computation
 \details{
 Formulas
 Simple linear regression without the intercept term
-β = Σxy / Σx²
-mss = Σ(xβ)², sum of squared fitted values
-rss = Σε², sum of squared (y minus fitted), sum of absolute errors
+beta_coef = sum(xy) / sum(x²)
+mss = sum(x * beta_coef)², sum of squared fitted values
+rss = sum(ε²), sum of squared (y minus fitted), sum of absolute errors
 R² = mss / (mss + rss)
-Lapse rate = βR²
+Lapse rate = beta_coef * R²
 }

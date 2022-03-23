@@ -11,9 +11,9 @@
 #' Instead, data is downloaded, optionally cached, when you need to run functions.
 #' @export
 data_update <- function(
-  dem = getOption("climRpnw.dem.path", default = "dem"),
-  gcm = getOption("climRpnw.gcm.path", default = "gcm"),
-  normal = getOption("climRpnw.normal.path", default = "normal"),
+  dem = getOption("climRpnw.dem.path", default = "inputs/dem"),
+  gcm = getOption("climRpnw.gcm.path", default = "inputs/gcm"),
+  normal = getOption("climRpnw.normal.path", default = "inputs/normal"),
   quiet = !interactive(),
   ...) {
   
@@ -83,11 +83,12 @@ data_download <- function(url, path, uid, quiet = !interactive()) {
 }
 
 #' Return current package data path
+#' @param ... Other parameters for `cache_ask`.
 #' @details If cache is used, return the cache path. Otherwise, it returns
 #' a temporary folder that will be used for this session only.
 #' @export
-data_path <- function() {
-  use_cache <- getOption("climRpnw.session.cache.ask.response", default = cache_ask())
+data_path <- function(...) {
+  use_cache <- getOption("climRpnw.session.cache.ask.response", default = cache_ask(...))
   if (use_cache) {
     return(cache_path())
   } else {
@@ -115,7 +116,7 @@ data_delete <- function(ask = interactive()) {
   }
   
   # Remove cache directory
-  unlink(data_path(), recursive = TRUE)
+  unlink(data_path(ask = FALSE), recursive = TRUE)
   # Reset files list uid database
   uid_delete()
   # Unset options
@@ -132,7 +133,12 @@ data_delete <- function(ask = interactive()) {
 #' @noRd
 data_check <- function() {
   if (!length(c(list_gcm(), list_dem(), list_normal()))) {
-    data_update()
+    response <- utils::askYesNo("climRpnw could not find data to use for this package. Do you want to download it now?")
+    if (!isTRUE(response)) {
+      message("You can call `data_update()` whenever you want to obtain data.")
+    } else {
+      data_update()
+    }
   }
 }
 
