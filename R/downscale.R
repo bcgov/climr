@@ -29,12 +29,12 @@ downscale <- function(xyz, normal, gcm = NULL, variables, grouping = c("m", "s",
   # possible garbage output :
   # Error in (function (x)  : attempt to apply non-function
   # Error in x$.self$finalize() : attempt to apply non-function
-  # Can ignore, suppressing messages for now
+  # Can ignore
   # https://github.com/rspatial/terra/issues/287
   res <- suppressMessages(
     {terra::extract(x = normal, y = xyz[,1L:2L], method = "bilinear")},
     classes = c("messages", "condition")
-  )
+  )[,-1] # Remove ID column
   
   # Compute lapse rates and cache for same session reprocessing
   if (isTRUE(use_cache)) {
@@ -44,16 +44,63 @@ downscale <- function(xyz, normal, gcm = NULL, variables, grouping = c("m", "s",
   }
   
   # Compute elevation differences between provided points elevation and normal
-  elev_delta <- xyz[,3L] - terra::extract(x = attr(normal, "dem"), y = xyz[,1L:2L], method = "simple")
+  elev_delta <- xyz[,3L] - suppressMessages(
+    {terra::extract(x = attr(normal, "dem"), y = xyz[,1L:2L], method = "simple")},
+    classes = c("messages", "condition")
+  )[,-1L] # Remove ID column
   
   # Compute individual point lapse rate adjustments
   lr <- elev_delta * suppressMessages(
     {terra::extract(x = lapse_rates, y = xyz[,1L:2L], method = "bilinear")},
     classes = c("messages", "condition")
-  )
+  )[, -1L] # Remove ID column
   
   # Combine results
-  res <- res + lr + future
+  res <- res + lr
+  
+  process_one_fut <- function(fut) {
+    nm <- names(fut)
+    # Extract future / gcm bilinear interpolation
+    fut <- suppressMessages(
+      {terra::extract(x = fut, y = xyz[,1L:2L], method = "bilinear")},
+      classes = c("messages", "condition")
+    )
+    # Find matching column in baseline
+    labels <- vapply(strsplit(nm, "_"), function(x) {paste0(x[2:3], collapse = "")}, character(1))
+    labels <- gsub("pr", "PPT", labels)
+    labels <- gsub("tas", "T", labels)
+    # Add matching column to fut and return
+    fut[,-1L] <- fut[,-1L] + res[,match(labels,names(res))]
+    
+    # Reshape (melt / dcast) to obtain final form
+    ref_dt <- tstrsplit(names(fut)[-1L], "_")
+    # Recombine PERIOD
+    ref_dt[[6]] <- paste(ref_dt[[6]], ref_dt[[7]], sep = "_")
+    ref_dt[7] <- NULL
+    # Transform to data.table
+    setDT(ref_dt)
+    setnames(ref_dt, c("GCM", "VAR", "MONTH", "SSP", "RUN", "PERIOD"))
+    set(ref_dt, j = "variable", value = names(fut)[-1L])
+    set(ref_dt, j = "VAR", value = c("pr" = "PPT", "tasmin" = "Tmin", "tasmax" = "Tmax")[ref_dt[["VAR"]]])
+    setkey(ref_dt, "variable")
+    
+    # Melt fut and set the same key
+    fut <- melt(setDT(fut), id.vars = "ID", variable.factor = FALSE)
+    setkey(fut, "variable")
+    
+    # And dcast back to get original column
+    fut <- dcast(fut[ref_dt,], ID + GCM + SSP + RUN + PERIOD ~ VAR + MONTH, value.var = "value", sep = "")
+    
+    return(fut)
+  }
+  
+  # Compute future
+  fut <- data.table::rbindlist(lapply(gcm, process_one_fut), use.names = TRUE)
+  
+  lapply()
+  nm <- names(fut)
+  
+  names(res)
   
   # Compute climate variables  
   
