@@ -32,6 +32,10 @@ uses cached computation. If \code{FALSE}, recompute. Default to \code{TRUE}.}
 \description{
 Downscale target rasters to points of interest
 }
+\details{
+Couple first calls should be slower as it will cache the costly lapse rate
+computation. After that, it should be as quick as possible.
+}
 \examples{
 \dontrun{
 xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))

@@ -8,6 +8,8 @@
 #' @param grouping A character vector of variables grouping. Can be `m` (monthly), `s` (seasonal) or `a` (annual).
 #' @param use_cache A boolean. For lapse rate calculation, if `TRUE` and available,
 #'  uses cached computation. If `FALSE`, recompute. Default to `TRUE`.
+#' @details Couple first calls should be slower as it will cache the costly lapse rate
+#' computation. After that, it should be as quick as possible.
 #' @import data.table
 #' @importFrom terra extract
 #' @export
