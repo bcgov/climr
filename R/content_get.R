@@ -25,8 +25,9 @@ content_get <- function(path, source = c("github"), ...) {
 #' @rdname content_get
 content_get_gh <- function(path,
                            repo = getOption("climRpnw.gh.repo", default = "bcgov/climR-pnw"),
-                           ref = "data",
-                           ...) {
+                           ref = "data") {
+  
+  if (FALSE) { type <- NULL }
   
   res <- gh::gh(
     "GET /repos/{repo}/contents/{path}{ref}",
@@ -40,29 +41,38 @@ content_get_gh <- function(path,
   # It is the results of applying a sha1 algorithm to the file content + metadata.
   # It is returned by the GitHub API and will be used in this package to manage files update.
   # This package use it as a uid for files.
-  flag_for_removal <- integer()
-  for (i in seq_len(length(res))) {
-    file <- res[[i]]
-    if (file[["type"]] == "dir") {
-      res <- c(res, content_get_gh(file[["path"]], repo = repo, ref = ref))
-      flag_for_removal <- c(flag_for_removal, i)
-    } else {
-      res[[i]] <- c(
-        url = file[["download_url"]],
-        path = file[["path"]],
-        uid = file[["sha"]]
-      )
-    }
-  }
-  res[flag_for_removal] <- NULL
   
-  return(res)
+  dt <- suppressWarnings(
+    data.table::rbindlist(
+      lapply(
+        res,
+        `[`,
+        c("download_url", "path", "sha", "type")
+      )
+    )
+  )
+  setnames(dt, c("url", "path", "uid", "type"))
+
+  # Recursively download from folders
+  dt <- data.table::rbindlist(
+    c(
+      list(dt[!type %in% "dir"][,-4L]),
+      lapply(
+        dt[type %in% "dir"][["path"]],
+        content_get_gh,
+        repo = repo,
+        ref = ref
+      )
+    )
+  )
+  
+  return(dt)
   
 }
 
 #' @rdname content_get
 content_get_void <- function(...) {
-  list(
+  data.table::data.table(
     url = character(),
     uid = character(),
     path = character()

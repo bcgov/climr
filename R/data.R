@@ -10,11 +10,11 @@
 #' Instead, data is downloaded, optionally cached, when you need to run functions.
 #' @export
 data_update <- function(
+  ...,
   dem = getOption("climRpnw.dem.path", default = "inputs_pkg/dem"),
   gcm = getOption("climRpnw.gcm.path", default = "inputs_pkg/gcm"),
   normal = getOption("climRpnw.normal.path", default = "inputs_pkg/normal"),
-  quiet = !interactive(),
-  ...) {
+  quiet = !interactive()) {
   
   # Reset options value if provided by user. They will be used to retrieve data by other functions.
   options("climRpnw.dem.path" = dem)
@@ -31,7 +31,16 @@ data_update <- function(
   normal_files <- content_get(path = normal, ...)
   
   # Do the actual download of files
-  data_get(files = c(dem_files, gcm_files, normal_files), quiet = quiet)
+  data_get(
+    files = data.table::rbindlist(
+      list(
+        dem_files,
+        gcm_files,
+        normal_files
+      )
+    ),
+    quiet = quiet
+  )
   
   return(invisible(TRUE))
   
@@ -43,19 +52,10 @@ data_update <- function(
 #' @details Each element must have a `url`, a `path` relative
 #' to data path and a unique identifier `uid`.
 data_get <- function(files, quiet = !interactive()) {
-  invisible(
-    vapply(
-      files, 
-      function(file) {
-        data_download(
-          url = file[["url"]],
-          path = file[["path"]],
-          uid = file[["uid"]],
-          quiet = quiet
-        )
-      },
-      logical(1)
-    )
+  data_download(
+    url = files[["url"]],
+    path = files[["path"]],
+    uid = files[["uid"]],
   )
 }
 
@@ -67,17 +67,34 @@ data_get <- function(files, quiet = !interactive()) {
 #' @param quiet A logical. If `TRUE`, suppress status messages (if any), and the progress bar.
 #' @importFrom utils download.file
 data_download <- function(url, path, uid, quiet = !interactive()) {
+  
   # If file uid  on local disk is the same, skip download
-  if (!uid_check(path, uid)) {
-    # Determine where to save the downloaded file
-    outfile <- file.path(data_path(), path)
-    # Create directory if it does not already exist
-    dir.create(dirname(outfile), recursive = TRUE, showWarnings = FALSE)
-    # Download file
-    download.file(url = url, destfile = outfile, quiet = quiet, mode = "wb")
-    # Update uid db
-    uid_update(path, uid)
+  existing <- uid_check(path, uid)
+  if (all(existing)) {
+    return(invisible(TRUE))
   }
+  
+  # Determine where to save the downloaded file
+  dest <- file.path(data_path(), path[!existing])
+  
+  # Create directory if it does not already exist
+  lapply(unique(dirname(dest)), dir.create, recursive = TRUE, showWarnings = FALSE)
+  
+  # Download files
+  download.file(
+    url = url[!existing],
+    destfile = dest,
+    method = "libcurl",
+    quiet = quiet,
+    mode = "wb"
+  )
+  
+  # Update uid db
+  uid_update(path[!existing], uid[!existing])
+  
+  # Update lapse rates cache using the first dem file found
+  lapse_rates(list_normal(), list_dem()[1])
+  
   return(invisible(TRUE))
 }
 

@@ -14,20 +14,21 @@ remotes::install_github("bcgov/climR-pnw")
 # Retrieve package data
 data_update()
 
-# Provide or create a points dataframe (lon, lat, elev)
-n <- 100000
-xyz <- data.frame(lon = runif(n, -125, -120), lat = runif(n, 51, 53), elev = runif(n, 1500, 2500))
-
-# Create a normal baseline + lapse_rates
+# Create a normal baseline
 normal <- normal_input()
 
 # Select GCM
 gcm <- gcm_input(
-  gcm = c("BCC-CSM2-MR", "CanESM5", "IPSL-CM6A-LR"),
-  ssp = c("ssp126", "ssp245"),
+  gcm = c("BCC-CSM2-MR"),
+  ssp = c("ssp126"),
   period = "2041_2060",
-  max_run = 3
+  max_run = 0
 )
+
+# Provide or create a points dataframe (lon, lat, elev)
+n <- 100000
+xyz <- data.frame(lon = runif(n, -125, -120), lat = runif(n, 51, 53), elev = numeric(n))
+xyz[,3] <- terra::extract(attr(normal, "dem"), xyz[,1:2], method = "bilinear")[,-1L]
 
 # Use downscale
 results <- downscale(
