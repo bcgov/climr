@@ -147,10 +147,10 @@ for(gcm in gcms){
     }
     
     # write data out for the GCMxElement 
-    writeRaster(compiled, paste("inputs/gcmData", gcm, element, "nc", sep="."), overwrite=TRUE, format="CDF", varname=element, varunit=if(element=="pr") "mm" else "degC", 
+    writeRaster(compiled, paste(sprintf("inputs_raw/gcm/%s/gcmData", gcm), gcm, element, "nc", sep="."), overwrite=TRUE, format="CDF", varname=element, varunit=if(element=="pr") "mm" else "degC", 
                 longname="", xname="latitude",   yname="longitude",zname="index",
                 zunit="numeric")
-    write.csv(names(compiled), paste("inputs/gcmIndex", gcm, element, "csv", sep=".")) # this is the metadata for each raster
+    write.csv(names(compiled), paste(sprintf("inputs_raw/gcm/%s/gcmIndex", gcm), gcm, element, "csv", sep=".")) # this is the metadata for each raster
     
     print(element)
   }
@@ -160,8 +160,8 @@ for(gcm in gcms){
 
 gcm <- "GFDL-ESM4"
 element <- "tasmin"
-test <- brick(paste("inputs/gcmData/gcmData", gcm, element, "nc", sep="."))
-index <- read.csv(paste("inputs/gcmData/gcmIndex", gcm, element, "csv", sep="."), )
+test <- brick(paste(sprintf("inputs_raw/gcm/%s/gcmData", gcm), gcm, element, "nc", sep="."))
+index <- read.csv(paste(sprintf("inputs_raw/gcm/%s/gcmIndex", gcm), gcm, element, "csv", sep="."), )
 names(test) <- index[,-1]
 test
 # names(test)

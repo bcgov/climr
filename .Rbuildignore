@@ -1,6 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^inputs$
+^inputs_raw$
+^inputs_pkg$
 ^scripts$
 ^\.git
 ^\.github$
