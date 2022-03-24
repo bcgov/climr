@@ -4,10 +4,18 @@
 \alias{lapse_rate}
 \title{Lapse rate computation}
 \usage{
-lapse_rate(target, NA_replace = TRUE, use_parallel = TRUE, rasterize = TRUE)
+lapse_rate(
+  target,
+  dem,
+  NA_replace = TRUE,
+  use_parallel = TRUE,
+  rasterize = TRUE
+)
 }
 \arguments{
 \item{target}{Target rasters to compute lapse rates for. Build with this package functions.}
+
+\item{dem}{A digital elevation model with matching target extent.}
 
 \item{NA_replace}{A boolean. Should NA lapse rate results be replaced by zeros. Default to TRUE.}
 

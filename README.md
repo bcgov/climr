@@ -17,11 +17,11 @@ data_update()
 # Provide or create a points dataframe (lon, lat, elev)
 xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
 
-# Create a baseline
-normal <- baseline()
+# Create a normal baseline
+normal <- normal_input()
 
 # Select GCM
-gcm <- future(
+gcm <- gcm_input(
   gcm = c("BCC-CSM2-MR", "CanESM5", "IPSL-CM6A-LR"),
   ssp = c("ssp126", "ssp245"),
   period = "2041_2060",
@@ -33,7 +33,7 @@ results <- downscale(
   xyz = xyz,
   normal = normal,
   gcm = gcm,
-  extra_variables = c("DD_0", "CMD")
+  extra = c("DD_0", "CMD")
 )
 
 # Details about available data
