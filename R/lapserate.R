@@ -136,7 +136,6 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 #' @return Lapse rate values.
 #' @importFrom terra as.list as.matrix ext
 #' @importFrom parallel detectCores mclapply
-#' @export
 lapse_rate <- function(normal, dem, NA_replace = TRUE, use_parallel = TRUE, rasterize = TRUE) {
   
   # Transform normal to list, capture names before
@@ -220,4 +219,84 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, use_parallel = TRUE, rast
   
   return(res)
   
+}
+
+#' Compute and cache lapse rates for later use
+#' @inheritParams lapse_rate
+#' @importFrom utils write.csv
+lapse_rates <- function(normal, dem, NA_replace = TRUE, use_parallel = TRUE, rasterize = TRUE) {
+  
+  # Load dem first file
+  dir_dem <- file.path(
+    data_path(),
+    getOption("climRpnw.dem.path", default = "inputs_pkg/dem"),
+    dem
+  )
+  # Directly using terra::rast does not preserve NA value from disk to memory.
+  # It stores -max.int32. Workaround until fixed. Use raster::brick, do math
+  # operation then use terra::rast.
+  dem <- terra::rast(
+    raster::raster(
+      list.files(dir_dem, full.names = TRUE, pattern = "\\.nc")[1]
+    ) - 0L
+  )
+  
+  # Loop for each normal
+  for (n in normal) {
+    
+    # Load normal files
+    dir_normal <- file.path(
+      data_path(),
+      getOption("climRpnw.normal.path", default = "inputs_pkg/normal"),
+      n
+    )
+    
+    # Directly using terra::rast does not preserve NA value from disk to memory.
+    # It stores -max.int32. Workaround until fixed. Use raster::brick, do math
+    # operation then use terra::rast.
+    r <- terra::rast(
+      raster::brick(
+        list.files(dir_normal, full.names = TRUE, pattern = "\\.nc")[1]
+      ) - 0L
+    )
+    names(r) <- data.table::fread(
+      list.files(dir_normal, full.names = TRUE, pattern = "\\.csv")[1], header = TRUE
+    )[["x"]]
+    
+    # All objects have to share the same extent for now
+    # This could be modified to process all the objects to adjust them to
+    # the same raster extent.
+    if (!terra::compareGeom(r, dem)) {
+      next
+    }
+    
+    message("Computing lapse rates for normal: ", n)
+    from <- lapse_rate(
+      normal = r,
+      dem = dem,
+      NA_replace = NA_replace,
+      use_parallel = use_parallel,
+      rasterize = rasterize
+    )
+    
+    message(
+      "Compressing and saving lapse rates to: ",
+      file.path(dir_normal, "lr", sprintf("%s.lr.nc", n))
+    )
+    dir.create(file.path(dir_normal, "lr"), recursive = TRUE, showWarnings = FALSE)
+    
+    # Actual writing and compressing
+    terra::writeCDF(
+      from,
+      file.path(dir_normal, "lr", sprintf("%s.lr.nc", n)),
+      overwrite = TRUE,
+      compression = 9
+    )
+    
+    # Then index
+    utils::write.csv(names(from), file.path(dir_normal, "lr", sprintf("%s.lr.csv", n)))
+    message("Done")
+  }
+  
+  return(invisible(TRUE))
 }

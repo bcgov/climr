@@ -18,7 +18,7 @@ data_update()
 n <- 100000
 xyz <- data.frame(lon = runif(n, -125, -120), lat = runif(n, 51, 53), elev = runif(n, 1500, 2500))
 
-# Create a normal baseline + lapse_rates
+# Create a normal baseline
 normal <- normal_input()
 
 # Select GCM

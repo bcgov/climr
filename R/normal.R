@@ -3,11 +3,12 @@
 #' `list_normal()`. Default to `list_normal()[1]`.
 #' @param dem A character. Label of the digital elevation model to use. Must have the same
 #' extent as the normal baseline. Can be obtained from `list_dem()`. Default to `list_dem()[1]`.
+#' @param use_cache Use a cached version of lapse rates if available instead of recomputing.
 #' @return A normal baseline to use with `downscale`. A `SpatRaster` with a `dem` attribute and
-#' a `lapse_rates` attribute..
+#' a `lr` attribute..
 #' @importFrom terra rast compareGeom
 #' @export
-normal_input <- function(normal = list_normal()[1], dem = list_dem()[1]) {
+normal_input <- function(normal = list_normal()[1], dem = list_dem()[1], use_cache = TRUE) {
   
   # Check if we have data, if not download some.
   data_check()
@@ -55,14 +56,26 @@ normal_input <- function(normal = list_normal()[1], dem = list_dem()[1]) {
     )
   }
   
-  # TODO : Some caching could be done here, tradeoff to consider.
-  # maybe run lapse_rate within data_update() and read from nc?
-  # file is too big to put on git.
-  lapse_rates <- lapse_rate(normal, dem)
+  # Use cached lapse rates if they exists
+  if (isTRUE(use_cache) && dir.exists(file.path(dir_normal, "lr"))) {
+    # Directly using terra::rast does not preserve NA value from disk to memory.
+    # It stores -max.int32. Workaround until fixed. Use raster::brick, do math
+    # operation then use terra::rast.
+    lr <- terra::rast(
+      raster::brick(
+        list.files(file.path(dir_normal, "lr"), full.names = TRUE, pattern = "\\.nc")[1]
+      ) - 0L
+    )
+    names(lr) <- data.table::fread(
+      list.files(file.path(dir_normal, "lr"), full.names = TRUE, pattern = "\\.csv")[1], header = TRUE
+    )[["x"]]
+  } else {
+    lr <- lapse_rate(normal, dem)
+  }
   
-  # Set dem/lapse_rates as attribute to normal
+  # Set dem / lr as attribute to normal
   attr(normal, "dem") <- dem
-  attr(normal, "lapse_rates") <- lapse_rates
+  attr(normal, "lr") <- lr
   attr(normal, "builder") <- "climRpnw"
   
   return(normal)
