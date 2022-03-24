@@ -79,6 +79,10 @@ gcm_input <- function(gcm = list_gcm(), ssp = list_ssp(), period = list_period()
       bricks <- append(bricks, brick)
     }
     
+    # Directly using terra::rast does not preserve NA value from disk to memory.
+    # It stores -max.int32. Workaround until fixed. Use raster::brick, do math
+    # operation then use terra::rast.
+    
     # Combine into one brick and turn into SpatRaster
     one_gcm <- terra::rast(raster::brick(raster::stack(bricks)))
     
@@ -121,7 +125,7 @@ gcm_input <- function(gcm = list_gcm(), ssp = list_ssp(), period = list_period()
     return(layers)
   }
   
-  res <- mapply(process_one_gcm, files_nc, files_csv, ssp = ssp, period = period)
+  res <- mapply(process_one_gcm, files_nc, files_csv, MoreArgs = list(ssp = ssp, period = period))
   attr(res, "builder") <- "climRpnw" 
   
   # Return a list of SpatRaster, one element for each model

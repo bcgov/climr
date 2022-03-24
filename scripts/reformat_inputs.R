@@ -49,3 +49,18 @@ for (file in files_nc) {
     compression = 9
   )
 }
+
+# Tentative, files is too big
+
+# Lapse rates
+dname <- list_normal()[1]
+normal <- normal_input(dname)
+from <- attr(normal, "lapse_rates")
+dir.create(sprintf("inputs_pkg/normal/%s/lr", dname), recursive = TRUE, showWarnings = FALSE)
+terra::writeCDF(
+  from,
+  sprintf("inputs_pkg/normal/%s/lr/%s.nc", dname, dname),
+  overwrite = TRUE,
+  compression = 9
+)
+write.csv(names(from),sprintf("inputs_pkg/normal/%s/lr/%s.csv", dname, dname))

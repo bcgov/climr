@@ -121,11 +121,11 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 }
 
 #' Lapse rate computation
-#' @param target Target rasters to compute lapse rates for. Build with this package functions.
-#' @param dem A digital elevation model with matching target extent.
+#' @param normal Normal rasters to compute lapse rates for. Build with this package functions.
+#' @param dem A digital elevation model with matching normal extent.
 #' @param NA_replace A boolean. Should NA lapse rate results be replaced by zeros. Default to TRUE.
 #' @param use_parallel A boolean. Should parallel::mclapply be used. Default to TRUE.
-#' @param rasterize Return an object of the same class category as target with the same extend.
+#' @param rasterize Return an object of the same class category as normal with the same extend.
 #' @details Formulas
 #' Simple linear regression without the intercept term
 #' beta_coef = sum(xy) / sum(x²)
@@ -137,13 +137,13 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 #' @importFrom terra as.list as.matrix ext
 #' @importFrom parallel detectCores mclapply
 #' @export
-lapse_rate <- function(target, dem, NA_replace = TRUE, use_parallel = TRUE, rasterize = TRUE) {
+lapse_rate <- function(normal, dem, NA_replace = TRUE, use_parallel = TRUE, rasterize = TRUE) {
   
-  # Transform target to list, capture names before
-  target_names <- names(target)
-  target <- shush(terra::as.list(target))
+  # Transform normal to list, capture names before
+  normal_names <- names(normal)
+  normal <- shush(terra::as.list(normal))
   
-  # Compute everything related to the dem and independant of target
+  # Compute everything related to the dem and independant of normal
   nr <- nrow(dem)
   nc <- ncol(dem)
   x <- shush(terra::as.matrix(dem, wide = TRUE))
@@ -156,7 +156,7 @@ lapse_rate <- function(target, dem, NA_replace = TRUE, use_parallel = TRUE, rast
   # Sums of x squared
   sum_xx <- sum_matrix(sup(x,2))
   
-  # For the lapse rate, x is the elevation, and y is the target
+  # For the lapse rate, x is the elevation, and y is the normal
   lapse_rate_redux <- function(r, x, nr, nc, n, sum_xx, NA_replace) {
     
     y <- shush(terra::as.matrix(r, wide = TRUE))
@@ -200,7 +200,7 @@ lapse_rate <- function(target, dem, NA_replace = TRUE, use_parallel = TRUE, rast
     func <- lapply
   }
   
-  res <- func(target, lapse_rate_redux, x, nr, nc, n, sum_xx, NA_replace)
+  res <- func(normal, lapse_rate_redux, x, nr, nc, n, sum_xx, NA_replace)
   
   # Transform back into raster layers stack
   if (isTRUE(rasterize)) {
@@ -215,8 +215,8 @@ lapse_rate <- function(target, dem, NA_replace = TRUE, use_parallel = TRUE, rast
     )
   }
   
-  # Set names of lapse rates to match target
-  names(res) <- target_names
+  # Set names of lapse rates to match normal
+  names(res) <- normal_names
   
   return(res)
   

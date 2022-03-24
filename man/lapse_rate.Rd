@@ -5,7 +5,7 @@
 \title{Lapse rate computation}
 \usage{
 lapse_rate(
-  target,
+  normal,
   dem,
   NA_replace = TRUE,
   use_parallel = TRUE,
@@ -13,15 +13,15 @@ lapse_rate(
 )
 }
 \arguments{
-\item{target}{Target rasters to compute lapse rates for. Build with this package functions.}
+\item{normal}{Normal rasters to compute lapse rates for. Build with this package functions.}
 
-\item{dem}{A digital elevation model with matching target extent.}
+\item{dem}{A digital elevation model with matching normal extent.}
 
 \item{NA_replace}{A boolean. Should NA lapse rate results be replaced by zeros. Default to TRUE.}
 
 \item{use_parallel}{A boolean. Should parallel::mclapply be used. Default to TRUE.}
 
-\item{rasterize}{Return an object of the same class category as target with the same extend.}
+\item{rasterize}{Return an object of the same class category as normal with the same extend.}
 }
 \value{
 Lapse rate values.
