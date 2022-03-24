@@ -1,19 +1,18 @@
 #' Update external package data
 #' @param dem A character. Relative path from the source root to digital elevation model files folder.
-#' Default to option value "climRpnw.dem.path" if set, or "inputs/digitalElevationModel".
+#' Default to option value "climRpnw.dem.path" if set, or "inputs_pkg/digitalElevationModel".
 #' @param gcm A character. Relative path from the source root to global circulation models files folder.
-#' Default to option value "climRpnw.gcm.path" if set, or "inputs/gcmData".
+#' Default to option value "climRpnw.gcm.path" if set, or "inputs_pkg/gcmData".
 #' @param normal A character. Relative path from the source root to base normal files folder.
-#' Default to option value "climRpnw.normal.path" if set, or "inputs/Normal_1961_1990MP".
 #' @param quiet A logical. If `TRUE`, suppress status messages (if any), and the progress bar.
 #' @param ... Others parameters such as `source` or `repo` for content getting functions.
 #' @details This package uses data that are too big to be included with sources.
 #' Instead, data is downloaded, optionally cached, when you need to run functions.
 #' @export
 data_update <- function(
-  dem = getOption("climRpnw.dem.path", default = "inputs/dem"),
-  gcm = getOption("climRpnw.gcm.path", default = "inputs/gcm"),
-  normal = getOption("climRpnw.normal.path", default = "inputs/normal"),
+  dem = getOption("climRpnw.dem.path", default = "inputs_pkg/dem"),
+  gcm = getOption("climRpnw.gcm.path", default = "inputs_pkg/gcm"),
+  normal = getOption("climRpnw.normal.path", default = "inputs_pkg/normal"),
   quiet = !interactive(),
   ...) {
   
@@ -125,7 +124,8 @@ data_delete <- function(ask = interactive()) {
     "climRpnw.session.tmp.path" = NULL,
     "climRpnw.dem.path" = NULL,
     "climRpnw.gcm.path" = NULL,
-    "climRpnw.normal.path" = NULL
+    "climRpnw.normal.path" = NULL,
+    "climRpnw.session.cache.ask.response" = NULL
   )
   
   return(invisible(TRUE))
