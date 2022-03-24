@@ -48,7 +48,7 @@ downscale <- function(xyz, normal, gcm = NULL, extra = character()) {
   
   # Compute individual point lapse rate adjustments
   lr <- elev_delta * shush(
-    terra::extract(x = attr(normal, "lapse_rates"), y = xyz[,1L:2L], method = "bilinear")
+    terra::extract(x = attr(normal, "lr"), y = xyz[,1L:2L], method = "bilinear")
   )[,-1L] # Remove ID column
   
   # Combine results (ignoring ID column)

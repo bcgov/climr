@@ -4,7 +4,7 @@
 \alias{normal_input}
 \title{Create normal baseline input for \code{downscale}}
 \usage{
-normal_input(normal = list_normal()[1], dem = list_dem()[1])
+normal_input(normal = list_normal()[1], dem = list_dem()[1], use_cache = TRUE)
 }
 \arguments{
 \item{normal}{A character. Label of the normal baseline to use. Can be obtained from
@@ -12,10 +12,12 @@ normal_input(normal = list_normal()[1], dem = list_dem()[1])
 
 \item{dem}{A character. Label of the digital elevation model to use. Must have the same
 extent as the normal baseline. Can be obtained from \code{list_dem()}. Default to \code{list_dem()[1]}.}
+
+\item{use_cache}{Use a cached version of lapse rates if available instead of recomputing.}
 }
 \value{
 A normal baseline to use with \code{downscale}. A \code{SpatRaster} with a \code{dem} attribute and
-a \code{lapse_rates} attribute..
+a \code{lr} attribute..
 }
 \description{
 Create normal baseline input for \code{downscale}
