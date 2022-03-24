@@ -121,10 +121,11 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 }
 
 #' Lapse rate computation
-#' @param target Target rasters to compute lapse rates for. Build with this package functions.
+#' @param normal Normal rasters to compute lapse rates for. Build with this package functions.
+#' @param dem A digital elevation model with matching normal extent.
 #' @param NA_replace A boolean. Should NA lapse rate results be replaced by zeros. Default to TRUE.
 #' @param use_parallel A boolean. Should parallel::mclapply be used. Default to TRUE.
-#' @param rasterize Return an object of the same class category as target with the same extend.
+#' @param rasterize Return an object of the same class category as normal with the same extend.
 #' @details Formulas
 #' Simple linear regression without the intercept term
 #' beta_coef = sum(xy) / sum(x²)
@@ -136,23 +137,16 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 #' @importFrom terra as.list as.matrix ext
 #' @importFrom parallel detectCores mclapply
 #' @export
-lapse_rate <- function(target, NA_replace = TRUE, use_parallel = TRUE, rasterize = TRUE) {
+lapse_rate <- function(normal, dem, NA_replace = TRUE, use_parallel = TRUE, rasterize = TRUE) {
   
-  # Make sure target was build using this package functions
-  if (!isTRUE(attr(target, "builder") == "climRpnw")) {
-    stop("Please use this package functions to create `target`. Read `?lapse_rate` for details.")
-  }
+  # Transform normal to list, capture names before
+  normal_names <- names(normal)
+  normal <- shush(terra::as.list(normal))
   
-  # Retrieve digital elevation model from attributes
-  dem <- attr(target, "dem")
-  # Transform target to list, capture names before
-  target_names <- names(target)
-  target <- try(terra::as.list(target), silent = TRUE)
-  
-  # Compute everything related to the dem and independant of target
+  # Compute everything related to the dem and independant of normal
   nr <- nrow(dem)
   nc <- ncol(dem)
-  x <- terra::as.matrix(dem, wide = TRUE)
+  x <- shush(terra::as.matrix(dem, wide = TRUE))
   # Expand and recycle borders
   x <- recycle_borders(x, nr, nc)
   # Compute surrounding cells deltas
@@ -162,10 +156,10 @@ lapse_rate <- function(target, NA_replace = TRUE, use_parallel = TRUE, rasterize
   # Sums of x squared
   sum_xx <- sum_matrix(sup(x,2))
   
-  # For the lapse rate, x is the elevation, and y is the target
+  # For the lapse rate, x is the elevation, and y is the normal
   lapse_rate_redux <- function(r, x, nr, nc, n, sum_xx, NA_replace) {
     
-    y <- terra::as.matrix(r, wide = TRUE)
+    y <- shush(terra::as.matrix(r, wide = TRUE))
     # Expand and recycle borders
     y <- recycle_borders(y, nr, nc)
     # Compute surrounding cells deltas
@@ -206,20 +200,24 @@ lapse_rate <- function(target, NA_replace = TRUE, use_parallel = TRUE, rasterize
     func <- lapply
   }
   
-  res <- func(target, lapse_rate_redux, x, nr, nc, n, sum_xx, NA_replace)
+  res <- func(normal, lapse_rate_redux, x, nr, nc, n, sum_xx, NA_replace)
   
+  # Transform back into raster layers stack
   if (isTRUE(rasterize)) {
-    res <- terra::rast(lapply(res, terra::rast, extent = terra::ext(dem)))
+    res <- shush(
+      terra::rast(
+        lapply(
+          res,
+          terra::rast,
+          extent = terra::ext(dem)
+        )
+      )
+    )
   }
   
-  # Set names of lapse rates to match target
-  names(res) <- target_names
+  # Set names of lapse rates to match normal
+  names(res) <- normal_names
   
   return(res)
   
 }
-
-#' Memoised version
-#' @inheritParams lapse_rate
-#' @importFrom memoise memoise
-lapse_rate_mem <- memoise::memoise(lapse_rate)

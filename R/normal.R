@@ -1,35 +1,68 @@
-#' Create normal baseline for `downscale`
+#' Create normal baseline input for `downscale`
 #' @param normal A character. Label of the normal baseline to use. Can be obtained from
 #' `list_normal()`. Default to `list_normal()[1]`.
 #' @param dem A character. Label of the digital elevation model to use. Must have the same
 #' extent as the normal baseline. Can be obtained from `list_dem()`. Default to `list_dem()[1]`.
-#' @return A normal baseline to use with `downscale`. A `SpatRaster` with a `dem` attribute.
+#' @return A normal baseline to use with `downscale`. A `SpatRaster` with a `dem` attribute and
+#' a `lapse_rates` attribute..
 #' @importFrom terra rast compareGeom
 #' @export
-baseline <- function(normal = list_normal()[1], dem = list_dem()[1]) {
+normal_input <- function(normal = list_normal()[1], dem = list_dem()[1]) {
   
   # Check if we have data, if not download some.
   data_check()
   
   # Load dem first file
-  dir_dem <- file.path(data_path(), getOption("climRpnw.dem.path", default = "inputs/dem"), dem)
-  # + 0 force load to memory
-  dem <- terra::rast(list.files(dir_dem, full.names = TRUE)[1]) + 0
+  dir_dem <- file.path(
+    data_path(),
+    getOption("climRpnw.dem.path", default = "inputs_pkg/dem"),
+    dem
+  )
+  # Directly using terra::rast does not preserve NA value from disk to memory.
+  # It stores -max.int32. Workaround until fixed. Use raster::brick, do math
+  # operation then use terra::rast.
+  dem <- terra::rast(
+    raster::raster(
+      list.files(dir_dem, full.names = TRUE, pattern = "\\.nc")[1]
+    ) - 0L
+  )
   
   # Load normal files
-  dir_normal <- file.path(data_path(), getOption("climRpnw.normal.path", default = "inputs/normal"), normal)
-  # + 0 force load to memory
-  normal <- terra::rast(list.files(dir_normal, full.names = TRUE)) + 0
+  dir_normal <- file.path(
+    data_path(),
+    getOption("climRpnw.normal.path", default = "inputs_pkg/normal"),
+    normal
+  )
+  # Directly using terra::rast does not preserve NA value from disk to memory.
+  # It stores -max.int32. Workaround until fixed. Use raster::brick, do math
+  # operation then use terra::rast.
+  normal <- terra::rast(
+    raster::brick(
+      list.files(dir_normal, full.names = TRUE, pattern = "\\.nc")[1]
+    ) - 0L
+  )
+  names(normal) <- data.table::fread(
+    list.files(dir_normal, full.names = TRUE, pattern = "\\.csv")[1], header = TRUE
+  )[["x"]]
   
   # All objects have to share the same extent for now
   # This could be modified to process all the objects to adjust them to
   # the same raster extent.
   if (!terra::compareGeom(normal, dem)) {
-    stop("Normal do not share the same extent, number of rows and columns, projection, resolution and origin as the referenced digital elevation model.")
+    stop(
+      "Normal do not share the same extent, number of rows and columns, projection,",
+      " resolution and origin as the referenced digital elevation model."
+    )
   }
   
-  # Set dem as attribute to normal
+  # TODO : Some caching could be done here, tradeoff to consider.
+  # maybe run lapse_rate within data_update() and read from nc?
+  # file is too big to put on git.
+  lapse_rates <- lapse_rate(normal, dem)
+  
+  # Set dem/lapse_rates as attribute to normal
   attr(normal, "dem") <- dem
+  attr(normal, "lapse_rates") <- lapse_rates
   attr(normal, "builder") <- "climRpnw"
   
   return(normal)
@@ -38,31 +71,39 @@ baseline <- function(normal = list_normal()[1], dem = list_dem()[1]) {
 #' List available normal
 #' @export
 list_normal <- function() {
-  dirs <- list.files(file.path(data_path(), getOption("climRpnw.normal.path", default = "inputs/normal")))
-  for (dir in dirs) {
-    # Check if all months for all three variables are there
-    files <- list.files(file.path(data_path(), getOption("climRpnw.normal.path", default = "inputs/normal"), dir))
-    avail <- vapply(strsplit(files, split = ".", fixed = TRUE), `[`, character(1), 1)
-    vars <- c("PPT", "Tmax", "Tmin")
-    months <- sprintf("%02d", 1:12)
-    needed <- apply(expand.grid(vars, months), 1, paste0, collapse = "")
-    if (any(miss <- !avail %in% needed)) {
-       warning(dir, " data is available, but missing information about ", paste0(avail[which(miss)], collapse = ", "), ".")
-    }
-  }
+  dirs <- list.files(
+    file.path(
+      data_path(),
+      getOption("climRpnw.normal.path", default = "inputs_pkg/normal")
+    )
+  )
   return(dirs)
 }
 
 #' List available digital elevation models
 #' @export
 list_dem <- function() {
-  dirs <- list.files(file.path(data_path(), getOption("climRpnw.dem.path", default = "inputs/dem")))
+  dirs <- list.files(
+    file.path(
+      data_path(),
+      getOption("climRpnw.dem.path", default = "inputs_pkg/dem")
+    )
+  )
   for (dir in dirs) {
-    # Check if all months for all three variables are there
-    files <- list.files(file.path(data_path(), getOption("climRpnw.dem.path", default = "inputs/dem"), dir))
-    avail <- vapply(strsplit(files, split = ".", fixed = TRUE), `[`, character(1), 1)
-    if (length(avail) > 1) {
-      warning(dir, " data is available, but multiple files found in subdirectory ", paste0(avail, collapse = ", "), ". Only the first one is loaded.")
+    # Check if multiple dem files are in one directory
+    files <- list.files(
+      file.path(
+        data_path(),
+        getOption("climRpnw.dem.path", default = "inputs_pkg/dem"),
+        dir
+      ),
+      pattern = "\\.nc$"
+    )
+    if (length(files) > 1) {
+      warning(
+        dir, " data is available, but multiple NetCDF files found in subdirectory.",
+        " Only the first one is loaded."
+      )
     }
   }
   return(dirs)

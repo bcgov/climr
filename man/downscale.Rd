@@ -4,43 +4,27 @@
 \alias{downscale}
 \title{Downscale target rasters to points of interest}
 \usage{
-downscale(
-  xyz,
-  normal,
-  gcm = NULL,
-  extra_variables = character(),
-  grouping = c("m", "s", "a"),
-  use_cache = TRUE
-)
+downscale(xyz, normal, gcm = NULL, extra = character())
 }
 \arguments{
 \item{xyz}{A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).}
 
-\item{normal}{Reference normal baseline climate variables rasters.}
+\item{normal}{Reference normal baseline input from \code{normal_input}.}
 
-\item{gcm}{Future climate variables rasters, probably from Global Circulation Models. Default to NULL.}
+\item{gcm}{Global Circulation Models input from \code{gcm_input}. Default to NULL.}
 
-\item{extra_variables}{A character vector of extra variables to compute. Supported variables can be obtained
-with \code{list_variables(FALSE)}. Definitions can be found in this package \code{variables} dataset.
-Default to \code{character()}.}
-
-\item{grouping}{A character vector of variables grouping. Can be \code{m} (monthly), \code{s} (seasonal) or \code{a} (annual).}
-
-\item{use_cache}{A boolean. For lapse rate calculation, if \code{TRUE} and available,
-uses cached computation. If \code{FALSE}, recompute. Default to \code{TRUE}.}
+\item{extra}{A character vector of extra variables to compute. Supported variables
+can be obtained with \code{list_variables(FALSE)}. Definitions can be found in this package
+\code{variables} dataset. Default to \code{character()}.}
 }
 \description{
 Downscale target rasters to points of interest
 }
-\details{
-Couple first calls should be slower as it will cache the costly lapse rate
-computation. After that, it should be as quick as possible.
-}
 \examples{
 \dontrun{
 xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
-normal <- baseline()
-gcm <- future(list_gcm()[3], list_ssp()[1], list_period()[2])
+normal <- normal_input()
+gcm_input <- gcm_input(list_gcm()[3], list_ssp()[1], list_period()[2])
 downscale(xyz, normal, gcm)
 }
 }
