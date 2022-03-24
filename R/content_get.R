@@ -25,7 +25,7 @@ content_get <- function(path, source = c("github"), ...) {
 #' @rdname content_get
 content_get_gh <- function(path,
                            repo = getOption("climRpnw.gh.repo", default = "bcgov/climR-pnw"),
-                           ref = NULL,
+                           ref = "data",
                            ...) {
   
   res <- gh::gh(
