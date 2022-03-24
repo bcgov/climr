@@ -18,7 +18,14 @@ normal_input <- function(normal = list_normal()[1], dem = list_dem()[1]) {
     getOption("climRpnw.dem.path", default = "inputs_pkg/dem"),
     dem
   )
-  dem <- terra::rast(list.files(dir_dem, full.names = TRUE)[1])
+  # Directly using terra::rast does not preserve NA value from disk to memory.
+  # It stores -max.int32. Workaround until fixed. Use raster::brick, do math
+  # operation then use terra::rast.
+  dem <- terra::rast(
+    raster::raster(
+      list.files(dir_dem, full.names = TRUE, pattern = "\\.nc")[1]
+    ) - 0L
+  )
   
   # Load normal files
   dir_normal <- file.path(
@@ -26,7 +33,17 @@ normal_input <- function(normal = list_normal()[1], dem = list_dem()[1]) {
     getOption("climRpnw.normal.path", default = "inputs_pkg/normal"),
     normal
   )
-  normal <- lapply(list.files(dir_normal, full.names = TRUE), terra::rast)
+  # Directly using terra::rast does not preserve NA value from disk to memory.
+  # It stores -max.int32. Workaround until fixed. Use raster::brick, do math
+  # operation then use terra::rast.
+  normal <- terra::rast(
+    raster::brick(
+      list.files(dir_normal, full.names = TRUE, pattern = "\\.nc")[1]
+    ) - 0L
+  )
+  names(normal) <- data.table::fread(
+    list.files(dir_normal, full.names = TRUE, pattern = "\\.csv")[1], header = TRUE
+  )[["x"]]
   
   # All objects have to share the same extent for now
   # This could be modified to process all the objects to adjust them to
@@ -38,7 +55,9 @@ normal_input <- function(normal = list_normal()[1], dem = list_dem()[1]) {
     )
   }
   
-  # Compute lapse rates and cache for same session reprocessing
+  # TODO : Some caching could be done here, tradeoff to consider.
+  # maybe run lapse_rate within data_update() and read from nc?
+  # file is too big to put on git.
   lapse_rates <- lapse_rate(normal, dem)
   
   # Set dem/lapse_rates as attribute to normal
@@ -58,26 +77,6 @@ list_normal <- function() {
       getOption("climRpnw.normal.path", default = "inputs_pkg/normal")
     )
   )
-  for (dir in dirs) {
-    # Check if all months for all three variables are there
-    files <- list.files(
-      file.path(
-        data_path(),
-        getOption("climRpnw.normal.path", default = "inputs_pkg/normal"),
-        dir
-      )
-    )
-    avail <- vapply(strsplit(files, split = ".", fixed = TRUE), `[`, character(1), 1)
-    vars <- c("PPT", "Tmax", "Tmin")
-    months <- sprintf("%02d", 1:12)
-    needed <- apply(expand.grid(vars, months), 1, paste0, collapse = "")
-    if (any(miss <- !avail %in% needed)) {
-       warning(
-         dir, " data is available, but missing information about ",
-         paste0(avail[which(miss)], collapse = ", "), "."
-       )
-    }
-  }
   return(dirs)
 }
 
@@ -91,19 +90,19 @@ list_dem <- function() {
     )
   )
   for (dir in dirs) {
-    # Check if all months for all three variables are there
+    # Check if multiple dem files are in one directory
     files <- list.files(
       file.path(
         data_path(),
         getOption("climRpnw.dem.path", default = "inputs_pkg/dem"),
         dir
-      )
+      ),
+      pattern = "\\.nc$"
     )
-    avail <- vapply(strsplit(files, split = ".", fixed = TRUE), `[`, character(1), 1)
-    if (length(avail) > 1) {
+    if (length(files) > 1) {
       warning(
-        dir, " data is available, but multiple files found in subdirectory ",
-        paste0(avail, collapse = ", "), ". Only the first one is loaded."
+        dir, " data is available, but multiple NetCDF files found in subdirectory.",
+        " Only the first one is loaded."
       )
     }
   }
