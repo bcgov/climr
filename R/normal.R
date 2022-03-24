@@ -37,14 +37,17 @@ normal_input <- function(normal = list_normal()[1], dem = list_dem()[1], use_cac
   # Directly using terra::rast does not preserve NA value from disk to memory.
   # It stores -max.int32. Workaround until fixed. Use raster::brick, do math
   # operation then use terra::rast.
+  # Tmax / Tmax are stored as : Real value * 10 then cast to integer
+  # Recasting to real value
+  nm <- data.table::fread(
+    list.files(dir_normal, full.names = TRUE, pattern = "\\.csv")[1], header = TRUE
+  )[["x"]]
   normal <- terra::rast(
     raster::brick(
       list.files(dir_normal, full.names = TRUE, pattern = "\\.nc")[1]
-    ) - 0L
+    ) / c(1L, 10L)[startsWith(nm, "T") + 1L]
   )
-  names(normal) <- data.table::fread(
-    list.files(dir_normal, full.names = TRUE, pattern = "\\.csv")[1], header = TRUE
-  )[["x"]]
+  names(normal) <- nm
   
   # All objects have to share the same extent for now
   # This could be modified to process all the objects to adjust them to
