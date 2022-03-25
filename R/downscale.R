@@ -2,9 +2,9 @@
 #' @param xyz A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).
 #' @param normal Reference normal baseline input from `normal_input`.
 #' @param gcm Global Circulation Models input from `gcm_input`. Default to NULL.
-#' @param extra A character vector of extra variables to compute. Supported variables
-#' can be obtained with `list_variables(FALSE)`. Definitions can be found in this package
-#' `variables` dataset. Default to `character()`.
+#' @param vars A character vector of climate variables to compute. Supported variables
+#' can be obtained with `list_variables()`. Definitions can be found in this package
+#' `variables` dataset. Default to monthly PPT, Tmax, Tmin.
 #' @import data.table
 #' @importFrom terra extract
 #' @export
@@ -15,7 +15,8 @@
 #' gcm_input <- gcm_input(list_gcm()[3], list_ssp()[1], list_period()[2])
 #' downscale(xyz, normal, gcm)
 #' }
-downscale <- function(xyz, normal, gcm = NULL, extra = character()) {
+downscale <- function(xyz, normal, gcm = NULL, 
+                      vars = sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3)))) {
   
   # Make sure normal was built using normal_input
   if (!isTRUE(attr(normal, "builder") == "climRpnw")) {
@@ -119,7 +120,7 @@ downscale <- function(xyz, normal, gcm = NULL, extra = character()) {
   }
   
   # Compute extra climate variables, assign by reference
-  append_extra(res, extra)
+  append_clim_vars(res, vars)
   
   return(res)
   
