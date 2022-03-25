@@ -1,18 +1,10 @@
 #' Add extra climate variables to a data.table
 #' @param dt A data.table with TminXX, TmaxXX, PPTXX for XX in 01 to 12.
 #' @param vars A character vector of climate variables to compute.
-append_clim_vars <- function(dt, vars) {
+#' @param xyz A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).
+append_clim_vars <- function(dt, vars, xyz) {
   
-  # Return variable or create it if not found in appenders list
-  
-  f <- function(nm) {
-    if (is.null(expr <- .subset2(appenders, nm))) {
-      message(var, " calculation is not supported yet.")
-    } else {
-      expr()
-    }
-  }
-  
+  # Return variable or create it if not found in dt
   v <- function(nm) {
     if (is.null(res <- .subset2(dt,nm))) {
       f(nm)
@@ -21,6 +13,14 @@ append_clim_vars <- function(dt, vars) {
     return(res)
   }
   
+  # Call appender if exists, otherwise print message
+  f <- function(nm) {
+    if (is.null(expr <- .subset2(appenders, nm))) {
+      message(nm, " calculation is not supported yet.")
+    } else {
+      expr()
+    }
+  }
   
   # Big appenders list, access each variable by using v("varname")
   # so it is recursively created
