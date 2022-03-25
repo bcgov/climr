@@ -1,5 +1,7 @@
 library(data.table)
 
+# param (internal)
+
 base <- "data-raw/derivedVariables/optimizedParameterTables"
 
 param <- list(
@@ -11,7 +13,10 @@ param <- list(
   PAS = fread(file = file.path(base, "param_PAS.csv"))
 )
 
+usethis::use_data(param, overwrite = TRUE, internal = TRUE)
+
+# variables (exported)
+
 variables <- fread("data-raw/derivedVariables/Variables_ClimateBC.csv")
 
-usethis::use_data(param, overwrite = TRUE, internal = TRUE)
 usethis::use_data(variables, overwrite = TRUE, internal = FALSE)

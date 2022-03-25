@@ -7,7 +7,7 @@
 calc_EXT(t_max_list, td)
 }
 \arguments{
-\item{t_max_list}{named list of monthly maximum temperature for each month}
+\item{t_max_list}{list of monthly maximum temperature for each month in order}
 
 \item{td}{difference between the mean warmest monthly temperature and the mean coldest monthly temperature}
 }

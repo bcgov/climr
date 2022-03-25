@@ -4,7 +4,12 @@
 \alias{downscale}
 \title{Downscale target rasters to points of interest}
 \usage{
-downscale(xyz, normal, gcm = NULL, extra = character())
+downscale(
+  xyz,
+  normal,
+  gcm = NULL,
+  vars = sprintf(c("PPT\%02d", "Tmax\%02d", "Tmin\%02d"), sort(rep(1:12, 3)))
+)
 }
 \arguments{
 \item{xyz}{A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).}
@@ -13,9 +18,9 @@ downscale(xyz, normal, gcm = NULL, extra = character())
 
 \item{gcm}{Global Circulation Models input from \code{gcm_input}. Default to NULL.}
 
-\item{extra}{A character vector of extra variables to compute. Supported variables
-can be obtained with \code{list_variables(FALSE)}. Definitions can be found in this package
-\code{variables} dataset. Default to \code{character()}.}
+\item{vars}{A character vector of climate variables to compute. Supported variables
+can be obtained with \code{list_variables()}. Definitions can be found in this package
+\code{variables} dataset. Default to monthly PPT, Tmax, Tmin.}
 }
 \description{
 Downscale target rasters to points of interest
