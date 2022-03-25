@@ -4,13 +4,23 @@
 append_clim_vars <- function(dt, vars) {
   
   # Return variable or create it if not found in appenders list
+  
+  f <- function(nm) {
+    if (is.null(expr <- .subset2(appenders, nm))) {
+      message(var, " calculation is not supported yet.")
+    } else {
+      expr()
+    }
+  }
+  
   v <- function(nm) {
     if (is.null(res <- .subset2(dt,nm))) {
-      appenders[[nm]]()
+      f(nm)
       res <- .subset2(dt,nm)
     }
     return(res)
   }
+  
   
   # Big appenders list, access each variable by using v("varname")
   # so it is recursively created
@@ -206,12 +216,7 @@ append_clim_vars <- function(dt, vars) {
   
   # Append vars except default one
   for (var in vars[!vars %in% sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3)))]) {
-    f <- appenders[[var]]
-    if (!is.null(f)) {
-      f()
-    } else {
-      message(var, " calculation is not supported yet.")
-    }
+    f(var)
   }
   
   # Remove unwanted variables
