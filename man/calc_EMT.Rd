@@ -7,7 +7,7 @@
 calc_EMT(t_min_list, td)
 }
 \arguments{
-\item{t_min_list}{named list of monthly minimum temperature for each month}
+\item{t_min_list}{list of monthly minimum temperature for each month in order}
 
 \item{td}{difference between the mean warmest monthly temperature and the mean coldest monthly temperature}
 }

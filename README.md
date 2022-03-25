@@ -35,7 +35,7 @@ results <- downscale(
   xyz = xyz,
   normal = normal,
   gcm = gcm,
-  extra = c("DD_0", "CMD")
+  var = c("Tmax01", "DD5_01")
 )
 
 # Details about available data
