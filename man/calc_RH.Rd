@@ -4,12 +4,12 @@
 \alias{calc_RH}
 \title{Calculate Relative Humidity (RH)}
 \usage{
-calc_RH(tmin_mean, tmax_mean)
+calc_RH(tmin, tmax)
 }
 \arguments{
-\item{tmin_mean}{monthly mean minimum air temperature}
+\item{tmin}{monthly mean minimum air temperature}
 
-\item{tmax_mean}{monthly mean maximum air temperature}
+\item{tmax}{monthly mean maximum air temperature}
 }
 \value{
 Relative Humidity

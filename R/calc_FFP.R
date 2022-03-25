@@ -17,8 +17,8 @@
 #' }
 calc_bFFP <- function(td, NFFD, t_min_list) {
   
-  tmin4 <- t_min_list[["4"]]
-  tmin6 <- t_min_list[["6"]]
+  tmin4 <- t_min_list[[4]]
+  tmin6 <- t_min_list[[6]]
   
   352.1358994 + -0.021715653 * tmin4^2 + -3.542187618 * tmin6 + 0.020359471 * tmin6^2 - 4.897998097 * td + 0.033521327 * td^2 - 2.164862277 * NFFD + 0.006767633 * NFFD^2 - 0.00000929 * NFFD^3 + 0.043516586 * (td * NFFD) - 0.00000253 * (td * NFFD)^2
 }
@@ -42,9 +42,9 @@ calc_bFFP <- function(td, NFFD, t_min_list) {
 #' }
 calc_eFFP <- function(NFFD, t_min_list) {
   
-  tmin9 <- t_min_list[["9"]]
-  tmin10 <- t_min_list[["10"]]
-  tmin11 <- t_min_list[["11"]]
+  tmin9 <- t_min_list[[9]]
+  tmin10 <- t_min_list[[10]]
+  tmin11 <- t_min_list[[11]]
   
   243.7752209 + 4.134210825 * tmin9 - 0.162876448 * tmin9^2 + 1.248649021 * tmin10 + 0.145073612 * tmin10^2 + 0.004319892 * tmin10 + -0.005753127 * tmin10^2 - 0.06296471 * NFFD + 0.000399177 * NFFD^2
   
