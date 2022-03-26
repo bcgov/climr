@@ -120,7 +120,7 @@ downscale <- function(xyz, normal, gcm = NULL,
   }
   
   # Compute extra climate variables, assign by reference
-  append_clim_vars(res, vars)
+  append_clim_vars(res, vars, xyz)
   
   return(res)
   

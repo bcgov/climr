@@ -4,12 +4,14 @@
 \alias{append_clim_vars}
 \title{Add extra climate variables to a data.table}
 \usage{
-append_clim_vars(dt, vars)
+append_clim_vars(dt, vars, xyz)
 }
 \arguments{
 \item{dt}{A data.table with TminXX, TmaxXX, PPTXX for XX in 01 to 12.}
 
 \item{vars}{A character vector of climate variables to compute.}
+
+\item{xyz}{A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).}
 }
 \description{
 Add extra climate variables to a data.table

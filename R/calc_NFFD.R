@@ -11,11 +11,7 @@
 #' }
 calc_NFFD <- function(m, tm) {
   
-  match_lines <- match(m, param$NFFD$Month)
+  if (FALSE) { a <- T0 <- b <- NULL }
+  param[["NFFD"]][m, a/(1 + exp(-(tm - T0)/b))]
   
-  a <- param$NFFD$a[match_lines]
-  b <- param$NFFD$b[match_lines]
-  t0 <- param$NFFD$T0[match_lines]
-  
-  a/(1 + exp(-(tm - t0)/b))
 }

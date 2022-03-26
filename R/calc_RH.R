@@ -14,8 +14,8 @@ calc_RH <- function(tmin, tmax) {
   es_tmin <- calc_es(tmin)
   es_tmax <- calc_es(tmax)
   es_avg = (es_tmin + es_tmax)/2
+  return(100 * es_tmin/es_avg)
   
-  100 * es_tmin/es_avg
 }
 
 
@@ -24,15 +24,15 @@ calc_RH <- function(tmin, tmax) {
 calc_es <- function(t) {
   
   svp <- calc_SVP(t)
+  i <- which(t < 0)
+  svp[i] <- svp[i] * (1 + ( t[i] * 0.01) )
+  return(svp)
   
-  which_minus_0 <- which(t < 0)
-  
-  svp[which_minus_0] <- svp[which_minus_0] * (1 + ( t[which_minus_0] * 0.01) )
-  
-  svp
 }
 
 # Saturated Vapour Pressure
 calc_SVP <- function(t){
-  0.6105 * exp((17.273*t)/(t+237.3))
+  
+  return(0.6105 * exp((17.273*t)/(t+237.3)))
+  
 }

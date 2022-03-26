@@ -1,15 +1,28 @@
 #' Add extra climate variables to a data.table
 #' @param dt A data.table with TminXX, TmaxXX, PPTXX for XX in 01 to 12.
 #' @param vars A character vector of climate variables to compute.
-append_clim_vars <- function(dt, vars) {
+#' @param xyz A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).
+append_clim_vars <- function(dt, vars, xyz) {
   
-  # Return variable or create it if not found in appenders list
+  # Return variable or create it if not found in dt
   v <- function(nm) {
     if (is.null(res <- .subset2(dt,nm))) {
-      appenders[[nm]]()
+      f(nm)
       res <- .subset2(dt,nm)
     }
     return(res)
+  }
+  
+  # Call appender if exists, otherwise print message
+  f <- function(nm) {
+    if (nm %in% names(dt)) {
+      # return if already computed
+      return()
+    } else if (is.null(expr <- .subset2(appenders, nm))) {
+      message(nm, " calculation is not supported yet.")
+    } else {
+      expr()
+    }
   }
   
   # Big appenders list, access each variable by using v("varname")
@@ -87,6 +100,32 @@ append_clim_vars <- function(dt, vars) {
     "CMI11" = function() {set(dt, j = "CMI11", value = calc_RH(v("Tmin11"), v("Tmax11")))},
     "CMI12" = function() {set(dt, j = "CMI12", value = calc_RH(v("Tmin12"), v("Tmax12")))},
     
+    "Eref01" = function() {set(dt, j = "Eref01", value = calc_Eref( 1, v("Tmin01"), v("Tmax01"), .subset2(xyz, 2)))},
+    "Eref02" = function() {set(dt, j = "Eref02", value = calc_Eref( 2, v("Tmin02"), v("Tmax02"), .subset2(xyz, 2)))},
+    "Eref03" = function() {set(dt, j = "Eref03", value = calc_Eref( 3, v("Tmin03"), v("Tmax03"), .subset2(xyz, 2)))},
+    "Eref04" = function() {set(dt, j = "Eref04", value = calc_Eref( 4, v("Tmin04"), v("Tmax04"), .subset2(xyz, 2)))},
+    "Eref05" = function() {set(dt, j = "Eref05", value = calc_Eref( 5, v("Tmin05"), v("Tmax05"), .subset2(xyz, 2)))},
+    "Eref06" = function() {set(dt, j = "Eref06", value = calc_Eref( 6, v("Tmin06"), v("Tmax06"), .subset2(xyz, 2)))},
+    "Eref07" = function() {set(dt, j = "Eref07", value = calc_Eref( 7, v("Tmin07"), v("Tmax07"), .subset2(xyz, 2)))},
+    "Eref08" = function() {set(dt, j = "Eref08", value = calc_Eref( 8, v("Tmin08"), v("Tmax08"), .subset2(xyz, 2)))},
+    "Eref09" = function() {set(dt, j = "Eref09", value = calc_Eref( 9, v("Tmin09"), v("Tmax09"), .subset2(xyz, 2)))},
+    "Eref10" = function() {set(dt, j = "Eref10", value = calc_Eref(10, v("Tmin10"), v("Tmax10"), .subset2(xyz, 2)))},
+    "Eref11" = function() {set(dt, j = "Eref11", value = calc_Eref(11, v("Tmin11"), v("Tmax11"), .subset2(xyz, 2)))},
+    "Eref12" = function() {set(dt, j = "Eref12", value = calc_Eref(12, v("Tmin12"), v("Tmax12"), .subset2(xyz, 2)))},
+    
+    "CMD01" = function() {set(dt, j = "CMD01", value = calc_CMD(v("Eref01"), v("PPT01")))},
+    "CMD02" = function() {set(dt, j = "CMD02", value = calc_CMD(v("Eref02"), v("PPT02")))},
+    "CMD03" = function() {set(dt, j = "CMD03", value = calc_CMD(v("Eref03"), v("PPT03")))},
+    "CMD04" = function() {set(dt, j = "CMD04", value = calc_CMD(v("Eref04"), v("PPT04")))},
+    "CMD05" = function() {set(dt, j = "CMD05", value = calc_CMD(v("Eref05"), v("PPT05")))},
+    "CMD06" = function() {set(dt, j = "CMD06", value = calc_CMD(v("Eref06"), v("PPT06")))},
+    "CMD07" = function() {set(dt, j = "CMD07", value = calc_CMD(v("Eref07"), v("PPT07")))},
+    "CMD08" = function() {set(dt, j = "CMD08", value = calc_CMD(v("Eref08"), v("PPT08")))},
+    "CMD09" = function() {set(dt, j = "CMD09", value = calc_CMD(v("Eref09"), v("PPT09")))},
+    "CMD10" = function() {set(dt, j = "CMD10", value = calc_CMD(v("Eref10"), v("PPT10")))},
+    "CMD11" = function() {set(dt, j = "CMD11", value = calc_CMD(v("Eref11"), v("PPT11")))},
+    "CMD12" = function() {set(dt, j = "CMD12", value = calc_CMD(v("Eref12"), v("PPT12")))},
+    
     "DD_0_01" = function() {set(dt, j = "DD_0_01", value = calc_DD_below_0( 1, v("Tave01")))},
     "DD_0_02" = function() {set(dt, j = "DD_0_02", value = calc_DD_below_0( 2, v("Tave02")))},
     "DD_0_03" = function() {set(dt, j = "DD_0_03", value = calc_DD_below_0( 3, v("Tave03")))},
@@ -144,20 +183,30 @@ append_clim_vars <- function(dt, vars) {
     "Tave_sm" = function() {set(dt, j = "Tave_sm", value = (v("Tave06")+v("Tave07")+v("Tave08"))/3)},
     "Tave_at" = function() {set(dt, j = "Tave_at", value = (v("Tave09")+v("Tave10")+v("Tave11"))/3)},
     
-    "NFFD_wt" = function() {set(dt, j = "NFFD_wt", value = v("NFFD_12")+v("NFFD_01")+v("NFFD_02"))},
-    "NFFD_sp" = function() {set(dt, j = "NFFD_sp", value = v("NFFD_03")+v("NFFD_04")+v("NFFD_05"))},
-    "NFFD_sm" = function() {set(dt, j = "NFFD_sm", value = v("NFFD_06")+v("NFFD_07")+v("NFFD_08"))},
-    "NFFD_at" = function() {set(dt, j = "NFFD_at", value = v("NFFD_09")+v("NFFD_10")+v("NFFD_11"))},
+    "NFFD_wt" = function() {set(dt, j = "NFFD_wt", value = v("NFFD12")+v("NFFD01")+v("NFFD02"))},
+    "NFFD_sp" = function() {set(dt, j = "NFFD_sp", value = v("NFFD03")+v("NFFD04")+v("NFFD05"))},
+    "NFFD_sm" = function() {set(dt, j = "NFFD_sm", value = v("NFFD06")+v("NFFD07")+v("NFFD08"))},
+    "NFFD_at" = function() {set(dt, j = "NFFD_at", value = v("NFFD09")+v("NFFD10")+v("NFFD11"))},
     
-    "PAS_wt" = function() {set(dt, j = "PAS_wt", value = v("PAS_12")+v("PAS_01")+v("PAS_02"))},
-    "PAS_sp" = function() {set(dt, j = "PAS_sp", value = v("PAS_03")+v("PAS_04")+v("PAS_05"))},
-    "PAS_sm" = function() {set(dt, j = "PAS_sm", value = v("PAS_06")+v("PAS_07")+v("PAS_08"))},
-    "PAS_at" = function() {set(dt, j = "PAS_at", value = v("PAS_09")+v("PAS_10")+v("PAS_11"))},
+    "PAS_wt" = function() {set(dt, j = "PAS_wt", value = v("PAS12")+v("PAS01")+v("PAS02"))},
+    "PAS_sp" = function() {set(dt, j = "PAS_sp", value = v("PAS03")+v("PAS04")+v("PAS05"))},
+    "PAS_sm" = function() {set(dt, j = "PAS_sm", value = v("PAS06")+v("PAS07")+v("PAS08"))},
+    "PAS_at" = function() {set(dt, j = "PAS_at", value = v("PAS09")+v("PAS10")+v("PAS11"))},
     
     "CMI_wt" = function() {set(dt, j = "CMI_wt", value = calc_RH(v("Tmin_wt"), v("Tmax_wt")))},
     "CMI_sp" = function() {set(dt, j = "CMI_sp", value = calc_RH(v("Tmin_sp"), v("Tmax_sp")))},
     "CMI_sm" = function() {set(dt, j = "CMI_sm", value = calc_RH(v("Tmin_sm"), v("Tmax_sm")))},
     "CMI_at" = function() {set(dt, j = "CMI_at", value = calc_RH(v("Tmin_at"), v("Tmax_at")))},
+    
+    "Eref_wt" = function() {set(dt, j = "Eref_wt", value = v("Eref12")+v("Eref01")+v("Eref02"))},
+    "Eref_sp" = function() {set(dt, j = "Eref_sp", value = v("Eref03")+v("Eref04")+v("Eref05"))},
+    "Eref_sm" = function() {set(dt, j = "Eref_sm", value = v("Eref06")+v("Eref07")+v("Eref08"))},
+    "Eref_at" = function() {set(dt, j = "Eref_at", value = v("Eref09")+v("Eref10")+v("Eref11"))},
+    
+    "CMD_wt" = function() {set(dt, j = "CMD_wt", value = v("CMD12")+v("CMD01")+v("CMD02"))},
+    "CMD_sp" = function() {set(dt, j = "CMD_sp", value = v("CMD03")+v("CMD04")+v("CMD05"))},
+    "CMD_sm" = function() {set(dt, j = "CMD_sm", value = v("CMD06")+v("CMD07")+v("CMD08"))},
+    "CMD_at" = function() {set(dt, j = "CMD_at", value = v("CMD09")+v("CMD10")+v("CMD11"))},
     
     "DD_0_wt" = function() {set(dt, j = "DD_0_wt", value = v("DD_0_12")+v("DD_0_01")+v("DD_0_02"))},
     "DD_0_sp" = function() {set(dt, j = "DD_0_sp", value = v("DD_0_03")+v("DD_0_04")+v("DD_0_05"))},
@@ -183,6 +232,8 @@ append_clim_vars <- function(dt, vars) {
     "NFFD" = function() {set(dt, j = "NFFD", value = v("NFFD_wt")+v("NFFD_sp")+v("NFFD_sm")+v("NFFD_at"))},
     "PAS" = function() {set(dt, j = "PAS", value = v("PAS_wt")+v("PAS_sp")+v("PAS_sm")+v("PAS_at"))},
     "CMI" = function() {set(dt, j = "CMI", value = calc_RH(v("Tmin"), v("Tmax")))},
+    "Eref" = function() {set(dt, j = "Eref", value = v("Eref_wt")+v("Eref_sp")+v("Eref_sm")+v("Eref_at"))},
+    "CMD" = function() {set(dt, j = "CMD", value = v("CMD_wt")+v("CMD_sp")+v("CMD_sm")+v("CMD_at"))},
     "DD_0" = function() {set(dt, j = "DD_0", value = v("DD_0_wt")+v("DD_0_sp")+v("DD_0_sm")+v("DD_0_at"))},
     "DD_18" = function() {set(dt, j = "DD_18", value = v("DD_18_wt")+v("DD_18_sp")+v("DD_18_sm")+v("DD_18_at"))},
     "DD5" = function() {set(dt, j = "DD5", value = v("DD5_wt")+v("DD5_sp")+v("DD5_sm")+v("DD5_at"))},
@@ -193,7 +244,7 @@ append_clim_vars <- function(dt, vars) {
     "MAT" = function() {set(dt, j = "MAT", value = (v("MWMT")+v("MCMT"))/2)},
     "MAP" = function() {set(dt, j = "MAP", value = v("PPT01")+v("PPT02")+v("PPT03")+v("PPT04")+v("PPT05")+v("PPT06")+v("PPT07")+v("PPT08")+v("PPT09")+v("PPT10")+v("PPT11")+v("PPT12"))},
     "MSP" = function() {set(dt, j = "MAP", value = v("PPT05")+v("PPT06")+v("PPT07")+v("PPT08")+v("PPT09"))},
-    "SMH" = function() {set(dt, j = "SMH", value = v("MWMT")/(v("MSP")/1000L))},
+    "SHM" = function() {set(dt, j = "SHM", value = v("MWMT")/(v("MSP")/1000L))},
     "AHM" = function() {set(dt, j = "MAP", value = (v("MAT")+10L)/(v("MAP")/1000L))},
     "TD" = function() {set(dt, j = "TD", value = v("MWMT")-v("MCMT"))},
     "EXT" = function() {set(dt, j = "EXT", value = calc_EXT(list(v("Tmax01"),v("Tmax02"),v("Tmax03"),v("Tmax04"),v("Tmax05"),v("Tmax06"),v("Tmax07"),v("Tmax08"),v("Tmax09"),v("Tmax10"),v("Tmax11"),v("Tmax12")), v("TD")))},
@@ -206,16 +257,14 @@ append_clim_vars <- function(dt, vars) {
   
   # Append vars except default one
   for (var in vars[!vars %in% sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3)))]) {
-    f <- appenders[[var]]
-    if (!is.null(f)) {
-      f()
-    } else {
-      message(var, " calculation is not supported yet.")
-    }
+    f(var)
   }
   
   # Remove unwanted variables
-  set(dt, j = names(dt)[!names(dt) %in% c("ID", "GCM", "SSP", "RUN", "PERIOD", vars)], value = NULL)
+  j_out <- names(dt)[!names(dt) %in% c("ID", "GCM", "SSP", "RUN", "PERIOD", vars)]
+  if (length(j_out)) {
+    set(dt, j = j_out, value = NULL)  
+  }
   
 }
 
