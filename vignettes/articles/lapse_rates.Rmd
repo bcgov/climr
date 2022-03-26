@@ -1,0 +1,13 @@
+---
+title: "Lapse rates"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Lapse rates calculation
+## Implementation details
