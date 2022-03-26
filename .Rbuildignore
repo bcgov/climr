@@ -9,3 +9,4 @@
 ^\.httr-oauth$
 ^data-raw$
 ^OPPORTUNITY.md$
+^vignettes/articles$
