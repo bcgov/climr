@@ -4,8 +4,33 @@
 
 # Data
 
-This branch is used exclusively to store climRpnw input data. This is an orphan with no relation
-to the main branch.
+This branch is used exclusively to store climRpnw input data. This is an orphan with no relation to the main branch.
+
+## Data format
+
+For netCDF files, a name matched layer labels `.csv` file should be saved alongside the actual data.
+
+## Directory structure
+
+### `inputs_pkg`
+
+Data source are in three folders : `dem` (Digital Elevation Model), `gcm` (Global Circulation Models) and `normal`.
+
+#### `dem`
+
+One folder per `dem`, folder name should represent `dem` label. Only one file, one layer per `dem` subdirectory. `dem` extent must match `normal` extent. Resampling can be done with `terra::resample` if this is not the case.
+
+#### `gcm`
+
+One folder per `gcm`. Folder name must match `gcm` label.
+
+#### `normal`
+
+One folder per `normal`. Folder name must match `normal` label. `normal` extent must match `dem` extent. Resampling can be done with `terra::resample` if this is not the case.
+
+### `inputs_raw`
+
+Same as `inputs_pkg`, but storage optimized for faster downloads and loading using ["./scripts/reformat_inputs.R""](./scripts/reformat_inputs.R).
 
 # climR-pnw
 An R package for downscaled global climate model normals in the Pacific Northwest
