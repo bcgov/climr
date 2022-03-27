@@ -3,8 +3,8 @@
 #' @param source A character. Name of the content source. Only supports
 #' "github" as of now.
 #' @param ... Extra arguments for `content_get` source dependent functions.
-#' @return A list of elements, each with a `url`, a `path` relative
-#' to data path and a unique identifier `uid`.
+#' @return A 3 columns data.table, `url`, `path` relative
+#' to data path and unique identifier `uid`.
 #' @rdname content_get
 content_get <- function(path, source = c("github"), ...) {
   source <- match.arg(source)
