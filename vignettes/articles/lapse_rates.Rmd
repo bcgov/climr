@@ -2,7 +2,7 @@
 title: "Lapse rates"
 ---
 
-```{r, include = FALSE}
+```{r, include = TRUE, echo = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -10,4 +10,106 @@ knitr::opts_chunk$set(
 ```
 
 # Lapse rates calculation
-## Implementation details
+
+From Wang (2016) Climate North America
+
+ > The algorithms then retrieve monthly climate data and elevation values for a location from the corresponding grid cell plus eight surrounding cells. The climate and elevation values of the nine cells are used to calculate differences in a climate variable and in elevation between all 36 possible pairs. A simple linear regression of the differences in the climate variable on the difference in elevation is then established, and the slope of the regression is used as the empirical lapse rate for each climate variable at each specific location. As the local regressions are dynamically developed along with locations of inquiry, we call this downscaling method a “dynamic local downscaling” approach. To avoid over-adjustments due to a weak linear relationship, each lapse rate was weighted by the R-square value of the local linear regression.
+ 
+The way this is done in this package, we precompute lapse rates for each 36 variables and store them with the associated normal.
+
+# Computation details
+
+Starting with equal extent digital elevation model raster (x) and 36 climate variables rasters (pre delta method y's).
+
+We first convert rasters to matrices as this is way easier to handle for this type of operation.  
+  
+![Base matrix](./assets/grid.svg)  
+  
+From there, since we want to compute everything in one swell swoop, we create border extended matrices to handle lapse rates values at the edge of a raster.
+  
+Starting with sides  
+![side extended matrix](./assets/grid2.svg)  
+  
+Then corners  
+![Corner extended matrix](./assets/grid3.svg)  
+  
+Next step is to sample the extended matrices 8 times and compute the differences with the original matrices. This is going to give us a stack of 8 matrices for each 36 variables that will be used to compute the linear regression coefficients.
+  
+![North-west sample](./assets/grid4.svg)  
+  
+![North sample](./assets/grid5.svg)  
+  
+![North-east sample](./assets/grid6.svg)  
+  
+![East sample](./assets/grid7.svg)  
+  
+![South-east sample](./assets/grid8.svg)  
+  
+![South sample](./assets/grid9.svg)  
+  
+![South-west sample](./assets/grid10.svg)  
+  
+![West sample](./assets/grid11.svg)  
+  
+Regresssion coefficients are computed using the following methods and the R² adjustment applied.
+
+```r
+#' Simple linear regression without the intercept term
+#' beta_coef = sum(xy) / sum(x²)
+#' mss = sum(x * beta_coef)², sum of squared fitted values
+#' rss = sum(ε²), sum of squared (y minus fitted), sum of absolute errors
+#' R² = mss / (mss + rss)
+#' Lapse rate = beta_coef * R²
+```
+
+Here is an example using two starting matrices
+
+```{r echo=TRUE}
+(dem <- matrix(sample(0:1000, 25), nrow = 5))
+(tmax <- matrix(30 - (dem/50) %/% 1, nrow = 5))
+```
+
+Start by extending matrices
+
+```{r echo=TRUE}
+dem_ext <- climRpnw:::recycle_borders(dem, 5, 5)
+(tmax_ext <- climRpnw:::recycle_borders(tmax, 5, 5))
+```
+
+Sample 8 times
+
+```{r echo=TRUE}
+dem_d <- climRpnw:::deltas(dem_ext, 5, 5)
+(tmax_d <- climRpnw:::deltas(tmax_ext, 5, 5))
+```
+
+Now compute relevant coefficients
+```{r echo = TRUE}
+# Number of surrounding cells
+n <- length(dem_d)
+# Sums of x squared
+sum_xx <- climRpnw:::sum_matrix(
+  climRpnw:::sup(dem_d,2)
+)
+beta_coef <- climRpnw:::sum_matrix(
+  climRpnw:::prod_matrix(dem_d, tmax_d)
+) / sum_xx
+# We need the fitted values to compute the
+# coefficient of determination
+f <- climRpnw:::fitted(dem_d, beta_coef)
+# We use the same approach as stats::summary.lm
+# applied to a list matrices
+mss <- climRpnw:::sum_matrix(
+  climRpnw:::sup(f,2)
+)
+rss <- climRpnw:::sum_matrix(
+  climRpnw:::sup(
+    climRpnw:::delta_matrix(tmax_d,f)
+    ,2
+  )
+)
+# We can combine the resulting matrices to get the
+# coefficient of determination and multiply by beta coficient
+(lapse_rate <- beta_coef * mss / (mss + rss))
+
+```
