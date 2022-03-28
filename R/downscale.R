@@ -120,6 +120,8 @@ downscale <- function(xyz, normal, gcm = NULL,
       lapply(gcm, process_one_gcm, res = res, xyz = xyz),
       use.names = TRUE
     )
+  } else {
+    data.table::setDT(res)
   }
   
   # Compute extra climate variables, assign by reference
