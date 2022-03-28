@@ -84,6 +84,7 @@ downscale <- function(xyz, normal, gcm = NULL,
     data.table::setDT(ref_dt)
     data.table::setnames(ref_dt, c("GCM", "VAR", "MONTH", "SSP", "RUN", "PERIOD"))
     data.table::set(ref_dt, j = "variable", value = nm)
+    data.table::set(ref_dt, j = "GCM", value = gsub(".", "-", ref_dt[["GCM"]], fixed = TRUE))
     data.table::set(
       ref_dt,
       j = "VAR",
