@@ -44,6 +44,7 @@ list_dem()
 list_gcm()
 list_normal()
 list_period()
+list_run()
 list_ssp()
 list_variables()
 
