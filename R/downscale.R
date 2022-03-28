@@ -7,6 +7,9 @@
 #' `variables` dataset. Default to monthly PPT, Tmax, Tmin.
 #' @import data.table
 #' @importFrom terra extract
+#' @return A downscaled dataset. If `gcm` is NULL, this is just the downscaled `normal`
+#' at point locations. If `gcm` is provided, this returns a downscaled dataset for each
+#' point location, general circulation model, shared socioeconomic pathway, run and period.
 #' @export
 #' @examples
 #' \dontrun{

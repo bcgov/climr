@@ -31,8 +31,8 @@ the source root.}
 \item{ref}{The name of the commit/branch/tag. Default NULL means it uses the repository’s default branch.}
 }
 \value{
-A list of elements, each with a \code{url}, a \code{path} relative
-to data path and a unique identifier \code{uid}.
+A 3 columns data.table, \code{url}, \code{path} relative
+to data path and unique identifier \code{uid}.
 
 A list of metadata about files in a repository directory or the content of a file. See
 https://docs.github.com/en/rest/reference/repos#get-repository-content for details.

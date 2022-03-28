@@ -22,6 +22,11 @@ downscale(
 can be obtained with \code{list_variables()}. Definitions can be found in this package
 \code{variables} dataset. Default to monthly PPT, Tmax, Tmin.}
 }
+\value{
+A downscaled dataset. If \code{gcm} is NULL, this is just the downscaled \code{normal}
+at point locations. If \code{gcm} is provided, this returns a downscaled dataset for each
+point location, general circulation model, shared socioeconomic pathway, run and period.
+}
 \description{
 Downscale target rasters to points of interest
 }

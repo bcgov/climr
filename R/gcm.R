@@ -209,3 +209,10 @@ list_ssp <- function(gcm) {
 list_period <- function(gcm) {
   list_parse(gcm, 6:7)
 }
+
+#' List available runs
+#' @param gcm An optional character vector. Limit list to provided global circulation models.
+#' @export
+list_run <- function(gcm) {
+  list_parse(gcm, 5)
+}
