@@ -47,7 +47,7 @@ downscale <- function(xyz, normal, gcm = NULL,
   
   # Compute elevation differences between provided points elevation and normal
   elev_delta <- xyz[,3L] - shush(
-      terra::extract(x = attr(normal, "dem"), y = xyz[,1L:2L], method = "simple")
+      terra::extract(x = attr(normal, "dem"), y = xyz[,1L:2L], method = "bilinear")
   )[,-1L] # Remove ID column
   
   # Compute individual point lapse rate adjustments
