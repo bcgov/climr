@@ -56,29 +56,28 @@ See [data branch README.md](https://github.com/bcgov/climR-pnw/blob/data/README.
 
 # Adding / Modifying climate variables
 
-All climate variables are computed via [R/append_clim_vars.R](./R/append_clim_vars.R). Add or modifying entries in the variables list. If you need to rely on other variables , use function `v` to access them. This will handle variable dependency for you.
+All climate variables are computed via [R/append_clim_vars.R](./R/append_clim_vars.R). Add or modify entries in the variables list as needed. Use function `v` to handle dependencies (i.e. `v("Tmin")` instead of `dt$Tmin` / `dt[["Tmin"]]`).
 
 # Caching
 
-This package use local caching, either permanent or in a temporary folder. The data source is currently GitHub, this could be modified by implementing another `content_get` type function. This functions should return a data.table with 3 columns, `url`, `path` and `uid`.
+This package use local caching, either permanent or in a temporary folder. GitHub is the current data source. This could be modified by implementing another `content_get` type function. This new function should return a data.table with 3 columns, `url`, `path` and `uid`.
 See `?content_get`.
 
 # Data functions
 
-Use `data_update()` to download data locally (required), `data_path()` to get current data local location, `list_data()` to list all downloaded files and `data_delete()` to remove downloaded data.
+Use `data_update()` to download data locally (required), `data_path()` to get local data path, `list_data()` to list all local files and `data_delete()` to remove package local data.
 
 # Lapse rates details
 
-See lapse rates vignettes for details.
+See lapse rates article in the vignettes folder for details.
 
 # Use of terra package
 
-Instead of implementing custom algorithms for bilinear interpolation and raster manipulation, this package use `terra` package. Long term, it will benefit from any performance improvement in `terra`. `terra` replaces `raster` package.
+Instead of implementing custom algorithms for bilinear interpolation and raster manipulation, this package use `terra`. Long term, it will benefit from any performance improvement in `terra`. `terra` is a replacement for the `raster` package.
 
-The most resources expensive operation of `downscale` is the data pivots using `data.table` dcast, so I would not be too worried about
-`terra` performances.
+Data pivot using `data.table` dcast is the most resource expensive operation of the `downscale` function according to profiling using `profvis`.
 
-`terra` still has a couple issues that were mitigated in this package. When this is the case, function were anotated. Mainly, we are sushing `terra` functions to prevent messages print to console (see https://github.com/rspatial/terra/issues/287). We are also loading NetCDF via `raster` package as GDAL is significantly slower than `ncdf4` implementation + NA values are not correctly transferred from disk to memory.
+`terra` still has a couple issues that were mitigated in this package. When this is the case, function were anotated. Mainly, we are sushing `terra` functions to prevent messages print to console (see https://github.com/rspatial/terra/issues/287). We are also loading NetCDF via `raster` package as GDAL is significantly slower than the `ncdf4` implementation. Finally, NA values are not correctly transferred from disk to memory.
 
 # climR-pnw
 An R package for downscaled global climate model normals in the Pacific Northwest
