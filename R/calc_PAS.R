@@ -9,9 +9,9 @@
 #' \dontrun{
 #' calc_PAS(4, 2)
 #' }
-calc_PAS <- function(m, tm) {
+calc_PAS <- function(m, tm, ppt) {
   
   if (FALSE) {T0 <- b <- NULL}
-  param[["PAS"]][m, 1/(1 + exp(-(tm - T0)/b))]
+  param[["PAS"]][m, ppt/(1 + exp(-(tm - T0)/b))]
 
 }
