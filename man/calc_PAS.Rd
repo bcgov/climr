@@ -4,7 +4,7 @@
 \alias{calc_PAS}
 \title{Calculate Precipitation As Snow (PAS)}
 \usage{
-calc_PAS(m, tm)
+calc_PAS(m, tm, ppt)
 }
 \arguments{
 \item{m}{month of the year}

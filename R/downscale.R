@@ -5,6 +5,7 @@
 #' @param vars A character vector of climate variables to compute. Supported variables
 #' can be obtained with `list_variables()`. Definitions can be found in this package
 #' `variables` dataset. Default to monthly PPT, Tmax, Tmin.
+#' @param ppt_lr A boolean. Apply lapse rate adjustment to precipitations. Default to FALSE.
 #' @import data.table
 #' @importFrom terra extract
 #' @return A downscaled dataset. If `gcm` is NULL, this is just the downscaled `normal`
@@ -19,7 +20,8 @@
 #' downscale(xyz, normal, gcm)
 #' }
 downscale <- function(xyz, normal, gcm = NULL, 
-                      vars = sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3)))) {
+                      vars = sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3))),
+                      ppt_lr = FALSE) {
   
   # Make sure normal was built using normal_input
   if (!isTRUE(attr(normal, "builder") == "climRpnw")) {
@@ -56,7 +58,12 @@ downscale <- function(xyz, normal, gcm = NULL,
   )[,-1L] # Remove ID column
   
   # Combine results (ignoring ID column)
-  res[,-1L] <- res[,-1L] + lr
+  if (isTRUE(ppt_lr)) {
+    res[,-1L] <- res[,-1L] + lr
+  } else {
+    ppt <- grep("^PPT", names(normal), invert = TRUE)
+    res[, ppt] <- res[, ppt] + lr[, ppt]
+  }
   
   # Process one GCM stacked layers
   process_one_gcm <- function(gcm_, res, xyz) {
