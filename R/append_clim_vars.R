@@ -87,18 +87,18 @@ append_clim_vars <- function(dt, vars, xyz) {
     "PAS11" = function() {set(dt, j = "PAS11", value = calc_PAS(11, v("Tmin11"), v("PPT11")))},
     "PAS12" = function() {set(dt, j = "PAS12", value = calc_PAS(12, v("Tmin12"), v("PPT12")))},
     
-    "CMI01" = function() {set(dt, j = "CMI01", value = calc_RH(v("Tmin01"), v("Tmax01")))},
-    "CMI02" = function() {set(dt, j = "CMI02", value = calc_RH(v("Tmin02"), v("Tmax02")))},
-    "CMI03" = function() {set(dt, j = "CMI03", value = calc_RH(v("Tmin03"), v("Tmax03")))},
-    "CMI04" = function() {set(dt, j = "CMI04", value = calc_RH(v("Tmin04"), v("Tmax04")))},
-    "CMI05" = function() {set(dt, j = "CMI05", value = calc_RH(v("Tmin05"), v("Tmax05")))},
-    "CMI06" = function() {set(dt, j = "CMI06", value = calc_RH(v("Tmin06"), v("Tmax06")))},
-    "CMI07" = function() {set(dt, j = "CMI07", value = calc_RH(v("Tmin07"), v("Tmax07")))},
-    "CMI08" = function() {set(dt, j = "CMI08", value = calc_RH(v("Tmin08"), v("Tmax08")))},
-    "CMI09" = function() {set(dt, j = "CMI09", value = calc_RH(v("Tmin09"), v("Tmax09")))},
-    "CMI10" = function() {set(dt, j = "CMI10", value = calc_RH(v("Tmin10"), v("Tmax10")))},
-    "CMI11" = function() {set(dt, j = "CMI11", value = calc_RH(v("Tmin11"), v("Tmax11")))},
-    "CMI12" = function() {set(dt, j = "CMI12", value = calc_RH(v("Tmin12"), v("Tmax12")))},
+    "RH01" = function() {set(dt, j = "RH01", value = calc_RH(v("Tmin01"), v("Tmax01")))},
+    "RH02" = function() {set(dt, j = "RH02", value = calc_RH(v("Tmin02"), v("Tmax02")))},
+    "RH03" = function() {set(dt, j = "RH03", value = calc_RH(v("Tmin03"), v("Tmax03")))},
+    "RH04" = function() {set(dt, j = "RH04", value = calc_RH(v("Tmin04"), v("Tmax04")))},
+    "RH05" = function() {set(dt, j = "RH05", value = calc_RH(v("Tmin05"), v("Tmax05")))},
+    "RH06" = function() {set(dt, j = "RH06", value = calc_RH(v("Tmin06"), v("Tmax06")))},
+    "RH07" = function() {set(dt, j = "RH07", value = calc_RH(v("Tmin07"), v("Tmax07")))},
+    "RH08" = function() {set(dt, j = "RH08", value = calc_RH(v("Tmin08"), v("Tmax08")))},
+    "RH09" = function() {set(dt, j = "RH09", value = calc_RH(v("Tmin09"), v("Tmax09")))},
+    "RH10" = function() {set(dt, j = "RH10", value = calc_RH(v("Tmin10"), v("Tmax10")))},
+    "RH11" = function() {set(dt, j = "RH11", value = calc_RH(v("Tmin11"), v("Tmax11")))},
+    "RH12" = function() {set(dt, j = "RH12", value = calc_RH(v("Tmin12"), v("Tmax12")))},
     
     "Eref01" = function() {set(dt, j = "Eref01", value = calc_Eref( 1, v("Tmin01"), v("Tmax01"), .subset2(xyz, 2)[v("ID")]))},
     "Eref02" = function() {set(dt, j = "Eref02", value = calc_Eref( 2, v("Tmin02"), v("Tmax02"), .subset2(xyz, 2)[v("ID")]))},
@@ -193,10 +193,10 @@ append_clim_vars <- function(dt, vars, xyz) {
     "PAS_sm" = function() {set(dt, j = "PAS_sm", value = v("PAS06")+v("PAS07")+v("PAS08"))},
     "PAS_at" = function() {set(dt, j = "PAS_at", value = v("PAS09")+v("PAS10")+v("PAS11"))},
     
-    "CMI_wt" = function() {set(dt, j = "CMI_wt", value = calc_RH(v("Tmin_wt"), v("Tmax_wt")))},
-    "CMI_sp" = function() {set(dt, j = "CMI_sp", value = calc_RH(v("Tmin_sp"), v("Tmax_sp")))},
-    "CMI_sm" = function() {set(dt, j = "CMI_sm", value = calc_RH(v("Tmin_sm"), v("Tmax_sm")))},
-    "CMI_at" = function() {set(dt, j = "CMI_at", value = calc_RH(v("Tmin_at"), v("Tmax_at")))},
+    "RH_wt" = function() {set(dt, j = "RH_wt", value = calc_RH(v("Tmin_wt"), v("Tmax_wt")))},
+    "RH_sp" = function() {set(dt, j = "RH_sp", value = calc_RH(v("Tmin_sp"), v("Tmax_sp")))},
+    "RH_sm" = function() {set(dt, j = "RH_sm", value = calc_RH(v("Tmin_sm"), v("Tmax_sm")))},
+    "RH_at" = function() {set(dt, j = "RH_at", value = calc_RH(v("Tmin_at"), v("Tmax_at")))},
     
     "Eref_wt" = function() {set(dt, j = "Eref_wt", value = v("Eref12")+v("Eref01")+v("Eref02"))},
     "Eref_sp" = function() {set(dt, j = "Eref_sp", value = v("Eref03")+v("Eref04")+v("Eref05"))},
@@ -231,7 +231,7 @@ append_clim_vars <- function(dt, vars, xyz) {
     "Tave" = function() {set(dt, j = "Tave", value = (v("Tave_wt")+v("Tave_sp")+v("Tave_sm")+v("Tave_at"))/4)},
     "NFFD" = function() {set(dt, j = "NFFD", value = v("NFFD_wt")+v("NFFD_sp")+v("NFFD_sm")+v("NFFD_at"))},
     "PAS" = function() {set(dt, j = "PAS", value = v("PAS_wt")+v("PAS_sp")+v("PAS_sm")+v("PAS_at"))},
-    "CMI" = function() {set(dt, j = "CMI", value = calc_RH(v("Tmin"), v("Tmax")))},
+    "RH" = function() {set(dt, j = "RH", value = calc_RH(v("Tmin"), v("Tmax")))},
     "Eref" = function() {set(dt, j = "Eref", value = v("Eref_wt")+v("Eref_sp")+v("Eref_sm")+v("Eref_at"))},
     "CMD" = function() {set(dt, j = "CMD", value = v("CMD_wt")+v("CMD_sp")+v("CMD_sm")+v("CMD_at"))},
     "DD_0" = function() {set(dt, j = "DD_0", value = v("DD_0_wt")+v("DD_0_sp")+v("DD_0_sm")+v("DD_0_at"))},
@@ -265,6 +265,9 @@ append_clim_vars <- function(dt, vars, xyz) {
   if (length(j_out)) {
     set(dt, j = j_out, value = NULL)  
   }
+  
+  # Reorder to match vars
+  setcolorder(dt, c(names(dt)[names(dt) %in% c("ID", "GCM", "SSP", "RUN", "PERIOD")], vars))
   
 }
 

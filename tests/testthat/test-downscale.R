@@ -31,6 +31,11 @@ test_that("test the whole chain works with all variables", {
     var = list_variables()
   )
   
+  # Test for creation
+  testthat::expect_true(all(list_variables() %in% names(results)))
+  # Test for order
+  testthat::expect_equal(tail(names(results), length(list_variables())), list_variables())
+  
   # Use downscale with some variables
   results2 <- downscale(
     xyz = xyz,
