@@ -216,20 +216,20 @@ Tmin09,September mean daily minimum temperature (deg. C),September,Monthly,Raw
 Tmin10,October mean daily minimum temperature (deg. C),October,Monthly,Raw
 Tmin11,November mean daily minimum temperature (deg. C),November,Monthly,Raw
 Tmin12,December mean daily minimum temperature (deg. C),December,Monthly,Raw
-CMI,Climatic moisture index,Any,Any,Raw
-CMI_at,Autumn climatic moisture index,Autumn,Seasonal,Raw
-CMI_sm,Summer climatic moisture index,Summer,Seasonal,Raw
-CMI_sp,Spring climatic moisture index,Spring,Seasonal,Raw
-CMI_wt,Winter climatic moisture index,Winter,Seasonal,Raw
-CMI01,January climatic moisture index,January,Monthly,Raw
-CMI02,February climatic moisture index,February,Monthly,Raw
-CMI03,March climatic moisture index,March,Monthly,Raw
-CMI04,April climatic moisture index,April,Monthly,Raw
-CMI05,May climatic moisture index,May,Monthly,Raw
-CMI06,June climatic moisture index,June,Monthly,Raw
-CMI07,July climatic moisture index,July,Monthly,Raw
-CMI08,August climatic moisture index,August,Monthly,Raw
-CMI09,September climatic moisture index,September,Monthly,Raw
-CMI10,October climatic moisture index,October,Monthly,Raw
-CMI11,November climatic moisture index,November,Monthly,Raw
-CMI12,December climatic moisture index,December,Monthly,Raw
+RH,relative humidity,Any,Any,Raw
+RH_at,Autumn relative humidity,Autumn,Seasonal,Raw
+RH_sm,Summer relative humidity,Summer,Seasonal,Raw
+RH_sp,Spring relative humidity,Spring,Seasonal,Raw
+RH_wt,Winter relative humidity,Winter,Seasonal,Raw
+RH01,January relative humidity,January,Monthly,Raw
+RH02,February relative humidity,February,Monthly,Raw
+RH03,March relative humidity,March,Monthly,Raw
+RH04,April relative humidity,April,Monthly,Raw
+RH05,May relative humidity,May,Monthly,Raw
+RH06,June relative humidity,June,Monthly,Raw
+RH07,July relative humidity,July,Monthly,Raw
+RH08,August relative humidity,August,Monthly,Raw
+RH09,September relative humidity,September,Monthly,Raw
+RH10,October relative humidity,October,Monthly,Raw
+RH11,November relative humidity,November,Monthly,Raw
+RH12,December relative humidity,December,Monthly,Raw
