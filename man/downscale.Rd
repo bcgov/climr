@@ -8,7 +8,8 @@ downscale(
   xyz,
   normal,
   gcm = NULL,
-  vars = sprintf(c("PPT\%02d", "Tmax\%02d", "Tmin\%02d"), sort(rep(1:12, 3)))
+  vars = sprintf(c("PPT\%02d", "Tmax\%02d", "Tmin\%02d"), sort(rep(1:12, 3))),
+  ppt_lr = FALSE
 )
 }
 \arguments{
@@ -21,6 +22,8 @@ downscale(
 \item{vars}{A character vector of climate variables to compute. Supported variables
 can be obtained with \code{list_variables()}. Definitions can be found in this package
 \code{variables} dataset. Default to monthly PPT, Tmax, Tmin.}
+
+\item{ppt_lr}{A boolean. Apply lapse rate adjustment to precipitations. Default to FALSE.}
 }
 \value{
 A downscaled dataset. If \code{gcm} is NULL, this is just the downscaled \code{normal}
