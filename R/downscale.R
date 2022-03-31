@@ -57,6 +57,9 @@ downscale <- function(xyz, normal, gcm = NULL,
     terra::extract(x = attr(normal, "lr"), y = xyz[,1L:2L], method = "bilinear")
   )[,-1L] # Remove ID column
   
+  # Replace any NAs left with 0s
+  lr[is.na(lr)] <- 0L
+  
   # Combine results (ignoring ID column)
   if (isTRUE(ppt_lr)) {
     res[,-1L] <- res[,-1L] + lr
