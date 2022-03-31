@@ -239,9 +239,9 @@ append_clim_vars <- function(dt, vars, xyz) {
     "DD5" = function() {set(dt, j = "DD5", value = v("DD5_wt")+v("DD5_sp")+v("DD5_sm")+v("DD5_at"))},
     "DD18" = function() {set(dt, j = "DD18", value = v("DD18_wt")+v("DD18_sp")+v("DD18_sm")+v("DD18_at"))},
     
-    "MWMT" = function() {set(dt, j = "MWMT", value = (v("Tmax01")+v("Tmax02")+v("Tmax03")+v("Tmax04")+v("Tmax05")+v("Tmax06")+v("Tmax07")+v("Tmax08")+v("Tmax09")+v("Tmax10")+v("Tmax11")+v("Tmax12"))/12)},
-    "MCMT" = function() {set(dt, j = "MCMT", value = (v("Tmin01")+v("Tmin02")+v("Tmin03")+v("Tmin04")+v("Tmin05")+v("Tmin06")+v("Tmin07")+v("Tmin08")+v("Tmin09")+v("Tmin10")+v("Tmin11")+v("Tmin12"))/12)},
-    "MAT" = function() {set(dt, j = "MAT", value = (v("MWMT")+v("MCMT"))/2)},
+    "MWMT" = function() {set(dt, j = "MWMT", value = pmax(v("Tave01"),v("Tave02"),v("Tave03"),v("Tave04"),v("Tave05"),v("Tave06"),v("Tave07"),v("Tave08"),v("Tave09"),v("Tave10"),v("Tave11"),v("Tave12")))},
+    "MCMT" = function() {set(dt, j = "MCMT", value = pmin(v("Tave01"),v("Tave02"),v("Tave03"),v("Tave04"),v("Tave05"),v("Tave06"),v("Tave07"),v("Tave08"),v("Tave09"),v("Tave10"),v("Tave11"),v("Tave12")))},
+    "MAT" = function() {set(dt, j = "MAT", value = v("Tave"))},
     "MAP" = function() {set(dt, j = "MAP", value = v("PPT01")+v("PPT02")+v("PPT03")+v("PPT04")+v("PPT05")+v("PPT06")+v("PPT07")+v("PPT08")+v("PPT09")+v("PPT10")+v("PPT11")+v("PPT12"))},
     "MSP" = function() {set(dt, j = "MSP", value = v("PPT05")+v("PPT06")+v("PPT07")+v("PPT08")+v("PPT09"))},
     "SHM" = function() {set(dt, j = "SHM", value = v("MWMT")/(v("MSP")/1000L))},
