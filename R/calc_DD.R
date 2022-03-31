@@ -4,9 +4,11 @@ calc_DD_m <- function(tm, k, a, b, t0, beta, c){
   DD_m <- numeric(length(tm))
   
   #when k is missing Tm will always be above the negative temperatures used for k 
-  i <- which(tm > k)
+  # Sign reversed in paper
+  # Reverse parameters b and t0 from paper
+  i <- which(tm < k)
   DD_m[i] <- a / (1 + exp(-(tm[i] - t0)/b))
-  i <- which(tm <= k)
+  i <- which(tm >= k)
   DD_m[i] <- c + beta * tm[i]
   
   return(DD_m)
