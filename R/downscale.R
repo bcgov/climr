@@ -65,7 +65,7 @@ downscale <- function(xyz, normal, gcm = NULL,
     res[,-1L] <- res[,-1L] + lr
   } else {
     ppt <- grep("^PPT", names(normal), invert = TRUE)
-    res[, ppt] <- res[, ppt] + lr[, ppt]
+    res[, ppt + 1L] <- res[, ppt + 1L] + lr[, ppt]
   }
   
   # Process one GCM stacked layers
