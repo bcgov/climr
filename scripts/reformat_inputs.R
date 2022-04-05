@@ -16,18 +16,18 @@ terra::writeCDF(
 )
 write.csv(names(from),"inputs_pkg/normal/Normal_1961_1990MP/Normal_1961_1990MP.csv")
 
-# Dem
+# Dem matching normal
 fname <- list.files("inputs_raw/dem/westnorthamerica", pattern = "\\.asc$", full.names = TRUE)
 
-dir.create("inputs_pkg/dem/westnorthamerica", recursive = TRUE, showWarnings = FALSE)
+dir.create("inputs_pkg/normal/Normal_1961_1990MP/dem", recursive = TRUE, showWarnings = FALSE)
 from <- terra::rast(fname)
 terra::writeCDF(
   from,
-  "inputs_pkg/dem/westnorthamerica/dem2_WNA.nc",
+  "inputs_pkg/normal/Normal_1961_1990MP/dem/dem2_WNA.nc",
   overwrite = TRUE,
   compression = 9
 )
-write.csv(names(from),"inputs_pkg/dem/westnorthamerica/dem2_WNA.csv")
+write.csv(names(from),"inputs_pkg/normal/Normal_1961_1990MP/dem/dem2_WNA.csv")
 
 # GCM
 
@@ -49,18 +49,3 @@ for (file in files_nc) {
     compression = 9
   )
 }
-
-# Tentative, files is too big
-
-# Lapse rates
-dname <- list_normal()[1]
-normal <- normal_input(dname)
-from <- attr(normal, "lapse_rates")
-dir.create(sprintf("inputs_pkg/normal/%s/lr", dname), recursive = TRUE, showWarnings = FALSE)
-terra::writeCDF(
-  from,
-  sprintf("inputs_pkg/normal/%s/lr/%s.nc", dname, dname),
-  overwrite = TRUE,
-  compression = 9
-)
-write.csv(names(from),sprintf("inputs_pkg/normal/%s/lr/%s.csv", dname, dname))
