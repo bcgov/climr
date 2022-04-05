@@ -20,9 +20,16 @@ write.csv(names(from),"inputs_pkg/normal/Normal_1961_1990MP/Normal_1961_1990MP.c
 fname <- list.files("inputs_raw/dem/westnorthamerica", pattern = "\\.asc$", full.names = TRUE)
 
 dir.create("inputs_pkg/normal/Normal_1961_1990MP/dem", recursive = TRUE, showWarnings = FALSE)
-from <- terra::rast(fname)
+
+from_dem <- terra::rast(fname)
+
+if (!terra::compareGeom(from, from_dem)) {
+  warning("SpatRaster for Normal and Digital Elevation Model have a different extents. They must be the same. Resampling.")
+  from_dem <- terra::resample(from_dem, from, method = "bilinear")
+}
+
 terra::writeCDF(
-  from,
+  from_dem,
   "inputs_pkg/normal/Normal_1961_1990MP/dem/dem2_WNA.nc",
   overwrite = TRUE,
   compression = 9
