@@ -12,6 +12,29 @@ normal_input <- function(normal = list_normal()[1], dem = list_dem()[1], use_cac
   
   # Check if we have data, if not download some.
   data_check()
+
+  # Where are normal files for this normal
+  dir_normal <- file.path(
+    data_path(),
+    getOption("climRpnw.normal.path", default = "inputs_pkg/normal"),
+    normal
+  )  
+  
+  # Return precomputed if cached
+  if (isTRUE(use_cache) && dir.exists(file.path(dir_normal, "cache"))) {
+    
+    # Directly using terra::rast does not preserve NA value from disk to memory.
+    # It stores -max.int32. Workaround until fixed. Use raster::brick, do math
+    # operation then use terra::rast.
+    res <- terra::rast(
+      list.files(file.path(dir_normal, "cache"), full.names = TRUE, pattern = "\\.tif")[1]
+    ) + 0
+    
+    attr(res, "builder") <- "climRpnw"
+    
+    return(res)
+    
+  }
   
   # Load dem first file
   dir_dem <- file.path(
@@ -29,11 +52,7 @@ normal_input <- function(normal = list_normal()[1], dem = list_dem()[1], use_cac
   )
   
   # Load normal files
-  dir_normal <- file.path(
-    data_path(),
-    getOption("climRpnw.normal.path", default = "inputs_pkg/normal"),
-    normal
-  )
+  
   # Directly using terra::rast does not preserve NA value from disk to memory.
   # It stores -max.int32. Workaround until fixed. Use raster::brick, do math
   # operation then use terra::rast.
@@ -59,29 +78,15 @@ normal_input <- function(normal = list_normal()[1], dem = list_dem()[1], use_cac
     )
   }
   
-  # Use cached lapse rates if they exists
-  if (isTRUE(use_cache) && dir.exists(file.path(dir_normal, "lr"))) {
-    # Directly using terra::rast does not preserve NA value from disk to memory.
-    # It stores -max.int32. Workaround until fixed. Use raster::brick, do math
-    # operation then use terra::rast.
-    lr <- terra::rast(
-      raster::brick(
-        list.files(file.path(dir_normal, "lr"), full.names = TRUE, pattern = "\\.nc")[1]
-      ) - 0L
-    )
-    names(lr) <- data.table::fread(
-      list.files(file.path(dir_normal, "lr"), full.names = TRUE, pattern = "\\.csv")[1], header = TRUE
-    )[["x"]]
-  } else {
-    lr <- lapse_rate(normal, dem)
-  }
+  lr <- lapse_rate(normal, dem)
   
-  # Set dem / lr as attribute to normal
-  attr(normal, "dem") <- dem
-  attr(normal, "lr") <- lr
-  attr(normal, "builder") <- "climRpnw"
+  res <- c(normal, lr, dem)
   
-  return(normal)
+  stopifnot(terra::nlyr(res) == 73)
+  
+  attr(res, "builder") <- "climRpnw"
+  
+  return(res)
 }
 
 #' List available normal

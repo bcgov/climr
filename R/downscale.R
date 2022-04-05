@@ -20,7 +20,7 @@
 #' downscale(xyz, normal, gcm)
 #' }
 downscale <- function(xyz, normal, gcm = NULL, 
-                      vars = sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3))),
+                      vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3)))),
                       ppt_lr = FALSE) {
   
   # Make sure normal was built using normal_input
@@ -45,27 +45,36 @@ downscale <- function(xyz, normal, gcm = NULL,
   # Error in x$.self$finalize() : attempt to apply non-function
   # Can ignore, trying to suppress messages with `shush`
   # https://github.com/rspatial/terra/issues/287
-  res <- shush(terra::extract(x = normal, y = xyz[,1L:2L], method = "bilinear"))
   
+  # stack before extracting
+  res <- shush(
+    terra::extract(
+      x = normal,
+      y = xyz[,1L:2L],
+      method = "bilinear"
+    )
+  )
+
   # Compute elevation differences between provided points elevation and normal
-  elev_delta <- xyz[,3L] - shush(
-      terra::extract(x = attr(normal, "dem"), y = xyz[,1L:2L], method = "bilinear")
-  )[,-1L] # Remove ID column
+  # Dem at position 74 (ID column + 36 normal layers + 36 lapse rate layers + 1 dem layer)
+  elev_delta <- xyz[,3L] - res[, 74L]
   
   # Compute individual point lapse rate adjustments
-  lr <- elev_delta * shush(
-    terra::extract(x = attr(normal, "lr"), y = xyz[,1L:2L], method = "bilinear")
-  )[,-1L] # Remove ID column
+  # Lapse rate position 38:73 (ID column + 36 normal layers + 36 lapse rate layers)
+  lr <- elev_delta * res[, 38L:73L]
   
   # Replace any NAs left with 0s
   lr[is.na(lr)] <- 0L
+  
+  # Remove lapse rates and digital elevation model from res
+  res[,38L:74L] <- NULL
   
   # Combine results (ignoring ID column)
   if (isTRUE(ppt_lr)) {
     res[,-1L] <- res[,-1L] + lr
   } else {
-    ppt <- grep("^PPT", names(normal), invert = TRUE)
-    res[, ppt] <- res[, ppt] + lr[, ppt]
+    ppt <- grep("^PPT", names(normal)[1L:36L], invert = TRUE)
+    res[, ppt + 1L] <- res[, ppt + 1L] + lr[, ppt]
   }
   
   # Process one GCM stacked layers

@@ -186,20 +186,21 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, use_parallel = TRUE, rast
   }
   
   if (isTRUE(use_parallel)) {
-    # Store current option value
-    cur_value <- getOption("mc.cores")
-    # Restore value on function exit
-    on.exit(options("mc.cores" = cur_value), add = TRUE)
-    # Set option value for the rest of the function execution
-    options("mc.cores" = parallel::detectCores()/2L)
+    
+    # Set up cluster
+    cl <- parallel::makePSOCKcluster(parallel::detectCores())
     # Use parallel lapply
-    func <- parallel::mclapply
+    res <- parallel::clusterApply(cl = cl, normal, lapse_rate_redux, x, nr, nc, n, sum_xx, NA_replace)
+    # Stop cluster
+    parallel::stopCluster(cl)
+    
   } else {
+    
     # Use regular lapply
-    func <- lapply
+    res <- lapply(normal, lapse_rate_redux, x, nr, nc, n, sum_xx, NA_replace)
+    
   }
   
-  res <- func(normal, lapse_rate_redux, x, nr, nc, n, sum_xx, NA_replace)
   
   # Transform back into raster layers stack
   if (isTRUE(rasterize)) {
@@ -283,21 +284,19 @@ lapse_rates <- function(normal, dem, NA_replace = TRUE, use_parallel = TRUE, ras
     )
     
     message(
-      "Compressing and saving lapse rates to: ",
-      file.path(dir_normal, "lr", sprintf("%s.lr.nc", n))
+      "Compressing and saving normal + lapse rates + dem to: ",
+      file.path(dir_normal, "cache", sprintf("%s.wlrdem.tif", n))
     )
-    dir.create(file.path(dir_normal, "lr"), recursive = TRUE, showWarnings = FALSE)
+    dir.create(file.path(dir_normal, "cache"), recursive = TRUE, showWarnings = FALSE)
     
     # Actual writing and compressing
-    terra::writeCDF(
-      from,
-      file.path(dir_normal, "lr", sprintf("%s.lr.nc", n)),
+    terra::writeRaster(
+      c(r, from, dem),
+      file.path(dir_normal, "cache", sprintf("%s.wlrdem.tif", n)),
       overwrite = TRUE,
-      compression = 9
+      gdal="COMPRESS=NONE"
     )
     
-    # Then index
-    utils::write.csv(names(from), file.path(dir_normal, "lr", sprintf("%s.lr.csv", n)))
     message("Done")
   }
   
