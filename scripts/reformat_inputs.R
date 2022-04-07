@@ -12,7 +12,8 @@ terra::writeCDF(
   overwrite = TRUE,
   prec = "integer",
   compression = 9,
-  shuffle = TRUE
+  shuffle = TRUE,
+  missval = 999999
 )
 write.csv(names(from),"inputs_pkg/normal/Normal_1961_1990MP/Normal_1961_1990MP.csv")
 
@@ -32,7 +33,8 @@ terra::writeCDF(
   from_dem,
   "inputs_pkg/normal/Normal_1961_1990MP/dem/dem2_WNA.nc",
   overwrite = TRUE,
-  compression = 9
+  compression = 9,
+  missval = 999999
 )
 write.csv(names(from),"inputs_pkg/normal/Normal_1961_1990MP/dem/dem2_WNA.csv")
 
@@ -53,6 +55,7 @@ for (file in files_nc) {
     unit = unique(terra::units(from)),
     longname = "",
     zname = "index",
-    compression = 9
+    compression = 9,
+    missval = 999999
   )
 }
