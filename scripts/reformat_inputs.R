@@ -34,7 +34,7 @@ terra::writeCDF(
   "inputs_pkg/normal/Normal_1961_1990MP/dem/dem2_WNA.nc",
   overwrite = TRUE,
   compression = 9,
-  missval = 999999
+  missval = NA
 )
 write.csv(names(from),"inputs_pkg/normal/Normal_1961_1990MP/dem/dem2_WNA.csv")
 
@@ -56,6 +56,6 @@ for (file in files_nc) {
     longname = "",
     zname = "index",
     compression = 9,
-    missval = 999999
+    missval = NA
   )
 }
