@@ -36,7 +36,7 @@ terra::writeCDF(
   compression = 9,
   missval = NA
 )
-write.csv(names(from),"inputs_pkg/normal/Normal_1961_1990MP/dem/dem2_WNA.csv")
+write.csv(names(from_dem),"inputs_pkg/normal/Normal_1961_1990MP/dem/dem2_WNA.csv")
 
 # GCM
 
