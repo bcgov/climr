@@ -5,7 +5,8 @@
 fname <- list.files("inputs_raw/normal/Normal_1961_1990MP", pattern = "\\.asc$", full.names = TRUE)
 
 dir.create("inputs_pkg/normal/Normal_1961_1990MP", recursive = TRUE, showWarnings = FALSE)
-from <- terra::rast(fname)
+# Making sure NA values are correctly handled for integer precision
+from <- terra::rast(raster::brick(raster::stack(fname))+0L)
 terra::writeCDF(
   from,
   "inputs_pkg/normal/Normal_1961_1990MP/Normal_1961_1990MP.nc",
@@ -13,7 +14,7 @@ terra::writeCDF(
   prec = "integer",
   compression = 9,
   shuffle = TRUE,
-  missval = 999999
+  missval = 99999
 )
 write.csv(names(from),"inputs_pkg/normal/Normal_1961_1990MP/Normal_1961_1990MP.csv")
 
