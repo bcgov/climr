@@ -1,6 +1,4 @@
 #' Update external package data
-#' @param dem A character. Relative path from the source root to digital elevation model files folder.
-#' Default to option value "climRpnw.dem.path" if set, or "inputs_pkg/digitalElevationModel".
 #' @param gcm A character. Relative path from the source root to global circulation models files folder.
 #' Default to option value "climRpnw.gcm.path" if set, or "inputs_pkg/gcmData".
 #' @param normal A character. Relative path from the source root to base normal files folder.
@@ -11,18 +9,13 @@
 #' @export
 data_update <- function(
   ...,
-  dem = getOption("climRpnw.dem.path", default = "inputs_pkg/dem"),
   gcm = getOption("climRpnw.gcm.path", default = "inputs_pkg/gcm"),
   normal = getOption("climRpnw.normal.path", default = "inputs_pkg/normal"),
   quiet = !interactive()) {
   
   # Reset options value if provided by user. They will be used to retrieve data by other functions.
-  options("climRpnw.dem.path" = dem)
   options("climRpnw.gcm.path" = gcm)
   options("climRpnw.normal.path" = normal)
-  
-  # Retrieve digital elevation models file list
-  dem_files <- content_get(path = dem, ...)
   
   # Retrieve gcm file list
   gcm_files <- content_get(path = gcm, ...)
@@ -34,7 +27,6 @@ data_update <- function(
   data_get(
     files = data.table::rbindlist(
       list(
-        dem_files,
         gcm_files,
         normal_files
       )
@@ -92,8 +84,8 @@ data_download <- function(url, path, uid, quiet = !interactive()) {
   # Update uid db
   uid_update(path[!existing], uid[!existing])
   
-  # Update lapse rates cache using the first dem file found
-  lapse_rates(list_normal(), list_dem()[1])
+  # Decompress, precompute and cache data
+  data_prepare()
   
   return(invisible(TRUE))
 }
@@ -139,7 +131,6 @@ data_delete <- function(ask = interactive()) {
   # Unset options
   options(
     "climRpnw.session.tmp.path" = NULL,
-    "climRpnw.dem.path" = NULL,
     "climRpnw.gcm.path" = NULL,
     "climRpnw.normal.path" = NULL,
     "climRpnw.session.cache.ask.response" = NULL
@@ -150,7 +141,7 @@ data_delete <- function(ask = interactive()) {
 
 #' @noRd
 data_check <- function() {
-  if (!length(c(list_gcm(), list_dem(), list_normal()))) {
+  if (!length(c(list_gcm(), list_normal()))) {
     response <- utils::askYesNo(
       "climRpnw could not find data to use for this package. Do you want to download it now?",
       prompts = c("Yes", "No", "Cancel")
@@ -163,10 +154,12 @@ data_check <- function() {
   }
 }
 
+
+
 #' List package local cache files
 #' @param subdirectory A character. A subdirectory of `data_path()`. Restrict listing to only
-#' this particular subdirectory. Use `getOption("climRpnw.dem.path")`,
-#' `getOption("climRpnw.gcm.path")` or `getOption("climRpnw.normal.path")`.
+#' this particular subdirectory. Use `getOption("climRpnw.gcm.path")` or
+#' `getOption("climRpnw.normal.path")`.
 #' @export
 list_data <- function(subdirectory) {
   dir <- data_path()
@@ -174,4 +167,122 @@ list_data <- function(subdirectory) {
     dir <- file.path(dir, subdirectory)
   }
   list.files(dir, recursive = TRUE, full.names = TRUE)
+}
+
+#' Prepare downloaded data for package use
+#' @importFrom terra writeRaster rast
+#' @export
+data_prepare <- function() {
+
+  normals <- list_normal()
+  
+  # Loop for each normal
+  for (n in normals) {
+    
+    # Load normal files
+    dir_normal <- file.path(
+      data_path(),
+      getOption("climRpnw.normal.path", default = "inputs_pkg/normal"),
+      n
+    )
+    dir_dem <- file.path(dir_normal, "dem")
+    
+    nm <- data.table::fread(list.files(dir_normal, full.names = TRUE, pattern = "\\.csv"), header = TRUE)[["x"]]
+    r <- terra::rast(list.files(dir_normal, full.names = TRUE, pattern = "\\.nc"))
+    names(r) <- nm
+    # Assuming Tmin and Tmax are in integer precision after applying a times 10 mod
+    # to reduce storage size. This removes the mod to get original values back.
+    r <- r / c(1L, 10L)[startsWith(names(r), "T") + 1L]
+    
+    nm <- data.table::fread(list.files(dir_dem, full.names = TRUE, pattern = "\\.csv"), header = TRUE)[["x"]]
+    d <- terra::rast(list.files(dir_dem, full.names = TRUE, pattern = "\\.nc"))
+    names(d) <- nm
+    
+    message("Computing lapse rates for normal: ", n)
+    lr <- lapse_rate(
+      normal = r,
+      dem = d,
+      NA_replace = TRUE,
+      nthread = 2,
+      rasterize = TRUE
+    )
+    
+    message(
+      "Saving uncompresseed normal + lapse rates + dem to: ",
+      file.path(dir_normal, sprintf("%s.wlrdem.tif", n))
+    )
+    
+    # Actual writing
+    terra::writeRaster(
+      c(r, lr, d),
+      file.path(dir_normal, sprintf("%s.wlrdem.tif", n)),
+      overwrite = TRUE,
+      gdal="COMPRESS=NONE"
+    )
+    
+  }
+  
+  gcms <- list_gcm()
+  
+  # Loop for each gcm
+  for (g in gcms) {
+    
+    # Load normal files
+    dir_gcm <- file.path(
+      data_path(),
+      getOption("climRpnw.gcm.path", default = "inputs_pkg/gcm"),
+      g
+    )
+    
+    nm <- data.table::rbindlist(
+      lapply(
+        list.files(dir_gcm, full.names = TRUE, pattern = "\\.csv"),
+        data.table::fread,
+        header = TRUE
+      )
+    )[["x"]]
+    # Replace GCM climate variables names with official labels
+    nm <- gsub("_pr_", "_PPT_", nm, fixed = TRUE)
+    nm <- gsub("_tasmax_", "_Tmax_", nm, fixed = TRUE)
+    nm <- gsub("_tasmin_", "_Tmin_", nm, fixed = TRUE)
+        
+    r <- terra::rast(list.files(dir_gcm, full.names = TRUE, pattern = "\\.nc"))
+    names(r) <- nm
+    
+    # Substract reference layers, only keep deltas, plus load in memory instead of disk
+    message("Computing deltas to reference")
+    # Find matching reference layer for each layer
+    # Reference layers will match with themselves
+    ref_layers <- grep("_reference_", nm, fixed = TRUE)
+    names(ref_layers) <- gsub("^([^_]+_[^_]+_[^_]+_).*$", "\\1", nm[ref_layers])
+    matching_ref <- ref_layers[gsub("^([^_]+_[^_]+_[^_]+_).*$", "\\1", nm)]
+    
+    # Reference layers positions
+    # They will be used to avoid computing deltas of
+    # reference layers with themselves
+    uniq_ref <- sort(unique(matching_ref))
+    
+    # Substract reference layer, this takes a few seconds as all
+    # data have to be loaded in memory from disk
+    r <- r[[-uniq_ref]] - r[[matching_ref[-uniq_ref]]]
+    
+    message(
+      "Saving uncompressed gcm deltas to: ",
+      file.path(dir_gcm, sprintf("gcmData.%s.deltas.tif", g))
+    )
+    
+    # Actual writing
+    terra::writeRaster(
+      r,
+      file.path(dir_gcm, sprintf("gcmData.%s.deltas.tif", g)),
+      overwrite = TRUE,
+      gdal="COMPRESS=NONE"
+    )
+    
+  }
+  
+  message("Done")
+  
+  return(invisible(TRUE))
+  
 }

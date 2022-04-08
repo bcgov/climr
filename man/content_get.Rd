@@ -11,7 +11,7 @@ content_get(path, source = c("github"), ...)
 content_get_gh(
   path,
   repo = getOption("climRpnw.gh.repo", default = "bcgov/climR-pnw"),
-  ref = "data"
+  ref = "data_perf"
 )
 
 content_get_void(...)

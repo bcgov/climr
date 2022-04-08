@@ -124,7 +124,7 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 #' @param normal Normal rasters to compute lapse rates for. Build with this package functions.
 #' @param dem A digital elevation model with matching normal extent.
 #' @param NA_replace A boolean. Should NA lapse rate results be replaced by zeros. Default to TRUE.
-#' @param use_parallel A boolean. Should parallel::mclapply be used. Default to TRUE.
+#' @param nthread An integer. Number of parallel threads to use to compute lapse rates.
 #' @param rasterize Return an object of the same class category as normal with the same extend.
 #' @details Formulas
 #' Simple linear regression without the intercept term
@@ -134,44 +134,62 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 #' R² = mss / (mss + rss)
 #' Lapse rate = beta_coef * R²
 #' @return Lapse rate values.
-#' @importFrom terra as.list as.matrix ext
-#' @importFrom parallel detectCores mclapply
-lapse_rate <- function(normal, dem, NA_replace = TRUE, use_parallel = TRUE, rasterize = TRUE) {
+#' @importFrom terra as.list as.matrix ext nlyr  compareGeom resample rast crs
+#' @importFrom parallel makeForkCluster makePSOCKcluster stopCluster parLapply
+#' @export
+lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize = TRUE) {
   
   # Transform normal to list, capture names before
   normal_names <- names(normal)
-  normal <- shush(terra::as.list(normal))
+  
+  # Validation
+  if (terra::nlyr(normal) != 36L || !all(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3))) %in% names(normal))) {
+    stop(
+      "Normal raster does not have the required 36 layers. Required layers are ",
+      paste(sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3)))), collapse = ", "),
+      "."
+    )
+  }
+  if (terra::nlyr(dem) != 1L) {
+    stop(
+      "Digital elevation model raster has to have one layer only."
+    )
+  }
+  # Matching geometries check
+  if (!terra::compareGeom(normal, dem)) {
+    warning("Normal and Digital elevation model rasters have different extents. They must be the same. Resampling dem to match.")
+    dem <- terra::resample(dem, normal, method = "bilinear")
+  }
   
   # Compute everything related to the dem and independant of normal
-  nr <- nrow(dem)
-  nc <- ncol(dem)
-  x <- shush(terra::as.matrix(dem, wide = TRUE))
+  n_r <- nrow(dem)
+  n_c <- ncol(dem)
+  x_i <- shush(terra::as.matrix(dem, wide = TRUE))
   # Expand and recycle borders
-  x <- recycle_borders(x, nr, nc)
+  x_i <- recycle_borders(x_i, n_r, n_c)
   # Compute surrounding cells deltas
-  x <- deltas(x, nr, nc, NA_replace)
+  x_i <- deltas(x_i, n_r, n_c, NA_replace)
   # Number of surrounding cells
-  n <- length(x)
+  n_sc <- length(x_i)
   # Sums of x squared
-  sum_xx <- sum_matrix(sup(x,2))
+  sum_xx <- sum_matrix(sup(x_i,2))
   
   # For the lapse rate, x is the elevation, and y is the normal
-  lapse_rate_redux <- function(r, x, nr, nc, n, sum_xx, NA_replace) {
+  lapse_rate_redux <- function(y_i, x_i, n_r, n_c, n_sc, sum_xx, NA_replace) {
     
-    y <- shush(terra::as.matrix(r, wide = TRUE))
     # Expand and recycle borders
-    y <- recycle_borders(y, nr, nc)
+    y_i <- recycle_borders(y_i, n_r, n_c)
     # Compute surrounding cells deltas
-    y <- deltas(y, nr, nc)
+    y_i <- deltas(y_i, n_r, n_c)
     # This is the regression coefficient matrix
-    beta_coef <- sum_matrix(prod_matrix(x,y)) / sum_xx
+    beta_coef <- sum_matrix(prod_matrix(x_i, y_i)) / sum_xx
     # We need the fitted values to compute the
     # coefficient of determination
-    f <- fitted(x, beta_coef)
+    f <- fitted(x_i, beta_coef)
     # We use the same approach as stats::summary.lm
     # applied to a list matrices
     mss <- sum_matrix(sup(f,2))
-    rss <- sum_matrix(sup(delta_matrix(y,f),2))
+    rss <- sum_matrix(sup(delta_matrix(y_i,f),2))
     # We can combine the resulting matrices to get the
     # coefficient of determination and multiply by beta coefficient
     lapse_rate <- beta_coef * mss / (mss + rss)
@@ -185,33 +203,58 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, use_parallel = TRUE, rast
     
   }
   
-  if (isTRUE(use_parallel)) {
-    # Store current option value
-    cur_value <- getOption("mc.cores")
-    # Restore value on function exit
-    on.exit(options("mc.cores" = cur_value), add = TRUE)
-    # Set option value for the rest of the function execution
-    options("mc.cores" = parallel::detectCores()/2L)
-    # Use parallel lapply
-    func <- parallel::mclapply
+  if (isTRUE(nthread > 1L)) {
+    
+    # initiate cluster
+    if (Sys.info()['sysname'] != "Windows") {
+      cl <- parallel::makeForkCluster(nthread)
+    } else {
+      cl <- parallel::makePSOCKcluster(nthread)
+    }
+    
+    # destroy cluster on exit
+    on.exit(parallel::stopCluster(cl), add = TRUE)
+    
+    res <- parallel::parLapply(
+      cl = cl,
+      X = shush(lapply(terra::as.list(normal), terra::as.matrix, wide = TRUE)),
+      fun = lapse_rate_redux,
+      x_i = x_i,
+      n_r = n_r,
+      n_c = n_c,
+      n_sc = n_sc,
+      sum_xx = sum_xx,
+      NA_replace = NA_replace
+    )
+    
   } else {
+    
     # Use regular lapply
-    func <- lapply
+    res <- lapply(
+      X = shush(lapply(terra::as.list(normal), terra::as.matrix, wide = TRUE)),
+      FUN = lapse_rate_redux,
+      x_i = x_i,
+      n_r = n_r,
+      n_c = n_c,
+      n_sc = n_sc,
+      sum_xx = sum_xx,
+      NA_replace = NA_replace
+    )
+    
   }
   
-  res <- func(normal, lapse_rate_redux, x, nr, nc, n, sum_xx, NA_replace)
-  
-  # Transform back into raster layers stack
+  # Transform back into SpatRaster
   if (isTRUE(rasterize)) {
     res <- shush(
       terra::rast(
         lapply(
           res,
           terra::rast,
-          extent = terra::ext(dem)
+          extent = terra::ext(normal)
         )
       )
     )
+    terra::crs(res) <- terra::crs(normal)
   }
   
   # Set names of lapse rates to match normal
@@ -219,87 +262,4 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, use_parallel = TRUE, rast
   
   return(res)
   
-}
-
-#' Compute and cache lapse rates for later use
-#' @inheritParams lapse_rate
-#' @importFrom utils write.csv
-lapse_rates <- function(normal, dem, NA_replace = TRUE, use_parallel = TRUE, rasterize = TRUE) {
-  
-  # Load dem first file
-  dir_dem <- file.path(
-    data_path(),
-    getOption("climRpnw.dem.path", default = "inputs_pkg/dem"),
-    dem
-  )
-  # Directly using terra::rast does not preserve NA value from disk to memory.
-  # It stores -max.int32. Workaround until fixed. Use raster::brick, do math
-  # operation then use terra::rast.
-  dem <- terra::rast(
-    raster::raster(
-      list.files(dir_dem, full.names = TRUE, pattern = "\\.nc")[1]
-    ) - 0L
-  )
-  
-  # Loop for each normal
-  for (n in normal) {
-    
-    # Load normal files
-    dir_normal <- file.path(
-      data_path(),
-      getOption("climRpnw.normal.path", default = "inputs_pkg/normal"),
-      n
-    )
-    
-    # Directly using terra::rast does not preserve NA value from disk to memory.
-    # It stores -max.int32. Workaround until fixed. Use raster::brick, do math
-    # operation then use terra::rast.
-    # Tmax / Tmax are stored as : Real value * 10 then cast to integer
-    # Recasting to real value
-    nm <- data.table::fread(
-      list.files(dir_normal, full.names = TRUE, pattern = "\\.csv")[1], header = TRUE
-    )[["x"]]
-    r <- terra::rast(
-      raster::brick(
-        list.files(dir_normal, full.names = TRUE, pattern = "\\.nc")[1]
-      ) / c(1L, 10L)[startsWith(nm, "T") + 1L]
-    )
-    names(r) <- nm
-    
-    # All objects have to share the same extent for now
-    # This could be modified to process all the objects to adjust them to
-    # the same raster extent.
-    if (!terra::compareGeom(r, dem)) {
-      next
-    }
-    
-    message("Computing lapse rates for normal: ", n)
-    from <- lapse_rate(
-      normal = r,
-      dem = dem,
-      NA_replace = NA_replace,
-      use_parallel = use_parallel,
-      rasterize = rasterize
-    )
-    
-    message(
-      "Compressing and saving lapse rates to: ",
-      file.path(dir_normal, "lr", sprintf("%s.lr.nc", n))
-    )
-    dir.create(file.path(dir_normal, "lr"), recursive = TRUE, showWarnings = FALSE)
-    
-    # Actual writing and compressing
-    terra::writeCDF(
-      from,
-      file.path(dir_normal, "lr", sprintf("%s.lr.nc", n)),
-      overwrite = TRUE,
-      compression = 9
-    )
-    
-    # Then index
-    utils::write.csv(names(from), file.path(dir_normal, "lr", sprintf("%s.lr.csv", n)))
-    message("Done")
-  }
-  
-  return(invisible(TRUE))
 }
