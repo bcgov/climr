@@ -5,29 +5,39 @@
 fname <- list.files("inputs_raw/normal/Normal_1961_1990MP", pattern = "\\.asc$", full.names = TRUE)
 
 dir.create("inputs_pkg/normal/Normal_1961_1990MP", recursive = TRUE, showWarnings = FALSE)
-from <- terra::rast(fname)
+# Making sure NA values are correctly handled for integer precision
+from <- terra::rast(raster::brick(raster::stack(fname))+0L)
 terra::writeCDF(
   from,
   "inputs_pkg/normal/Normal_1961_1990MP/Normal_1961_1990MP.nc",
   overwrite = TRUE,
   prec = "integer",
   compression = 9,
-  shuffle = TRUE
+  shuffle = TRUE,
+  missval = 99999
 )
 write.csv(names(from),"inputs_pkg/normal/Normal_1961_1990MP/Normal_1961_1990MP.csv")
 
-# Dem
+# Dem matching normal
 fname <- list.files("inputs_raw/dem/westnorthamerica", pattern = "\\.asc$", full.names = TRUE)
 
-dir.create("inputs_pkg/dem/westnorthamerica", recursive = TRUE, showWarnings = FALSE)
-from <- terra::rast(fname)
+dir.create("inputs_pkg/normal/Normal_1961_1990MP/dem", recursive = TRUE, showWarnings = FALSE)
+
+from_dem <- terra::rast(fname)
+
+if (!terra::compareGeom(from, from_dem)) {
+  warning("SpatRaster for Normal and Digital Elevation Model have a different extents. They must be the same. Resampling.")
+  from_dem <- terra::resample(from_dem, from, method = "bilinear")
+}
+
 terra::writeCDF(
-  from,
-  "inputs_pkg/dem/westnorthamerica/dem2_WNA.nc",
+  from_dem,
+  "inputs_pkg/normal/Normal_1961_1990MP/dem/dem2_WNA.nc",
   overwrite = TRUE,
-  compression = 9
+  compression = 9,
+  missval = NA
 )
-write.csv(names(from),"inputs_pkg/dem/westnorthamerica/dem2_WNA.csv")
+write.csv(names(from_dem),"inputs_pkg/normal/Normal_1961_1990MP/dem/dem2_WNA.csv")
 
 # GCM
 
@@ -46,21 +56,7 @@ for (file in files_nc) {
     unit = unique(terra::units(from)),
     longname = "",
     zname = "index",
-    compression = 9
+    compression = 9,
+    missval = NA
   )
 }
-
-# Tentative, files is too big
-
-# Lapse rates
-dname <- list_normal()[1]
-normal <- normal_input(dname)
-from <- attr(normal, "lapse_rates")
-dir.create(sprintf("inputs_pkg/normal/%s/lr", dname), recursive = TRUE, showWarnings = FALSE)
-terra::writeCDF(
-  from,
-  sprintf("inputs_pkg/normal/%s/lr/%s.nc", dname, dname),
-  overwrite = TRUE,
-  compression = 9
-)
-write.csv(names(from),sprintf("inputs_pkg/normal/%s/lr/%s.csv", dname, dname))
