@@ -9,9 +9,6 @@
 #' A value of 0 is `ensembleMean` only. Runs are included in the order they are found in the
 #' models data untile `max_run` is reached. Default to 0L.
 #' @return An object to use with `downscale`. A `SpatRaster` with, possibly, multiple layers.
-#' @details Will use raster package for now. Switch to terra methods once it gets
-#' better performance. See
-#' https://gis.stackexchange.com/questions/413105/terrarast-vs-rasterbrick-for-loading-in-nc-files.
 #' @importFrom terra rast
 #' @importFrom utils head
 #' @export

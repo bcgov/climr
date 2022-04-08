@@ -243,7 +243,7 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
     
   }
   
-  # Transform back into raster layers stack
+  # Transform back into SpatRaster
   if (isTRUE(rasterize)) {
     res <- shush(
       terra::rast(
