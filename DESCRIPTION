@@ -1,8 +1,10 @@
 Package: climRpnw
 Title: Downscaling of global climate data for Central-Western North America
-Version: 0.0.0.9000
+Version: 0.0.0.9900
 Authors@R: c(
-    person("Bruno", "Tremblay", email = "bruno@boostao.ca", role = c("aut", "cre"),
+    person("Colin", "Mahony", email = "Colin.Mahony@gov.bc.ca", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-6111-5675")),
+    person("Bruno", "Tremblay", email = "bruno@boostao.ca", role = c("aut"),
            comment = c(ORCID = "0000-0002-2945-356X")),
     person("Francois", "Bornais", email = "francois@boostao.ca", role = c("aut")),
     person(family = "Province of British Columbia", role = c("cph", "fnd")))
@@ -21,8 +23,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Imports: 
     terra,
-    raster,
-    ncdf4,
     parallel,
     data.table,
     gh,

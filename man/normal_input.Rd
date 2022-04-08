@@ -4,20 +4,21 @@
 \alias{normal_input}
 \title{Create normal baseline input for \code{downscale}}
 \usage{
-normal_input(normal = list_normal()[1], dem = list_dem()[1], use_cache = TRUE)
+normal_input(normal = list_normal()[1], dem = NULL, ...)
 }
 \arguments{
-\item{normal}{A character. Label of the normal baseline to use. Can be obtained from
-\code{list_normal()}. Default to \code{list_normal()[1]}.}
+\item{normal}{A character or a SpatRaster. For character, label of the normal baseline to use.
+Can be obtained from \code{list_normal()}. For SpatRaster, 36 layers normal climate variables with
+names PPT01:PPT12, Tmax01:Tmax12 and Tmin01:Tmin12. Default to \code{list_normal()[1]}.}
 
-\item{dem}{A character. Label of the digital elevation model to use. Must have the same
-extent as the normal baseline. Can be obtained from \code{list_dem()}. Default to \code{list_dem()[1]}.}
+\item{dem}{A digital elevation model SpatRaster. Only needed if normal is a SpatRaster.
+Default to NULL.}
 
-\item{use_cache}{Use a cached version of lapse rates if available instead of recomputing.}
+\item{...}{Other arguments for lapse rates calculation. See \code{?lapse_rate}.}
 }
 \value{
-A normal baseline to use with \code{downscale}. A \code{SpatRaster} with a \code{dem} attribute and
-a \code{lr} attribute..
+A normal baseline to use with \code{downscale}. A \code{SpatRaster} containing normals, lapse rates
+and digital elevation model layers.
 }
 \description{
 Create normal baseline input for \code{downscale}

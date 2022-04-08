@@ -40,7 +40,6 @@ results <- downscale(
 
 # Details about available data
 list_data()
-list_dem()
 list_gcm()
 list_normal()
 list_period()

@@ -2,6 +2,7 @@
 #'
 #' @param m month of the year
 #' @param tm min temperature for that month
+#' @param ppt precipitation mm
 #'
 #' @return Precipitation As Snow
 #'
@@ -11,7 +12,7 @@
 #' }
 calc_PAS <- function(m, tm, ppt) {
   
-  if (FALSE) {T0 <- b <- NULL}
+  if (FALSE) {T0 <- a <- b <- NULL}
   
   param[["PAS"]][m, ppt * a / (1 + exp(-(tm - T0) / b))]
 

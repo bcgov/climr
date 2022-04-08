@@ -6,7 +6,6 @@
 \usage{
 data_update(
   ...,
-  dem = getOption("climRpnw.dem.path", default = "inputs_pkg/dem"),
   gcm = getOption("climRpnw.gcm.path", default = "inputs_pkg/gcm"),
   normal = getOption("climRpnw.normal.path", default = "inputs_pkg/normal"),
   quiet = !interactive()
@@ -14,9 +13,6 @@ data_update(
 }
 \arguments{
 \item{...}{Others parameters such as \code{source} or \code{repo} for content getting functions.}
-
-\item{dem}{A character. Relative path from the source root to digital elevation model files folder.
-Default to option value "climRpnw.dem.path" if set, or "inputs_pkg/digitalElevationModel".}
 
 \item{gcm}{A character. Relative path from the source root to global circulation models files folder.
 Default to option value "climRpnw.gcm.path" if set, or "inputs_pkg/gcmData".}

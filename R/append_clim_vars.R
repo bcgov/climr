@@ -1,8 +1,7 @@
 #' Add extra climate variables to a data.table
 #' @param dt A data.table with TminXX, TmaxXX, PPTXX for XX in 01 to 12.
 #' @param vars A character vector of climate variables to compute.
-#' @param xyz A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).
-append_clim_vars <- function(dt, vars, xyz) {
+append_clim_vars <- function(dt, vars) {
   
   # Return variable or create it if not found in dt
   v <- function(nm) {
@@ -100,18 +99,18 @@ append_clim_vars <- function(dt, vars, xyz) {
     "RH11" = function() {set(dt, j = "RH11", value = calc_RH(v("Tmin11"), v("Tmax11")))},
     "RH12" = function() {set(dt, j = "RH12", value = calc_RH(v("Tmin12"), v("Tmax12")))},
     
-    "Eref01" = function() {set(dt, j = "Eref01", value = calc_Eref( 1, v("Tmin01"), v("Tmax01"), .subset2(xyz, 2)[v("ID")]))},
-    "Eref02" = function() {set(dt, j = "Eref02", value = calc_Eref( 2, v("Tmin02"), v("Tmax02"), .subset2(xyz, 2)[v("ID")]))},
-    "Eref03" = function() {set(dt, j = "Eref03", value = calc_Eref( 3, v("Tmin03"), v("Tmax03"), .subset2(xyz, 2)[v("ID")]))},
-    "Eref04" = function() {set(dt, j = "Eref04", value = calc_Eref( 4, v("Tmin04"), v("Tmax04"), .subset2(xyz, 2)[v("ID")]))},
-    "Eref05" = function() {set(dt, j = "Eref05", value = calc_Eref( 5, v("Tmin05"), v("Tmax05"), .subset2(xyz, 2)[v("ID")]))},
-    "Eref06" = function() {set(dt, j = "Eref06", value = calc_Eref( 6, v("Tmin06"), v("Tmax06"), .subset2(xyz, 2)[v("ID")]))},
-    "Eref07" = function() {set(dt, j = "Eref07", value = calc_Eref( 7, v("Tmin07"), v("Tmax07"), .subset2(xyz, 2)[v("ID")]))},
-    "Eref08" = function() {set(dt, j = "Eref08", value = calc_Eref( 8, v("Tmin08"), v("Tmax08"), .subset2(xyz, 2)[v("ID")]))},
-    "Eref09" = function() {set(dt, j = "Eref09", value = calc_Eref( 9, v("Tmin09"), v("Tmax09"), .subset2(xyz, 2)[v("ID")]))},
-    "Eref10" = function() {set(dt, j = "Eref10", value = calc_Eref(10, v("Tmin10"), v("Tmax10"), .subset2(xyz, 2)[v("ID")]))},
-    "Eref11" = function() {set(dt, j = "Eref11", value = calc_Eref(11, v("Tmin11"), v("Tmax11"), .subset2(xyz, 2)[v("ID")]))},
-    "Eref12" = function() {set(dt, j = "Eref12", value = calc_Eref(12, v("Tmin12"), v("Tmax12"), .subset2(xyz, 2)[v("ID")]))},
+    "Eref01" = function() {set(dt, j = "Eref01", value = calc_Eref( 1, v("Tmin01"), v("Tmax01"), v("Lat")))},
+    "Eref02" = function() {set(dt, j = "Eref02", value = calc_Eref( 2, v("Tmin02"), v("Tmax02"), v("Lat")))},
+    "Eref03" = function() {set(dt, j = "Eref03", value = calc_Eref( 3, v("Tmin03"), v("Tmax03"), v("Lat")))},
+    "Eref04" = function() {set(dt, j = "Eref04", value = calc_Eref( 4, v("Tmin04"), v("Tmax04"), v("Lat")))},
+    "Eref05" = function() {set(dt, j = "Eref05", value = calc_Eref( 5, v("Tmin05"), v("Tmax05"), v("Lat")))},
+    "Eref06" = function() {set(dt, j = "Eref06", value = calc_Eref( 6, v("Tmin06"), v("Tmax06"), v("Lat")))},
+    "Eref07" = function() {set(dt, j = "Eref07", value = calc_Eref( 7, v("Tmin07"), v("Tmax07"), v("Lat")))},
+    "Eref08" = function() {set(dt, j = "Eref08", value = calc_Eref( 8, v("Tmin08"), v("Tmax08"), v("Lat")))},
+    "Eref09" = function() {set(dt, j = "Eref09", value = calc_Eref( 9, v("Tmin09"), v("Tmax09"), v("Lat")))},
+    "Eref10" = function() {set(dt, j = "Eref10", value = calc_Eref(10, v("Tmin10"), v("Tmax10"), v("Lat")))},
+    "Eref11" = function() {set(dt, j = "Eref11", value = calc_Eref(11, v("Tmin11"), v("Tmax11"), v("Lat")))},
+    "Eref12" = function() {set(dt, j = "Eref12", value = calc_Eref(12, v("Tmin12"), v("Tmax12"), v("Lat")))},
     
     "CMD01" = function() {set(dt, j = "CMD01", value = calc_CMD(v("Eref01"), v("PPT01")))},
     "CMD02" = function() {set(dt, j = "CMD02", value = calc_CMD(v("Eref02"), v("PPT02")))},
