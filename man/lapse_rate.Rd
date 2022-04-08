@@ -4,13 +4,7 @@
 \alias{lapse_rate}
 \title{Lapse rate computation}
 \usage{
-lapse_rate(
-  normal,
-  dem,
-  NA_replace = TRUE,
-  use_parallel = TRUE,
-  rasterize = TRUE
-)
+lapse_rate(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize = TRUE)
 }
 \arguments{
 \item{normal}{Normal rasters to compute lapse rates for. Build with this package functions.}
@@ -19,7 +13,7 @@ lapse_rate(
 
 \item{NA_replace}{A boolean. Should NA lapse rate results be replaced by zeros. Default to TRUE.}
 
-\item{use_parallel}{A boolean. Should parallel::mclapply be used. Default to TRUE.}
+\item{nthread}{An integer. Number of parallel threads to use to compute lapse rates.}
 
 \item{rasterize}{Return an object of the same class category as normal with the same extend.}
 }

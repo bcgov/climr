@@ -10,6 +10,8 @@ calc_PAS(m, tm, ppt)
 \item{m}{month of the year}
 
 \item{tm}{min temperature for that month}
+
+\item{ppt}{precipitation mm}
 }
 \value{
 Precipitation As Snow

@@ -8,8 +8,9 @@ downscale(
   xyz,
   normal,
   gcm = NULL,
-  vars = sprintf(c("PPT\%02d", "Tmax\%02d", "Tmin\%02d"), sort(rep(1:12, 3))),
-  ppt_lr = FALSE
+  vars = sort(sprintf(c("PPT\%02d", "Tmax\%02d", "Tmin\%02d"), sort(rep(1:12, 3)))),
+  ppt_lr = FALSE,
+  nthread = 1L
 )
 }
 \arguments{
@@ -24,6 +25,8 @@ can be obtained with \code{list_variables()}. Definitions can be found in this p
 \code{variables} dataset. Default to monthly PPT, Tmax, Tmin.}
 
 \item{ppt_lr}{A boolean. Apply lapse rate adjustment to precipitations. Default to FALSE.}
+
+\item{nthread}{An integer. Number of parallel threads to use to do computations. Default to 1L.}
 }
 \value{
 A downscaled dataset. If \code{gcm} is NULL, this is just the downscaled \code{normal}
