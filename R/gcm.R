@@ -12,7 +12,7 @@
 #' @details Will use raster package for now. Switch to terra methods once it gets
 #' better performance. See
 #' https://gis.stackexchange.com/questions/413105/terrarast-vs-rasterbrick-for-loading-in-nc-files.
-#' @importFrom raster brick stack
+#' @importFrom terra rast
 #' @importFrom utils head
 #' @export
 gcm_input <- function(gcm = list_gcm(), ssp = list_ssp(), period = list_period() , max_run = 0L) {
@@ -33,99 +33,38 @@ gcm_input <- function(gcm = list_gcm(), ssp = list_ssp(), period = list_period()
     names(res) <- gcm
     res
   }
-  files_nc <- get_rel_files("\\.nc$", gcm)
-  files_csv <- get_rel_files("\\.csv$", gcm)
-  
-  # Check if we have non matching gcmIndex for gcmData
-  index_check(findex = files_csv, fdata = files_nc)
+  files_tif <- get_rel_files("\\.tif$", gcm)
   
   # Load each file individually + select layers
-  process_one_gcm <- function(data, index, ssp, period) {
+  process_one_gcm <- function(file_tif, ssp, period) {
     
-    # Initiate list
-    bricks <- list()
+    # Initiate raster
+    r <- terra::rast(file_tif)
+    nm <- names(r)
     
     # Select runs + ensembleMean (since alphabetical sort, ensembleMean will be first element)
-    runs <- utils::head(list_unique(index, 5L), max_run + 1L)
-    
-    # process one file
-    for (i in seq_len(length(index))) {
-      # Read in csv file with headers
-      values <- data.table::fread(index[i], header = TRUE)
-      # Always select reference
-      reference_lines <- which(grepl("_reference_", values[["x"]], fixed = TRUE))
-      # Select other layers
-      pattern <- paste0(
-        "(",
-        paste0(ssp, collapse = "|"),
-        ")_(",
-        paste0(runs, collapse = "|"),
-        ")_(",
-        paste0(period, collapse = "|"),
-        ")$"
-      )
-      match_lines <- which(grepl(pattern, values[["x"]]))
-      # Extract layer numbers
-      lyrs <- as.integer(values[["V1"]])[c(reference_lines, match_lines)]
-      # Extract layer names
-      lyrs_names <- values[["x"]][c(reference_lines, match_lines)]
-      # Read data as brick
-      brick <- raster::brick(data[i])[[lyrs]]
-      # Rename layers
-      names(brick) <- lyrs_names
-      # Compute deltas (differences with reference layers)
-      brick <- delta_to_reference(brick)
-      # Include in brick list
-      bricks <- append(bricks, brick)
-    }
-    
-    # Directly using terra::rast does not preserve NA value from disk to memory.
-    # It stores -max.int32. Workaround until fixed. Use raster::brick, do math
-    # operation then use terra::rast.
-    
-    # Combine into one brick and turn into SpatRaster
-    one_gcm <- terra::rast(raster::brick(raster::stack(bricks)))
-    
-    return(one_gcm)
-  }
-  
-  # Substract reference layers, only keep deltas, plus load in memory instead of disk
-  delta_to_reference <- function(layers) {
-    
-    # Store names for later use
-    nm <- names(layers)
-    
-    # Find matching reference layer for each layer
-    # reference will match with itself
-    matching_ref <- vapply(
-      strsplit(nm, "_"),
-      function(x) {
-        grep(
-          paste(
-            paste0(x[1:3], collapse = "_"),
-            "reference_",
-            sep = "_"
-          ),
-          nm
-        )
-      },
-      integer(1)
+    runs <- utils::head(
+      sort(unique(vapply(strsplit(nm, "_"), `[`, character(1), 5))),
+      max_run + 1L
     )
     
-    # Reference layers positions
-    # They will be used to avoid computing deltas of
-    # reference layers with themselves
-    uniq_ref <- sort(unique(matching_ref))
+    # Select layers
+    pattern <- paste0(
+      "(",
+      paste0(ssp, collapse = "|"),
+      ")_(",
+      paste0(runs, collapse = "|"),
+      ")_(",
+      paste0(period, collapse = "|"),
+      ")$"
+    )
+    lyrs <- which(grepl(pattern, nm))
     
-    # Substract reference layer, this takes a few seconds as all
-    # data have to be loaded in memory from disk
-    layers <- layers[[-uniq_ref]] - layers[[matching_ref[-uniq_ref]]]
+    return(r[[lyrs]])
     
-    # Return layers without the references
-    return(layers)
   }
   
-  res <- mapply(process_one_gcm, files_nc, files_csv, MoreArgs = list(ssp = ssp, period = period))
+  res <- lapply(files_tif, process_one_gcm, ssp = ssp, period = period)
   attr(res, "builder") <- "climRpnw" 
   
   # Return a list of SpatRaster, one element for each model
