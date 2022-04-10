@@ -197,39 +197,53 @@ downscale_ <- function(xyzID, normal, gcm, vars, ppt_lr) {
     # Add matching column to gcm_
     gcm_[,-1L] <- gcm_[,-1L] + res[,match(labels, names(res))]
     
-    # Reshape (melt / dcast) to obtain final form
-    ref_dt <- data.table::tstrsplit(nm, "_")
-    # Recombine PERIOD into one field
-    ref_dt[[6]] <- paste(ref_dt[[6]], ref_dt[[7]], sep = "_")
-    ref_dt[7] <- NULL
-    # Transform ref_dt to data.table for remerging
-    data.table::setDT(ref_dt)
-    data.table::setnames(ref_dt, c("GCM", "VAR", "MONTH", "SSP", "RUN", "PERIOD"))
-    data.table::set(ref_dt, j = "variable", value = nm)
-    data.table::set(ref_dt, j = "GCM", value = gsub(".", "-", ref_dt[["GCM"]], fixed = TRUE))
-    data.table::setkey(ref_dt, "variable")
-    
     # Set Latitude and possibly ID
     gcm_[["Lat"]] <- xyzID[,2L]
     if (ncol(xyzID) == 4L) {
       gcm_[["ID"]] <- xyzID[, 4L]
     }
     
-    # Melt gcm_ and set the same key for merging
-    gcm_ <- data.table::melt(
-      data.table::setDT(gcm_),
-      id.vars = c("ID", "Lat"),
-      variable.factor = FALSE
-    )
-    data.table::setkey(gcm_, "variable")
+    # Find groupset (GCM_CLIMATEVAR_MONTH_{GROUPSET})
+    groupset <- sort(unique(gsub("^[^_]+_[^_]+_[^_]+_(.*)$", "\\1", nm)))
     
-    # Finally, dcast back to final form to get original 36 columns
-    gcm_ <- data.table::dcast(
-      # The merge with shared keys is as simple as that
-      gcm_[ref_dt,],
-      ID + GCM + SSP + RUN + PERIOD + Lat ~ VAR + MONTH,
-      value.var = "value",
-      sep = ""
+    # Find groupset columns indices
+    col_indices <- lapply(
+      groupset,
+      function(gs) {
+        c(1, grep(gs, x = names(gcm_), fixed = TRUE), ncol(gcm_))
+      }
+    )
+    
+    # Rename columns to climate variables names
+    names(gcm_) <- gsub("^(ID|Lat)$|^[^_]+_([^_]+)_([^_]+)_(.*)$", "\\1\\2\\3", names(gcm_))
+    
+    # Extract GCM label
+    gcm_label <- gsub(".", "-", gsub("^([^_]+)_.*$", "\\1", nm[1]), fixed = TRUE)
+    
+    # Recombine extract by stacking groupset
+    gcm_ <- data.table::rbindlist(
+      mapply(
+        function(cinx, labels) {
+          dt <- data.table::setDT(gcm_[,cinx])
+          
+          data.table::set(
+            dt,
+            j = c("GCM", "SSP", "RUN", "PERIOD"),
+            value = list(
+              gcm_label,
+              labels[1],
+              labels[2],
+              sprintf("%s_%s", labels[3], labels[4])
+            )
+          )
+          
+          dt
+        },
+        col_indices,
+        strsplit(groupset, "_"),
+        SIMPLIFY = FALSE
+      ),
+      use.names = TRUE
     )
     
     return(gcm_)
