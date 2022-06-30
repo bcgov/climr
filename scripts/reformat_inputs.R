@@ -2,26 +2,28 @@
 # Recompress existing nc file for faster download
 
 # Normal
-fname <- list.files("inputs_raw/normal/Normal_1961_1990MP", pattern = "\\.asc$", full.names = TRUE)
+fname <- list.files("./Normal_1961_1990MP", pattern = "\\.asc$", full.names = TRUE)
 
 dir.create("inputs_pkg/normal/Normal_1961_1990MP", recursive = TRUE, showWarnings = FALSE)
 # Making sure NA values are correctly handled for integer precision
 from <- terra::rast(raster::brick(raster::stack(fname))+0L)
+library(terra)
+from <- rast(fname)
 terra::writeCDF(
   from,
-  "inputs_pkg/normal/Normal_1961_1990MP/Normal_1961_1990MP.nc",
+  "../inputs_pkg/normal/Normal_1961_1990MP_BC/Normal_1961_1990MP.nc",
   overwrite = TRUE,
   prec = "integer",
   compression = 9,
   shuffle = TRUE,
   missval = 99999
 )
-write.csv(names(from),"inputs_pkg/normal/Normal_1961_1990MP/Normal_1961_1990MP.csv")
+write.csv(names(from),"../inputs_pkg/normal/Normal_1961_1990MP_BC/Normal_1961_1990MP.csv")
 
 # Dem matching normal
-fname <- list.files("inputs_raw/dem/westnorthamerica", pattern = "\\.asc$", full.names = TRUE)
+fname <- list.files("../inputs_pkg/", pattern = "\\.asc$", full.names = TRUE)
 
-dir.create("inputs_pkg/normal/Normal_1961_1990MP/dem", recursive = TRUE, showWarnings = FALSE)
+dir.create("../inputs_pkg/normal/Normal_1961_1990MP_BC/dem", recursive = TRUE, showWarnings = FALSE)
 
 from_dem <- terra::rast(fname)
 
@@ -32,12 +34,12 @@ if (!terra::compareGeom(from, from_dem)) {
 
 terra::writeCDF(
   from_dem,
-  "inputs_pkg/normal/Normal_1961_1990MP/dem/dem2_WNA.nc",
+  "../inputs_pkg/normal/Normal_1961_1990MP_BC/dem/dem2_BC.nc",
   overwrite = TRUE,
   compression = 9,
   missval = NA
 )
-write.csv(names(from_dem),"inputs_pkg/normal/Normal_1961_1990MP/dem/dem2_WNA.csv")
+write.csv(names(from_dem),"../inputs_pkg/normal/Normal_1961_1990MP_BC/dem/dem2_BC.csv")
 
 # GCM
 
