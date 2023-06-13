@@ -10,12 +10,14 @@
 data_update <- function(
   ...,
   gcm = getOption("climRpnw.gcm.path", default = "inputs_pkg/gcm"),
+  historic = getOption("climRpnw.historic.path", default = "inputs_pkg/historic"),
   normal = getOption("climRpnw.normal.path", default = "inputs_pkg/normal"),
   quiet = !interactive()) {
   
   # Reset options value if provided by user. They will be used to retrieve data by other functions.
   options("climRpnw.gcm.path" = gcm)
   options("climRpnw.normal.path" = normal)
+  options("climRpnw.historic.path" = historic)
   
   # Retrieve gcm file list
   gcm_files <- content_get(path = gcm, ...)

@@ -4,7 +4,7 @@ library(climRpnw)
 data_update()
 
 # Create a normal baseline
-list_normal()
+list_period()
 normal <- normal_input(normal = "Normal_1961_1990MP_BC")
 dem1 <- terra::rast("C:/Users/kirid/AppData/Local/R/cache/R/climRpnw/inputs_pkg/normal/Normal_1961_1990MP_BC/Normal_1961_1990MP_BC.wlrdem.tif")
 # Select GCM
