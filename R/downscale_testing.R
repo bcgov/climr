@@ -1,26 +1,11 @@
-#' Downscale target rasters to points of interest
-#' @param xyz A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).
-#' @param normal Reference normal baseline input from `normal_input`.
-#' @param gcm Global Circulation Models input from `gcm_input`. Default to NULL.
-#' @param vars A character vector of climate variables to compute. Supported variables
-#' can be obtained with `list_variables()`. Definitions can be found in this package
-#' `variables` dataset. Default to monthly PPT, Tmax, Tmin.
-#' @param ppt_lr A boolean. Apply lapse rate adjustment to precipitations. Default to FALSE.
-#' @param nthread An integer. Number of parallel threads to use to do computations. Default to 1L.
-#' @import data.table
-#' @importFrom terra extract rast sources ext xres yres crop
-#' @importFrom parallel makeForkCluster makePSOCKcluster stopCluster splitIndices parLapply
-#' @return A downscaled dataset. If `gcm` is NULL, this is just the downscaled `normal`
-#' at point locations. If `gcm` is provided, this returns a downscaled dataset for each
-#' point location, general circulation model, shared socioeconomic pathway, run and period.
-#' @export
-#' @examples
-#' \dontrun{
-#' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
-#' normal <- normal_input()
-#' gcm_input <- gcm_input(list_gcm()[3], list_ssp()[1], list_period()[2])
-#' downscale(xyz, normal, gcm)
-#' }
+library(climRpnw)
+xyz <- data.frame(lon = runif(10, -125, -120), lat = runif(10, 51, 53), elev = runif(10))
+normal <- normal_input()
+gcm_ <- gcm_input(list_gcm()[3], list_ssp()[3], list_period()[2])
+downscale(xyz, normal, gcm)
+historic = "2001_2020"
+gcm = gcm_input
+
 downscale <- function(xyz, normal, gcm = NULL, historic = NULL,
                       vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3)))),
                       ppt_lr = FALSE, nthread = 1L) {
@@ -113,6 +98,9 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL,
 
 #' Simple downscale
 #' @noRd
+#' 
+xyzID <- xyz
+
 downscale_ <- function(xyzID, normal, gcm, historic, vars, ppt_lr) {
   
   # Define normal extent
@@ -136,13 +124,13 @@ downscale_ <- function(xyzID, normal, gcm, historic, vars, ppt_lr) {
   # https://github.com/rspatial/terra/issues/287
   
   # stack before extracting
-  res <- shush(
+  res <- 
     terra::extract(
       x = normal,
       y = xyzID[,1L:2L],
       method = "bilinear"
     )
-  )
+
 
   # Compute elevation differences between provided points elevation and normal
   # Dem at position 74 (ID column + 36 normal layers + 36 lapse rate layers + 1 dem layer)
@@ -168,7 +156,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, vars, ppt_lr) {
   
   # Process one GCM stacked layers
   process_one_gcm <- function(gcm_, res, xyzID) {
-    
+    gcm_ <- gcm[[1]]
     # Store names for later use
     nm <- names(gcm_)
     
@@ -185,7 +173,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, vars, ppt_lr) {
     # Extract gcm bilinear interpolations
     # Cropping will reduce the size of data to load in memory
     gcm_ <- terra::crop(gcm_, ex, snap = "out")
-    gcm_ <- shush(terra::extract(x = gcm_, y = xyzID[,1L:2L], method = "bilinear"))
+    gcm_ <- terra::extract(x = gcm_, y = xyzID[,1L:2L], method = "bilinear")
     
     # Create match set to match with res names
     labels <- vapply(
