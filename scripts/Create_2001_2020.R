@@ -33,10 +33,9 @@ for(file in all_ppt[-1]){
 }
 
 plot(ppt$PPT01)
-plot(ppt$Tmax07)
 
-ppt2 <- ppt/normal[[1:12]]
-plot(ppt2)
+ppt2 <- ppt - normal[[1:12]]
+plot(ppt2$PPT01)
 
 all_temp <- all_files[!grepl("PPT",all_files)]
 
@@ -84,7 +83,7 @@ all_ref <- resample(all_dat,ref_rast, method = "bilinear")
 plot(all_ref$PPT01)
 plot(all_ref$Tmax08)
 
-writeRaster(all_ref, "2001_2020_rast.tif")
+writeRaster(all_ref, "inputs_pkg/historic/Historic_2001_2020/2001_2020.tif", overwrite = T)
 all_ref <- rast("inputs_pkg/historic/Historic_2001_2020/2001_2020.tif")
 terra::writeCDF(
   all_ref,
