@@ -1,13 +1,14 @@
 remotes::install_github("bcgov/climR-pnw")
 library(climRpnw)
+library(data.table)
 # Retrieve package data
 data_update()
 
 # Create a normal baseline
 list_period()
-normal <- normal_input(normal = "Normal_1961_1990MP_BC")
+normal <- normal_input()
 dem1 <- terra::rast("C:/Users/kirid/AppData/Local/R/cache/R/climRpnw/inputs_pkg/normal/Normal_1961_1990MP_BC/Normal_1961_1990MP_BC.wlrdem.tif")
-# Select GCM
+# # Select GCM
 gcm <- gcm_input(
   gcm = c("BCC-CSM2-MR"),
   ssp = c("ssp245"),
@@ -15,17 +16,20 @@ gcm <- gcm_input(
   max_run = 0
 )
 
+historic <- historic_input()
+list_variables()
 # Provide or create a points dataframe (lon, lat, elev)
-n <- 100000
+n <- 100
 xyz <- data.frame(lon = runif(n, -125, -120), lat = runif(n, 51, 53), elev = numeric(n))
-xyz[,3] <- terra::extract(dem1, xyz[,1:2], method = "bilinear")[,-1L]
+xyz$elev <- terra::extract(dem1, xyz[,1:2], method = "bilinear")[["dem2_BC"]]
 
 # Use downscale
 results <- downscale(
   xyz = xyz,
   normal = normal,
   gcm = gcm,
-  var = c("Tmax01", "DD5_01")
+  historic = historic,
+  vars = c("CMD_sp","Tave_wt")
 )
 
 # Details about available data

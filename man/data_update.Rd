@@ -7,6 +7,7 @@
 data_update(
   ...,
   gcm = getOption("climRpnw.gcm.path", default = "inputs_pkg/gcm"),
+  historic = getOption("climRpnw.historic.path", default = "inputs_pkg/historic"),
   normal = getOption("climRpnw.normal.path", default = "inputs_pkg/normal"),
   quiet = !interactive()
 )

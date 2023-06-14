@@ -8,6 +8,7 @@ downscale(
   xyz,
   normal,
   gcm = NULL,
+  historic = NULL,
   vars = sort(sprintf(c("PPT\%02d", "Tmax\%02d", "Tmin\%02d"), sort(rep(1:12, 3)))),
   ppt_lr = FALSE,
   nthread = 1L
@@ -19,6 +20,8 @@ downscale(
 \item{normal}{Reference normal baseline input from \code{normal_input}.}
 
 \item{gcm}{Global Circulation Models input from \code{gcm_input}. Default to NULL.}
+
+\item{historic}{Historic time period input from \code{historic_input}. Default to NULL}
 
 \item{vars}{A character vector of climate variables to compute. Supported variables
 can be obtained with \code{list_variables()}. Definitions can be found in this package
