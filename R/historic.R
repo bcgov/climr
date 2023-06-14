@@ -1,14 +1,12 @@
 #' Create historic input for `downscale`.
 #' @param period A character vector. Label of the period to use.
 #' Can be obtained from `list_period()`. Default to `list_period()`.
-#' @param max_run An integer. Maximum number of model runs to include.
-#' A value of 0 is `ensembleMean` only. Runs are included in the order they are found in the
-#' models data untile `max_run` is reached. Default to 0L.
 #' @return An object to use with `downscale`. A `SpatRaster` with, possibly, multiple layers.
 #' @importFrom terra rast
 #' @importFrom utils head
 #' @export
-historic_input <- function(period = list_period_historic()) {
+
+historic_input <- function(period = list_historic()[1]) {
   
   # Check if we have data, if not download some.
   data_check()
@@ -19,11 +17,10 @@ historic_input <- function(period = list_period_historic()) {
       file.path(
         data_path(),
         getOption("climRpnw.historic.path", default = "inputs_pkg/historic"),
-        gcm
+        period
       ),
       list.files, recursive = TRUE, full.names = TRUE, pattern = pattern
     )
-    names(res) <- gcm
     res
   }
   files_tif <- get_rel_files("\\.tif$")
@@ -34,9 +31,6 @@ historic_input <- function(period = list_period_historic()) {
     # Initiate raster
     r <- terra::rast(file_tif)
     #nm <- names(r)
-    
-    
-    
     return(r)
     
   }
@@ -48,3 +42,33 @@ historic_input <- function(period = list_period_historic()) {
   return(res)
   
 }
+
+#' List available global circulation models
+#' @export
+
+list_historic <- function() {
+  list.files(
+    file.path(
+      data_path(),
+      getOption("climRpnw.historic.path", default = "inputs_pkg/historic")
+    )
+  )
+}
+
+# dat <- rast("../climR-pnw-data/inputs_pkg/historic/Historic_2001_2020/anom_2001_2020.nc")
+# nm <- fread("../climR-pnw-data/inputs_pkg/historic/Historic_2001_2020/anom_2001_2020.csv",header = T)[['x']]
+# r <- terra::rast(list.files(dir_gcm, full.names = TRUE, pattern = "\\.nc"))
+# names(dat) <- nm
+# 
+# message(
+#   "Saving uncompressed historic deltas to: ",
+#   file.path(dir_hist, sprintf("gcmData.%s.deltas.tif", h))
+# )
+# 
+# # Actual writing
+# terra::writeRaster(
+#   dat,
+#   "../climR-pnw-data/inputs_pkg/historic/Historic_2001_2020/2001_2020.tif",
+#   overwrite = TRUE,
+#   gdal="COMPRESS=NONE"
+# )

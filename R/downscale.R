@@ -2,6 +2,7 @@
 #' @param xyz A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).
 #' @param normal Reference normal baseline input from `normal_input`.
 #' @param gcm Global Circulation Models input from `gcm_input`. Default to NULL.
+#' @param historic Historic time period input from `historic_input`. Default to NULL
 #' @param vars A character vector of climate variables to compute. Supported variables
 #' can be obtained with `list_variables()`. Definitions can be found in this package
 #' `variables` dataset. Default to monthly PPT, Tmax, Tmin.
@@ -21,6 +22,7 @@
 #' gcm_input <- gcm_input(list_gcm()[3], list_ssp()[1], list_period()[2])
 #' downscale(xyz, normal, gcm)
 #' }
+
 downscale <- function(xyz, normal, gcm = NULL, historic = NULL,
                       vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3)))),
                       ppt_lr = FALSE, nthread = 1L) {
@@ -62,7 +64,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL,
       function(x) {xyz[x,]}
     )
     
-    threaded_downscale_ <- function(xyz, normal_path, gcm_paths, vars, ppt_lr) {
+    threaded_downscale_ <- function(xyz, normal_path, gcm_paths, historic_paths, vars, ppt_lr) {
 
       # Set DT threads to 1 in parallel to avoid overloading CPU
       # Not needed for forking, not taking any chances
@@ -75,9 +77,12 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL,
       gcm <- lapply(gcm_paths, function(x) {
         terra::rast(x[["source"]], lyrs = x[["lyrs"]])
       })
+      historic <- lapply(historic_paths, function(x) {
+        terra::rast(x[["source"]], lyrs = x[["lyrs"]])
+      })
       
       # Downscale
-      res <- downscale_(xyz, normal, gcm, vars, ppt_lr)
+      res <- downscale_(xyz, normal, gcm, historic, vars, ppt_lr)
       
       return(res)
     }
@@ -93,6 +98,10 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL,
           s <- terra::sources(x, bands = TRUE)
           list(source = unique(s[["source"]]), lyrs = s[["bands"]])
         }),
+        hist_paths = lapply(historic, function(x) {
+          s <- terra::sources(x, bands = TRUE)
+          list(source = unique(s[["source"]]), lyrs = s[["bands"]])
+        }),
         vars = vars,
         ppt_lr = ppt_lr
       ),
@@ -102,7 +111,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL,
   } else {
     
     # Downscale without parallel processing
-    res <- downscale_(xyz, normal, gcm, vars, ppt_lr)
+    res <- downscale_(xyz, normal, gcm, historic, vars, ppt_lr)
     
   }
 
@@ -113,8 +122,11 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL,
 
 #' Simple downscale
 #' @noRd
-downscale_ <- function(xyzID, normal, gcm, historic, vars, ppt_lr) {
-  
+#' 
+#xyzID <- xyz
+
+downscale_ <- function(xyzID, normal, gcm, historic, vars, ppt_lr = FALSE) {
+  #print(xyzID)
   # Define normal extent
   ex <- terra::ext(
     c(
@@ -136,18 +148,19 @@ downscale_ <- function(xyzID, normal, gcm, historic, vars, ppt_lr) {
   # https://github.com/rspatial/terra/issues/287
   
   # stack before extracting
-  res <- shush(
+  res <- 
     terra::extract(
       x = normal,
       y = xyzID[,1L:2L],
       method = "bilinear"
     )
-  )
+
 
   # Compute elevation differences between provided points elevation and normal
   # Dem at position 74 (ID column + 36 normal layers + 36 lapse rate layers + 1 dem layer)
   elev_delta <- xyzID[,3L] - res[, 74L]
-  
+  #print(elev_delta)
+  #print(res)
   # Compute individual point lapse rate adjustments
   # Lapse rate position 38:73 (ID column + 36 normal layers + 36 lapse rate layers)
   lr <- elev_delta * res[, 38L:73L]
@@ -168,7 +181,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, vars, ppt_lr) {
   
   # Process one GCM stacked layers
   process_one_gcm <- function(gcm_, res, xyzID) {
-    
+    gcm_ <- gcm[[1]]
     # Store names for later use
     nm <- names(gcm_)
     
@@ -185,7 +198,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, vars, ppt_lr) {
     # Extract gcm bilinear interpolations
     # Cropping will reduce the size of data to load in memory
     gcm_ <- terra::crop(gcm_, ex, snap = "out")
-    gcm_ <- shush(terra::extract(x = gcm_, y = xyzID[,1L:2L], method = "bilinear"))
+    gcm_ <- terra::extract(x = gcm_, y = xyzID[,1L:2L], method = "bilinear")
     
     # Create match set to match with res names
     labels <- vapply(
@@ -236,7 +249,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, vars, ppt_lr) {
   }
   
   process_one_historic <- function(historic_, res, xyzID) {
-    
+    #print(historic_)
     # Store names for later use
     nm <- names(historic_)
     
@@ -253,75 +266,83 @@ downscale_ <- function(xyzID, normal, gcm, historic, vars, ppt_lr) {
     # Extract gcm bilinear interpolations
     # Cropping will reduce the size of data to load in memory
     historic_ <- terra::crop(historic_, ex, snap = "out")
-    historic_ <- shush(terra::extract(x = historic_, y = historic_[,1L:2L], method = "bilinear"))
+    historic_ <- terra::extract(x = historic_, y = xyzID[,1L:2L], method = "bilinear")
     
     # Create match set to match with res names
-    labels <- vapply(
-      strsplit(nm, "_"),
-      function(x) {paste0(x[2:3], collapse = "")},
-      character(1)
-    )
+    labels <- nm
     
     # Add matching column to gcm_
     historic_[,-1L] <- historic_[,-1L] + res[,match(labels, names(res))]
     
     # Reshape (melt / dcast) to obtain final form
     ref_dt <- data.table::tstrsplit(nm, "_")
-    # Recombine PERIOD into one field
-    ref_dt[[6]] <- paste(ref_dt[[6]], ref_dt[[7]], sep = "_")
-    ref_dt[7] <- NULL
-    # Transform ref_dt to data.table for remerging
     data.table::setDT(ref_dt)
-    data.table::setnames(ref_dt, c("GCM", "VAR", "MONTH", "SSP", "RUN", "PERIOD"))
+    data.table::setnames(ref_dt, c("VAR"))
     data.table::set(ref_dt, j = "variable", value = nm)
-    data.table::set(ref_dt, j = "GCM", value = gsub(".", "-", ref_dt[["GCM"]], fixed = TRUE))
+    data.table::set(ref_dt, j = "PERIOD", value = "2001_2020")
     data.table::setkey(ref_dt, "variable")
-    
     # Set Latitude and possibly ID
-    gcm_[["Lat"]] <- xyzID[,2L]
+    historic_[["Lat"]] <- xyzID[,2L]
     if (ncol(xyzID) == 4L) {
-      gcm_[["ID"]] <- xyzID[, 4L]
+      historic_[["ID"]] <- xyzID[, 4L]
     }
     
     # Melt gcm_ and set the same key for merging
-    gcm_ <- data.table::melt(
-      data.table::setDT(gcm_),
+    historic_ <- data.table::melt(
+      data.table::setDT(historic_),
       id.vars = c("ID", "Lat"),
       variable.factor = FALSE
     )
-    data.table::setkey(gcm_, "variable")
+    data.table::setkey(historic_, "variable")
     
     # Finally, dcast back to final form to get original 36 columns
-    gcm_ <- data.table::dcast(
+    historic_ <- data.table::dcast(
       # The merge with shared keys is as simple as that
-      gcm_[ref_dt,],
-      ID + GCM + SSP + RUN + PERIOD + Lat ~ VAR + MONTH,
+      historic_[ref_dt,],
+      ID + PERIOD + Lat ~ VAR,
       value.var = "value",
       sep = ""
     )
     
-    return(gcm_)
+    return(historic_)
   }
   
-  # In case user provided some gcm
   if (!is.null(gcm)) {
     # Process each gcm and rbind resulting tables
-    res <- data.table::rbindlist(
+    res_gcm <- data.table::rbindlist(
       lapply(gcm, process_one_gcm, res = res, xyzID = xyzID),
       use.names = TRUE
     )
+  } else res_gcm <- NULL
+  if(!is.null(historic)) {
+    #print(historic)
+    res_hist <- data.table::rbindlist(
+      lapply(historic, process_one_historic, res = res, xyzID = xyzID),
+      use.names = TRUE
+    )
   } else {
-    # Set Latitude and possibly ID
-    res[["Lat"]] <- xyzID[,2L]
-    if (ncol(xyzID) == 4L) {
-      res[["ID"]] <- xyzID[, 4L]
-    }
-    data.table::setDT(res)
+    # # Set Latitude and possibly ID
+    # res[["Lat"]] <- xyzID[,2L]
+    # if (ncol(xyzID) == 4L) {
+    #   res[["ID"]] <- xyzID[, 4L]
+    # }
+    # 
+    #data.table::setDT(res)
   }
-  
+  res <- rbind(res_gcm, res_hist, use.names = TRUE, fill = TRUE)
   # Compute extra climate variables, assign by reference
   append_clim_vars(res, vars)
   
   return(res)
   
 }
+
+###testing
+# library(climRpnw)
+# xyz <- data.frame(lon = runif(10, -125, -120), lat = runif(10, 51, 53), elev = runif(10))
+# normal <- normal_input()
+# #gcm_ <- gcm_input(list_gcm()[3], list_ssp()[3], list_period()[2])
+# historic <- historic_input()
+# out <- downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)
+# #historic = "2001_2020"
+# gcm = gcm_input

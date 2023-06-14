@@ -31,8 +31,3 @@ An object to use with \code{downscale}. A \code{SpatRaster} with, possibly, mult
 \description{
 Create gcm input for \code{downscale}.
 }
-\details{
-Will use raster package for now. Switch to terra methods once it gets
-better performance. See
-https://gis.stackexchange.com/questions/413105/terrarast-vs-rasterbrick-for-loading-in-nc-files.
-}

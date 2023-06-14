@@ -25,12 +25,16 @@ data_update <- function(
   # Retrieve normal file list
   normal_files <- content_get(path = normal, ...)
   
+  # Retrieve historic file list
+  historic_files <- content_get(path = historic, ...)
+  
   # Do the actual download of files
   data_get(
     files = data.table::rbindlist(
       list(
         gcm_files,
-        normal_files
+        normal_files,
+        historic_files
       )
     ),
     quiet = quiet
@@ -135,6 +139,7 @@ data_delete <- function(ask = interactive()) {
     "climRpnw.session.tmp.path" = NULL,
     "climRpnw.gcm.path" = NULL,
     "climRpnw.normal.path" = NULL,
+    "climRpnw.historic.path" = NULL,
     "climRpnw.session.cache.ask.response" = NULL
   )
   
@@ -277,6 +282,47 @@ data_prepare <- function() {
     terra::writeRaster(
       r,
       file.path(dir_gcm, sprintf("gcmData.%s.deltas.tif", g)),
+      overwrite = TRUE,
+      gdal="COMPRESS=NONE"
+    )
+    
+  }
+  
+  histper <- list_historic()
+  
+  # Loop for each gcm
+  for (h in histper) {
+    
+    # Load normal files
+    dir_hist <- file.path(
+      data_path(),
+      getOption("climRpnw.historic.path", default = "inputs_pkg/historic"),
+      h
+    )
+    
+    nm <- data.table::rbindlist(
+      lapply(
+        list.files(dir_hist, full.names = TRUE, pattern = "\\.csv"),
+        data.table::fread,
+        header = TRUE
+      )
+    )[["x"]]
+    
+    # nm <- gsub("PPT","PPT_",nm)
+    # nm <- gsub("Tmax","Tmax_",nm)
+    # nm <- gsub("Tmin","Tmin_",nm)
+    r <- terra::rast(list.files(dir_hist, full.names = TRUE, pattern = "\\.nc"))
+    names(r) <- nm
+    
+    message(
+      "Saving uncompressed historic deltas to: ",
+      file.path(dir_hist, sprintf("gcmData.%s.deltas.tif", h))
+    )
+    
+    # Actual writing
+    terra::writeRaster(
+      r,
+      file.path(dir_hist, sprintf("historicData.%s.deltas.tif", h)),
       overwrite = TRUE,
       gdal="COMPRESS=NONE"
     )
