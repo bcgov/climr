@@ -1,6 +1,7 @@
 remotes::install_github("bcgov/climR-pnw")
 library(climRpnw)
 library(data.table)
+library(terra)
 # Retrieve package data
 data_update()
 
@@ -12,12 +13,16 @@ dem1 <- terra::rast("C:/Users/kirid/AppData/Local/R/cache/R/climRpnw/inputs_pkg/
 gcm <- gcm_input(
   gcm = c("BCC-CSM2-MR"),
   ssp = c("ssp245"),
-  period = "2041_2060",
+  period = "2001_2020",
   max_run = 0
 )
 
+test1 <- rast("C:/Users/kirid/AppData/Local/R/cache/R/climRpnw/inputs_pkg/gcm/ACCESS-ESM1-5/gcmData.ACCESS-ESM1-5.deltas.tif")
+plot(test1[[1000]])
+
+list_historic()
 historic <- historic_input()
-list_variables()
+
 # Provide or create a points dataframe (lon, lat, elev)
 n <- 100
 xyz <- data.frame(lon = runif(n, -125, -120), lat = runif(n, 51, 53), elev = numeric(n))

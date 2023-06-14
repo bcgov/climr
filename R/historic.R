@@ -43,7 +43,7 @@ historic_input <- function(period = list_historic()[1]) {
   
 }
 
-#' List available global circulation models
+#' List available historic periods
 #' @export
 
 list_historic <- function() {
