@@ -300,19 +300,19 @@ data_prepare <- function() {
       h
     )
     
-    nm <- data.table::rbindlist(
-      lapply(
-        list.files(dir_hist, full.names = TRUE, pattern = "\\.csv"),
-        data.table::fread,
-        header = TRUE
-      )
-    )[["x"]]
+    # nm <- data.table::rbindlist(
+    #   lapply(
+    #     list.files(dir_hist, full.names = TRUE, pattern = "\\.csv"),
+    #     data.table::fread,
+    #     header = TRUE
+    #   )
+    # )[["x"]]
     
     # nm <- gsub("PPT","PPT_",nm)
     # nm <- gsub("Tmax","Tmax_",nm)
     # nm <- gsub("Tmin","Tmin_",nm)
-    r <- terra::rast(list.files(dir_hist, full.names = TRUE, pattern = "\\.nc"))
-    names(r) <- nm
+    # r <- terra::rast(list.files(dir_hist, full.names = TRUE, pattern = "\\.tif"))
+    # names(r) <- nm
     
     message(
       "Saving uncompressed historic deltas to: ",
@@ -320,12 +320,12 @@ data_prepare <- function() {
     )
     
     # Actual writing
-    terra::writeRaster(
-      r,
-      file.path(dir_hist, sprintf("historicData.%s.deltas.tif", h)),
-      overwrite = TRUE,
-      gdal="COMPRESS=NONE"
-    )
+    # terra::writeRaster(
+    #   r,
+    #   file.path(dir_hist, sprintf("historicData.%s.deltas.tif", h)),
+    #   overwrite = TRUE,
+    #   gdal="COMPRESS=NONE"
+    # )
     
   }
   
