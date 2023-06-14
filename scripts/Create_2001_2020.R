@@ -2,18 +2,18 @@
 library(data.table)
 library(terra)
 
-t1 <- rast("inputs_raw/dem/westnorthamerica/dem2_WNA_2001/Decade_2001_2010MP/PPT01.asc")
+t1 <- rast("inputs_raw/dem/westnorthamerica/Decade_2001_2010MP/PPT01.asc")
 plot(t1)
 
-normal <- rast("inputs_pkg/normal/Normal_1961_1990MP_BC/Normal_1961_1990MP.nc")
+normal <- rast("inputs_pkg/normal/Normal_1961_1990MP/Normal_1961_1990MP.nc")
 plot(normal$Normal_1961_1990MP_1)
 
 tgcm <- rast("inputs_pkg/gcm/ACCESS-ESM1-5/gcmData.ACCESS-ESM1-5.pr.nc")
 plot(tgcm[[2000]])
 
 #################################
-datdir_2001 <- "inputs_raw/dem/westnorthamerica/dem2_WNA_2001/Decade_2001_2010MP/"
-datdir_2011 <- "inputs_raw/dem/westnorthamerica/dem2_WNA_2010/Decade_2011_2020MP/"
+datdir_2001 <- "inputs_raw/dem/westnorthamerica/Decade_2001_2010MP/"
+datdir_2011 <- "inputs_raw/dem/westnorthamerica/Decade_2011_2020MP/"
 all_files <- list.files(datdir_2001)
 all_ppt <- all_files[grep("PPT",all_files)]
 
@@ -32,13 +32,12 @@ for(file in all_ppt[-1]){
   add(ppt) <- davg
 }
 
-ppt <- resample(ppt, normal, method = "bilinear")
 plot(ppt$PPT01)
-ppt_norm <- normal[[1:12]]
-anom <- ppt/ppt_norm
-plot(anom$PPT01)
+plot(ppt$Tmax07)
 
-#######Temperature####################
+ppt2 <- ppt/normal[[1:12]]
+plot(ppt2)
+
 all_temp <- all_files[!grepl("PPT",all_files)]
 
 d1 <- rast(paste0(datdir_2001,all_temp[1]))
@@ -56,39 +55,45 @@ for(file in all_temp[-1]){
   add(temp) <- davg
 }
 
-temp <- resample(temp, normal, method = "bilinear")
-plot(temp$Tmax01)
-t_norm <- normal[[-c(1:12)]]
+temp2 <- temp - normal[[13:36]]
+plot(temp2$Tmax07)
+temp2 <- temp2/10
+plot(temp2$Tmax01)
+
+all_dat <- c(ppt2,temp2)
+names(all_dat)
+plot(all_dat$PPT01)
+plot(all_dat$Tmax07)
+
+
+# tgcm <- rast("inputs_pkg/gcm/CanESM5/gcmData.CanESM5.pr.nc")
+# plot(tgcm[[13]])
+# ppt <- resample(ppt, normal, method = "bilinear")
+# plot(ppt$PPT01)
+# ppt_norm <- normal[[1:12]]
+# anom <- ppt/ppt_norm
+# plot(anom$PPT01)
+
+#######Temperature####################
+
 #t_norm[t_norm < 1000] <- NA
-temp_anom <- temp - t_norm
-temp_anom[temp_anom > 10000] <- NA
 
-all_anom <- c(anom, temp_anom)
+ref_rast <- rast("inputs_pkg/gcm/ACCESS-ESM1-5/gcmData.ACCESS-ESM1-5.pr.nc")
+plot(ref_rast[[1]])
+all_ref <- resample(all_dat,ref_rast, method = "bilinear")
+plot(all_ref$PPT01)
+plot(all_ref$Tmax08)
 
-terra::writeCDF(
-  all_anom,
-  "inputs_raw/raw_anom_2001_2020.nc",
-  overwrite = TRUE,
-  prec = "integer",
-  compression = 9,
-  shuffle = TRUE,
-  missval = 99999
-)
-
-refsize <- rast("inputs_pkg/gcm/ACCESS-ESM1-5/gcmData.ACCESS-ESM1-5.pr.nc")
-all_ref <- resample(all_anom, refsize, method = "bilinear")
-plot(all_ref$Tmin01)
-
+writeRaster(all_ref, "2001_2020_rast.tif")
+all_ref <- rast("inputs_pkg/historic/Historic_2001_2020/2001_2020.tif")
 terra::writeCDF(
   all_ref,
-  "inputs_raw/anom_2001_2020.nc",
+  file.path("inputs_pkg/historic/Historic_2001_2020/2001_2020.nc"),
   overwrite = TRUE,
-  prec = "integer",
-  compression = 9,
-  shuffle = TRUE,
-  missval = 99999
+  zname = "index",
+  missval = NA
 )
-write.csv(names(all_ref),"inputs_raw/anom_2001_2020.csv")
+write.csv(names(all_ref),"inputs_pkg/historic/Historic_2001_2020/2001_2020.csv")
 
 
 plot(refsize[[1]])
