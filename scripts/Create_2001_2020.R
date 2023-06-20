@@ -34,7 +34,7 @@ for(file in all_ppt[-1]){
 
 plot(ppt$PPT01)
 
-ppt2 <- ppt - normal[[1:12]]
+ppt2 <- ppt / normal[[1:12]]
 plot(ppt2$PPT01)
 
 all_temp <- all_files[!grepl("PPT",all_files)]
