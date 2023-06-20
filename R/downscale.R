@@ -181,7 +181,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, vars, ppt_lr = FALSE) {
   
   # Process one GCM stacked layers
   process_one_gcm <- function(gcm_, res, xyzID) {
-    gcm_ <- gcm[[1]]
+    ##gcm_ <- gcm[[1]]
     # Store names for later use
     nm <- names(gcm_)
     
@@ -208,7 +208,9 @@ downscale_ <- function(xyzID, normal, gcm, historic, vars, ppt_lr = FALSE) {
     )
     
     # Add matching column to gcm_
-    gcm_[,-1L] <- gcm_[,-1L] + res[,match(labels, names(res))]
+    ppt_ <- grep("PPT",labels)
+    gcm_[,ppt_ + 1L] <- gcm_[,ppt_ + 1L] * res[,match(labels[ppt_], names(res))] ##PPT
+    gcm_[,-c(1L, ppt_ + 1L)] <- gcm_[,-c(1L, ppt_ + 1L)] + res[,match(labels[-ppt_], names(res))] ##Temperature
     
     # Reshape (melt / dcast) to obtain final form
     ref_dt <- data.table::tstrsplit(nm, "_")
@@ -271,8 +273,10 @@ downscale_ <- function(xyzID, normal, gcm, historic, vars, ppt_lr = FALSE) {
     # Create match set to match with res names
     labels <- nm
     
-    # Add matching column to gcm_
-    historic_[,-1L] <- historic_[,-1L] + res[,match(labels, names(res))]
+    ppt_ <- grep("PPT",labels)
+    historic_[,ppt_ + 1L] <- historic_[,ppt_ + 1L] * res[,match(labels[ppt_], names(res))] ##PPT
+    historic_[,-c(1L, ppt_ + 1L)] <- historic_[,-c(1L, ppt_ + 1L)] + res[,match(labels[-ppt_], names(res))] ##Temperature
+    
     
     # Reshape (melt / dcast) to obtain final form
     ref_dt <- data.table::tstrsplit(nm, "_")

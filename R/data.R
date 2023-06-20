@@ -256,13 +256,17 @@ data_prepare <- function() {
     r <- terra::rast(list.files(dir_gcm, full.names = TRUE, pattern = "\\.nc"))
     names(r) <- nm
     
+    ppt_layers <- grep("_PPT_",nm,fixed = TRUE)
+    r_ppt <- r[[ppt_layers]]
+    r_temp <- r[[-ppt_layers]]
     # Substract reference layers, only keep deltas, plus load in memory instead of disk
-    message("Computing deltas to reference")
+    message("Computing deltas for precipitation")
     # Find matching reference layer for each layer
     # Reference layers will match with themselves
-    ref_layers <- grep("_reference_", nm, fixed = TRUE)
-    names(ref_layers) <- gsub("^([^_]+_[^_]+_[^_]+_).*$", "\\1", nm[ref_layers])
-    matching_ref <- ref_layers[gsub("^([^_]+_[^_]+_[^_]+_).*$", "\\1", nm)]
+    nm_ptt <- nm[ppt_layers]
+    ref_layers <- grep("_reference_", nm_ptt, fixed = TRUE)
+    names(ref_layers) <- gsub("^([^_]+_[^_]+_[^_]+_).*$", "\\1", nm_ptt[ref_layers])
+    matching_ref <- ref_layers[gsub("^([^_]+_[^_]+_[^_]+_).*$", "\\1", nm_ptt)]
     
     # Reference layers positions
     # They will be used to avoid computing deltas of
@@ -271,7 +275,25 @@ data_prepare <- function() {
     
     # Substract reference layer, this takes a few seconds as all
     # data have to be loaded in memory from disk
-    r <- r[[-uniq_ref]] - r[[matching_ref[-uniq_ref]]]
+    r_ppt <- r_ppt[[-uniq_ref]] / r_ppt[[matching_ref[-uniq_ref]]]
+    
+    message("Computing deltas for tmin and tmax")
+    # Find matching reference layer for each layer
+    # Reference layers will match with themselves
+    nm_temp <- nm[-ppt_layers]
+    ref_layers <- grep("_reference_", nm_temp, fixed = TRUE)
+    names(ref_layers) <- gsub("^([^_]+_[^_]+_[^_]+_).*$", "\\1", nm_temp[ref_layers])
+    matching_ref <- ref_layers[gsub("^([^_]+_[^_]+_[^_]+_).*$", "\\1", nm_temp)]
+    
+    # Reference layers positions
+    # They will be used to avoid computing deltas of
+    # reference layers with themselves
+    uniq_ref <- sort(unique(matching_ref))
+    
+    # Substract reference layer, this takes a few seconds as all
+    # data have to be loaded in memory from disk
+    r_temp <- r_temp[[-uniq_ref]] - r_temp[[matching_ref[-uniq_ref]]]
+    r <- c(r_ppt, r_temp)
     
     message(
       "Saving uncompressed gcm deltas to: ",
