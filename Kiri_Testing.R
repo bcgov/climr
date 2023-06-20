@@ -6,7 +6,7 @@ library(terra)
 data_update()
 
 # Create a normal baseline
-list_period()
+list_historic()
 normal <- normal_input()
 dem1 <- terra::rast("C:/Users/kirid/AppData/Local/R/cache/R/climRpnw/inputs_pkg/normal/Normal_1961_1990MP_BC/Normal_1961_1990MP_BC.wlrdem.tif")
 # # Select GCM
@@ -17,9 +17,6 @@ gcm <- gcm_input(
   max_run = 0
 )
 
-test1 <- rast("C:/Users/kirid/AppData/Local/R/cache/R/climRpnw/inputs_pkg/gcm/ACCESS-ESM1-5/gcmData.ACCESS-ESM1-5.deltas.tif")
-plot(test1[[1000]])
-
 list_historic()
 historic <- historic_input()
 
@@ -28,13 +25,14 @@ n <- 100
 xyz <- data.frame(lon = runif(n, -125, -120), lat = runif(n, 51, 53), elev = numeric(n))
 xyz$elev <- terra::extract(dem1, xyz[,1:2], method = "bilinear")[["dem2_BC"]]
 
+list_variables()
 # Use downscale
 results <- downscale(
   xyz = xyz,
   normal = normal,
   gcm = gcm,
   historic = historic,
-  vars = c("CMD_sp","Tave_wt")
+  vars = c("CMD_sp","Tave_wt","PPT_sp")
 )
 
 # Details about available data
