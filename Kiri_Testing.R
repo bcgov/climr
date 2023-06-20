@@ -3,13 +3,15 @@ library(climRpnw)
 library(data.table)
 library(terra)
 # Retrieve package data
+data_delete() ##changed data, so this makes sure it gets redownloaded
 data_update()
 
 # Create a normal baseline
-list_historic()
+list_normal()
 normal <- normal_input()
-dem1 <- terra::rast("C:/Users/kirid/AppData/Local/R/cache/R/climRpnw/inputs_pkg/normal/Normal_1961_1990MP_BC/Normal_1961_1990MP_BC.wlrdem.tif")
+
 # # Select GCM
+list_gcm()
 gcm <- gcm_input(
   gcm = c("BCC-CSM2-MR"),
   ssp = c("ssp245"),
@@ -17,18 +19,22 @@ gcm <- gcm_input(
   max_run = 0
 )
 
+## Select historic period
 list_historic()
 historic <- historic_input()
 
 # Provide or create a points dataframe (lon, lat, elev)
-n <- 100
-xyz <- data.frame(lon = runif(n, -125, -120), lat = runif(n, 51, 53), elev = numeric(n))
-xyz$elev <- terra::extract(dem1, xyz[,1:2], method = "bilinear")[["dem2_BC"]]
+# n <- 100
+# xyz <- data.frame(lon = runif(n, -125, -120), lat = runif(n, 51, 53), elev = numeric(n))
+# xyz$elev <- terra::extract(dem1, xyz[,1:2], method = "bilinear")[["dem2_BC"]]
+
+in_locations <- fread("../AMAT_site_locations.csv")
+in_xyz <- as.data.frame(in_locations[,.(LONG_S,LAT_S,ELEV_S)]) ##currently needs to be a data.frame or matrix, not data.table
 
 list_variables()
-# Use downscale
+# Downscale!
 results <- downscale(
-  xyz = xyz,
+  xyz = in_xyz,
   normal = normal,
   gcm = gcm,
   historic = historic,
