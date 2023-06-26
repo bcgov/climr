@@ -200,6 +200,7 @@ data_prepare <- function() {
     # Assuming Tmin and Tmax are in integer precision after applying a times 10 mod
     # to reduce storage size. This removes the mod to get original values back.
     r <- r / c(1L, 10L)[startsWith(names(r), "T") + 1L]
+    r[r < -1000] <- NA
     
     nm <- data.table::fread(list.files(dir_dem, full.names = TRUE, pattern = "\\.csv"), header = TRUE)[["x"]]
     d <- terra::rast(list.files(dir_dem, full.names = TRUE, pattern = "\\.nc"))
@@ -213,6 +214,7 @@ data_prepare <- function() {
       nthread = 2,
       rasterize = TRUE
     )
+    names(lr) <- paste0("lr_",names(lr))
     
     message(
       "Saving uncompresseed normal + lapse rates + dem to: ",
