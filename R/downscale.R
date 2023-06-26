@@ -332,6 +332,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, vars, ppt_lr = FALSE) {
     # }
     # 
     #data.table::setDT(res)
+    res_hist <- NULL
   }
   res <- rbind(res_gcm, res_hist, use.names = TRUE, fill = TRUE)
   # Compute extra climate variables, assign by reference
