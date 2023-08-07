@@ -23,7 +23,7 @@
 #' downscale(xyz, normal, gcm)
 #' }
 
-downscale <- function(xyz, normal, gcm = NULL, historic = NULL,
+downscale <- function(xyz, normal, gcm = NULL, historic = NULL, return_normal = FALSE,
                       vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3)))),
                       ppt_lr = FALSE, nthread = 1L) {
   
@@ -65,7 +65,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL,
     )
     
     threaded_downscale_ <- function(xyz, normal_path, gcm_paths, historic_paths, vars, ppt_lr) {
-
+      
       # Set DT threads to 1 in parallel to avoid overloading CPU
       # Not needed for forking, not taking any chances
       dt_nt <- data.table::getDTthreads()
@@ -82,7 +82,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL,
       })
       
       # Downscale
-      res <- downscale_(xyz, normal, gcm, historic, vars, ppt_lr)
+      res <- downscale_(xyz, normal, gcm, historic, return_normal, vars, ppt_lr)
       
       return(res)
     }
@@ -111,10 +111,10 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL,
   } else {
     
     # Downscale without parallel processing
-    res <- downscale_(xyz, normal, gcm, historic, vars, ppt_lr)
+    res <- downscale_(xyz, normal, gcm, historic, return_normal, vars, ppt_lr)
     
   }
-
+  
   data.table::setkey(res, "ID")
   return(res)
   
@@ -125,7 +125,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL,
 #' 
 #xyzID <- xyz
 
-downscale_ <- function(xyzID, normal, gcm, historic, vars, ppt_lr = FALSE) {
+downscale_ <- function(xyzID, normal, gcm, historic, return_normal, vars, ppt_lr = FALSE) {
   #print(xyzID)
   # Define normal extent
   ex <- terra::ext(
@@ -154,8 +154,8 @@ downscale_ <- function(xyzID, normal, gcm, historic, vars, ppt_lr = FALSE) {
       y = xyzID[,1L:2L],
       method = "bilinear"
     )
-
-
+  
+  
   # Compute elevation differences between provided points elevation and normal
   # Dem at position 74 (ID column + 36 normal layers + 36 lapse rate layers + 1 dem layer)
   elev_delta <- xyzID[,3L] - res[, 74L]
@@ -325,16 +325,46 @@ downscale_ <- function(xyzID, normal, gcm, historic, vars, ppt_lr = FALSE) {
       use.names = TRUE
     )
   } else {
-    # # Set Latitude and possibly ID
-    # res[["Lat"]] <- xyzID[,2L]
-    # if (ncol(xyzID) == 4L) {
-    #   res[["ID"]] <- xyzID[, 4L]
-    # }
-    # 
-    #data.table::setDT(res)
     res_hist <- NULL
   }
-  res <- rbind(res_gcm, res_hist, use.names = TRUE, fill = TRUE)
+  
+  if(return_normal){
+    nm <- names(res)[-1]
+    labels <- nm
+    normal_ <- res
+    # Reshape (melt / dcast) to obtain final form
+    ref_dt <- data.table::tstrsplit(nm, "_")
+    data.table::setDT(ref_dt)
+    data.table::setnames(ref_dt, c("VAR"))
+    data.table::set(ref_dt, j = "variable", value = nm)
+    data.table::set(ref_dt, j = "PERIOD", value = "1961_1990")
+    data.table::setkey(ref_dt, "variable")
+    # Set Latitude and possibly ID
+    normal_[["Lat"]] <- xyzID[,2L]
+    if (ncol(xyzID) == 4L) {
+      normal_[["ID"]] <- xyzID[, 4L]
+    }
+    
+    # Melt gcm_ and set the same key for merging
+    normal_ <- data.table::melt(
+      data.table::setDT(normal_),
+      id.vars = c("ID", "Lat"),
+      variable.factor = FALSE
+    )
+    data.table::setkey(normal_, "variable")
+    
+    # Finally, dcast back to final form to get original 36 columns
+    normal_ <- data.table::dcast(
+      # The merge with shared keys is as simple as that
+      normal_[ref_dt,],
+      ID + PERIOD + Lat ~ VAR,
+      value.var = "value",
+      sep = ""
+    )
+  }else{
+    normal_ <- NULL
+  }
+  res <- rbind(res_gcm, res_hist, normal_, use.names = TRUE, fill = TRUE)
   # Compute extra climate variables, assign by reference
   append_clim_vars(res, vars)
   
