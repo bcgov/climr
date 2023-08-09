@@ -1,3 +1,6 @@
+##Kiri Daust
+
+
 #### BGC compare hypercube
 
 library(climRpnw)
@@ -38,9 +41,10 @@ in_coords <- as.data.frame(dem, xy = TRUE, na.rm = FALSE)
 
 gcms <- list_gcm()
 
-for(gcm_nm in gcms[-1]){
+for(gcm_nm in gcms[-(1:7)]){
   gcm_nm <- gcms[9]
-  cat(gcm_nm)
+  cat(gcm_nm,"\n")
+  
   gcm <- gcm_input(
     gcm = gcm_nm,
     ssp = c("ssp245"),
@@ -49,6 +53,7 @@ for(gcm_nm in gcms[-1]){
   )
   
   res_bc <- downscale(in_coords, normal = normal, gcm = gcm, vars = clim_vars)
+  #cat("Done Downscale")
   setDT(res_bc)
   
   for(var in clim_vars){
@@ -60,9 +65,11 @@ for(gcm_nm in gcms[-1]){
       add(bc_res) <- temp
     }
   }
+  #cat("Done rasterising")
   names(bc_res) <- clim_vars
   writeRaster(bc_res,paste0("BC_GCM_Vars/Mod",gcm_nm,".tif"), overwrite = T)
   rm(res_bc,bc_res)
+  #cat("Done loop")
 }
 
 #######################################################################3
