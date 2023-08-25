@@ -42,18 +42,17 @@ normal_input <- function(normal = list_normal()[1], dem = NULL, ...) {
   return(res)
 }
 
-#' Create normal baseline input for `downscale` from cloud db
+#' Create normal baseline input for `downscale` from postgis database.
+#' @param dbCon A db connection object created by `data_connect`.
+#' @param bbox Numeric vector of length 4 giving bounding box of study region, create by `get_bb()`
 #' @param normal A character or a SpatRaster. For character, label of the normal baseline to use.
 #' Can be obtained from `list_normal()`. For SpatRaster, 36 layers normal climate variables with
 #' names PPT01:PPT12, Tmax01:Tmax12 and Tmin01:Tmin12. Default to `list_normal()[1]`.
-#' @param dem A digital elevation model SpatRaster. Only needed if normal is a SpatRaster.
-#' Default to NULL.
-#' @param ... Other arguments for lapse rates calculation. See `?lapse_rate`.
 #' @return A normal baseline to use with `downscale`. A `SpatRaster` containing normals, lapse rates
 #' and digital elevation model layers.
 #' @importFrom terra rast writeRaster
 #' @export
-normal_input_postgis <- function(normal = list_normal()[1], dbCon, bbox = NULL) {
+normal_input_postgis <- function(dbCon, bbox = NULL, normal = list_normal()[1]) {
   
   res <- pgGetTerra(dbCon,"normal_wna", boundary = bbox, bands = 1:73)
   names(res) <- c("PPT01", "PPT02", "PPT03", "PPT04", "PPT05", "PPT06", "PPT07", 

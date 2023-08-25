@@ -5,7 +5,7 @@
 #' @param bands Which raster bands to return. Default 37:73
 #' @param boundary Numeric vector of length 4 (ymax,ymin,xmax,xmin). Default `NULL`
 #' @return terra rast 
-#' @importFrom terra rast add<-
+#' @import terra
 #' @import RPostgres
 #' @import DBI
 #' @export
@@ -112,28 +112,27 @@ pgGetTerra <- function(conn, name, rast = "rast", bands = 37:73,
   return(rout)
 }
 
-library(foreach)
-dbExtractNormal <- function(dbCon, points, bands = 1:73){
-
-  temp <- paste(points$Long,in_xyz$Lat)
-  pts <- paste0("MULTIPOINT((",paste(temp, collapse = "),("),"))")
-  
-  bandqs <- paste0("ST_Value(normal_wna.rast, ",bands,", geom, true, 'bilinear') as val_",bands)
-
-  q <- paste0("SELECT ",paste(bandqs,collapse = ","),"
-FROM ST_Dump(ST_GeomFromText('", pts ,"', 4326)) as dp
-JOIN normal_wna ON ST_Intersects(normal_wna.rast, dp.geom)")
-  
-  dat <- dbGetQuery(dbCon, q)
-  
-}
+# library(foreach)
+# dbExtractNormal <- function(dbCon, points, bands = 1:73){
+# 
+#   temp <- paste(points$Long,in_xyz$Lat)
+#   pts <- paste0("MULTIPOINT((",paste(temp, collapse = "),("),"))")
+#   
+#   bandqs <- paste0("ST_Value(normal_wna.rast, ",bands,", geom, true, 'bilinear') as val_",bands)
+# 
+#   q <- paste0("SELECT ",paste(bandqs,collapse = ","),"
+# FROM ST_Dump(ST_GeomFromText('", pts ,"', 4326)) as dp
+# JOIN normal_wna ON ST_Intersects(normal_wna.rast, dp.geom)")
+#   
+#   dat <- dbGetQuery(dbCon, q)
+#   
+# }
 
 
 #' Find bounding box of data
-#' @param in_xyz data.table of points to downscale
+#' @param in_xyz data.table (or data.frame) of points to downscale
 #' @return bounding box (e.g. c(51,50,-121,-122))
 #' @export
-
 get_bb <- function(in_xyz){
   return(c(max(in_xyz[,2]),min(in_xyz[,2]),max(in_xyz[,1]),min(in_xyz[,1])))
 }

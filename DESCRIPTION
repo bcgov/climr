@@ -1,7 +1,8 @@
-Package: climRpnw
-Title: Downscaling of global climate data for Central-Western North America
-Version: 0.0.0.9900
+Package: climRdev
+Title: Downscaling of global climate data (development verison)
+Version: 0.0.0.9990
 Authors@R: c(
+    person("Kiri","Daust", email = "kiri.daust@gov.bc.ca", role = "aut"),
     person("Colin", "Mahony", email = "Colin.Mahony@gov.bc.ca", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-6111-5675")),
     person("Bruno", "Tremblay", email = "bruno@boostao.ca", role = c("aut"),
@@ -26,6 +27,7 @@ Imports:
     parallel,
     data.table,
     gh,
+    RPostgres,
     methods
 Depends: 
     R (>= 4.0)

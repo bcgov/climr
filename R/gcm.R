@@ -69,6 +69,24 @@ gcm_input <- function(gcm = list_gcm(), ssp = list_ssp(), period = list_period()
   
 }
 
+
+#' Create gcm input for `downscale` using data on Postgis database.
+#' @param dbCon A db connection object created by `data_connect`.
+#' @param bbox Numeric vector of length 4 giving bounding box of study region, create by `get_bb()`
+#' @param gcm A character vector. Label of the global circulation models to use.
+#' Can be obtained from `list_gcm()`. Default to `list_gcm()`.
+#' @param ssp A character vector. Label of the shared socioeconomic pathways to use.
+#' Can be obtained from `list_ssp()`. Default to `list_ssp()`.
+#' @param period A character vector. Label of the period to use.
+#' Can be obtained from `list_period()`. Default to `list_period()`.
+#' @param max_run An integer. Maximum number of model runs to include.
+#' A value of 0 is `ensembleMean` only. Runs are included in the order they are found in the
+#' models data untile `max_run` is reached. Default to 0L.
+#' @return An object to use with `downscale`. A `SpatRaster` with, possibly, multiple layers.
+#' @importFrom terra rast
+#' @importFrom utils head
+#' @importFrom RPostgres dbGetQuery
+#' @export
 gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), period = list_period() , max_run = 0L) {
 
   dbnames <- structure(list(GCM = c("ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5", 
