@@ -163,7 +163,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, return_normal, vars, ppt_lr
   #print(res)
   # Compute individual point lapse rate adjustments
   # Lapse rate position 38:73 (ID column + 36 normal layers + 36 lapse rate layers)
-  lr <- elev_delta * res[, 38L:73L]
+  lr <- elev_delta * res[, 38L:73L] ##do we need anything other than the lapse rate?
   
   # Replace any NAs left with 0s
   lr[is.na(lr)] <- 0L

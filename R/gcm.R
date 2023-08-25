@@ -69,6 +69,41 @@ gcm_input <- function(gcm = list_gcm(), ssp = list_ssp(), period = list_period()
   
 }
 
+gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), period = list_period() , max_run = 0L) {
+
+  dbnames <- structure(list(GCM = c("ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5", 
+                                    "CNRM-ESM2-1", "EC-Earth3", "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0", 
+                                    "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL"), 
+                            dbname = c("gcm_access", "gcm_bcc", "gcm_canesm", "gcm_cnrm", 
+                "gcm_ecearth", "gcm_gfdl", "gcm_giss", "gcm_inm", "gcm_ipsl", 
+                "gcm_miroc6", "gcm_mpi1", "gcm_mpi2", "gcm_ukesm")), class = "data.frame", row.names = c(NA, -13L))
+  
+  # Load each file individually + select layers
+  process_one_gcm <- function(gcm_nm, ssp, period) { ##need to update to all GCMs
+    gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
+    gcm_nm <- gsub("-",".",gcm_nm)
+    
+    q <- paste0("select fullnm, laynum from esm_layers where mod = '",gcm_nm,"' and scenario in ('",paste(ssp,collapse = "','"),
+                "') and period in ('",paste(period,collapse = "','"),"') and run = 'ensembleMean'")
+    #print(q)
+    layerinfo <- dbGetQuery(dbCon, q)
+    
+    #print(layerinfo$laynum)
+    gcm_rast <- pgGetTerra(dbCon, gcmcode, bands = layerinfo$laynum, boundary = bbox)
+    names(gcm_rast) <- layerinfo$fullnm
+    
+    return(gcm_rast)
+  }
+  
+  res <- lapply(gcm, process_one_gcm, ssp = ssp, period = period)
+  attr(res, "builder") <- "climRpnw" 
+  
+  # Return a list of SpatRaster, one element for each model
+  return(res)
+  
+}
+
+
 #' Read and parse gcm models csv files
 #' @param files A character vector. File paths.
 #' @param col_num An integer vector. Positions of elements to retrieve in label. Label is split

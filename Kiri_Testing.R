@@ -8,7 +8,7 @@ data_update()
 
 # Create a normal baseline
 list_normal()
-normal <- normal_input()
+normal_orig <- normal_input()
 
 # # Select GCM
 list_gcm()
@@ -27,9 +27,15 @@ historic <- historic_input()
 # n <- 100
 # xyz <- data.frame(lon = runif(n, -125, -120), lat = runif(n, 51, 53), elev = numeric(n))
 # xyz$elev <- terra::extract(dem1, xyz[,1:2], method = "bilinear")[["dem2_BC"]]
-
-in_locations <- fread("../AMAT_site_locations.csv")
-in_xyz <- as.data.frame(in_locations[,.(LONG_S,LAT_S,ELEV_S)]) ##currently needs to be a data.frame or matrix, not data.table
+library(terra)
+library(pool)
+in_locations <- fread("Test_Locations_VanIsl.csv")
+in_xyz <- as.data.frame(in_locations[,.(Long,Lat,Elev)]) ##currently needs to be a data.frame or matrix, not data.table
+thebb <- get_bb(in_xyz)
+dbCon <- data_connect()
+normal <- normal_input_postgis(dbCon = dbCon, bbox = thebb)
+plot(normal[[1]])
+gcm <- gcm_input_postgis(dbCon, bbox = thebb, gcm = c("BCC-CSM2-MR","UKESM1-0-LL"), ssp = "ssp245", period = c("2021_2040","2041_2060","2061_2080"))
 
 list_variables()
 # Downscale!
@@ -37,7 +43,6 @@ results <- downscale(
   xyz = in_xyz,
   normal = normal,
   gcm = gcm,
-  historic = historic,
   vars = c("CMD_sp","Tave_wt","PPT_sp")
 )
 
