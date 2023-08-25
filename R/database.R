@@ -2,6 +2,7 @@
 #' @return pool object of database connection
 #' @import pool
 #' @import RPostgres
+#' @export
 
 data_connect <- function(){
   pool <- dbPool(

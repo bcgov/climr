@@ -2,10 +2,10 @@
 % Please edit documentation in R/historic.R
 \name{list_historic}
 \alias{list_historic}
-\title{List available global circulation models}
+\title{List available historic periods}
 \usage{
 list_historic()
 }
 \description{
-List available global circulation models
+List available historic periods
 }
