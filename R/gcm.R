@@ -176,32 +176,27 @@ list_parse <- function(gcm, col_num = 1) {
 
 #' List available global circulation models
 #' @export
-list_gcm <- function() {
-  list.files(
-    file.path(
-      data_path(),
-      getOption("climRpnw.gcm.path", default = "inputs_pkg/gcm")
-    )
-  )
+list_gcm <- function(dbCon) {
+  sort(dbGetQuery(dbCon, "SELECT DISTINCT mod FROM esm_layers")[,1])
 }
 
 #' List available shared socioeconomic pathways
 #' @param gcm An optional character vector. Limit list to provided global circulation models.
 #' @export
-list_ssp <- function(gcm) {
-  list_parse(gcm, 4)
+list_ssp <- function(dbCon) {
+  sort(dbGetQuery(dbCon, "SELECT DISTINCT scenario FROM esm_layers")[,1])
 }
 
 #' List available period
 #' @param gcm An optional character vector. Limit list to provided global circulation models.
 #' @export
-list_period <- function(gcm) {
-  list_parse(gcm, 6:7)
+list_period <- function(dbCon) {
+  sort(dbGetQuery(dbCon, "SELECT DISTINCT period FROM esm_layers")[,1])
 }
 
 #' List available runs
 #' @param gcm An optional character vector. Limit list to provided global circulation models.
 #' @export
-list_run <- function(gcm) {
-  list_parse(gcm, 5)
+list_run <- function(dbCon, gcm) {
+  sort(dbGetQuery(dbCon, paste0("SELECT DISTINCT run FROM esm_layers WHERE mod IN ('",paste(gcm, collapse = "','","')")))[,1])
 }
