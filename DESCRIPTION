@@ -28,6 +28,7 @@ Imports:
     data.table,
     gh,
     RPostgres,
+    pool,
     methods
 Depends: 
     R (>= 4.0)
