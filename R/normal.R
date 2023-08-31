@@ -51,6 +51,8 @@ normal_input <- function(normal = list_normal()[1], dem = NULL, ...) {
 #' @return A normal baseline to use with `downscale`. A `SpatRaster` containing normals, lapse rates
 #' and digital elevation model layers.
 #' @importFrom terra rast writeRaster ext
+#' @importFrom data.table fread fwrite data.table
+#' @import uuid
 #' @export
 normal_input_postgis <- function(dbCon, bbox = NULL, normal = list_normal()[1], cache = TRUE) {
   

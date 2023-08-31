@@ -12,7 +12,10 @@ normal <- normal_input_postgis(dbCon = dbCon, bbox = thebb, cache = TRUE) ##get 
 plot(normal[[42]])
 
 ##get GCM anomolies
-gcm <- gcm_input_postgis(dbCon, bbox = thebb, gcm = c("BCC-CSM2-MR","UKESM1-0-LL"), ssp = "ssp245", period = c("2021_2040","2041_2060","2061_2080"))
+gcm <- gcm_input_postgis(dbCon, bbox = thebb, gcm = c("BCC-CSM2-MR","UKESM1-0-LL"), 
+                         ssp = c("ssp370"), 
+                         period = c("2021_2040","2041_2060","2061_2080"),
+                         cache = TRUE)
 plot(gcm[[1]][[1]])
 
 # Downscale!

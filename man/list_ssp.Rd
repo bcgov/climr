@@ -4,10 +4,10 @@
 \alias{list_ssp}
 \title{List available shared socioeconomic pathways}
 \usage{
-list_ssp(gcm)
+list_ssp(dbCon)
 }
 \arguments{
-\item{gcm}{An optional character vector. Limit list to provided global circulation models.}
+\item{dbCon}{database connection}
 }
 \description{
 List available shared socioeconomic pathways
