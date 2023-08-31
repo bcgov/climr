@@ -10,7 +10,8 @@ gcm_input_postgis(
   gcm = list_gcm(),
   ssp = list_ssp(),
   period = list_period(),
-  max_run = 0L
+  max_run = 0L,
+  cache = TRUE
 )
 }
 \arguments{
@@ -30,9 +31,11 @@ Can be obtained from \code{list_period()}. Default to \code{list_period()}.}
 \item{max_run}{An integer. Maximum number of model runs to include.
 A value of 0 is \code{ensembleMean} only. Runs are included in the order they are found in the
 models data untile \code{max_run} is reached. Default to 0L.}
+
+\item{cache}{Logical specifying whether to cache new data locally or no. Default \code{TRUE}}
 }
 \value{
-An object to use with \code{downscale}. A \code{SpatRaster} with, possibly, multiple layers.
+An object to use with \code{downscale}. A list of \code{SpatRaster} with, possibly, multiple layers.
 }
 \description{
 Create gcm input for \code{downscale} using data on Postgis database.

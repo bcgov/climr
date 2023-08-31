@@ -29,6 +29,7 @@ Imports:
     gh,
     RPostgres,
     pool,
+    uuid,
     methods
 Depends: 
     R (>= 4.0)

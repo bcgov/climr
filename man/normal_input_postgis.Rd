@@ -4,7 +4,12 @@
 \alias{normal_input_postgis}
 \title{Create normal baseline input for \code{downscale} from postgis database.}
 \usage{
-normal_input_postgis(dbCon, bbox = NULL, normal = list_normal()[1])
+normal_input_postgis(
+  dbCon,
+  bbox = NULL,
+  normal = list_normal()[1],
+  cache = TRUE
+)
 }
 \arguments{
 \item{dbCon}{A db connection object created by \code{data_connect}.}

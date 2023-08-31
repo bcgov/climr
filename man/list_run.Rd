@@ -4,9 +4,11 @@
 \alias{list_run}
 \title{List available runs}
 \usage{
-list_run(gcm)
+list_run(dbCon, gcm)
 }
 \arguments{
+\item{dbCon}{database connection}
+
 \item{gcm}{An optional character vector. Limit list to provided global circulation models.}
 }
 \description{

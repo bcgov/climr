@@ -82,12 +82,15 @@ gcm_input <- function(gcm = list_gcm(), ssp = list_ssp(), period = list_period()
 #' @param max_run An integer. Maximum number of model runs to include.
 #' A value of 0 is `ensembleMean` only. Runs are included in the order they are found in the
 #' models data untile `max_run` is reached. Default to 0L.
-#' @return An object to use with `downscale`. A `SpatRaster` with, possibly, multiple layers.
+#' @param cache Logical specifying whether to cache new data locally or no. Default `TRUE`
+#' @return An object to use with `downscale`. A list of `SpatRaster` with, possibly, multiple layers.
 #' @importFrom terra rast
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
+#' @import uuid
+#' @import data.table
 #' @export
-gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), period = list_period() , max_run = 0L) {
+gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), period = list_period(), max_run = 0L, cache = TRUE) {
 
   dbnames <- structure(list(GCM = c("ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5", 
                                     "CNRM-ESM2-1", "EC-Earth3", "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0", 
@@ -101,14 +104,50 @@ gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_s
     gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
     gcm_nm <- gsub("-",".",gcm_nm)
     
+    if(dir.exists(paste0(cache_path(),"/gcm/",gcmcode))){
+      bnds <- fread(paste0(cache_path(),"/gcm/",gcmcode,"/meta_area.csv"))
+      data.table::setorder(bnds, -numlay)
+      for(i in 1:nrow(bnds)){
+        isin <- is_in_bbox(bbox, matrix(bnds[i,2:5]))
+        if(isin) break
+      }
+      if(isin){
+        oldid <- bnds$uid[i]
+        periods <- fread(paste0(cache_path(),"/gcm/",gcmcode,"/meta_period.csv"))
+        ssps <- fread(paste0(cache_path(),"/gcm/",gcmcode,"/meta_ssp.csv"))
+        if(all(period %in% periods[uid == oldid,period]) & all(ssp %in% ssps[uid == oldid,ssp])){
+          message("Retrieving from cache...")
+          gcm_rast <- terra::rast(paste0(cache_path(),"/gcm/",gcmcode,"/",oldid,".tif"))
+          return(gcm_rast)
+        }else{
+          message("Not fully cached :( Will download more")
+        }
+        
+      }
+    }
+    
     q <- paste0("select fullnm, laynum from esm_layers where mod = '",gcm_nm,"' and scenario in ('",paste(ssp,collapse = "','"),
                 "') and period in ('",paste(period,collapse = "','"),"') and run = 'ensembleMean'")
     #print(q)
     layerinfo <- dbGetQuery(dbCon, q)
-    
-    #print(layerinfo$laynum)
+    message("Downloading GCM anomalies")
     gcm_rast <- pgGetTerra(dbCon, gcmcode, bands = layerinfo$laynum, boundary = bbox)
     names(gcm_rast) <- layerinfo$fullnm
+    
+    if(cache){
+      message("Caching data...")
+      uid <- uuid::UUIDgenerate()
+      if(!dir.exists(paste0(cache_path(), "/gcm/",gcmcode))) dir.create(paste0(cache_path(), "/gcm/",gcmcode), recursive = TRUE)
+      terra::writeRaster(gcm_rast, paste0(cache_path(),"/gcm/",gcmcode, "/", uid,".tif"))
+      rastext <- terra::ext(gcm_rast)
+      t1 <- data.table::data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1], 
+                                   numlay = terra::nlyr(gcm_rast))
+      t2 <- data.table::data.table(uid = rep(uid, length(period)),period = period)
+      t3 <- data.table::data.table(uid = rep(uid, length(ssp)),ssp = ssp)
+      data.table::fwrite(t1, file = paste0(cache_path(),"/gcm/",gcmcode,"/meta_area.csv"), append = TRUE)
+      data.table::fwrite(t2, file = paste0(cache_path(),"/gcm/",gcmcode,"/meta_period.csv"), append = TRUE)
+      data.table::fwrite(t3, file = paste0(cache_path(),"/gcm/",gcmcode,"/meta_ssp.csv"), append = TRUE)
+    }
     
     return(gcm_rast)
   }
@@ -175,27 +214,32 @@ list_parse <- function(gcm, col_num = 1) {
 }
 
 #' List available global circulation models
+#' @importFrom RPostgres dbGetQuery
 #' @export
 list_gcm <- function(dbCon) {
   sort(dbGetQuery(dbCon, "SELECT DISTINCT mod FROM esm_layers")[,1])
 }
 
 #' List available shared socioeconomic pathways
-#' @param gcm An optional character vector. Limit list to provided global circulation models.
+#' @param dbCon database connection
+#' @importFrom RPostgres dbGetQuery
 #' @export
 list_ssp <- function(dbCon) {
   sort(dbGetQuery(dbCon, "SELECT DISTINCT scenario FROM esm_layers")[,1])
 }
 
 #' List available period
-#' @param gcm An optional character vector. Limit list to provided global circulation models.
+#' @param dbCon database connection
+#' @importFrom RPostgres dbGetQuery
 #' @export
 list_period <- function(dbCon) {
   sort(dbGetQuery(dbCon, "SELECT DISTINCT period FROM esm_layers")[,1])
 }
 
 #' List available runs
+#' @param dbCon database connection
 #' @param gcm An optional character vector. Limit list to provided global circulation models.
+#' @importFrom RPostgres dbGetQuery
 #' @export
 list_run <- function(dbCon, gcm) {
   sort(dbGetQuery(dbCon, paste0("SELECT DISTINCT run FROM esm_layers WHERE mod IN ('",paste(gcm, collapse = "','","')")))[,1])
