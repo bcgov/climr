@@ -115,7 +115,7 @@ gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_s
         oldid <- bnds$uid[i]
         periods <- fread(paste0(cache_path(),"/gcm/",gcmcode,"/meta_period.csv"))
         ssps <- fread(paste0(cache_path(),"/gcm/",gcmcode,"/meta_ssp.csv"))
-        if(all(period %in% periods[uid == oldid,period]) & all(ssp %in% ssps[uid == oldid,ssp])){
+        if(all(period %in% periods[uid == oldid,period]) & all(ssp %in% ssps[uid == oldid,ssp]) & max_run <= bnds[uid == oldid, max_run]){
           message("Retrieving from cache...")
           gcm_rast <- terra::rast(paste0(cache_path(),"/gcm/",gcmcode,"/",oldid,".tif"))
           return(gcm_rast)
@@ -126,8 +126,11 @@ gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_s
       }
     }
     
+    runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers where mod = '",gcm_nm,"'"))$run)
+    sel_runs <- runs[1:(max_run+1L)]
+    
     q <- paste0("select fullnm, laynum from esm_layers where mod = '",gcm_nm,"' and scenario in ('",paste(ssp,collapse = "','"),
-                "') and period in ('",paste(period,collapse = "','"),"') and run = 'ensembleMean'")
+                "') and period in ('",paste(period,collapse = "','"),"') and run in ('",paste(sel_runs, collapse = "','"),"')")
     #print(q)
     layerinfo <- dbGetQuery(dbCon, q)
     message("Downloading GCM anomalies")
@@ -141,7 +144,7 @@ gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_s
       terra::writeRaster(gcm_rast, paste0(cache_path(),"/gcm/",gcmcode, "/", uid,".tif"))
       rastext <- terra::ext(gcm_rast)
       t1 <- data.table::data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1], 
-                                   numlay = terra::nlyr(gcm_rast))
+                                   numlay = terra::nlyr(gcm_rast),  max_run = max_run)
       t2 <- data.table::data.table(uid = rep(uid, length(period)),period = period)
       t3 <- data.table::data.table(uid = rep(uid, length(ssp)),ssp = ssp)
       data.table::fwrite(t1, file = paste0(cache_path(),"/gcm/",gcmcode,"/meta_area.csv"), append = TRUE)
@@ -208,7 +211,7 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm_ts(), ssp = list_ssp
         oldid <- bnds$uid[i]
         periods <- fread(paste0(cache_path(),"/gcmts/",gcmcode,"/meta_period.csv"))
         ssps <- fread(paste0(cache_path(),"/gcmts/",gcmcode,"/meta_ssp.csv"))
-        if(all(period %in% periods[uid == oldid,period]) & all(ssp %in% ssps[uid == oldid,ssp])){
+        if(all(period %in% periods[uid == oldid,period]) & all(ssp %in% ssps[uid == oldid,ssp]) & max_run <= bnds[uid == oldid, max_run]){
           message("Retrieving from cache...")
           gcm_rast <- terra::rast(paste0(cache_path(),"/gcmts/",gcmcode,"/",oldid,".tif"))
           return(gcm_rast)
@@ -218,9 +221,12 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm_ts(), ssp = list_ssp
         
       }
     }
+
+    runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers_ts where mod = '",gcm_nm,"'"))$run)
+    sel_runs <- runs[1:(max_run+1L)]
     
     q <- paste0("select fullnm, laynum from esm_layers_ts where mod = '",gcm_nm,"' and scenario in ('",paste(ssp,collapse = "','"),
-                "') and period in ('",paste(period,collapse = "','"),"') and run = 'ensembleMean'")
+                "') and period in ('",paste(period,collapse = "','"),"') and run in ('",paste(sel_runs, collapse = "','"),"')")
     #print(q)
     layerinfo <- dbGetQuery(dbCon, q)
     message("Downloading GCM anomalies")
@@ -242,7 +248,7 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm_ts(), ssp = list_ssp
       terra::writeRaster(gcm_rast, paste0(cache_path(),"/gcmts/",gcmcode, "/", uid,".tif"))
       rastext <- terra::ext(gcm_rast)
       t1 <- data.table::data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1], 
-                                   numlay = terra::nlyr(gcm_rast))
+                                   numlay = terra::nlyr(gcm_rast), max_run = max_run)
       t2 <- data.table::data.table(uid = rep(uid, length(period)),period = period)
       t3 <- data.table::data.table(uid = rep(uid, length(ssp)),ssp = ssp)
       data.table::fwrite(t1, file = paste0(cache_path(),"/gcmts/",gcmcode,"/meta_area.csv"), append = TRUE)
