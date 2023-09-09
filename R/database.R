@@ -9,7 +9,7 @@ data_connect <- function(){
     drv = RPostgres::Postgres(),
     dbname = "climr",
     host = '146.190.244.244',
-    port = 5432, 
+    port = 5432,
     user = 'climr_client',
     password = 'PowerOfBEC2023'
   )
