@@ -78,18 +78,41 @@ pgGetTerra <- function(conn, name, rast = "rast", bands = 37:73,
                                     " ", boundary[1], ",", boundary[4], " ", boundary[1],
                                     "))'),", projID, "))) as a;"))
     
-    
-    bandqs1 <- paste0("UNNEST(ST_Dumpvalues(rast, ",bands,")) as vals_",bands)
-    bandqs2 <- paste0("ST_Union(rast",rastque,",",bands,") rast_",bands)
+    if(length(bands) > 1664){ ##maximum number of columns
+      brks <- c(seq(1,length(bands),by = 1663),length(bands))
+      for(i in 1:(length(brks)-1)){
+        bands_temp <- bands[brks[i]:brks[i+1]]
+        bandqs1 <- paste0("UNNEST(ST_Dumpvalues(rast, ",bands_temp,")) as vals_",bands_temp)
+        bandqs2 <- paste0("ST_Union(rast",rastque,",",bands_temp,") rast_",bands_temp)
+        
+        rast_vals_temp <- dbGetQuery(conn,paste0("SELECT ",paste(bandqs1,collapse = ","), 
+                                            
+                                            " from (SELECT ST_Union(rast) rast FROM ",nameque," WHERE ST_Intersects(",
+                                            rastque, ",ST_SetSRID(ST_GeomFromText('POLYGON((", boundary[4],
+                                            " ", boundary[1], ",", boundary[4], " ", boundary[2],
+                                            ",\n  ", boundary[3], " ", boundary[2], ",", boundary[3],
+                                            " ", boundary[1], ",", boundary[4], " ", boundary[1],
+                                            "))'),", projID, "))) as a;"))
+        if(i == 1){
+          rast_vals <- rast_vals_temp
+        }else{
+          rast_vals <- cbind(rast_vals, rast_vals_temp)
+        }
+      }
+    }else{
+      bandqs1 <- paste0("UNNEST(ST_Dumpvalues(rast, ",bands,")) as vals_",bands)
+      bandqs2 <- paste0("ST_Union(rast",rastque,",",bands,") rast_",bands)
       
-    rast_vals <- dbGetQuery(conn,paste0("SELECT ",paste(bandqs1,collapse = ","), 
-           
-          " from (SELECT ST_Union(rast) rast FROM ",nameque," WHERE ST_Intersects(",
-                                   rastque, ",ST_SetSRID(ST_GeomFromText('POLYGON((", boundary[4],
-                                   " ", boundary[1], ",", boundary[4], " ", boundary[2],
-                                   ",\n  ", boundary[3], " ", boundary[2], ",", boundary[3],
-                                   " ", boundary[1], ",", boundary[4], " ", boundary[1],
-                                   "))'),", projID, "))) as a;"))  
+      rast_vals <- dbGetQuery(conn,paste0("SELECT ",paste(bandqs1,collapse = ","), 
+                                          
+                                          " from (SELECT ST_Union(rast) rast FROM ",nameque," WHERE ST_Intersects(",
+                                          rastque, ",ST_SetSRID(ST_GeomFromText('POLYGON((", boundary[4],
+                                          " ", boundary[1], ",", boundary[4], " ", boundary[2],
+                                          ",\n  ", boundary[3], " ", boundary[2], ",", boundary[3],
+                                          " ", boundary[1], ",", boundary[4], " ", boundary[1],
+                                          "))'),", projID, "))) as a;"))
+    }
+      
       
     for(b in 1:length(bands)){
       

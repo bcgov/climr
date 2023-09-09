@@ -15,6 +15,7 @@ plot(normal[[42]])
 gcm <- gcm_input_postgis(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5"), 
                          ssp = c("ssp370"), 
                          period = c("2021_2040","2041_2060","2061_2080"),
+                         max_run = 4,
                          cache = TRUE)
 plot(gcm[[1]][[1]])
 
@@ -22,6 +23,7 @@ plot(gcm[[1]][[1]])
 gcm_ts <- gcm_ts_input(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5"), 
                          ssp = c("ssp370"), 
                          years = 2020:2080,
+                         max_run = 4,
                          cache = TRUE)
 plot(gcm_ts[[1]][[1]])
 
@@ -36,17 +38,23 @@ results <- downscale(
 results <- data.table(results)
 resdd5 <- results[PERIOD %in% 2020:2080,]
 resdd5 <- resdd5[ID == 1,]
-resdd5[,c("ID","GCM","SSP","RUN") := NULL]
-resdd5 <- melt(resdd5, id.vars = "PERIOD")
+resdd5[,c("ID","GCM","SSP") := NULL]
+resdd5 <- melt(resdd5, id.vars = c("PERIOD","RUN"))
 setorder(resdd5, PERIOD, variable)
 resdd5[,temp := gsub("[A-Z]|[a-z]","",variable)]
 resdd5[,PERIOD := paste(PERIOD,temp,"01", sep = "-")]
 resdd5[,PERIOD := as.Date(PERIOD)]
 
+res_jan <- resdd5[variable == "Tmax01",]
+
 library(ggplot2)
-ggplot(resdd5,aes(x = PERIOD, y = value)) +
+ggplot(res_jan[RUN != "ensembleMean",],aes(x = PERIOD, y = value, col = RUN)) +
   geom_line() +
+  geom_line(data = res_jan[RUN == 'ensembleMean',], aes(x = PERIOD, y = value), col = "black", linewidth = 1)+
   xlab("Date") +
-  ylab("Tmax")
+  ylab("Tmax_Jan") +
+  ggtitle("ACCESS-ESM1-5")
+
+ggsave("TS_Example.png", width = 6, height = 4, dpi = 400)
 
 poolClose(dbCon)
