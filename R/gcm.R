@@ -1,73 +1,3 @@
-#' Create gcm input for `downscale`.
-#' @param gcm A character vector. Label of the global circulation models to use.
-#' Can be obtained from `list_gcm()`. Default to `list_gcm()`.
-#' @param ssp A character vector. Label of the shared socioeconomic pathways to use.
-#' Can be obtained from `list_ssp()`. Default to `list_ssp()`.
-#' @param period A character vector. Label of the period to use.
-#' Can be obtained from `list_period()`. Default to `list_period()`.
-#' @param max_run An integer. Maximum number of model runs to include.
-#' A value of 0 is `ensembleMean` only. Runs are included in the order they are found in the
-#' models data untile `max_run` is reached. Default to 0L.
-#' @return An object to use with `downscale`. A `SpatRaster` with, possibly, multiple layers.
-#' @importFrom terra rast
-#' @importFrom utils head
-#' @export
-gcm_input <- function(gcm = list_gcm(), ssp = list_ssp(), period = list_period() , max_run = 0L) {
-  
-  # Check if we have data, if not download some.
-  data_check()
-  
-  # Get relevant files
-  get_rel_files <- function(pattern, gcm) {
-    res <- lapply(
-      file.path(
-        data_path(),
-        getOption("climRpnw.gcm.path", default = "inputs_pkg/gcm"),
-        gcm
-      ),
-      list.files, recursive = TRUE, full.names = TRUE, pattern = pattern
-    )
-    names(res) <- gcm
-    res
-  }
-  files_tif <- get_rel_files("\\.tif$", gcm)
-  
-  # Load each file individually + select layers
-  process_one_gcm <- function(file_tif, ssp, period) {
-    
-    # Initiate raster
-    r <- terra::rast(file_tif)
-    nm <- names(r)
-    
-    # Select runs + ensembleMean (since alphabetical sort, ensembleMean will be first element)
-    runs <- utils::head(
-      sort(unique(vapply(strsplit(nm, "_"), `[`, character(1), 5))),
-      max_run + 1L
-    )
-    
-    # Select layers
-    pattern <- paste0(
-      "(",
-      paste0(ssp, collapse = "|"),
-      ")_(",
-      paste0(runs, collapse = "|"),
-      ")_(",
-      paste0(period, collapse = "|"),
-      ")$"
-    )
-    lyrs <- which(grepl(pattern, nm))
-    
-    return(r[[lyrs]])
-    
-  }
-  
-  res <- lapply(files_tif, process_one_gcm, ssp = ssp, period = period)
-  attr(res, "builder") <- "climRpnw" 
-  
-  # Return a list of SpatRaster, one element for each model
-  return(res)
-  
-}
 
 
 #' Create gcm input for `downscale` using data on Postgis database.
@@ -118,7 +48,15 @@ gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_s
         if(all(period %in% periods[uid == oldid,period]) & all(ssp %in% ssps[uid == oldid,ssp]) & max_run <= bnds[uid == oldid, max_run]){
           message("Retrieving from cache...")
           gcm_rast <- terra::rast(paste0(cache_path(),"/gcm/",gcmcode,"/",oldid,".tif"))
-          return(gcm_rast)
+          runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers where mod = '",gcm_nm,"'"))$run)
+          sel_runs <- runs[1:(max_run+1L)]
+          
+          layinfo <- data.table(fullnm = names(gcm_rast))
+          layinfo[,c("Mod","Var","Month","Scenario","Run","Period1","Period2") := tstrsplit(fullnm, "_")]
+          layinfo[,Period := paste(Period1,Period2, sep = "_")]
+          layinfo[, laynum := seq_along(fullnm)]
+          sel <- layinfo[Scenario %in% ssp & Period %in% period & Run %in% sel_runs,laynum]
+          return(gcm_rast[[sel]])
         }else{
           message("Not fully cached :( Will download more")
         }
@@ -214,7 +152,14 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm_ts(), ssp = list_ssp
         if(all(period %in% periods[uid == oldid,period]) & all(ssp %in% ssps[uid == oldid,ssp]) & max_run <= bnds[uid == oldid, max_run]){
           message("Retrieving from cache...")
           gcm_rast <- terra::rast(paste0(cache_path(),"/gcmts/",gcmcode,"/",oldid,".tif"))
-          return(gcm_rast)
+          runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers_ts where mod = '",gcm_nm,"'"))$run)
+          sel_runs <- runs[1:(max_run+1L)]
+          
+          layinfo <- data.table(fullnm = names(gcm_rast))
+          layinfo[,c("Mod","Var","Month","Scenario","Run","Year") := tstrsplit(fullnm, "_")]
+          layinfo[, laynum := seq_along(fullnm)]
+          sel <- layinfo[Scenario %in% ssp & Year %in% period & Run %in% sel_runs,laynum]
+          return(gcm_rast[[sel]])
         }else{
           message("Not fully cached :( Will download more")
         }
