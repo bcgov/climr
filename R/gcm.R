@@ -133,7 +133,7 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm_ts(), ssp = list_ssp
                             dbname = c("gcmts_access", "gcmts_bcc", "gcmts_canesm", "gcmts_cnrm", 
                                        "gcmts_ecearth", "gcmts_gfdl", "gcmts_giss", "gcmts_inm", "gcmts_ipsl", 
                                        "gcmts_miroc6", "gcmts_mpi1", "gcmts_mpi2", "gcmts_ukesm")), class = "data.frame", row.names = c(NA, -13L))
-  
+  if(nrow(dbnames) < 1) stop("That isn't a valid GCM")
   # Load each file individually + select layers
   process_one_gcm <- function(gcm_nm, ssp, period) { ##need to update to all GCMs
     gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
@@ -168,6 +168,7 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm_ts(), ssp = list_ssp
     }
 
     runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers_ts where mod = '",gcm_nm,"'"))$run)
+    if(length(runs) < 1) stop("That GCM isn't in our database yet.")
     sel_runs <- runs[1:(max_run+1L)]
     
     q <- paste0("select fullnm, laynum from esm_layers_ts where mod = '",gcm_nm,"' and scenario in ('",paste(ssp,collapse = "','"),
@@ -181,7 +182,7 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm_ts(), ssp = list_ssp
     message("Tmax...")
     gcm_rast_tmax <- pgGetTerra(dbCon, paste0(gcmcode,"_tmax"), bands = layerinfo$laynum, boundary = bbox)
     names(gcm_rast_tmax) <- layerinfo$fullnm
-    message("Tmin")
+    message("Tmin...")
     gcm_rast_tmin <- pgGetTerra(dbCon, paste0(gcmcode,"_tmin"), bands = layerinfo$laynum, boundary = bbox)
     names(gcm_rast_tmin) <- gsub("Tmax","Tmin", layerinfo$fullnm)
     gcm_rast <- c(gcm_rast_ppt, gcm_rast_tmax, gcm_rast_tmin)
