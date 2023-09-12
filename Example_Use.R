@@ -21,7 +21,7 @@ gcm <- gcm_input_postgis(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "EC-Earth
 plot(gcm[[2]][[1]])
 
 ##get GCM anomolies (time series)
-gcm_ts <- gcm_ts_input(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "xxx"), 
+gcm_ts <- gcm_ts_input(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "EC-Earth3"), 
                          ssp = c("ssp370"), 
                          years = 2020:2080,
                          max_run = 0,
@@ -36,6 +36,8 @@ results <- downscale(
   gcm_ts = gcm_ts,
   vars = sprintf(c("Tmax%02d"),1:12)
 )
+
+##########make some figures#############
 results <- data.table(results)
 resdd5 <- results[PERIOD %in% 2020:2080,]
 resdd5 <- resdd5[ID == 1,]
