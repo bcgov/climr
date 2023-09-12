@@ -13,25 +13,26 @@ normal <- normal_input_postgis(dbCon = dbCon, bbox = thebb, cache = TRUE) ##get 
 plot(normal[[1]])
 
 ##get GCM anomolies (20 yr periods)
-gcm <- gcm_input_postgis(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5"), 
+gcm <- gcm_input_postgis(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "EC-Earth3"), 
                          ssp = c("ssp370"), 
                          period = c("2021_2040","2041_2060","2061_2080"),
-                         max_run = 4,
+                         max_run = 0,
                          cache = TRUE)
-plot(gcm[[1]][[1]])
+plot(gcm[[2]][[1]])
 
 ##get GCM anomolies (time series)
-gcm_ts <- gcm_ts_input(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5"), 
+gcm_ts <- gcm_ts_input(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "xxx"), 
                          ssp = c("ssp370"), 
                          years = 2020:2080,
-                         max_run = 4,
+                         max_run = 0,
                          cache = TRUE)
-plot(gcm_ts[[1]][[1]])
+plot(gcm_ts[[2]][[1]])
 
 # Downscale!
 results <- downscale(
   xyz = in_xyz,
   normal = normal,
+  gcm = gcm,
   gcm_ts = gcm_ts,
   vars = sprintf(c("Tmax%02d"),1:12)
 )
