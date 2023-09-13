@@ -3,9 +3,15 @@ library(data.table)
 library(terra)
 library(pool)
 
-in_locations <- fread("Test_locations_small.csv")
+in_locations <- fread("Test_locations_small.csv") ##provide or create a 
 
 in_xyz <- as.data.frame(in_locations[,.(Long,Lat,Elev)]) ##currently needs to be a data.frame or matrix, not data.table
+
+##provide or create a long, lat, elev dataframe
+in_xyz <- structure(list(Long = c(-127.70521, -127.62279, -127.56235, -127.7162, 
+                                  -127.18585, -127.1254, -126.94957, -126.95507), 
+                         Lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025), 
+                         Elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L)), row.names = c(NA, -8L), class = "data.frame")
 
 thebb <- get_bb(in_xyz) ##get bounding box based on input points
 dbCon <- data_connect() ##connect to database
@@ -20,7 +26,7 @@ gcm <- gcm_input_postgis(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "EC-Earth
                          cache = TRUE)
 plot(gcm[[2]][[1]])
 
-##get GCM anomolies (time series)
+##get GCM anomolies (time series) - note that for multiple runs, this can take a bit to download the data
 gcm_ts <- gcm_ts_input(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "EC-Earth3"), 
                          ssp = c("ssp370"), 
                          years = 2020:2080,
