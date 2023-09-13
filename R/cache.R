@@ -6,7 +6,7 @@
 #' set using the `climRpnw.cache.path` option with `options("climRpnw.cache.path" = "your_path")`.
 #' @return The full path of the package local cache.
 cache_path <- function() {
-  getOption("climRpnw.cache.path", default = tools::R_user_dir("climRpnw", "cache"))
+  getOption("climRpnw.cache.path", default = tools::R_user_dir("climRdev", "cache"))
 }
 
 #' Check if package local cache exists

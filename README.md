@@ -1,3 +1,5 @@
+# climR: Data for a Changing World
+
 <!-- badges: start -->
 [![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](<Redirect-URL>)
 <!-- badges: end -->
@@ -5,38 +7,33 @@
 # Install
 
 ```r
-remotes::install_github("bcgov/climR-pnw")
+remotes::install_github("kdaust/climR-dev")
 ```
 
 # Usage
 
 ```r
-# Retrieve package data
-data_update()
-
-# Create a normal baseline
-normal <- normal_input()
-
-# Select GCM
-gcm <- gcm_input(
-  gcm = c("BCC-CSM2-MR"),
-  ssp = c("ssp126"),
-  period = "2041_2060",
-  max_run = 0
-)
 
 # Provide or create a points dataframe (lon, lat, elev)
-n <- 100000
-xyz <- data.frame(lon = runif(n, -125, -120), lat = runif(n, 51, 53), elev = numeric(n))
-xyz[,3] <- terra::extract(attr(normal, "dem"), xyz[,1:2], method = "bilinear")[,-1L]
 
-# Use downscale
+thebb <- get_bb(in_xyz) ##get bounding box based on input points
+dbCon <- data_connect() ##connect to database
+normal <- normal_input_postgis(dbCon = dbCon, bbox = thebb) ##get normal data and lapse rates
+plot(normal[[1]])
+
+##get GCM anomolies
+gcm <- gcm_input_postgis(dbCon, bbox = thebb, gcm = c("BCC-CSM2-MR","UKESM1-0-LL"), ssp = "ssp245", period = c("2021_2040","2041_2060","2061_2080"))
+plot(gcm[[1]][[1]])
+
+# Downscale!
 results <- downscale(
-  xyz = xyz,
+  xyz = in_xyz,
   normal = normal,
   gcm = gcm,
-  var = c("Tmax01", "DD5_01")
+  vars = c("CMD_sp","Tave_wt","PPT_sp")
 )
+
+poolClose(dbCon)
 
 # Details about available data
 list_data()
@@ -51,16 +48,11 @@ list_variables()
 
 # Data
 
-See [data branch README.md](https://github.com/bcgov/climR-pnw/blob/data/README.md) for details.
+This development version switches to a remote Postgis database for getting data. Data are not currently cached, but will be in the future.
 
 # Adding / Modifying climate variables
 
 All climate variables are computed via [R/append_clim_vars.R](./R/append_clim_vars.R). Add or modify entries in the variables list as needed. Use function `v` to handle dependencies (i.e. `v("Tmin")` instead of `dt$Tmin` / `dt[["Tmin"]]`).
-
-# Caching
-
-This package use local caching, either permanent or in a temporary folder. GitHub is the current data source. This could be modified by implementing another `content_get` type function. This new function should return a data.table with 3 columns, `url`, `path` and `uid`.
-See `?content_get`.
 
 # Data functions
 
@@ -78,7 +70,7 @@ Data pivot using `data.table` dcast is the most resource expensive operation of 
 
 `terra` still has a couple issues that were mitigated in this package. When this is the case, function were anotated. Mainly, we are sushing `terra` functions to prevent messages print to console (see https://github.com/rspatial/terra/issues/287). We are also loading NetCDF via `raster` package as GDAL is significantly slower than the `ncdf4` implementation. Finally, NA values are not correctly transferred from disk to memory.
 
-# climR-pnw
+# climR-dev
 An R package for downscaled global climate model normals in the Pacific Northwest
 
 Copyright 2021 Province of British Columbia

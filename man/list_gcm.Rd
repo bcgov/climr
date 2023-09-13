@@ -4,7 +4,7 @@
 \alias{list_gcm}
 \title{List available global circulation models}
 \usage{
-list_gcm()
+list_gcm(dbCon)
 }
 \description{
 List available global circulation models

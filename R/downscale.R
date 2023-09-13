@@ -23,7 +23,7 @@
 #' downscale(xyz, normal, gcm)
 #' }
 
-downscale <- function(xyz, normal, gcm = NULL, historic = NULL, return_normal = FALSE,
+downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, return_normal = FALSE,
                       vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3)))),
                       ppt_lr = FALSE, nthread = 1L) {
   
@@ -64,7 +64,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, return_normal = 
       function(x) {xyz[x,]}
     )
     
-    threaded_downscale_ <- function(xyz, normal_path, gcm_paths, historic_paths, vars, ppt_lr) {
+    threaded_downscale_ <- function(xyz, normal_path, gcm_paths, historic_paths, vars, ppt_lr) { ##add gcm_ts here
       
       # Set DT threads to 1 in parallel to avoid overloading CPU
       # Not needed for forking, not taking any chances
@@ -111,7 +111,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, return_normal = 
   } else {
     
     # Downscale without parallel processing
-    res <- downscale_(xyz, normal, gcm, historic, return_normal, vars, ppt_lr)
+    res <- downscale_(xyz, normal, gcm, historic, gcm_ts, return_normal, vars, ppt_lr)
     
   }
   
@@ -125,7 +125,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, return_normal = 
 #' 
 #xyzID <- xyz
 
-downscale_ <- function(xyzID, normal, gcm, historic, return_normal, vars, ppt_lr = FALSE) {
+downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, return_normal, vars, ppt_lr = FALSE) {
   #print(xyzID)
   # Define normal extent
   ex <- terra::ext(
@@ -163,7 +163,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, return_normal, vars, ppt_lr
   #print(res)
   # Compute individual point lapse rate adjustments
   # Lapse rate position 38:73 (ID column + 36 normal layers + 36 lapse rate layers)
-  lr <- elev_delta * res[, 38L:73L]
+  lr <- elev_delta * res[, 38L:73L] ##do we need anything other than the lapse rate?
   
   # Replace any NAs left with 0s
   lr[is.na(lr)] <- 0L
@@ -180,7 +180,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, return_normal, vars, ppt_lr
   }
   
   # Process one GCM stacked layers
-  process_one_gcm <- function(gcm_, res, xyzID) {
+  process_one_gcm <- function(gcm_, res, xyzID, timeseries) {
     ##gcm_ <- gcm[[1]]
     # Store names for later use
     nm <- names(gcm_)
@@ -215,8 +215,10 @@ downscale_ <- function(xyzID, normal, gcm, historic, return_normal, vars, ppt_lr
     # Reshape (melt / dcast) to obtain final form
     ref_dt <- data.table::tstrsplit(nm, "_")
     # Recombine PERIOD into one field
-    ref_dt[[6]] <- paste(ref_dt[[6]], ref_dt[[7]], sep = "_")
-    ref_dt[7] <- NULL
+    if(!timeseries){
+      ref_dt[[6]] <- paste(ref_dt[[6]], ref_dt[[7]], sep = "_")
+      ref_dt[7] <- NULL
+    }
     # Transform ref_dt to data.table for remerging
     data.table::setDT(ref_dt)
     data.table::setnames(ref_dt, c("GCM", "VAR", "MONTH", "SSP", "RUN", "PERIOD"))
@@ -249,6 +251,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, return_normal, vars, ppt_lr
     
     return(gcm_)
   }
+  
   
   process_one_historic <- function(historic_, res, xyzID) {
     #print(historic_)
@@ -314,10 +317,17 @@ downscale_ <- function(xyzID, normal, gcm, historic, return_normal, vars, ppt_lr
   if (!is.null(gcm)) {
     # Process each gcm and rbind resulting tables
     res_gcm <- data.table::rbindlist(
-      lapply(gcm, process_one_gcm, res = res, xyzID = xyzID),
+      lapply(gcm, process_one_gcm, res = res, xyzID = xyzID, timeseries = FALSE),
       use.names = TRUE
     )
   } else res_gcm <- NULL
+  if (!is.null(gcm_ts)) {
+    # Process each gcm and rbind resulting tables
+    res_gcmts <- data.table::rbindlist(
+      lapply(gcm_ts, process_one_gcm, res = res, xyzID = xyzID, timeseries = TRUE),
+      use.names = TRUE
+    )
+  } else res_gcmts <- NULL
   if(!is.null(historic)) {
     #print(historic)
     res_hist <- data.table::rbindlist(
@@ -364,7 +374,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, return_normal, vars, ppt_lr
   }else{
     normal_ <- NULL
   }
-  res <- rbind(res_gcm, res_hist, normal_, use.names = TRUE, fill = TRUE)
+  res <- rbind(res_gcm, res_gcmts, res_hist, normal_, use.names = TRUE, fill = TRUE)
   # Compute extra climate variables, assign by reference
   append_clim_vars(res, vars)
   

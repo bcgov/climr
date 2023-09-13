@@ -5,7 +5,7 @@
 #' @param bands Which raster bands to return. Default 37:73
 #' @param boundary Numeric vector of length 4 (ymax,ymin,xmax,xmin). Default `NULL`
 #' @return terra rast 
-#' @importFrom terra rast
+#' @import terra
 #' @import RPostgres
 #' @import DBI
 #' @export
@@ -76,34 +76,76 @@ pgGetTerra <- function(conn, name, rast = "rast", bands = 37:73,
                                     " ", boundary[1], ",", boundary[4], " ", boundary[2],
                                     ",\n  ", boundary[3], " ", boundary[2], ",", boundary[3],
                                     " ", boundary[1], ",", boundary[4], " ", boundary[1],
-                                    "))'),", srid, "))) as a;"))
-    for (b in bands) {
-      
-      vals <- dbGetQuery(conn,paste0("select
-            unnest(st_dumpvalues(rast, 1)) as vals 
-            from
-            (select st_union(",rastque,",",b,") rast from ",nameque, "\n
-              WHERE ST_Intersects(",
-                                     rastque, ",ST_SetSRID(ST_GeomFromText('POLYGON((", boundary[4],
-                                     " ", boundary[1], ",", boundary[4], " ", boundary[2],
-                                     ",\n  ", boundary[3], " ", boundary[2], ",", boundary[3],
-                                     " ", boundary[1], ",", boundary[4], " ", boundary[1],
-                                     "))'),", srid, "))) as a;"))$vals  
-      
-      rout <- terra::rast(nrows = info$rows, ncols = info$cols, xmin = info$xmn, 
-                          xmax = info$xmx, ymin = info$ymn, ymax = info$ymx,
-                          crs = paste0("EPSG:",projID), vals = vals)
-      #plot(rout)
-      if(length(bands) > 1) {
-        if (b == bands[1]) {
-          rb <- rout
-        } else {
-          add(rb) <- rout ##add layer in place
+                                    "))'),", projID, "))) as a;"))
+    
+    if(length(bands) > 1664){ ##maximum number of columns
+      brks <- c(seq(1,length(bands),by = 1663),(length(bands)+1))
+      for(i in 1:(length(brks)-1)){
+        bands_temp <- bands[brks[i]:(brks[i+1]-1)]
+        bandqs1 <- paste0("UNNEST(ST_Dumpvalues(rast, ",bands_temp,")) as vals_",bands_temp)
+        bandqs2 <- paste0("ST_Union(rast",rastque,",",bands_temp,") rast_",bands_temp)
+        
+        rast_vals_temp <- dbGetQuery(conn,paste0("SELECT ",paste(bandqs1,collapse = ","), 
+                                            
+                                            " from (SELECT ST_Union(rast) rast FROM ",nameque," WHERE ST_Intersects(",
+                                            rastque, ",ST_SetSRID(ST_GeomFromText('POLYGON((", boundary[4],
+                                            " ", boundary[1], ",", boundary[4], " ", boundary[2],
+                                            ",\n  ", boundary[3], " ", boundary[2], ",", boundary[3],
+                                            " ", boundary[1], ",", boundary[4], " ", boundary[1],
+                                            "))'),", projID, "))) as a;"))
+        setDT(rast_vals_temp)
+        if(i == 1){
+          rast_vals <- copy(rast_vals_temp)
+        }else{
+          rast_vals <- cbind(rast_vals, rast_vals_temp)
         }
       }
+      rast_vals <- suppressWarnings(melt(rast_vals, id.vars = c()))
+    }else{
+      bandqs1 <- paste0("UNNEST(ST_Dumpvalues(rast, ",bands,")) as vals_",bands)
+      bandqs2 <- paste0("ST_Union(rast",rastque,",",bands,") rast_",bands)
+      
+      rast_vals <- dbGetQuery(conn,paste0("SELECT ",paste(bandqs1,collapse = ","), 
+                                          
+                                          " from (SELECT ST_Union(rast) rast FROM ",nameque," WHERE ST_Intersects(",
+                                          rastque, ",ST_SetSRID(ST_GeomFromText('POLYGON((", boundary[4],
+                                          " ", boundary[1], ",", boundary[4], " ", boundary[2],
+                                          ",\n  ", boundary[3], " ", boundary[2], ",", boundary[3],
+                                          " ", boundary[1], ",", boundary[4], " ", boundary[1],
+                                          "))'),", projID, "))) as a;"))
+      setDT(rast_vals)
+      rast_vals <- suppressWarnings(melt(rast_vals, id.vars = c())) 
     }
-  }
-  
-  if(length(bands) > 1) {rout <- rb}
+      
+      rout <- terra::rast(nrows = info$rows, ncols = info$cols, xmin = info$xmn, 
+                          xmax = info$xmx, ymin = info$ymn, ymax = info$ymx, nlyrs = length(bands),
+                          crs = paste0("EPSG:",projID), vals = rast_vals$value)
+
+    }
   return(rout)
+}
+
+# library(foreach)
+# dbExtractNormal <- function(dbCon, points, bands = 1:73){
+# 
+#   temp <- paste(points$Long,in_xyz$Lat)
+#   pts <- paste0("MULTIPOINT((",paste(temp, collapse = "),("),"))")
+#   
+#   bandqs <- paste0("ST_Value(normal_wna.rast, ",bands,", geom, true, 'bilinear') as val_",bands)
+# 
+#   q <- paste0("SELECT ",paste(bandqs,collapse = ","),"
+# FROM ST_Dump(ST_GeomFromText('", pts ,"', 4326)) as dp
+# JOIN normal_wna ON ST_Intersects(normal_wna.rast, dp.geom)")
+#   
+#   dat <- dbGetQuery(dbCon, q)
+#   
+# }
+
+
+#' Find bounding box of data
+#' @param in_xyz data.table (or data.frame) of points to downscale
+#' @return bounding box (e.g. c(51,50,-121,-122))
+#' @export
+get_bb <- function(in_xyz){
+  return(c(max(in_xyz[,2]),min(in_xyz[,2]),max(in_xyz[,1]),min(in_xyz[,1])))
 }
