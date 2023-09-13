@@ -9,6 +9,8 @@ downscale(
   normal,
   gcm = NULL,
   historic = NULL,
+  gcm_ts = NULL,
+  return_normal = FALSE,
   vars = sort(sprintf(c("PPT\%02d", "Tmax\%02d", "Tmin\%02d"), sort(rep(1:12, 3)))),
   ppt_lr = FALSE,
   nthread = 1L

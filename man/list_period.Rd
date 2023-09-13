@@ -4,10 +4,10 @@
 \alias{list_period}
 \title{List available period}
 \usage{
-list_period(gcm)
+list_period(dbCon)
 }
 \arguments{
-\item{gcm}{An optional character vector. Limit list to provided global circulation models.}
+\item{dbCon}{database connection}
 }
 \description{
 List available period
