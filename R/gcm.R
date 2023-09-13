@@ -270,7 +270,7 @@ list_parse <- function(gcm, col_num = 1) {
 #' @importFrom RPostgres dbGetQuery
 #' @export
 list_gcm <- function(dbCon) {
-  sort(dbGetQuery(dbCon, "SELECT DISTINCT mod FROM esm_layers")[,1])
+  sort(dbGetQuery(dbCon, "SELECT DISTINCT mod FROM esm_layers_ts")[,1])
 }
 
 #' List available shared socioeconomic pathways
