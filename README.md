@@ -1,4 +1,4 @@
-# climR: Data for a Changing World
+# climr: Data for a Changing World
 
 <!-- badges: start -->
 [![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](<Redirect-URL>)
@@ -79,7 +79,7 @@ Data pivot using `data.table` dcast is the most resource expensive operation of 
 
 `terra` still has a couple issues that were mitigated in this package. When this is the case, function were anotated. Mainly, we are sushing `terra` functions to prevent messages print to console (see https://github.com/rspatial/terra/issues/287). We are also loading NetCDF via `raster` package as GDAL is significantly slower than the `ncdf4` implementation. Finally, NA values are not correctly transferred from disk to memory.
 
-# climRdev
+# climrdev
 An R package for downscaled global climate model normals in the Pacific Northwest
 
 Copyright 2021 Province of British Columbia

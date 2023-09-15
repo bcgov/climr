@@ -3,7 +3,7 @@ library(data.table)
 library(terra)
 library(pool)
 
-in_locations <- fread("Test_locations_small.csv") ##provide or create a 
+in_locations <- fread("Test_Locations_VanIsl.csv") ##provide or create a 
 
 in_xyz <- as.data.frame(in_locations[,.(Long,Lat,Elev)]) ##currently needs to be a data.frame or matrix, not data.table
 
@@ -27,10 +27,10 @@ gcm <- gcm_input_postgis(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "EC-Earth
 plot(gcm[[2]][[1]])
 
 ##get GCM anomolies (time series) - note that for multiple runs, this can take a bit to download the data
-gcm_ts <- gcm_ts_input(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "EC-Earth3"), 
-                         ssp = c("ssp370"), 
+gcm_ts <- gcm_ts_input(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "MPI-ESM1-2-HR"), 
+                         ssp = c("ssp245"), 
                          years = 2020:2080,
-                         max_run = 0,
+                         max_run = 4,
                          cache = TRUE)
 plot(gcm_ts[[2]][[1]])
 
@@ -38,7 +38,7 @@ plot(gcm_ts[[2]][[1]])
 results <- downscale(
   xyz = in_xyz,
   normal = normal,
-  gcm = gcm,
+  #gcm = gcm,
   gcm_ts = gcm_ts,
   vars = sprintf(c("Tmax%02d"),1:12)
 )
@@ -47,8 +47,8 @@ results <- downscale(
 results <- data.table(results)
 resdd5 <- results[PERIOD %in% 2020:2080,]
 resdd5 <- resdd5[ID == 1,]
-resdd5[,c("ID","GCM") := NULL]
-resdd5 <- melt(resdd5, id.vars = c("PERIOD","SSP", "RUN"))
+resdd5[,c("ID","SSP") := NULL]
+resdd5 <- melt(resdd5, id.vars = c("PERIOD","GCM", "RUN"))
 setorder(resdd5, PERIOD, variable)
 resdd5[,temp := gsub("[A-Z]|[a-z]","",variable)]
 resdd5[,PERIOD := paste(PERIOD,temp,"01", sep = "-")]
@@ -57,9 +57,9 @@ resdd5[,PERIOD := as.Date(PERIOD)]
 res_jan <- resdd5[variable == "Tmax01",]
 
 library(ggplot2)
-ggplot(res_jan[RUN != "ensembleMean",],aes(x = PERIOD, y = value, col = SSP, group = factor(interaction(RUN,SSP)))) +
+ggplot(res_jan[RUN != "ensembleMean",],aes(x = PERIOD, y = value, col = GCM, group = factor(interaction(RUN,GCM)))) +
   geom_line() +
-  geom_line(data = res_jan[RUN == 'ensembleMean',], aes(x = PERIOD, y = value, group = SSP), col = "black", linewidth = 1)+
+  geom_line(data = res_jan[RUN == 'ensembleMean',], aes(x = PERIOD, y = value, group = GCM), col = "black", linewidth = 1)+
   xlab("Date") +
   ylab("Tmax_Jan") +
   ggtitle("ACCESS-ESM1-5")
