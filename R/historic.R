@@ -1,47 +1,108 @@
+
 #' Create historic input for `downscale`.
 #' @param period A character vector. Label of the period to use.
 #' Can be obtained from `list_period()`. Default to `list_period()`.
 #' @return An object to use with `downscale`. A `SpatRaster` with, possibly, multiple layers.
 #' @importFrom terra rast
 #' @importFrom utils head
+#' @importFrom RPostgres dbGetQuery
+#' @import data.table
+#' @import uuid
 #' @export
+historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache = TRUE) {
+  
+  dbnames <- structure(list(PERIOD = c("2001_2020"), 
+                            dbname = c("historic_periods")), class = "data.frame", row.names = c(NA, -13L))
+  
 
-historic_input <- function(period = list_historic()[1]) {
+  dbcode <- dbnames$dbname[dbnames$PERIOD %in% period]
   
-  # Check if we have data, if not download some.
-  data_check()
-  
-  # Get relevant files
-  get_rel_files <- function(pattern) {
-    res <- lapply(
-      file.path(
-        data_path(),
-        getOption("climRpnw.historic.path", default = "inputs_pkg/historic"),
-        period
-      ),
-      list.files, recursive = TRUE, full.names = TRUE, pattern = pattern
-    )
-    res
-  }
-  files_tif <- get_rel_files("\\.tif$")
-  
-  # Load each file individually + select layers
-  process_one_historic <- function(file_tif) {
-    
-    # Initiate raster
-    r <- terra::rast(file_tif)
-    #nm <- names(r)
-    return(r)
-    
+  if(dir.exists(paste0(cache_path(),"/historic/",dbcode))){
+    bnds <- data.table::fread(paste0(cache_path(),"/historic/",dbcode,"/meta_area.csv"))
+    data.table::setorder(bnds, -numlay)
+    for(i in 1:nrow(bnds)){
+      isin <- is_in_bbox(bbox, matrix(bnds[i,2:5]))
+      if(isin) break
+    }
+    if(isin){
+      oldid <- bnds$uid[i]
+      periods <- data.table::fread(paste0(cache_path(),"/historic/",dbcode,"/meta_period.csv"))
+      if(all(period %in% periods[uid == oldid,period]) ){
+        message("Retrieving from cache...")
+        hist_rast <- terra::rast(paste0(cache_path(),"/historic/",dbcode,"/",oldid,".tif"))
+        attr(hist_rast, "builder") <- "climRpnw" 
+        return(list(hist_rast))
+      }else{
+        message("Not fully cached :( Will download more")
+      }
+      
+    }
   }
   
-  res <- lapply(files_tif, process_one_historic)
-  attr(res, "builder") <- "climRpnw" 
+  q <- paste0("select fullnm, laynum from historic_layers where period in ('",paste(period, collapse = "','"),"')")
+  #print(q)
+  layerinfo <- RPostgres::dbGetQuery(dbCon, q)
+  message("Downloading historic anomalies")
+  hist_rast <- pgGetTerra(dbCon, dbcode, bands = layerinfo$laynum, boundary = bbox)
+  names(hist_rast) <- layerinfo$fullnm
   
-  # Return a list of SpatRaster, one element for each model
-  return(res)
+  if(cache){
+    message("Caching data...")
+    uid <- uuid::UUIDgenerate()
+    if(!dir.exists(paste0(cache_path(), "/historic/",dbcode))) dir.create(paste0(cache_path(), "/historic/",dbcode), recursive = TRUE)
+    terra::writeRaster(hist_rast, paste0(cache_path(),"/historic/",dbcode, "/", uid,".tif"))
+    rastext <- terra::ext(hist_rast)
+    t1 <- data.table::data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1], 
+                                 numlay = terra::nlyr(hist_rast))
+    t2 <- data.table::data.table(uid = rep(uid, length(period)),period = period)
+    data.table::fwrite(t1, file = paste0(cache_path(),"/historic/",dbcode,"/meta_area.csv"), append = TRUE)
+    data.table::fwrite(t2, file = paste0(cache_path(),"/historic/",dbcode,"/meta_period.csv"), append = TRUE)
+  }
   
+  attr(hist_rast, "builder") <- "climRpnw" 
+  return(list(hist_rast))
 }
+
+
+
+
+
+# historic_input <- function(period = list_historic()[1]) {
+#   
+#   # Check if we have data, if not download some.
+#   data_check()
+#   
+#   # Get relevant files
+#   get_rel_files <- function(pattern) {
+#     res <- lapply(
+#       file.path(
+#         data_path(),
+#         getOption("climRpnw.historic.path", default = "inputs_pkg/historic"),
+#         period
+#       ),
+#       list.files, recursive = TRUE, full.names = TRUE, pattern = pattern
+#     )
+#     res
+#   }
+#   files_tif <- get_rel_files("\\.tif$")
+#   
+#   # Load each file individually + select layers
+#   process_one_historic <- function(file_tif) {
+#     
+#     # Initiate raster
+#     r <- terra::rast(file_tif)
+#     #nm <- names(r)
+#     return(r)
+#     
+#   }
+#   
+#   res <- lapply(files_tif, process_one_historic)
+#   attr(res, "builder") <- "climRpnw" 
+#   
+#   # Return a list of SpatRaster, one element for each model
+#   return(res)
+#   
+# }
 
 #' List available historic periods
 #' @export
