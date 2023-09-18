@@ -18,6 +18,8 @@ dbCon <- data_connect() ##connect to database
 normal <- normal_input_postgis(dbCon = dbCon, bbox = thebb, cache = TRUE) ##get normal data and lapse rates
 plot(normal[[1]])
 
+historic <- historic_input(dbCon, bbox = thebb, period = "2001_2020", cache = TRUE)
+plot(historic[[1]][[1]])
 ##get GCM anomolies (20 yr periods)
 gcm <- gcm_input_postgis(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "EC-Earth3"), 
                          ssp = c("ssp370"), 
@@ -38,8 +40,9 @@ plot(gcm_ts[[2]][[1]])
 results <- downscale(
   xyz = in_xyz,
   normal = normal,
+  historic = historic,
   gcm = gcm,
-  gcm_ts = gcm_ts,
+  #gcm_ts = gcm_ts,
   vars = sprintf(c("Tmax%02d"),1:12)
 )
 
