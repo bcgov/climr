@@ -64,6 +64,70 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 }
 
 
+#' Create historic timeseries input for `downscale`.
+#' @param dbCon Database connection
+#' @param bbox Bounding box of data, from `get_bb`
+#' @param years Years to retrieve timeseries for, in `1902:2022`. Default `2010:2022`
+#' @return An object to use with `downscale`. A `SpatRaster` with, possibly, multiple layers.
+#' @importFrom terra rast
+#' @importFrom utils head
+#' @importFrom RPostgres dbGetQuery
+#' @import data.table
+#' @import uuid
+#' @export
+#' 
+historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRUE) {
+  
+  dbcode <- "historic_ts"
+  ts_name <- "climatebc"
+  
+  if(dir.exists(paste0(cache_path(),"/historic_ts/",ts_name))){
+    bnds <- data.table::fread(paste0(cache_path(),"/historic_ts/",ts_name,"/meta_area.csv"))
+    data.table::setorder(bnds, -numlay)
+    for(i in 1:nrow(bnds)){
+      isin <- is_in_bbox(bbox, matrix(bnds[i,2:5]))
+      if(isin) break
+    }
+    if(isin){
+      oldid <- bnds$uid[i]
+      periods <- data.table::fread(paste0(cache_path(),"/historic_ts/",ts_name,"/meta_period.csv"))
+      if(all(years %in% periods[uid == oldid,period]) ){
+        message("Retrieving from cache...")
+        hist_rast <- terra::rast(paste0(cache_path(),"/historic_ts/",ts_name,"/",oldid,".tif"))
+        attr(hist_rast, "builder") <- "climRpnw" 
+        return(list(hist_rast))
+      }else{
+        message("Not fully cached :( Will download more")
+      }
+      
+    }
+  }
+  
+  q <- paste0("select fullnm, laynum from historic_ts_layers where period in ('",paste(years, collapse = "','"),"')")
+  #print(q)
+  layerinfo <- RPostgres::dbGetQuery(dbCon, q)
+  message("Downloading historic anomalies")
+  hist_rast <- pgGetTerra(dbCon, dbcode, bands = layerinfo$laynum, boundary = bbox)
+  names(hist_rast) <- layerinfo$fullnm
+  
+  if(cache){
+    message("Caching data...")
+    uid <- uuid::UUIDgenerate()
+    if(!dir.exists(paste0(cache_path(), "/historic_ts/",ts_name))) dir.create(paste0(cache_path(), "/historic_ts/",ts_name), recursive = TRUE)
+    terra::writeRaster(hist_rast, paste0(cache_path(),"/historic_ts/",ts_name, "/", uid,".tif"))
+    rastext <- terra::ext(hist_rast)
+    t1 <- data.table::data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1], 
+                                 numlay = terra::nlyr(hist_rast))
+    t2 <- data.table::data.table(uid = rep(uid, length(years)),period = years)
+    data.table::fwrite(t1, file = paste0(cache_path(),"/historic_ts/",ts_name,"/meta_area.csv"), append = TRUE)
+    data.table::fwrite(t2, file = paste0(cache_path(),"/historic_ts/",ts_name,"/meta_period.csv"), append = TRUE)
+  }
+  
+  attr(hist_rast, "builder") <- "climRpnw" 
+  return(list(hist_rast))
+}
+
+
 
 
 

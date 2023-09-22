@@ -20,6 +20,9 @@ plot(normal[[1]])
 
 historic <- historic_input(dbCon, bbox = thebb, period = "2001_2020", cache = TRUE)
 plot(historic[[1]][[1]])
+
+historic_ts <- historic_input_ts(dbCon, bbox = thebb, years = 1950:2022)
+plot(historic_ts[[1]][[1]])
 ##get GCM anomolies (20 yr periods)
 gcm <- gcm_input_postgis(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "EC-Earth3"), 
                          ssp = c("ssp370"), 
@@ -40,18 +43,16 @@ plot(gcm_ts[[2]][[1]])
 results <- downscale(
   xyz = in_xyz,
   normal = normal,
-  historic = historic,
-  gcm = gcm,
-  gcm_ts = gcm_ts,
+  historic_ts = historic_ts,
+  #gcm = gcm,
   vars = sprintf(c("Tmax%02d"),1:12)
 )
 
 ##########make some figures#############
 results <- data.table(results)
-resdd5 <- results[PERIOD %in% 2020:2080,]
-resdd5 <- resdd5[ID == 1,]
-resdd5[,c("ID","SSP") := NULL]
-resdd5 <- melt(resdd5, id.vars = c("PERIOD","GCM", "RUN"))
+resdd5 <- results[ID == 1,]
+resdd5[,c("ID") := NULL]
+resdd5 <- melt(resdd5, id.vars = c("PERIOD"))
 setorder(resdd5, PERIOD, variable)
 resdd5[,temp := gsub("[A-Z]|[a-z]","",variable)]
 resdd5[,PERIOD := paste(PERIOD,temp,"01", sep = "-")]
@@ -60,12 +61,11 @@ resdd5[,PERIOD := as.Date(PERIOD)]
 res_jan <- resdd5[variable == "Tmax01",]
 
 library(ggplot2)
-ggplot(res_jan[RUN != "ensembleMean",],aes(x = PERIOD, y = value, col = GCM, group = factor(interaction(RUN,GCM)))) +
+ggplot(res_jan,aes(x = PERIOD, y = value)) +
   geom_line() +
-  geom_line(data = res_jan[RUN == 'ensembleMean',], aes(x = PERIOD, y = value, group = GCM), col = "black", linewidth = 1)+
+  #geom_line(data = res_jan[RUN == 'ensembleMean',], aes(x = PERIOD, y = value, group = GCM), col = "black", linewidth = 1)+
   xlab("Date") +
-  ylab("Tmax_Jan") +
-  ggtitle("ACCESS-ESM1-5")
+  ylab("Tmax")
 
 ggsave("TS_Example.png", width = 6, height = 4, dpi = 400)
 
