@@ -23,7 +23,7 @@
 #' downscale(xyz, normal, gcm)
 #' }
 
-downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, return_normal = FALSE,
+downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, historic_ts = NULL, return_normal = FALSE,
                       vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3)))),
                       ppt_lr = FALSE, nthread = 1L) {
   
@@ -111,7 +111,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, r
   } else {
     
     # Downscale without parallel processing
-    res <- downscale_(xyz, normal, gcm, historic, gcm_ts, return_normal, vars, ppt_lr)
+    res <- downscale_(xyz, normal, gcm, historic, gcm_ts, historic_ts, return_normal, vars, ppt_lr)
     
   }
   
@@ -125,7 +125,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, r
 #' 
 #xyzID <- xyz
 
-downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, return_normal, vars, ppt_lr = FALSE) {
+downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, historic_ts, return_normal, vars, ppt_lr = FALSE) {
   #print(xyzID)
   # Define normal extent
   ex <- terra::ext(
@@ -253,7 +253,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, return_normal, vars
   }
   
   
-  process_one_historic <- function(historic_, res, xyzID) {
+  process_one_historic <- function(historic_, res, xyzID, timeseries) {
     #print(historic_)
     # Store names for later use
     nm <- names(historic_)
@@ -275,6 +275,9 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, return_normal, vars
     
     # Create match set to match with res names
     labels <- nm
+    if(timeseries){
+      labels <- gsub("_.*","",labels)
+    }
     
     ppt_ <- grep("PPT",labels)
     historic_[,ppt_ + 1L] <- historic_[,ppt_ + 1L] * res[,match(labels[ppt_], names(res))] ##PPT
@@ -284,9 +287,15 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, return_normal, vars
     # Reshape (melt / dcast) to obtain final form
     ref_dt <- data.table::tstrsplit(nm, "_")
     data.table::setDT(ref_dt)
-    data.table::setnames(ref_dt, c("VAR"))
-    data.table::set(ref_dt, j = "variable", value = nm)
-    data.table::set(ref_dt, j = "PERIOD", value = "2001_2020")
+    if(timeseries){
+      data.table::setnames(ref_dt, c("VAR","PERIOD"))
+      data.table::set(ref_dt, j = "variable", value = nm)
+    }else{
+      data.table::setnames(ref_dt, c("VAR"))
+      data.table::set(ref_dt, j = "variable", value = nm)
+      data.table::set(ref_dt, j = "PERIOD", value = "2001_2020")
+    }
+    
     data.table::setkey(ref_dt, "variable")
     # Set Latitude and possibly ID
     historic_[["Lat"]] <- xyzID[,2L]
@@ -331,11 +340,20 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, return_normal, vars
   if(!is.null(historic)) {
     #print(historic)
     res_hist <- data.table::rbindlist(
-      lapply(historic, process_one_historic, res = res, xyzID = xyzID),
+      lapply(historic, process_one_historic, res = res, xyzID = xyzID, timeseries = FALSE),
       use.names = TRUE
     )
   } else {
     res_hist <- NULL
+  }
+  if(!is.null(historic_ts)) {
+    #print(historic)
+    res_hist_ts <- data.table::rbindlist(
+      lapply(historic_ts, process_one_historic, res = res, xyzID = xyzID, timeseries = TRUE),
+      use.names = TRUE
+    )
+  } else {
+    res_hist_ts <- NULL
   }
   
   if(return_normal){
@@ -374,7 +392,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, return_normal, vars
   }else{
     normal_ <- NULL
   }
-  res <- rbind(res_gcm, res_gcmts, res_hist, normal_, use.names = TRUE, fill = TRUE)
+  res <- rbind(res_gcm, res_gcmts, res_hist, res_hist_ts, normal_, use.names = TRUE, fill = TRUE)
   # Compute extra climate variables, assign by reference
   append_clim_vars(res, vars)
   

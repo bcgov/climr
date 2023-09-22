@@ -4,7 +4,7 @@
 \alias{historic_input}
 \title{Create historic input for \code{downscale}.}
 \usage{
-historic_input(period = list_historic()[1])
+historic_input(dbCon, bbox = NULL, period = list_historic(), cache = TRUE)
 }
 \arguments{
 \item{period}{A character vector. Label of the period to use.
