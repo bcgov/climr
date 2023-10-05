@@ -32,19 +32,19 @@ gcm <- gcm_input_postgis(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "EC-Earth
 plot(gcm[[2]][[1]])
 
 ##get GCM anomolies (time series) - note that for multiple runs, this can take a bit to download the data
-gcm_ts <- gcm_ts_input(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "MPI-ESM1-2-HR"), 
-                         ssp = c("ssp245"), 
-                         years = 2020:2080,
-                         max_run = 4,
+gcm_ts <- gcm_ts_input(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5"), 
+                         ssp = c("ssp245","ssp370"), 
+                         years = 2020:2100,
+                         max_run = 6,
                          cache = TRUE)
-plot(gcm_ts[[2]][[1]])
+plot(gcm_ts[[1]][[1]])
 
 # Downscale!
 results <- downscale(
   xyz = in_xyz,
   normal = normal,
-  historic_ts = historic_ts,
-  #gcm = gcm,
+  #historic_ts = historic_ts,
+  gcm_ts = gcm_ts,
   vars = sprintf(c("Tmax%02d"),1:12)
 )
 
@@ -52,20 +52,25 @@ results <- downscale(
 results <- data.table(results)
 resdd5 <- results[ID == 1,]
 resdd5[,c("ID") := NULL]
-resdd5 <- melt(resdd5, id.vars = c("PERIOD"))
+resdd5 <- melt(resdd5, id.vars = c("PERIOD","GCM","SSP","RUN"))
 setorder(resdd5, PERIOD, variable)
 resdd5[,temp := gsub("[A-Z]|[a-z]","",variable)]
 resdd5[,PERIOD := paste(PERIOD,temp,"01", sep = "-")]
 resdd5[,PERIOD := as.Date(PERIOD)]
 
 res_jan <- resdd5[variable == "Tmax01",]
-
+res_jan <- res_jan[GCM == "ACCESS-ESM1-5",]
+res_jan <- res_jan[SSP == "ssp245",]
 library(ggplot2)
-ggplot(res_jan,aes(x = PERIOD, y = value)) +
+library(ggsci)
+ggplot(res_jan[RUN != "ensembleMean",],aes(x = PERIOD, y = value, col = RUN)) +
   geom_line() +
-  #geom_line(data = res_jan[RUN == 'ensembleMean',], aes(x = PERIOD, y = value, group = GCM), col = "black", linewidth = 1)+
+  geom_line(data = res_jan[RUN == 'ensembleMean',], aes(x = PERIOD, y = value), col = "black", linewidth = 1)+
   xlab("Date") +
-  ylab("Tmax")
+  ylab("Tmax") +
+  theme_bw() +
+  scale_color_jama() +
+  ylab("Tmax_01 (C)")
 
 ggsave("TS_Example.png", width = 6, height = 4, dpi = 400)
 
