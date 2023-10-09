@@ -6,6 +6,9 @@ library(analogsea)
 ##add normals
 library(ssh)
 
+dat <- fread("C:/Program Files/ClimateNA/Perioddat/Year_1908.ann")
+d2 <- fread("C:/Program Files/ClimateNA/Perioddat/cru_index.dat")
+
 
 dat <- rast("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climRpnw/inputs_pkg/normal/Normal_1961_1990MP/Normal_1961_1990MP.wlrdem.tif")
 d2 <- dat[[73]]
@@ -61,6 +64,22 @@ for(i in 2:13){
                                      pgisfn))
 }
 
+
+###upload historic data
+scp_upload(session, "Historic_Anomolies.tif", to = "/share")
+pgisfn <- paste0("raster2pgsql -s 4326 -I -C -M Historic_Anomolies.tif -t 6x6 historic_ts > historic_ts.sql")
+ssh_exec_wait(session, command = c("cd /share",
+                                   "ls",
+                                   pgisfn))
+"GTIFF_DIRECT_IO=YES raster2pgsql -s 4326 -I -M Historic_Anomolies.tif -t 6x6 historic_ts > historic_ts.sql &"
+
+
+metadt <- data.table(Orig = names(all_hist))
+metadt[,c("var","period") := tstrsplit(Orig, "_")]
+metadt[,laynum := seq_along(Orig)]
+setnames(metadt, old = "Orig", new = "fullnm")
+dbWriteTable(conn, name = "historic_ts_layers", metadt, row.names = FALSE)
+dbExecute(conn, "create index on historic_ts_layers(period)")
 
 for(i in 2:13){
   gcm <- allgcms[i]
