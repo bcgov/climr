@@ -18,6 +18,8 @@ dbCon <- data_connect() ##connect to database
 normal <- normal_input_postgis(dbCon = dbCon, bbox = thebb, cache = TRUE) ##get normal data and lapse rates
 plot(normal[[1]])
 
+dem <- rast("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climRpnw/inputs_pkg/normal/Normal_1961_1990MP/dem/dem2_WNA.nc")
+
 historic <- historic_input(dbCon, bbox = thebb, period = "2001_2020", cache = TRUE)
 plot(historic[[1]][[1]])
 
