@@ -95,7 +95,7 @@ normal_input_postgis <- function(dbCon, bbox = NULL, normal = list_normal()[1], 
     if(!dir.exists(paste0(cache_path(),"/normal"))) dir.create(paste0(cache_path(),"/normal"), recursive = TRUE)
     terra::writeRaster(res, paste0(cache_path(),"/normal/",uid,".tif"))
     rastext <- terra::ext(res)
-    temp <- data.table::data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1])
+    temp <- data.table::data.table(uid = uid, ymax = rastext[4]+0.1, ymin = rastext[3]-0.1, xmax = rastext[2]+0.1, xmin = rastext[1]-0.1)
     data.table::fwrite(temp, file = paste0(cache_path(),"/normal/","meta_data.csv"), append = TRUE)
   }
   # Return preprocessed raster
