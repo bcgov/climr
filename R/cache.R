@@ -5,6 +5,7 @@
 #' @details By default, it uses `tools::R_user_dir`. The cache location can be
 #' set using the `climRpnw.cache.path` option with `options("climRpnw.cache.path" = "your_path")`.
 #' @return The full path of the package local cache.
+#' @export
 cache_path <- function() {
   getOption("climRpnw.cache.path", default = tools::R_user_dir("climRdev", "cache"))
 }

@@ -3,6 +3,11 @@ library(data.table)
 library(terra)
 library(pool)
 
+library(climRdev)
+thebb <- c(60.0033688541466, 38.9909731490503, -107.993162013109, -139.037335926101)
+dbCon <- data_connect()
+normal <- normal_input_postgis(dbCon = dbCon, bbox = thebb, cache = TRUE)
+
 in_locations <- fread("Test_Locations_VanIsl.csv") ##provide or create a 
 
 in_xyz <- as.data.frame(in_locations[,.(Long,Lat,Elev)]) ##currently needs to be a data.frame or matrix, not data.table
