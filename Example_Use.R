@@ -3,20 +3,38 @@ library(data.table)
 library(terra)
 library(pool)
 
+##provide or create a long, lat, elev dataframe
 library(climRdev)
-thebb <- c(60.0033688541466, 38.9909731490503, -107.993162013109, -139.037335926101)
+in_xyz <- structure(list(Long = c(-127.62279, -127.56235, -127.7162, 
+                                  -127.18585, -127.1254, -126.94957, -126.95507), 
+                         Lat = c(55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025), 
+                         Elev = c(296L, 626L, 377L, 424L, 591L, 723L, 633L)), row.names = c(NA, -7L), class = "data.frame")
+thebb <- get_bb(in_xyz) ##get bounding box based on input points
 dbCon <- data_connect()
-normal <- normal_input_postgis(dbCon = dbCon, bbox = thebb, cache = TRUE)
+normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = TRUE) 
+normalbc <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = TRUE) 
+plot(normalbc[[14]])
+gcm <- gcm_input_postgis(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "EC-Earth3"), 
+                         ssp = c("ssp370"), 
+                         period = c("2021_2040","2041_2060","2061_2080"),
+                         max_run = 0,
+                         cache = TRUE)
+results <- downscale(
+  xyz = in_xyz,
+  normal = normal,
+  gcm = gcm,
+  vars = sprintf(c("Tmax%02d"),1:12)
+)
 
+
+thebb <- c(60, 32, -102, -139)
+
+normal <- normal_input_postgis(dbCon = dbCon,normal = "normal_na", bbox = thebb, cache = TRUE)
+plot(normal[[14]])
 in_locations <- fread("Test_Locations_VanIsl.csv") ##provide or create a 
 
 in_xyz <- as.data.frame(in_locations[,.(Long,Lat,Elev)]) ##currently needs to be a data.frame or matrix, not data.table
 
-##provide or create a long, lat, elev dataframe
-in_xyz <- structure(list(Long = c(-127.62279, -127.56235, -127.7162, 
-                                  -127.18585, -127.1254, -126.94957, -126.95507), 
-                         Lat = c(55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025), 
-                         Elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L)), row.names = c(NA, -8L), class = "data.frame")
 
 thebb <- get_bb(in_xyz) ##get bounding box based on input points
 dbCon <- data_connect() ##connect to database
