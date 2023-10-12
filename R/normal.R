@@ -54,11 +54,11 @@ normal_input <- function(normal = list_normal()[1], dem = NULL, ...) {
 #' @importFrom data.table fread fwrite data.table
 #' @import uuid
 #' @export
-normal_input_postgis <- function(dbCon, bbox = NULL, normal = list_normal()[1], cache = TRUE) {
+normal_input_postgis <- function(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE) {
   
   ##check cached
-  if(dir.exists(paste0(cache_path(),"/normal"))){
-    bnds <- fread(paste0(cache_path(),"/normal/","meta_data.csv"))
+  if(dir.exists(paste0(cache_path(),"/normal/",normal))){
+    bnds <- fread(paste0(cache_path(),"/normal/",normal,"/meta_data.csv"))
     
     for(i in 1:nrow(bnds)){
       isin <- is_in_bbox(bbox, matrix(bnds[i,2:5]))
@@ -67,14 +67,14 @@ normal_input_postgis <- function(dbCon, bbox = NULL, normal = list_normal()[1], 
     if(isin){
       message("Retrieving from cache...")
       oldid <- bnds$uid[i]
-      res <- terra::rast(paste0(cache_path(),"/normal/",oldid,".tif"))
+      res <- terra::rast(paste0(cache_path(),"/normal/",normal,"/",oldid,".tif"))
       attr(res, "builder") <- "climRpnw"
       return(res)
     }
   }
   
   message("Downloading new data...")
-  res <- pgGetTerra(dbCon,"normal_wna", boundary = bbox, bands = 1:73)
+  res <- pgGetTerra(dbCon,normal, boundary = bbox, bands = 1:73)
   names(res) <- c("PPT01", "PPT02", "PPT03", "PPT04", "PPT05", "PPT06", "PPT07", 
                   "PPT08", "PPT09", "PPT10", "PPT11", "PPT12", "Tmax01", "Tmax02", 
                   "Tmax03", "Tmax04", "Tmax05", "Tmax06", "Tmax07", "Tmax08", "Tmax09", 
@@ -92,11 +92,11 @@ normal_input_postgis <- function(dbCon, bbox = NULL, normal = list_normal()[1], 
   if(cache){
     message("Caching data...")
     uid <- uuid::UUIDgenerate()
-    if(!dir.exists(paste0(cache_path(),"/normal"))) dir.create(paste0(cache_path(),"/normal"), recursive = TRUE)
-    terra::writeRaster(res, paste0(cache_path(),"/normal/",uid,".tif"))
+    if(!dir.exists(paste0(cache_path(),"/normal/",normal))) dir.create(paste0(cache_path(),"/normal/",normal), recursive = TRUE)
+    terra::writeRaster(res, paste0(cache_path(),"/normal/",normal,"/",uid,".tif"))
     rastext <- terra::ext(res)
     temp <- data.table::data.table(uid = uid, ymax = rastext[4]+0.1, ymin = rastext[3]-0.1, xmax = rastext[2]+0.1, xmin = rastext[1]-0.1)
-    data.table::fwrite(temp, file = paste0(cache_path(),"/normal/","meta_data.csv"), append = TRUE)
+    data.table::fwrite(temp, file = paste0(cache_path(),"/normal/",normal,"/meta_data.csv"), append = TRUE)
   }
   # Return preprocessed raster
   return(res)
@@ -113,5 +113,5 @@ is_in_bbox <- function(newbb, oldbb){
 #' List available normal
 #' @export
 list_normal <- function() {
-  "Normal_WNA"
+  c("normal_na","normal_bc")
 }
