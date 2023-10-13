@@ -27,7 +27,7 @@ results <- downscale(
 )
 
 
-thebb <- c(60, 32, -102, -139)
+thebb <- c(60, 30, -102, -139)
 
 normal <- normal_input_postgis(dbCon = dbCon,normal = "normal_na", bbox = thebb, cache = TRUE)
 plot(normal[[14]])
