@@ -50,11 +50,17 @@ pgGetTerra <- function(conn, name, rast = "rast", bands = 37:73,
                                         " ", boundary[1], ",", boundary[4], " ", boundary[1],
                                         "))'),", projID, "))) as a;"))
     setDT(rast_vals)
-    rast_vals <- suppressWarnings(melt(rast_vals, id.vars = c())) 
-    rout <- terra::rast(nrows = info$rows, ncols = info$cols, xmin = info$xmn, 
-                        xmax = info$xmx, ymin = info$ymn, ymax = info$ymx, nlyrs = length(bands),
-                        crs = paste0("EPSG:",projID), vals = rast_vals$value)
-    rout
+    if(all(is.na(rast_vals$vals_1))){
+      warning("Empty tile - not enough data")
+      return(NULL)
+    }else{
+      rast_vals <- suppressWarnings(melt(rast_vals, id.vars = c())) 
+      rout <- terra::rast(nrows = info$rows, ncols = info$cols, xmin = info$xmn, 
+                          xmax = info$xmx, ymin = info$ymn, ymax = info$ymx, nlyrs = length(bands),
+                          crs = paste0("EPSG:",projID), vals = rast_vals$value)
+      rout
+    }
+    
   }
 
   if(length(bands) > 1664){ ##maximum number of columns
@@ -100,10 +106,10 @@ pgGetTerra <- function(conn, name, rast = "rast", bands = 37:73,
                         crs = paste0("EPSG:",projID), vals = rast_vals$value)
     
   }else{
-    max_dist <- 12
+    max_dist <- 10
     #if(boundary[1] - boundary[2] > max_dist | boundary[3] - boundary[4] > max_dist){
-    x_seq <- c(seq(boundary[2], boundary[1], by = max_dist), boundary[1])
-    y_seq <- c(seq(boundary[4], boundary[3], by = max_dist), boundary[3])
+    x_seq <- unique(c(seq(boundary[2], boundary[1], by = max_dist), boundary[1]))
+    y_seq <- unique(c(seq(boundary[4], boundary[3], by = max_dist), boundary[3]))
     
     boundary_ls <- list()
     for(i in 1:(length(x_seq) - 1)){
@@ -113,6 +119,7 @@ pgGetTerra <- function(conn, name, rast = "rast", bands = 37:73,
     }
     
     r_list <- lapply(boundary_ls, FUN = make_raster)
+    r_list <- r_list[!sapply(r_list,is.null)]
     if(length(r_list) > 1){
       rout <- terra::merge(sprc(r_list))
     }else{
