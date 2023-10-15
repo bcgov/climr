@@ -228,6 +228,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, historic_ts, return
     
     # Set Latitude and possibly ID
     gcm_[["Lat"]] <- xyzID[,2L]
+    gcm_[["Elev"]] <- xyzID[,3L]
     if (ncol(xyzID) == 4L) {
       gcm_[["ID"]] <- xyzID[, 4L]
     }
@@ -235,7 +236,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, historic_ts, return
     # Melt gcm_ and set the same key for merging
     gcm_ <- data.table::melt(
       data.table::setDT(gcm_),
-      id.vars = c("ID", "Lat"),
+      id.vars = c("ID", "Lat", "Elev"),
       variable.factor = FALSE
     )
     data.table::setkey(gcm_, "variable")
@@ -244,7 +245,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, historic_ts, return
     gcm_ <- data.table::dcast(
       # The merge with shared keys is as simple as that
       gcm_[ref_dt,],
-      ID + GCM + SSP + RUN + PERIOD + Lat ~ VAR + MONTH,
+      ID + GCM + SSP + RUN + PERIOD + Lat + Elev ~ VAR + MONTH,
       value.var = "value",
       sep = ""
     )
@@ -299,6 +300,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, historic_ts, return
     data.table::setkey(ref_dt, "variable")
     # Set Latitude and possibly ID
     historic_[["Lat"]] <- xyzID[,2L]
+    historic_[["Elev"]] <- xyzID[,3L]
     if (ncol(xyzID) == 4L) {
       historic_[["ID"]] <- xyzID[, 4L]
     }
@@ -306,7 +308,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, historic_ts, return
     # Melt gcm_ and set the same key for merging
     historic_ <- data.table::melt(
       data.table::setDT(historic_),
-      id.vars = c("ID", "Lat"),
+      id.vars = c("ID", "Lat", "Elev"),
       variable.factor = FALSE
     )
     data.table::setkey(historic_, "variable")
@@ -315,7 +317,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, historic_ts, return
     historic_ <- data.table::dcast(
       # The merge with shared keys is as simple as that
       historic_[ref_dt,],
-      ID + PERIOD + Lat ~ VAR,
+      ID + PERIOD + Lat + Elev ~ VAR,
       value.var = "value",
       sep = ""
     )
@@ -369,6 +371,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, historic_ts, return
     data.table::setkey(ref_dt, "variable")
     # Set Latitude and possibly ID
     normal_[["Lat"]] <- xyzID[,2L]
+    normal_[["Elev"]] <- xyzID[,3L]
     if (ncol(xyzID) == 4L) {
       normal_[["ID"]] <- xyzID[, 4L]
     }
@@ -376,7 +379,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, historic_ts, return
     # Melt gcm_ and set the same key for merging
     normal_ <- data.table::melt(
       data.table::setDT(normal_),
-      id.vars = c("ID", "Lat"),
+      id.vars = c("ID", "Lat", "Elev"),
       variable.factor = FALSE
     )
     data.table::setkey(normal_, "variable")
@@ -385,7 +388,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, historic_ts, return
     normal_ <- data.table::dcast(
       # The merge with shared keys is as simple as that
       normal_[ref_dt,],
-      ID + PERIOD + Lat ~ VAR,
+      ID + PERIOD + Lat + Elev ~ VAR,
       value.var = "value",
       sep = ""
     )
@@ -393,6 +396,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, historic_ts, return
     normal_ <- NULL
   }
   res <- rbind(res_gcm, res_gcmts, res_hist, res_hist_ts, normal_, use.names = TRUE, fill = TRUE)
+  #print(names(res))
   # Compute extra climate variables, assign by reference
   append_clim_vars(res, vars)
   

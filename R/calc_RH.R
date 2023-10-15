@@ -18,6 +18,17 @@ calc_RH <- function(tmin, tmax) {
   
 }
 
+##based on simplified Penman - Monteith method fro Hogg 1997
+calc_CMI <- function(ppt, tave, tmin, tmax, alt){
+  D <- 0.5*(calc_SVP(tmax) - calc_SVP(tmin)) - calc_SVP(tmin - 2.5)
+  pet <- data.table::fifelse(tave > 10, 93 * D * exp(alt/9300),
+                             data.table::fifelse(tave > -5, (6.2 * tave + 31) * D * exp(alt/9300), 0))
+  return(ppt - pet)
+}
+
+# calc_cmi <- function(ppt, pet){
+#   return(ppt - pet)
+# }
 
 # es: saturated vapour pressure at a temperature t
 # t: air temperature
