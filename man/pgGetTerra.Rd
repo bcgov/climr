@@ -4,7 +4,7 @@
 \alias{pgGetTerra}
 \title{Download raster with bounding box from PostGIS}
 \usage{
-pgGetTerra(conn, name, rast = "rast", bands = 37:73, boundary = NULL)
+pgGetTerra(conn, name, tile, rast = "rast", bands = 37:73, boundary = NULL)
 }
 \arguments{
 \item{conn}{a DBI or RPostgres connection object}

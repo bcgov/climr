@@ -72,7 +72,7 @@ gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_s
     #print(q)
     layerinfo <- dbGetQuery(dbCon, q)
     message("Downloading GCM anomalies")
-    gcm_rast <- pgGetTerra(dbCon, gcmcode, bands = layerinfo$laynum, boundary = bbox)
+    gcm_rast <- pgGetTerra(dbCon, gcmcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
     names(gcm_rast) <- layerinfo$fullnm
     
     if(cache){
@@ -177,13 +177,13 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm_ts(), ssp = list_ssp
     layerinfo <- dbGetQuery(dbCon, q)
     message("Downloading GCM anomalies")
     message("Precip...")
-    gcm_rast_ppt <- pgGetTerra(dbCon, paste0(gcmcode,"_ppt"), bands = layerinfo$laynum, boundary = bbox)
+    gcm_rast_ppt <- pgGetTerra(dbCon, paste0(gcmcode,"_ppt"), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
     names(gcm_rast_ppt) <- gsub("Tmax","PPT", layerinfo$fullnm)
     message("Tmax...")
-    gcm_rast_tmax <- pgGetTerra(dbCon, paste0(gcmcode,"_tmax"), bands = layerinfo$laynum, boundary = bbox)
+    gcm_rast_tmax <- pgGetTerra(dbCon, paste0(gcmcode,"_tmax"), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
     names(gcm_rast_tmax) <- layerinfo$fullnm
     message("Tmin...")
-    gcm_rast_tmin <- pgGetTerra(dbCon, paste0(gcmcode,"_tmin"), bands = layerinfo$laynum, boundary = bbox)
+    gcm_rast_tmin <- pgGetTerra(dbCon, paste0(gcmcode,"_tmin"), tile = FALSE,  bands = layerinfo$laynum, boundary = bbox)
     names(gcm_rast_tmin) <- gsub("Tmax","Tmin", layerinfo$fullnm)
     gcm_rast <- c(gcm_rast_ppt, gcm_rast_tmax, gcm_rast_tmin)
     

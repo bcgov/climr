@@ -74,7 +74,7 @@ normal_input_postgis <- function(dbCon, bbox = NULL, normal = "normal_na", cache
   }
   
   message("Downloading new data...")
-  res <- pgGetTerra(dbCon,normal, boundary = bbox, bands = 1:73)
+  res <- pgGetTerra(dbCon,normal, tile = TRUE, boundary = bbox, bands = 1:73)
   names(res) <- c("PPT01", "PPT02", "PPT03", "PPT04", "PPT05", "PPT06", "PPT07", 
                   "PPT08", "PPT09", "PPT10", "PPT11", "PPT12", "Tmax01", "Tmax02", 
                   "Tmax03", "Tmax04", "Tmax05", "Tmax06", "Tmax07", "Tmax08", "Tmax09", 

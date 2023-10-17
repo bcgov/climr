@@ -2,6 +2,23 @@ library(climRdev)
 library(data.table)
 library(terra)
 library(pool)
+library(sf)
+
+bc_bnd <- st_read("D:/Prov_bnd/Prov_bnd")
+bc_bnd <- bc_bnd['NAME']
+bc_bnd <- st_transform(bc_bnd, 4326)
+bc_bnd <- st_make_valid(bc_bnd)
+st_write(bc_bnd, "BC_Outline.gpkg")
+
+xyz <- fread("TestPnts_NorAm.csv")
+xyz <- as.data.frame(xyz)
+
+res <- climr_downscale(xyz = xyz, which_normal = "auto", 
+                       gcm_models = c("ACCESS-ESM1-5", "EC-Earth3"), 
+                       ssp = "ssp370", 
+                       gcm_period = c("2021_2040", "2041_2060"),
+                       gcm_ts_years = 2060:2080,
+                       vars = c("PPT","CMD","CMI"))
 
 ##provide or create a long, lat, elev dataframe
 library(climRdev)
@@ -11,6 +28,7 @@ in_xyz <- structure(list(Long = c(-127.62279, -127.56235, -127.7162,
                          Elev = c(296L, 626L, 377L, 424L, 591L, 723L, 633L)), row.names = c(NA, -7L), class = "data.frame")
 thebb <- get_bb(in_xyz) ##get bounding box based on input points
 dbCon <- data_connect()
+dbCon <- NULL
 normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = TRUE) 
 normalbc <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = TRUE) 
 plot(normalbc[[14]])
@@ -21,9 +39,9 @@ gcm <- gcm_input_postgis(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "EC-Earth
                          cache = TRUE)
 results <- downscale(
   xyz = in_xyz,
-  normal = normal,
-  gcm = gcm,
-  vars = sprintf(c("Tmax%02d"),1:12)
+  normal = normalbc,
+  return_normal = TRUE,
+  vars = c("CMD","PPT", "PET07", "CMI")
 )
 
 
