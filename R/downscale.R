@@ -1,3 +1,114 @@
+
+#' Downscale and Calculate climate variables for points of interest
+#' @param xyz three or four column data.frame: long, lat, elev, (id)
+#' @param which_normal Select which normal layer to use. Default is "auto", which selected the highest resolution normal for each point
+#' @param historic_period Which historic period. Default `NULL`
+#' @importFrom sf st_as_sf st_join
+#' @export
+
+climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), historic_period = NULL, historic_ts = NULL,
+                            gcm_models = NULL, ssp = c("ssp126", "ssp245", "ssp370", "ssp585"), 
+                            gcm_period = c("2001_2020", "2021_2040", "2041_2060", "2061_2080", "2081_2100"),
+                            gcm_ts_years = 2020:2030, max_run = 0L, return_normal = TRUE, 
+                            vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3)))), cache = TRUE){
+ 
+  # which_normal = "auto"
+  # historic_period = NULL
+  # historic_ts = NULL
+  # gcm_models = c("ACCESS-ESM1-5", "EC-Earth3")
+  # ssp = c("ssp245","ssp370")
+  # gcm_period = c("2021_2040", "2041_2060")
+  # gcm_ts_years = 2020:2030
+  # max_run = 0L
+  # return_normal = TRUE
+  # cache = TRUE
+  # vars = c("PPT","CMI","PET07")
+  
+  message("Welcome to climr!")
+  dbCon <- data_connect() ##connect to database - add check here
+  thebb <- get_bb(xyz) ##get bounding box based on input points
+  
+  message("Getting normals...")
+  if(which_normal == "NorAm"){
+    normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache) 
+  }else if(which_normal == "BC"){
+    normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache) 
+  }else{
+    if(ncol(xyz) == 3) xyz$ID <- 1:nrow(xyz)
+    pnts <- sf::st_as_sf(xyz, coords = c(names(xyz)[1],names(xyz)[2]), crs = 4326)
+    pnts2 <- sf::st_join(bc_bnd, pnts, left = T)
+    bc_ids <- pnts2$ID[!is.na(pnts2$ID)]
+    if(length(bc_ids) >= 1){
+      xyz_save <- xyz
+      xyz <- xyz[xyz$ID %in% bc_ids,]
+      thebb_bc <- get_bb(xyz)
+      normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb_bc, cache = cache) 
+    }else{
+      normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
+    }
+  }
+  
+  message("Getting historic...")
+  if(!is.null(historic_period)) historic_period <- historic_input(dbCon, bbox = thebb, period = historic_period, cache = cache)
+  if(!is.null(historic_ts)) historic_ts <- historic_input_ts(dbCon, bbox = thebb, years = historic_ts, cache = cache)
+  
+  message("Getting GCMs...")
+  if(!is.null(gcm_models)){
+    if(!is.null(gcm_period)){
+      gcm <- gcm_input_postgis(dbCon, bbox = thebb, gcm = gcm_models, 
+                               ssp = ssp, 
+                               period = gcm_period,
+                               max_run = max_run,
+                               cache = cache)
+    }
+    if(!is.null(gcm_ts_years)){
+      gcm_ts <- gcm_ts_input(dbCon, bbox = thebb, gcm = gcm_models, 
+                             ssp = ssp, 
+                             years = gcm_ts_years,
+                             max_run = max_run,
+                             cache = cache)
+    }
+  }
+  
+  message("Downscaling!!")
+  results <- downscale(
+    xyz = xyz,
+    normal = normal,
+    historic = historic_period,
+    historic_ts = historic_ts,
+    gcm = gcm, 
+    gcm_ts = gcm_ts,
+    return_normal = return_normal,
+    vars = vars
+  )
+ 
+  if(which_normal %in% c("BC","NorAm")) return(results)
+  if(length(bc_ids) == nrow(xyz_save) | length(bc_ids) < 1){
+    return(results)
+  }else{
+    na_xyz <- xyz_save[!xyz_save$ID %in% bc_ids,]
+    thebb <- get_bb(na_xyz)
+    normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
+    
+    results_na <- downscale(
+      xyz = na_xyz,
+      normal = normal,
+      historic = historic_period,
+      historic_ts = historic_ts,
+      gcm = gcm, 
+      gcm_ts = gcm_ts,
+      return_normal = return_normal,
+      vars = vars
+    )
+    
+    res_all <- rbind(results, results_na)
+    return(res_all)
+  }
+}
+
+
+
+
 #' Downscale target rasters to points of interest
 #' @param xyz A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).
 #' @param normal Reference normal baseline input from `normal_input`.

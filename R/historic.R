@@ -43,7 +43,7 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
   #print(q)
   layerinfo <- RPostgres::dbGetQuery(dbCon, q)
   message("Downloading historic anomalies")
-  hist_rast <- pgGetTerra(dbCon, dbcode, bands = layerinfo$laynum, boundary = bbox)
+  hist_rast <- pgGetTerra(dbCon, dbcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
   names(hist_rast) <- layerinfo$fullnm
   
   if(cache){
@@ -107,7 +107,7 @@ historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRU
   #print(q)
   layerinfo <- RPostgres::dbGetQuery(dbCon, q)
   message("Downloading historic anomalies")
-  hist_rast <- pgGetTerra(dbCon, dbcode, bands = layerinfo$laynum, boundary = bbox)
+  hist_rast <- pgGetTerra(dbCon, dbcode,tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
   names(hist_rast) <- layerinfo$fullnm
   
   if(cache){
