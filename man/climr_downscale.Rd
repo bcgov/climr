@@ -22,10 +22,34 @@ climr_downscale(
 \arguments{
 \item{xyz}{three or four column data.frame: long, lat, elev, (id)}
 
-\item{which_normal}{Select which normal layer to use. Default is "auto", which selected the highest resolution normal for each point}
+\item{which_normal}{Select which normal layer to use. Default is "auto", which selects the highest resolution normal for each point}
 
 \item{historic_period}{Which historic period. Default \code{NULL}}
+
+\item{historic_ts}{Historic years requested. Must be in \code{1902:2015}. Default \code{NULL}}
+
+\item{gcm_models}{Vector of GCM names. Options are \code{list_gcm(data_connect())}. Used for gcm periods and gcm timeseries. Default \code{NULL}}
+
+\item{ssp}{vector of emission scenarios. Default is all (\code{c("ssp126", "ssp245", "ssp370", "ssp585")})}
+
+\item{gcm_period}{Requested future periods. Options are \code{list_period(data_connect())}}
+
+\item{gcm_ts_years}{Requested future years. Must be in \code{2015:2100}}
+
+\item{max_run}{Integer. Maximum number of runs for each model. Default \code{0L} returns ensemble mean.}
+
+\item{return_normal}{Logical. Return downscaled normal period (1961-1990). Default \code{TRUE}}
+
+\item{vars}{Character vector of climate variables. Options are \code{list_vars()}}
+
+\item{cache}{Logical. Cache data locally? Default \code{TRUE}}
+}
+\value{
+Data.frame of downscaled climate variables for each location. Historic, normal, and future periods are all returned in one table.
 }
 \description{
 Downscale and Calculate climate variables for points of interest
+}
+\author{
+Kiri Daust
 }

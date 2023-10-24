@@ -1,8 +1,19 @@
 
 #' Downscale and Calculate climate variables for points of interest
 #' @param xyz three or four column data.frame: long, lat, elev, (id)
-#' @param which_normal Select which normal layer to use. Default is "auto", which selected the highest resolution normal for each point
+#' @param which_normal Select which normal layer to use. Default is "auto", which selects the highest resolution normal for each point
 #' @param historic_period Which historic period. Default `NULL`
+#' @param historic_ts Historic years requested. Must be in `1902:2015`. Default `NULL`
+#' @param gcm_models Vector of GCM names. Options are `list_gcm(data_connect())`. Used for gcm periods and gcm timeseries. Default `NULL`
+#' @param ssp vector of emission scenarios. Default is all (`c("ssp126", "ssp245", "ssp370", "ssp585")`)
+#' @param gcm_period Requested future periods. Options are `list_period(data_connect())`
+#' @param gcm_ts_years Requested future years. Must be in `2015:2100`
+#' @param max_run Integer. Maximum number of runs for each model. Default `0L` returns ensemble mean.
+#' @param return_normal Logical. Return downscaled normal period (1961-1990). Default `TRUE`
+#' @param vars Character vector of climate variables. Options are `list_vars()`
+#' @param cache Logical. Cache data locally? Default `TRUE`
+#' @return Data.frame of downscaled climate variables for each location. Historic, normal, and future periods are all returned in one table.
+#' @author Kiri Daust
 #' @importFrom sf st_as_sf st_join
 #' @export
 
@@ -25,7 +36,11 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
   # vars = c("PPT","CMI","PET07")
   
   message("Welcome to climr!")
-  dbCon <- data_connect() ##connect to database - add check here
+  dbCon <- tryCatch(data_connect(),
+                    error = function(e) {
+                      warning("Could not connect to database. Will try using cached data.")
+                      NULL
+                    })
   thebb <- get_bb(xyz) ##get bounding box based on input points
   
   message("Getting normals...")
