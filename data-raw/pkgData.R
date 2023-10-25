@@ -22,3 +22,5 @@ variables <- fread("data-raw/derivedVariables/Variables_ClimateBC.csv")
 usethis::use_data(variables, overwrite = TRUE, internal = FALSE)
 
 usethis::use_data(bc_bnd, overwrite = TRUE, internal = FALSE)
+
+usethis::use_data(bc_outline, overwrite = TRUE, internal = FALSE)

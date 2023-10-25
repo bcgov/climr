@@ -22,11 +22,11 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
                             gcm_period = c("2001_2020", "2021_2040", "2041_2060", "2061_2080", "2081_2100"),
                             gcm_ts_years = 2020:2030, max_run = 0L, return_normal = TRUE, 
                             vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3)))), cache = TRUE){
- 
+  # xyz <- coords 
   # which_normal = "auto"
   # historic_period = NULL
   # historic_ts = NULL
-  # gcm_models = c("ACCESS-ESM1-5", "EC-Earth3")
+  # gcm_models = NULL
   # ssp = c("ssp245","ssp370")
   # gcm_period = c("2021_2040", "2041_2060")
   # gcm_ts_years = 2020:2030
@@ -38,7 +38,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
   message("Welcome to climr!")
   dbCon <- tryCatch(data_connect(),
                     error = function(e) {
-                      warning("Could not connect to database. Will try using cached data.")
+                      warning(e,"Could not connect to database. Will try using cached data.")
                       NULL
                     })
   thebb <- get_bb(xyz) ##get bounding box based on input points
@@ -50,12 +50,12 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
     normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache) 
   }else{
     if(ncol(xyz) == 3) xyz$ID <- 1:nrow(xyz)
-    pnts <- sf::st_as_sf(xyz, coords = c(names(xyz)[1],names(xyz)[2]), crs = 4326)
-    pnts2 <- sf::st_join(bc_bnd, pnts, left = T)
-    bc_ids <- pnts2$ID[!is.na(pnts2$ID)]
+    bc_outline <- terra::rast("extdata/bc_outline.tif")
+    pnts <- terra::extract(bc_outline,xyz[,1:2], method = "simple")
+    bc_ids <- xyz[,4][!is.na(pnts$PPT01)]
     if(length(bc_ids) >= 1){
       xyz_save <- xyz
-      xyz <- xyz[xyz$ID %in% bc_ids,]
+      xyz <- xyz[!is.na(pnts$PPT01),]
       thebb_bc <- get_bb(xyz)
       normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb_bc, cache = cache) 
     }else{
@@ -75,6 +75,8 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
                                period = gcm_period,
                                max_run = max_run,
                                cache = cache)
+    }else{
+      gcm <- NULL
     }
     if(!is.null(gcm_ts_years)){
       gcm_ts <- gcm_ts_input(dbCon, bbox = thebb, gcm = gcm_models, 
@@ -82,7 +84,11 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
                              years = gcm_ts_years,
                              max_run = max_run,
                              cache = cache)
+    }else{
+      gcm_ts <- NULL
     }
+  }else{
+    gcm <- gcm_ts <- NULL
   }
   
   message("Downscaling!!")
@@ -101,7 +107,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
   if(length(bc_ids) == nrow(xyz_save) | length(bc_ids) < 1){
     return(results)
   }else{
-    na_xyz <- xyz_save[!xyz_save$ID %in% bc_ids,]
+    na_xyz <- xyz_save[!xyz_save[,4] %in% bc_ids,]
     thebb <- get_bb(na_xyz)
     normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
     
