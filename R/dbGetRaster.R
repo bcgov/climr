@@ -24,7 +24,7 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
   projID <- dbGetQuery(conn, paste0("select ST_SRID(",rastque,") as srid from ",nameque," where rid = 1;"))$srid[1]
 
   make_raster <- function(boundary){
-    #cat(".")
+    cat(".")
     info <- dbGetQuery(conn, paste0("select 
             st_xmax(st_envelope(rast)) as xmx,
             st_xmin(st_envelope(rast)) as xmn,
@@ -110,7 +110,7 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
       rout <- make_raster(boundary)
       return(rout)
     }
-    max_dist <- 10
+    max_dist <- 5
     #if(boundary[1] - boundary[2] > max_dist | boundary[3] - boundary[4] > max_dist){
     x_seq <- unique(c(seq(boundary[2], boundary[1], by = max_dist), boundary[1]))
     y_seq <- unique(c(seq(boundary[4], boundary[3], by = max_dist), boundary[3]))

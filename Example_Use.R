@@ -4,20 +4,33 @@ library(terra)
 library(pool)
 library(sf)
 
+coords <- fread("C:/Users/kdaust/Government of BC/External Future Forest Ecosystems Centre - Kiri/WNA_BGC/WNA_2km_grid_WHM.csv")
+coords <- coords[!is.na(elev),]
+#coords <- fread("WNA_2km_grid_WHM.csv")
+#setcolorder(coords, c("long","lat","elev","id"))
+coords <- as.data.frame(coords)# %>% dplyr::rename(long = 1, lat = 2)
+
+## based on vs_final below
+vars_needed <- c("DD5","DD_0_at","DD_0_wt","PPT05","PPT06","PPT07","PPT08","PPT09","CMD","PPT_at","PPT_wt","CMD07","SHM", "AHM", "NFFD", "PAS", "CMI")
+
+clim_vars <- climr_downscale(coords, which_normal = "NorAm", return_normal = TRUE, vars = vars_needed)
+
+
 bc_bnd <- st_read("D:/Prov_bnd/Prov_bnd")
 bc_bnd <- bc_bnd['NAME']
 bc_bnd <- st_transform(bc_bnd, 4326)
 bc_bnd <- st_make_valid(bc_bnd)
 st_write(bc_bnd, "BC_Outline.gpkg")
 
-xyz <- fread("TestPnts_NorAm.csv")
+xyz <- fread("Test_Locations_VanIsl.csv")
+xyz <- setcolorder(xyz, c("Long","Lat","Elev"))
 xyz <- as.data.frame(xyz)
 
 res <- climr_downscale(xyz = xyz, which_normal = "auto", 
                        gcm_models = c("ACCESS-ESM1-5", "EC-Earth3"), 
                        ssp = "ssp370", 
                        gcm_period = c("2021_2040", "2041_2060"),
-                       gcm_ts_years = 2060:2080,
+                       #gcm_ts_years = 2060:2080,
                        vars = c("PPT","CMD","CMI"))
 
 ##provide or create a long, lat, elev dataframe
