@@ -50,26 +50,30 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
     normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache) 
   }else{
     if(ncol(xyz) == 3) xyz$ID <- 1:nrow(xyz)
-    bc_outline <- terra::rast("extdata/bc_outline.tif")
+    bc_outline <- terra::rast(system.file("extdata", "bc_outline.tif", package="climRdev"))
     pnts <- terra::extract(bc_outline,xyz[,1:2], method = "simple")
     bc_ids <- xyz[,4][!is.na(pnts$PPT01)]
     if(length(bc_ids) >= 1){
       xyz_save <- xyz
       xyz <- xyz[!is.na(pnts$PPT01),]
       thebb_bc <- get_bb(xyz)
+      message("for BC...")
       normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb_bc, cache = cache) 
     }else{
       normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
     }
   }
   
-  message("Getting historic...")
-  if(!is.null(historic_period)) historic_period <- historic_input(dbCon, bbox = thebb, period = historic_period, cache = cache)
+  
+  if(!is.null(historic_period)){
+    message("Getting historic...")
+    historic_period <- historic_input(dbCon, bbox = thebb, period = historic_period, cache = cache)
+  } 
   if(!is.null(historic_ts)) historic_ts <- historic_input_ts(dbCon, bbox = thebb, years = historic_ts, cache = cache)
   
-  message("Getting GCMs...")
   if(!is.null(gcm_models)){
     if(!is.null(gcm_period)){
+      message("Getting GCMs...")
       gcm <- gcm_input_postgis(dbCon, bbox = thebb, gcm = gcm_models, 
                                ssp = ssp, 
                                period = gcm_period,
@@ -109,6 +113,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
   }else{
     na_xyz <- xyz_save[!xyz_save[,4] %in% bc_ids,]
     thebb <- get_bb(na_xyz)
+    message("Now North America...")
     normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
     
     results_na <- downscale(
