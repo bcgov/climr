@@ -13,8 +13,9 @@ coords <- as.data.frame(coords)# %>% dplyr::rename(long = 1, lat = 2)
 ## based on vs_final below
 vars_needed <- c("DD5","DD_0_at","DD_0_wt","PPT05","PPT06","PPT07","PPT08","PPT09","CMD","PPT_at","PPT_wt","CMD07","SHM", "AHM", "NFFD", "PAS", "CMI")
 
-clim_vars <- climr_downscale(coords, which_normal = "NorAm", return_normal = TRUE, vars = vars_needed)
-
+clim_vars <- climr_downscale(coords, which_normal = "auto", return_normal = TRUE, vars = vars_needed)
+clim_vars <- clim_vars[!is.nan(clim_vars$PPT05),]
+fwrite(clim_vars,"WNA_ClimVars.csv")
 
 bc_bnd <- st_read("D:/Prov_bnd/Prov_bnd")
 bc_bnd <- bc_bnd['NAME']
