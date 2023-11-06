@@ -1,3 +1,93 @@
+###Prep historic modelled timeseries
+library(terra)
+allgcms <- list.files("C:/Users/kdaust/LocalFiles/ProcessedGCMs/gcm/historic/")
+gcm_nm <- allgcms[1]
+ref_rast <- rast("C:/DataFiles/ProcessedRasters/Normal_NA.wlrdem.tif")
+ref_rast <- ref_rast[[1]]
+
+for(gcm_nm in allgcms[-c(1:4)]){
+  ###gcm time series
+  cat(gcm_nm)
+  mod.files <- list.files(paste0("C:/Users/kdaust/LocalFiles/ProcessedGCMs/gcm/historic/",gcm_nm,"/"), full.names = TRUE, pattern = "\\.tif", all.files = TRUE)
+  
+  r <- rast(mod.files)
+  #r <- crop(r, ref_rast)
+  plot(r[[1]])
+  # 
+  # t1 <- r[[1]]
+  # plot(t1)
+  # t2 <- crop(t1,temp)
+  nm <- names(r)
+  nm <- gsub("_pr_", "_PPT_", nm, fixed = TRUE)
+  nm <- gsub("_tasmax_", "_Tmax_", nm, fixed = TRUE)
+  nm <- gsub("_tasmin_", "_Tmin_", nm, fixed = TRUE)
+  
+  names(r) <- nm
+  ppt_layers <- grep("_PPT_",nm,fixed = TRUE)
+  r_ppt <- r[[ppt_layers]]
+  r_temp <- r[[-ppt_layers]]
+  # Substract reference layers, only keep deltas, plus load in memory instead of disk
+  message("Computing deltas for precipitation")
+  # Find matching reference layer for each layer
+  # Reference layers will match with themselves
+  nm_ptt <- nm[ppt_layers]
+  ref_layers <- grep("_reference_", nm_ptt, fixed = TRUE)
+  names(ref_layers) <- gsub("^([^_]+_[^_]+_[^_]+_).*$", "\\1", nm_ptt[ref_layers])
+  matching_ref <- ref_layers[gsub("^([^_]+_[^_]+_[^_]+_).*$", "\\1", nm_ptt)]
+  
+  # Reference layers positions
+  # They will be used to avoid computing deltas of
+  # reference layers with themselves
+  uniq_ref <- sort(unique(matching_ref))
+  
+  # Substract reference layer, this takes a few seconds as all
+  # data have to be loaded in memory from disk
+  r_ppt <- r_ppt[[-uniq_ref]] / r_ppt[[matching_ref[-uniq_ref]]]
+  
+  message("Computing deltas for tmin and tmax")
+  # Find matching reference layer for each layer
+  # Reference layers will match with themselves
+  nm_temp <- nm[-ppt_layers]
+  ref_layers <- grep("_reference_", nm_temp, fixed = TRUE)
+  names(ref_layers) <- gsub("^([^_]+_[^_]+_[^_]+_).*$", "\\1", nm_temp[ref_layers])
+  matching_ref <- ref_layers[gsub("^([^_]+_[^_]+_[^_]+_).*$", "\\1", nm_temp)]
+  
+  # Reference layers positions
+  # They will be used to avoid computing deltas of
+  # reference layers with themselves
+  uniq_ref <- sort(unique(matching_ref))
+  
+  # Substract reference layer, this takes a few seconds as all
+  # data have to be loaded in memory from disk
+  r_temp <- r_temp[[-uniq_ref]] - r_temp[[matching_ref[-uniq_ref]]]
+  #r <- c(r_ppt, r_temp)
+  r_all <- c(r_ppt,r_temp)
+  
+  terra::writeRaster(
+    r_all,
+    file.path(paste0("C:/Users/kdaust/LocalFiles/ProcessedGCMs/gcm/historic/",gcm_nm), sprintf("gcmData.%s.deltas.tif", gcm_nm)),
+    overwrite = TRUE,
+    gdal="COMPRESS=NONE"
+  )
+}
+##upload
+library(ssh)
+
+session <- ssh_connect("root@146.190.244.244")
+
+for(gcm_nm in allgcms[-c(1,2,3,4)]){
+  cat(gcm_nm)
+  scp_upload(session, file.path(paste0("C:/Users/kdaust/LocalFiles/ProcessedGCMs/gcm/historic/",gcm_nm), sprintf("gcmData.%s.deltas.tif", gcm_nm)), 
+             to = "/share/gcm_historic")
+}
+
+ssh_exec_wait(session, command = c("cd /share",
+                                   "ls",
+                                   "raster2pgsql -s 4326 -I -C -M Normal_1961_1990MP.wlrdem.tif -t 50x50 normal_wna > normal_wna.sql"))
+
+
+
+
 ### Prep historic timeseries
 library(terra)
 library(data.table)
