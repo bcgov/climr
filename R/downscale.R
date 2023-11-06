@@ -20,7 +20,7 @@
 climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), historic_period = NULL, historic_ts = NULL,
                             gcm_models = NULL, ssp = c("ssp126", "ssp245", "ssp370", "ssp585"), 
                             gcm_period = c("2001_2020", "2021_2040", "2041_2060", "2061_2080", "2081_2100"),
-                            gcm_ts_years = 2020:2030, max_run = 0L, return_normal = TRUE, 
+                            gcm_ts_years = NULL, max_run = 0L, return_normal = TRUE, 
                             vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3)))), cache = TRUE){
   # xyz <- coords 
   # which_normal = "auto"
