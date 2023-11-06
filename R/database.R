@@ -1,11 +1,11 @@
 #' Connect to postgis database
 #' @return pool object of database connection
-#' @import pool
+#' @importFrom pool dbPool
 #' @import RPostgres
 #' @export
 
 data_connect <- function(){
-  pool <- dbPool(
+  pool <- pool::dbPool(
     drv = RPostgres::Postgres(),
     dbname = "climr",
     host = '146.190.244.244',

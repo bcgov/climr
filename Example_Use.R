@@ -4,6 +4,21 @@ library(terra)
 library(pool)
 library(sf)
 
+##provide or create a long, lat, elev dataframe
+in_xyz <- structure(list(Long = c(-127.70521, -127.62279, -127.56235, -127.7162, 
+                                  -127.18585, -127.1254, -126.94957, -126.95507), 
+                         Lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025), 
+                         Elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L)), row.names = c(NA, -8L), class = "data.frame")
+
+res <- climr_downscale(xyz = in_xyz, which_normal = "auto", 
+                       gcm_models = c("ACCESS-ESM1-5", "EC-Earth3"), 
+                       ssp = c("ssp370","ssp245"), 
+                       gcm_period = c("2021_2040", "2041_2060","2061_2080"),
+                       #gcm_ts_years = 2020:2060,
+                       max_run = 3,
+                       vars = c("PPT","CMD","CMI"))
+
+
 coords <- fread("C:/Users/kdaust/Government of BC/External Future Forest Ecosystems Centre - Kiri/WNA_BGC/WNA_2km_grid_WHM.csv")
 coords <- coords[!is.na(elev),]
 #coords <- fread("WNA_2km_grid_WHM.csv")

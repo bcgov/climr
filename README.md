@@ -7,21 +7,40 @@
 # Install
 
 ```r
-remotes::install_github("bcgov/climR-pnw")
+remotes::install_github("bcgov/climr")
 ```
 
-# Usage
+# Example Usage
 
 ```r
-
 ##provide or create a long, lat, elev dataframe
 in_xyz <- structure(list(Long = c(-127.70521, -127.62279, -127.56235, -127.7162, 
                                   -127.18585, -127.1254, -126.94957, -126.95507), 
                          Lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025), 
                          Elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L)), row.names = c(NA, -8L), class = "data.frame")
 
-thebb <- get_bb(in_xyz) ##get bounding box based on input points
+##if you just want to downscale points and not think about what happening behind the scenes, use this function
+
+res <- climr_downscale(xyz = in_xyz, which_normal = "auto", 
+                       gcm_models = c("ACCESS-ESM1-5", "EC-Earth3"), 
+                       ssp = c("ssp370","ssp245"), 
+                       gcm_period = c("2021_2040", "2041_2060","2061_2080"),
+                       #gcm_ts_years = 2020:2060,
+                       max_run = 3, # we want 3 individual runs for each model
+                       vars = c("PPT","CMD","CMI"))
+                       
+##Functions to show what data are available:
+
 dbCon <- data_connect() ##connect to database
+list_gcm(dbCon)
+list_period(dbCon)
+list_run(dbCon)
+list_ssp(dbCon)
+list_variables()
+
+                       
+## Otherwise, you can download and investigate the normals and annomalies#####################
+thebb <- get_bb(in_xyz) ##get bounding box based on input points
 normal <- normal_input_postgis(dbCon = dbCon, bbox = thebb, cache = TRUE) ##get normal data and lapse rates
 plot(normal[[1]])
 
@@ -50,12 +69,6 @@ results <- downscale(
   vars = sprintf(c("Tmax%02d"),1:12)
 )
 
-# Details about available data
-list_gcm(dbCon)
-list_period(dbCon)
-list_run(dbCon)
-list_ssp(dbCon)
-list_variables()
 
 ```
 
@@ -77,9 +90,7 @@ Instead of implementing custom algorithms for bilinear interpolation and raster 
 
 Data pivot using `data.table` dcast is the most resource expensive operation of the `downscale` function according to profiling using `profvis`.
 
-`terra` still has a couple issues that were mitigated in this package. When this is the case, function were anotated. Mainly, we are sushing `terra` functions to prevent messages print to console (see https://github.com/rspatial/terra/issues/287). We are also loading NetCDF via `raster` package as GDAL is significantly slower than the `ncdf4` implementation. Finally, NA values are not correctly transferred from disk to memory.
-
-# climrdev
+# climr
 An R package for downscaled global climate model normals in the Pacific Northwest
 
 Copyright 2021 Province of British Columbia
