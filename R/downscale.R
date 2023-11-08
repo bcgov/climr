@@ -20,7 +20,7 @@
 climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), historic_period = NULL, historic_ts = NULL,
                             gcm_models = NULL, ssp = c("ssp126", "ssp245", "ssp370", "ssp585"), 
                             gcm_period = c("2001_2020", "2021_2040", "2041_2060", "2061_2080", "2081_2100"),
-                            gcm_ts_years = NULL, max_run = 0L, return_normal = TRUE, 
+                            gcm_ts_years = NULL, gcm_hist_years = NULL, max_run = 0L, return_normal = TRUE, 
                             vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3)))), cache = TRUE){
   # xyz <- coords 
   # which_normal = "auto"
@@ -91,8 +91,13 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
     }else{
       gcm_ts <- NULL
     }
+    if(!is.null(gcm_hist_years)){
+      gcm_hist <- gcm_hist_input()
+    }else{
+      gcm_hist <- NULL
+    }
   }else{
-    gcm <- gcm_ts <- NULL
+    gcm <- gcm_ts <- gcm_hist <- NULL
   }
   
   message("Downscaling!!")
@@ -160,7 +165,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' downscale(xyz, normal, gcm)
 #' }
 
-downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, historic_ts = NULL, return_normal = FALSE,
+downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, gcm_hist = NULL, historic_ts = NULL, return_normal = FALSE,
                       vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3)))),
                       ppt_lr = FALSE, nthread = 1L) {
   
@@ -248,7 +253,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, h
   } else {
     
     # Downscale without parallel processing
-    res <- downscale_(xyz, normal, gcm, historic, gcm_ts, historic_ts, return_normal, vars, ppt_lr)
+    res <- downscale_(xyz, normal, gcm, historic, gcm_ts, gcm_hist, historic_ts, return_normal, vars, ppt_lr)
     
   }
   
@@ -262,7 +267,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, h
 #' 
 #xyzID <- xyz
 
-downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, historic_ts, return_normal, vars, ppt_lr = FALSE) {
+downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_ts, return_normal, vars, ppt_lr = FALSE) {
   #print(xyzID)
   # Define normal extent
   ex <- terra::ext(
@@ -390,6 +395,73 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, historic_ts, return
     return(gcm_)
   }
   
+  process_one_gcm_hist <- function(gcm_, res, xyzID) {
+    ##gcm_ <- gcm[[1]]
+    # Store names for later use
+    nm <- names(gcm_)
+    
+    # Define gcm extent. res*2 To make sure we capture surrounding
+    # cells for bilinear interpolation.
+    ex <- terra::ext(
+      c(
+        min(xyzID[,1L]) - terra::xres(gcm_)*2,
+        max(xyzID[,1L]) + terra::xres(gcm_)*2,
+        min(xyzID[,2L]) - terra::yres(gcm_)*2,
+        max(xyzID[,2L]) + terra::yres(gcm_)*2
+      )
+    )
+    # Extract gcm bilinear interpolations
+    # Cropping will reduce the size of data to load in memory
+    gcm_ <- terra::crop(gcm_, ex, snap = "out")
+    gcm_ <- terra::extract(x = gcm_, y = xyzID[,1L:2L], method = "bilinear")
+    
+    # Create match set to match with res names
+    labels <- vapply(
+      strsplit(nm, "_"),
+      function(x) {paste0(x[2:3], collapse = "")},
+      character(1)
+    )
+    
+    # Add matching column to gcm_
+    ppt_ <- grep("PPT",labels)
+    gcm_[,ppt_ + 1L] <- gcm_[,ppt_ + 1L] * res[,match(labels[ppt_], names(res))] ##PPT
+    gcm_[,-c(1L, ppt_ + 1L)] <- gcm_[,-c(1L, ppt_ + 1L)] + res[,match(labels[-ppt_], names(res))] ##Temperature
+    
+    # Reshape (melt / dcast) to obtain final form
+    ref_dt <- data.table::tstrsplit(nm, "_")
+
+    # Transform ref_dt to data.table for remerging
+    data.table::setDT(ref_dt)
+    data.table::setnames(ref_dt, c("GCM", "VAR", "MONTH", "RUN", "PERIOD"))
+    data.table::set(ref_dt, j = "variable", value = nm)
+    data.table::set(ref_dt, j = "GCM", value = gsub(".", "-", ref_dt[["GCM"]], fixed = TRUE))
+    data.table::setkey(ref_dt, "variable")
+    
+    # Set Latitude and possibly ID
+    gcm_[["Lat"]] <- xyzID[,2L]
+    gcm_[["Elev"]] <- xyzID[,3L]
+    if (ncol(xyzID) == 4L) {
+      gcm_[["ID"]] <- xyzID[, 4L]
+    }
+    
+    # Melt gcm_ and set the same key for merging
+    gcm_ <- data.table::melt(
+      data.table::setDT(gcm_),
+      id.vars = c("ID", "Lat", "Elev"),
+      variable.factor = FALSE
+    )
+    data.table::setkey(gcm_, "variable")
+    
+    gcm_ <- data.table::dcast(
+      gcm_[ref_dt,],
+      ID + GCM + RUN + PERIOD + Lat + Elev ~ VAR + MONTH,
+      value.var = "value",
+      sep = ""
+    )
+    
+    return(gcm_)
+  }
+  
   
   process_one_historic <- function(historic_, res, xyzID, timeseries) {
     #print(historic_)
@@ -476,6 +548,13 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, historic_ts, return
       use.names = TRUE
     )
   } else res_gcmts <- NULL
+  if (!is.null(gcm_hist)) {
+    # Process each gcm and rbind resulting tables
+    res_gcm_hist <- data.table::rbindlist(
+      lapply(gcm_hist, process_one_gcm_hist, res = res, xyzID = xyzID),
+      use.names = TRUE
+    )
+  } else res_gcm_hist <- NULL
   if(!is.null(historic)) {
     #print(historic)
     res_hist <- data.table::rbindlist(
@@ -532,7 +611,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, historic_ts, return
   }else{
     normal_ <- NULL
   }
-  res <- rbind(res_gcm, res_gcmts, res_hist, res_hist_ts, normal_, use.names = TRUE, fill = TRUE)
+  res <- rbind(res_gcm, res_gcmts, res_gcm_hist, res_hist, res_hist_ts, normal_, use.names = TRUE, fill = TRUE)
   #print(names(res))
   # Compute extra climate variables, assign by reference
   append_clim_vars(res, vars)

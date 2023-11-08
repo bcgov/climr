@@ -1,9 +1,37 @@
 ###Prep historic modelled timeseries
 library(terra)
+library(data.table)
 allgcms <- list.files("C:/Users/kdaust/LocalFiles/ProcessedGCMs/gcm/historic/")
 gcm_nm <- allgcms[1]
 ref_rast <- rast("C:/DataFiles/ProcessedRasters/Normal_NA.wlrdem.tif")
 ref_rast <- ref_rast[[1]]
+
+library(RPostgres)
+conn <- dbConnect(RPostgres::Postgres(),dbname = 'climr',
+                  host = '146.190.244.244',
+                  port = 5432,
+                  user = 'postgres',
+                  password = 'climr2022')
+
+
+
+for(gcm_nm in allgcms[-c(1:6)]){
+  cat(gcm_nm,"\n")
+  mod.files <- list.files(paste0("C:/Users/kdaust/LocalFiles/ProcessedGCMs/gcm/historic/",gcm_nm,"/"), full.names = TRUE, pattern = "\\.deltas.tif", all.files = TRUE)
+  rt <- rast(mod.files)
+  nms <- names(rt)
+  nms2 <- gsub("ensembleMean","ensemble_Mean",nms)
+  
+  metadt <- data.table(Orig = nms2)
+  metadt[,c("mod","var","month","type","run","year") := tstrsplit(Orig, "_")]
+  metadt[run == "Mean", run := "ensembleMean"]
+  metadt[,c("Orig","type") := NULL]
+  metadt[,laynum := seq_along(nms)]
+  
+  dbWriteTable(conn, "esm_layers_hist", metadt, row.names = F, append = TRUE)
+  
+}
+dbExecute(conn,"create index on esm_layers_hist(mod,run,year)")
 
 for(gcm_nm in allgcms[-c(1:4)]){
   ###gcm time series
