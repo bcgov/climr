@@ -101,6 +101,103 @@ gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_s
   
 }
 
+
+#' Create gcm historic timeseries input for `downscale`
+#' @param dbCon A db connection object created by `data_connect`.
+#' @param bbox Numeric vector of length 4 giving bounding box of study region, create by `get_bb()`
+#' @param gcm A character vector. Label of the global circulation models to use.
+#' Can be obtained from `list_gcm()`. Default to `list_gcm()`.
+#' @param years Numeric vector of desired years. Must be in `1851:2015`.
+#' Can be obtained from `list_period()`. Default to `list_period()`.
+#' @param max_run An integer. Maximum number of model runs to include.
+#' A value of 0 is `ensembleMean` only. Runs are included in the order they are found in the
+#' models data untile `max_run` is reached. Default to 0L.
+#' @param cache Logical specifying whether to cache new data locally or no. Default `TRUE`
+#' @return An object to use with `downscale`. A list of `SpatRaster` with, possibly, multiple layers.
+#' @importFrom terra rast
+#' @importFrom utils head
+#' @importFrom RPostgres dbGetQuery
+#' @import uuid
+#' @import data.table
+#' @export
+gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:1950, max_run = 0L, cache = TRUE) {
+  
+  dbnames <- structure(list(GCM = c("ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5", 
+                                    "CNRM-ESM2-1", "EC-Earth3", "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0", 
+                                    "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL"), 
+                            dbname = c("access_hist", "bcc_hist", "canesm_hist", "cnrm_hist", 
+                                       "ec_earth_hist", "gfdl_hist", "giss_hist", "inm_hist", "ipsl_hist", 
+                                       "miroc6_hist", "mpi_hist", "mri_hist", "ukesm_hist")), class = "data.frame", row.names = c(NA, -13L))
+  
+  # Load each file individually + select layers
+  process_one_gcm <- function(gcm_nm, years) { ##need to update to all GCMs
+    gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
+    
+    if(dir.exists(paste0(cache_path(),"/gcmhist/",gcmcode))){
+      bnds <- fread(paste0(cache_path(),"/gcmhist/",gcmcode,"/meta_area.csv"))
+      data.table::setorder(bnds, -numlay)
+      for(i in 1:nrow(bnds)){
+        isin <- is_in_bbox(bbox, matrix(bnds[i,2:5]))
+        if(isin) break
+      }
+      if(isin){
+        oldid <- bnds$uid[i]
+        yeardat <- fread(paste0(cache_path(),"/gcmhist/",gcmcode,"/meta_years.csv"))
+        if(all(years %in% yeardat[uid == oldid,years]) & max_run <= bnds[uid == oldid, max_run]){
+          message("Retrieving from cache...")
+          gcm_rast <- terra::rast(paste0(cache_path(),"/gcmhist/",gcmcode,"/",oldid,".tif"))
+          runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers_hist where mod = '",gcm_nm,"'"))$run)
+          sel_runs <- runs[1:(max_run+1L)]
+          
+          layinfo <- data.table(fullnm = names(gcm_rast))
+          layinfo[,c( "Mod", "Var","Month","Run","Year") := tstrsplit(fullnm, "_")]
+          layinfo[, laynum := seq_along(Year)]
+          sel <- layinfo[Year %in% years & Run %in% sel_runs,laynum]
+          return(gcm_rast[[sel]])
+        }else{
+          message("Not fully cached :( Will download more")
+        }
+        
+      }
+    }
+    
+    runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers_hist where mod = '",gcm_nm,"'"))$run)
+    sel_runs <- runs[1:(max_run+1L)]
+    
+    q <- paste0("select mod, var, month, run, year, laynum from esm_layers_hist where mod = '",gcm_nm,"' and year in ('",paste(years,collapse = "','"),"') and run in ('",paste(sel_runs, collapse = "','"),"')")
+    #print(q)
+    layerinfo <- as.data.table(dbGetQuery(dbCon, q))
+    layerinfo[,fullnm := paste(mod, var,month,run,year, sep = "_")]
+    message("Downloading GCM anomalies")
+    gcm_rast <- pgGetTerra(dbCon, gcmcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
+    names(gcm_rast) <- layerinfo$fullnm
+    
+    if(cache){
+      message("Caching data...")
+      uid <- uuid::UUIDgenerate()
+      if(!dir.exists(paste0(cache_path(), "/gcmhist/",gcmcode))) dir.create(paste0(cache_path(), "/gcmhist/",gcmcode), recursive = TRUE)
+      terra::writeRaster(gcm_rast, paste0(cache_path(),"/gcmhist/",gcmcode, "/", uid,".tif"))
+      rastext <- terra::ext(gcm_rast)
+      t1 <- data.table::data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1], 
+                                   numlay = terra::nlyr(gcm_rast),  max_run = max_run)
+      t2 <- data.table::data.table(uid = rep(uid, length(years)),years = years)
+      data.table::fwrite(t1, file = paste0(cache_path(),"/gcmhist/",gcmcode,"/meta_area.csv"), append = TRUE)
+      data.table::fwrite(t2, file = paste0(cache_path(),"/gcmhist/",gcmcode,"/meta_years.csv"), append = TRUE)
+    }
+    
+    return(gcm_rast)
+  }
+  
+  res <- lapply(gcm, process_one_gcm, years = years)
+  attr(res, "builder") <- "climRpnw" 
+  
+  # Return a list of SpatRaster, one element for each model
+  return(res)
+  
+}
+
+
+
 # gcm_nm <- "ACCESS-ESM1-5"
 # ssp <- c("ssp245","ssp370")
 # period <- 2020:2050

@@ -57,6 +57,10 @@ in_xyz <- structure(list(Long = c(-127.62279, -127.56235, -127.7162,
                          Elev = c(296L, 626L, 377L, 424L, 591L, 723L, 633L)), row.names = c(NA, -7L), class = "data.frame")
 thebb <- get_bb(in_xyz) ##get bounding box based on input points
 dbCon <- data_connect()
+
+gcmh <- gcm_hist_input(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "EC-Earth3"), years = 1851:1900, cache = T)
+test1 <- downscale(in_xyz,normal = normalbc, gcm_hist = gcmh, return_normal = T)
+
 dbCon <- NULL
 normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = TRUE) 
 normalbc <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = TRUE) 

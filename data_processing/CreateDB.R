@@ -1,21 +1,56 @@
 library(terra)
-library(climRpnw)
+library(climRdev)
 library(RPostgres)
 library(data.table)
 library(analogsea)
 ##add normals
 library(ssh)
 
-dat <- fread("C:/Program Files/ClimateNA/Perioddat/Year_1908.ann")
-d2 <- fread("C:/Program Files/ClimateNA/Perioddat/cru_index.dat")
+
+bc_rast <- rast("C:/DataFiles/bc_normal/Year_1901MP/PPT01.asc")
+bc_rast[!is.na(bc_rast)] <- 1L
+na_rast <- rast("C:/DataFiles/Normal_1961_1990MP/PPT07.asc")
+plot(na_rast)
+bc_rast2 <- resample(bc_rast, na_rast)
+bc_rast2 <- crop(bc_rast2,bc_rast)
+plot(bc_rast2)
+bc_outline <- bc_rast2
+writeRaster(bc_outline, filename = "inst/extdata/bc_outline.tif", datatype = "INT1U")
+
+##process NA normals
+# Load normal files
+dir_normal <- "C:/DataFiles/Normal_1961_1990MP/"
+d <- rast("C:/Program Files/ClimateNA/InputFiles/na4000.asc")
+
+r <- terra::rast(list.files(dir_normal, full.names = TRUE, pattern = "\\.asc"))
+r <- r[[grep("PPT|Tmin|Tmax", names(r))]]
+
+lr <- lapse_rate(
+  normal = r,
+  dem = d,
+  NA_replace = TRUE,
+  nthread = 2,
+  rasterize = TRUE
+)
+names(lr) <- paste0("lr_",names(lr))
+
+# Actual writing
+terra::writeRaster(
+  c(r, lr, d),
+  file.path("C:/DataFiles/ProcessedRasters/", sprintf("%s.wlrdem.tif", "Normal_NA")),
+  overwrite = TRUE,
+  gdal="COMPRESS=NONE"
+)
+
+############# now upload
+session <- ssh_connect("root@146.190.244.244")
+scp_upload(session, "C:/DataFiles/ProcessedRasters/Normal_NA.wlrdem.tif", to = "/share")
+ssh_exec_wait(session, command = c("cd /share",
+                                   "ls",
+                                   "raster2pgsql -s 4326 -I -C -M Normal_1961_1990MP.wlrdem.tif -t 50x50 normal_wna > normal_wna.sql"))
 
 
-dat <- rast("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climRpnw/inputs_pkg/normal/Normal_1961_1990MP/Normal_1961_1990MP.wlrdem.tif")
-d2 <- dat[[73]]
-library(raster)
-tif <- raster(d2)
-NAvalue(tif) <- -9999
-writeRaster(tif, "C:/DataFiles/wna_normal.asc", overwrite = T)
+#####################################################################################
 
 
 session <- ssh_connect("root@146.190.244.244")
