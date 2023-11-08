@@ -12,11 +12,35 @@ in_xyz <- structure(list(Long = c(-127.70521, -127.62279, -127.56235, -127.7162,
 
 res <- climr_downscale(xyz = in_xyz, which_normal = "auto", 
                        gcm_models = c("ACCESS-ESM1-5", "EC-Earth3"), 
-                       ssp = c("ssp370","ssp245"), 
-                       gcm_period = c("2021_2040", "2041_2060","2061_2080"),
+                       #ssp = c("ssp370","ssp245"), 
+                       #gcm_period = c("2021_2040", "2041_2060","2061_2080"),
                        #gcm_ts_years = 2020:2060,
+                       historic_ts = 1902:2005,
+                       gcm_hist_years = 1851:2005,
+                       return_normal = TRUE,
                        max_run = 3,
-                       vars = c("PPT","CMD","CMI"))
+                       vars = c("PPT","CMD","CMI","Tave01","Tave07"))
+
+res2 <- res[ID == 1,]
+res2[is.na(GCM),GCM := "Observed"]
+res2 <- res2[GCM %in% c("EC-Earth3","Observed"),]
+res2 <- res2[is.na(SSP),]
+
+library(ggplot2)
+library(ggsci)
+res2[,PERIOD := as.numeric(PERIOD)]
+ggplot(res2[RUN != "ensembleMean" & GCM != "Observed",],aes(x = PERIOD, y = PPT, col = RUN)) +
+  geom_line() +
+  geom_line(data = res2[RUN == 'ensembleMean',], aes(x = PERIOD, y = PPT), col = "black", linewidth = 1)+
+  geom_line(data = res2[GCM == "Observed",], aes(x = PERIOD, y = PPT, col = "Observed"), col = "red", linewidth = 1)+
+  xlab("Date") +
+  ylab("Tave_July") +
+  theme_bw() +
+  scale_color_jama() +
+  ggtitle("EC-Earth3: Historic")
+
+
+ggsave("Historic_Example.png", width = 6, height = 4, dpi = 400)
 
 
 coords <- fread("C:/Users/kdaust/Government of BC/External Future Forest Ecosystems Centre - Kiri/WNA_BGC/WNA_2km_grid_WHM.csv")

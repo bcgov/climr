@@ -37,6 +37,8 @@ climr_downscale(
 
 \item{gcm_ts_years}{Requested future years. Must be in \code{2015:2100}}
 
+\item{gcm_hist_years}{Requested historic modelled years. Must be in \code{1851:2015}}
+
 \item{max_run}{Integer. Maximum number of runs for each model. Default \code{0L} returns ensemble mean.}
 
 \item{return_normal}{Logical. Return downscaled normal period (1961-1990). Default \code{TRUE}}
