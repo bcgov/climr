@@ -8,6 +8,7 @@
 #' @param ssp vector of emission scenarios. Default is all (`c("ssp126", "ssp245", "ssp370", "ssp585")`)
 #' @param gcm_period Requested future periods. Options are `list_period(data_connect())`
 #' @param gcm_ts_years Requested future years. Must be in `2015:2100`
+#' @param gcm_hist_years Requested historic modelled years. Must be in `1851:2010`
 #' @param max_run Integer. Maximum number of runs for each model. Default `0L` returns ensemble mean.
 #' @param return_normal Logical. Return downscaled normal period (1961-1990). Default `TRUE`
 #' @param vars Character vector of climate variables. Options are `list_vars()`
@@ -92,7 +93,10 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
       gcm_ts <- NULL
     }
     if(!is.null(gcm_hist_years)){
-      gcm_hist <- gcm_hist_input()
+      gcm_hist <- gcm_hist_input(dbCon, bbox = thebb, gcm = gcm_models, 
+                                 years = gcm_hist_years,
+                                 max_run = max_run,
+                                 cache = cache)
     }else{
       gcm_hist <- NULL
     }
@@ -108,6 +112,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
     historic_ts = historic_ts,
     gcm = gcm, 
     gcm_ts = gcm_ts,
+    gcm_hist = gcm_hist,
     return_normal = return_normal,
     vars = vars
   )
@@ -128,6 +133,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
       historic_ts = historic_ts,
       gcm = gcm, 
       gcm_ts = gcm_ts,
+      gcm_hist = gcm_hist,
       return_normal = return_normal,
       vars = vars
     )
