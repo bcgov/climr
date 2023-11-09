@@ -2,15 +2,15 @@
 % Please edit documentation in R/gcm.R
 \name{list_run}
 \alias{list_run}
-\title{List available runs}
+\title{List available runs for given GCM}
 \usage{
 list_run(dbCon, gcm)
 }
 \arguments{
 \item{dbCon}{database connection}
 
-\item{gcm}{An optional character vector. Limit list to provided global circulation models.}
+\item{gcm}{Character vector to specify requested GCMs}
 }
 \description{
-List available runs
+List available runs for given GCM
 }

@@ -4,10 +4,7 @@
 \alias{list_ssp}
 \title{List available shared socioeconomic pathways}
 \usage{
-list_ssp(dbCon)
-}
-\arguments{
-\item{dbCon}{database connection}
+list_ssp()
 }
 \description{
 List available shared socioeconomic pathways
