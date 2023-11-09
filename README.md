@@ -16,17 +16,17 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 ## About climr
 
-climr is an experimental r package that builds on the downscaling concepts operationalized in the <a href='https://climatena.ca/' target='_blank'>ClimateNA</a> tool (Wang et al. 2016). it provides downscaling of observational and simulated climate data using change-factor (a.k.a. climate imprint) downscaling, a simple method that adds low-spatial-resolution climate anomalies to a high-spatial-resolution reference climatological map, with additional elevation adjustment for "scale-free" downscaling. climr is designed to be fast and to minimize local data storage requirements. To do so, it uses a remote PostGIS database, and optionally caches data locally.
+climr is an experimental r package that builds on the downscaling concepts operationalized in the <a href='https://climatena.ca/' target='_blank'>ClimateNA</a> tool (Wang et al. 2016). It provides downscaling of observational and simulated climate data using change-factor (a.k.a. climate imprint) downscaling, a simple method that adds low-spatial-resolution climate anomalies to a high-spatial-resolution reference climatological map, with additional elevation adjustment for "scale-free" downscaling. climr is designed to be fast and to minimize local data storage requirements. To do so, it uses a remote PostGIS database, and optionally caches data locally.
 
 #### Features
 
-climr provides users with the following data:
+climr provides the following data:
 
--   historical observational time series (1900-2022), currently limited to the ClimateNA time series (Wang et al., 2016)
+-   Historical observational time series (1900-2022), currently limited to the ClimateNA time series (Wang et al., 2016)
 
--   multiple historical (1850-2014) and future (2015-2100) climate model simulations for each of 13 CMIP6 global climate models, in monthly time series and 20-year normals
+-   Multiple historical (1850-2014) and future (2015-2100) climate model simulations for each of 13 CMIP6 global climate models, in monthly time series and 20-year normals
 
--   user-specified climate variables, with derived variables following the ClimateNA methodology of Wang et al. (2016).
+-   User selection of single or multiple climate variables, with derived variables following the ClimateNA methodology of Wang et al. (2016).
 
 #### Data Sources
 
@@ -106,7 +106,6 @@ results <- downscale(
   gcm_ts = gcm_ts,
   vars = sprintf(c("Tmax%02d"),1:12)
 )
-
 ```
 
 #### Adding / Modifying climate variables
