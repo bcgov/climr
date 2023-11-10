@@ -22,9 +22,9 @@ climr is an experimental r package that builds on the downscaling concepts opera
 
 climr provides the following data:
 
--   Historical observational time series (1900-2022), currently limited to the ClimateNA time series (Wang et al., 2016)
+-   Historical observational time series (1902-2022), currently limited to the ClimateNA time series (Wang et al., 2016)
 
--   Multiple historical (1850-2014) and future (2015-2100) climate model simulations for each of 13 CMIP6 global climate models, in monthly time series and 20-year normals
+-   Multiple historical (1851-2010) and future (2001-2100) climate model simulations for each of 13 CMIP6 global climate models, in monthly time series and 20-year normals
 
 -   User selection of single or multiple climate variables, with derived variables following the ClimateNA methodology of Wang et al. (2016).
 
@@ -69,11 +69,9 @@ res <- climr_downscale(xyz = in_xyz, which_normal = "auto",
                        
 ##Functions to show what data are available:
 
-dbCon <- data_connect() ##connect to database
-list_gcm(dbCon)
-list_period(dbCon)
-list_run(dbCon)
-list_ssp(dbCon)
+list_gcm()
+list_gcm_period()
+list_ssp()
 list_variables()
 
                        

@@ -11,7 +11,7 @@ climr_downscale(
   historic_ts = NULL,
   gcm_models = NULL,
   ssp = c("ssp126", "ssp245", "ssp370", "ssp585"),
-  gcm_period = c("2001_2020", "2021_2040", "2041_2060", "2061_2080", "2081_2100"),
+  gcm_period = NULL,
   gcm_ts_years = NULL,
   gcm_hist_years = NULL,
   max_run = 0L,
@@ -29,15 +29,15 @@ climr_downscale(
 
 \item{historic_ts}{Historic years requested. Must be in \code{1902:2015}. Default \code{NULL}}
 
-\item{gcm_models}{Vector of GCM names. Options are \code{list_gcm(data_connect())}. Used for gcm periods and gcm timeseries. Default \code{NULL}}
+\item{gcm_models}{Vector of GCM names. Options are \code{list_gcm()}. Used for gcm periods, gcm timeseries, and historic timeseries. Default \code{NULL}}
 
-\item{ssp}{vector of emission scenarios. Default is all (\code{c("ssp126", "ssp245", "ssp370", "ssp585")})}
+\item{ssp}{vector of emission scenarios. Default is all (\code{c("ssp126", "ssp245", "ssp370", "ssp585")}). Used for future periods and timeseries.}
 
-\item{gcm_period}{Requested future periods. Options are \code{list_period(data_connect())}}
+\item{gcm_period}{Requested future periods. Options are \code{list_period()}}
 
-\item{gcm_ts_years}{Requested future years. Must be in \code{2015:2100}}
+\item{gcm_ts_years}{Requested future timeseries years. Must be in \code{2015:2100}}
 
-\item{gcm_hist_years}{Requested historic modelled years. Must be in \code{1851:2015}}
+\item{gcm_hist_years}{Requested historic modelled years. Must be in \code{1851:2010}}
 
 \item{max_run}{Integer. Maximum number of runs for each model. Default \code{0L} returns ensemble mean.}
 
