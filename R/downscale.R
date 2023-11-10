@@ -4,10 +4,10 @@
 #' @param which_normal Select which normal layer to use. Default is "auto", which selects the highest resolution normal for each point
 #' @param historic_period Which historic period. Default `NULL`
 #' @param historic_ts Historic years requested. Must be in `1902:2015`. Default `NULL`
-#' @param gcm_models Vector of GCM names. Options are `list_gcm(data_connect())`. Used for gcm periods and gcm timeseries. Default `NULL`
-#' @param ssp vector of emission scenarios. Default is all (`c("ssp126", "ssp245", "ssp370", "ssp585")`)
-#' @param gcm_period Requested future periods. Options are `list_period(data_connect())`
-#' @param gcm_ts_years Requested future years. Must be in `2015:2100`
+#' @param gcm_models Vector of GCM names. Options are `list_gcm()`. Used for gcm periods, gcm timeseries, and historic timeseries. Default `NULL`
+#' @param ssp vector of emission scenarios. Default is all (`c("ssp126", "ssp245", "ssp370", "ssp585")`). Used for future periods and timeseries.
+#' @param gcm_period Requested future periods. Options are `list_period()`
+#' @param gcm_ts_years Requested future timeseries years. Must be in `2015:2100`
 #' @param gcm_hist_years Requested historic modelled years. Must be in `1851:2010`
 #' @param max_run Integer. Maximum number of runs for each model. Default `0L` returns ensemble mean.
 #' @param return_normal Logical. Return downscaled normal period (1961-1990). Default `TRUE`
@@ -20,8 +20,7 @@
 
 climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), historic_period = NULL, historic_ts = NULL,
                             gcm_models = NULL, ssp = c("ssp126", "ssp245", "ssp370", "ssp585"), 
-                            gcm_period = c("2001_2020", "2021_2040", "2041_2060", "2061_2080", "2081_2100"),
-                            gcm_ts_years = NULL, gcm_hist_years = NULL, max_run = 0L, return_normal = TRUE, 
+                            gcm_period = NULL, gcm_ts_years = NULL, gcm_hist_years = NULL, max_run = 0L, return_normal = TRUE, 
                             vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3)))), cache = TRUE){
   # xyz <- coords 
   # which_normal = "auto"
