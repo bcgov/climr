@@ -116,11 +116,16 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
     y_seq <- unique(c(seq(boundary[4], boundary[3], by = max_dist), boundary[3]))
     
     boundary_ls <- list()
-    for(i in 1:(length(x_seq) - 1)){
-      for(j in 1:(length(y_seq)-1)){
-        boundary_ls[[paste0(i,j)]] <- c(x_seq[i+1],x_seq[i],y_seq[j+1],y_seq[j])
+    if(length(x_seq) < 2 | length(y_seq) < 2){
+      boundary_ls[["11"]] <- boundary
+    }else{
+      for(i in 1:(length(x_seq) - 1)){
+        for(j in 1:(length(y_seq)-1)){
+          boundary_ls[[paste0(i,j)]] <- c(x_seq[i+1],x_seq[i],y_seq[j+1],y_seq[j])
+        }
       }
     }
+    
     
     r_list <- lapply(boundary_ls, FUN = make_raster)
     r_list <- r_list[!sapply(r_list,is.null)]
