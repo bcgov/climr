@@ -1,5 +1,5 @@
-Package: climRdev
-Title: Downscaling of global climate data (development verison)
+Package: climr
+Title: Downscaling of global climate data
 Version: 0.0.0.9990
 Authors@R: c(
     person("Kiri","Daust", email = "kiri.daust@gov.bc.ca", role = "aut"),
@@ -10,7 +10,8 @@ Authors@R: c(
     person("Francois", "Bornais", email = "francois@boostao.ca", role = c("aut")),
     person(family = "Province of British Columbia", role = c("cph", "fnd")))
 Description: This package replicate the basic approach of ClimateNA (climatena.ca),
-    but with (1) improved speed, (2) cloud delivery, and (3) programmatic access via R.
+    but with (1) improved speed, (2) Multiple runs of each GCM, (3) cloud delivery, and (4) 
+    programmatic access via R.
     A simple downscaling method is used to bias-correct low-resolution (~100km) global
     climate model anomalies to high-resolution (2km) maps of historical climate, with
     further elevation adjustment to user-specified elevation grids/points based on

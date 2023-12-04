@@ -1,24 +1,40 @@
 library(climRdev)
-library(data.table)
-library(terra)
 library(pool)
-library(sf)
 
-##provide or create a long, lat, elev dataframe
+##provide or create a long, lat, elev, and optionally id, dataframe - usually read from csv file
 in_xyz <- structure(list(Long = c(-127.70521, -127.62279, -127.56235, -127.7162, 
                                   -127.18585, -127.1254, -126.94957, -126.95507), 
                          Lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025), 
                          Elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L)), row.names = c(NA, -8L), class = "data.frame")
 
-res <- climr_downscale(xyz = in_xyz, which_normal = "auto", 
-                       gcm_models = c("ACCESS-ESM1-5", "EC-Earth3"), 
-                       #ssp = c("ssp370","ssp245"), 
-                       #gcm_period = c("2021_2040", "2041_2060","2061_2080"),
-                       #gcm_ts_years = 2020:2060,
+##show available variables:
+list_variables()
+list_ssp()
+
+pnts <- data.frame(x = c(-126.9011), y = c(50.54011), el = c(236), id = c(1))
+
+test <- climr_downscale(xyz = pnts, which_normal = "auto", 
+                           return_normal = TRUE, ##put this to TRUE if you want the 1961-1990 period
+                           vars = c("PPT","CMD","CMI","Tave01","Tave07")) ##specify desired variables
+
+##if you just want historic observational time series - note that the first time you run,
+##it has to download the data so might take some time. It will then cache the data, so will
+##be faster for future runs
+ds_hist <- climr_downscale(xyz = in_xyz, which_normal = "auto", 
                        historic_ts = 1902:2005,
+                       return_normal = FALSE, ##put this to TRUE if you want the 1961-1990 period
+                       vars = c("PPT","CMD","CMI","Tave01","Tave07")) ##specify desired variables
+
+
+##if you want historic modelled data:
+list_gcm()
+ds_results <- climr_downscale(xyz = in_xyz, which_normal = "auto", 
+                       gcm_models = c("ACCESS-ESM1-5", "MPI-ESM1-2-HR"), 
                        gcm_hist_years = 1851:2005,
-                       return_normal = TRUE,
-                       max_run = 3,
+                       gcm_ts_years = 2020:2060,
+                       ssp = c("ssp345","ssp470"),
+                       return_normal = FALSE,
+                       max_run = 3L,
                        vars = c("PPT","CMD","CMI","Tave01","Tave07"))
 
 res2 <- res[ID == 1,]
