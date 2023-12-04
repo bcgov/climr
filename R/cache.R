@@ -7,7 +7,7 @@
 #' @return The full path of the package local cache.
 #' @export
 cache_path <- function() {
-  getOption("climRpnw.cache.path", default = tools::R_user_dir("climRdev", "cache"))
+  getOption("climRpnw.cache.path", default = tools::R_user_dir("climr", "cache"))
 }
 
 #' Check if package local cache exists
@@ -23,7 +23,7 @@ cache_ask <- function(ask = interactive()) {
   # Only ask if cache does not already exists
   if (!cache_exists() && isTRUE(ask)) {
     response <- utils::askYesNo(
-      "Is it ok to cache climRpnw raster files locally?",
+      "Is it ok to cache climr raster files locally?",
       prompts = c("Yes", "No", "Cancel")
     )
     if (is.na(response)) {
