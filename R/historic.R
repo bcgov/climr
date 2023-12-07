@@ -172,12 +172,7 @@ historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRU
 #' @export
 
 list_historic <- function() {
-  list.files(
-    file.path(
-      data_path(),
-      getOption("climRpnw.historic.path", default = "inputs_pkg/historic")
-    )
-  )
+  return("2001_2020")
 }
 
 # dat <- rast("../climR-pnw-data/inputs_pkg/historic/Historic_2001_2020/anom_2001_2020.nc")
