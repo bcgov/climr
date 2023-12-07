@@ -16,6 +16,7 @@
 #' @return Data.frame of downscaled climate variables for each location. Historic, normal, and future periods are all returned in one table.
 #' @author Kiri Daust
 #' @importFrom sf st_as_sf st_join
+#' @importFrom pool poolClose
 #' @export
 
 climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), historic_period = NULL, historic_ts = NULL,
@@ -36,11 +37,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
   # vars = c("PPT","CMI","PET07")
   
   message("Welcome to climr!")
-  dbCon <- tryCatch(data_connect(),
-                    error = function(e) {
-                      warning(e,"Could not connect to database. Will try using cached data.")
-                      NULL
-                    })
+  dbCon <- data_connect()
   thebb <- get_bb(xyz) ##get bounding box based on input points
   
   message("Getting normals...")
@@ -118,6 +115,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
  
   if(which_normal %in% c("BC","NorAm")) return(results)
   if(length(bc_ids) == nrow(xyz_save) | length(bc_ids) < 1){
+    poolClose(dbCon)
     return(results)
   }else{
     na_xyz <- xyz_save[!xyz_save[,4] %in% bc_ids,]
@@ -138,6 +136,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
     )
     
     res_all <- rbind(results, results_na)
+    poolClose(dbCon)
     return(res_all)
   }
 }
