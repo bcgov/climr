@@ -6,8 +6,8 @@
 
 data_connect <- function(){
   pool <- tryCatch({
-    pool::dbPool(
-      drv = RPostgres::Postgres(),
+    dbPool(
+      drv = Postgres(),
       dbname = "climr",
       host = '146.190.244.244',
       port = 5432,
@@ -17,8 +17,8 @@ data_connect <- function(){
   },
    error = function(e) {
      tryCatch({
-       pool::dbPool(
-         drv = RPostgres::Postgres(),
+       dbPool(
+         drv = Postgres(),
          dbname = "climr",
          host = '146.190.244.244',
          port = 5432,

@@ -23,7 +23,7 @@ cache_exists <- function() {
 cache_ask <- function(ask = interactive()) {
   # Only ask if cache does not already exists
   if (!cache_exists() && isTRUE(ask)) {
-    response <- utils::askYesNo(
+    response <- askYesNo(
       "Is it ok to cache climr raster files locally?",
       prompts = c("Yes", "No", "Cancel")
     )
