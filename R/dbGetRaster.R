@@ -201,7 +201,9 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
 
 
 #' Find bounding box of data
-#' @param in_xyz data.table (or data.frame) of points to downscale
+#' 
+#' @param in_xyz `data.table` (or `data.frame`) of points to downscale
+
 #' @return bounding box (e.g. c(51,50,-121,-122))
 #' @export
 get_bb <- function(in_xyz){

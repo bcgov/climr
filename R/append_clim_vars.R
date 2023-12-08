@@ -288,7 +288,7 @@ append_clim_vars <- function(dt, vars) {
 }
 
 #' List climate variables
-#' @param only_extra A boolean. Should Tmin, Tmax and PPT be excluded? Default to FALSE.
+#' @param only_extra A boolean. Should Tmin, Tmax and PPT be excluded? Defaults to FALSE.
 #' @export
 list_variables <- function(only_extra = FALSE) {
   if (FALSE) { variables <- NULL }

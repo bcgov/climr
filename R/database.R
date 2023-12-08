@@ -1,7 +1,10 @@
-#' Connect to postgis database
+#' Connect to PostGIS database
+#' 
 #' @return pool object of database connection
+#' 
 #' @importFrom pool dbPool
 #' @importFrom RPostgres Postgres
+#' 
 #' @export
 
 data_connect <- function(){

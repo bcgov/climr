@@ -1,12 +1,11 @@
 #' Create normal baseline input for `downscale`
 #' @template normal
 #' @template dem
-#' names PPT01:PPT12, Tmax01:Tmax12 and Tmin01:Tmin12. Default to `list_normal()[1]`.
-#' @param dem A digital elevation model SpatRaster. Only needed if normal is a SpatRaster.
-#' Default to NULL.
-#' @param ... Other arguments for lapse rates calculation. See `?lapse_rate`.
-#' @return A normal baseline to use with `downscale`. A `SpatRaster` containing normals, lapse rates
-#' and digital elevation model layers.
+#' @param ... Other arguments passed [lapse_rate()] for lapse rates calculation. 
+#' 
+#' @return A normal baseline to use with `downscale`. 
+#'   A `SpatRaster` containing normals, lapse rates and digital elevation model
+#'   layers.
 #' @importFrom terra rast writeRaster
 #' @export
 normal_input <- function(normal = list_normal()[1], dem = NULL, ...) {
@@ -49,6 +48,7 @@ normal_input <- function(normal = list_normal()[1], dem = NULL, ...) {
 #' 
 #' @return A normal baseline to use with `downscale`. A `SpatRaster` containing normals, lapse rates
 #' and digital elevation model layers.
+#' 
 #' @importFrom terra rast writeRaster ext
 #' @importFrom data.table fread fwrite data.table
 #' @importFrom uuid UUIDgenerate

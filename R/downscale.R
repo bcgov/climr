@@ -1,5 +1,5 @@
-
 #' Downscale and Calculate climate variables for points of interest
+
 #' @param xyz three or four column data.frame: long, lat, elev, (id)
 #' @param which_normal Select which normal layer to use. Default is "auto", which selects the highest resolution normal for each point
 #' @param historic_period Which historic period. Default `NULL`
@@ -13,8 +13,12 @@
 #' @param return_normal Logical. Return downscaled normal period (1961-1990). Default `TRUE`
 #' @param vars Character vector of climate variables. Options are `list_vars()`
 #' @param cache Logical. Cache data locally? Default `TRUE`
-#' @return Data.frame of downscaled climate variables for each location. Historic, normal, and future periods are all returned in one table.
+
+#' @return `data.frame` of downscaled climate variables for each location. 
+#'   Historic, normal, and future periods are all returned in one table.
+
 #' @author Kiri Daust
+
 #' @importFrom sf st_as_sf st_join
 #' @importFrom pool poolClose
 #' @importFrom terra rast extract sources ext xres yres crop
