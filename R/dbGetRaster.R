@@ -5,7 +5,7 @@
 #'   Defaults to "rast"
 #' @param bands Which raster bands to return. Default 37:73.
 #' @template boundary
-#' @importFrom data.table setDT copy cbind
+
 #' @return A SpatRaster
 #' 
 #' @importFrom data.table setDT copy
