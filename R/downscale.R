@@ -178,6 +178,8 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' normal <- normal_input()
 #' gcm_input <- gcm_input(list_gcm()[3], list_ssp()[1], list_period()[2])
 #' downscale(xyz, normal, gcm)
+#' historic <- historic_input()
+#' out <- downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)
 #' }
 
 downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, gcm_hist = NULL, historic_ts = NULL, return_normal = FALSE,
@@ -635,12 +637,3 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
   
 }
 
-###testing
-# library(climRpnw)
-# xyz <- data.frame(lon = runif(10, -125, -120), lat = runif(10, 51, 53), elev = runif(10))
-# normal <- normal_input()
-# #gcm_ <- gcm_input(list_gcm()[3], list_ssp()[3], list_period()[2])
-# historic <- historic_input()
-# out <- downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)
-# #historic = "2001_2020"
-# gcm = gcm_input
