@@ -19,6 +19,7 @@ calc_RH <- function(tmin, tmax) {
 }
 
 ##based on simplified Penman - Monteith method fro Hogg 1997
+#' @importFrom data.table fifelse
 calc_PET <- function(tave, tmin, tmax, alt){
   D <- 0.5*(calc_SVP(tmax) - calc_SVP(tmin)) - calc_SVP(tmin - 2.5)
   pet <- data.table::fifelse(tave > 10, 93 * D * exp(alt/9300),
