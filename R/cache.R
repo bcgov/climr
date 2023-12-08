@@ -1,8 +1,7 @@
 # Cache utility
 
 #' Return package local cache path
-#' @importFrom tools R_user_dir
-#' @details By default, it uses `tools::R_user_dir`. The cache location can be
+#' @details By default, it uses [tools::R_user_dir()]. The cache location can be
 #' set using the `climRpnw.cache.path` option with `options("climRpnw.cache.path" = "your_path")`.
 #' @return The full path of the package local cache.
 #' @importFrom tools R_user_dir
