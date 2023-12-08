@@ -18,7 +18,10 @@ calc_RH <- function(tmin, tmax) {
   
 }
 
-##based on simplified Penman - Monteith method fro Hogg 1997
+#' Calculate Potential Evapotranspiration
+#' 
+#' Based on simplified Penman - Monteith method from Hogg (1997)
+#' @references Hogg, E.H. (1997). Temporal scaling of moisture and the forest-grassland boundary in western Canada. Agricultural and Forest Meteorology, Research on Forest Environmental Influences in a Changing World, 84, 115–122.
 #' @importFrom data.table fifelse
 calc_PET <- function(tave, tmin, tmax, alt){
   D <- 0.5*(calc_SVP(tmax) - calc_SVP(tmin)) - calc_SVP(tmin - 2.5)
@@ -31,7 +34,7 @@ calc_PET <- function(tave, tmin, tmax, alt){
 #   return(ppt - pet)
 # }
 
-# es: saturated vapour pressure at a temperature t
+#' Calculate Saturated Vapour Pressure at a temperature t
 #' @template t
 calc_es <- function(t) {
   
