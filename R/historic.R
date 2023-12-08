@@ -6,8 +6,8 @@
 #' @importFrom terra rast
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
-#' @import data.table
-#' @import uuid
+#' @importFrom data.table fread setorder data.table fwrite
+#' @importFrom uuid UUIDgenerate
 #' @export
 historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache = TRUE) {
   
@@ -72,8 +72,8 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 #' @importFrom terra rast
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
-#' @import data.table
-#' @import uuid
+#' @importFrom data.table fread setorder data.table fwrite
+#' @importFrom uuid UUIDgenerate
 #' @export
 #' 
 historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRUE) {

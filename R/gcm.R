@@ -17,7 +17,7 @@
 #' @importFrom terra rast
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
-#' @import uuid
+#' @importFrom uuid UUIDgenerate
 #' @import data.table
 #' @export
 gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), period = list_period(), max_run = 0L, cache = TRUE) {

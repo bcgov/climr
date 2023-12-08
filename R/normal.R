@@ -52,7 +52,7 @@ normal_input <- function(normal = list_normal()[1], dem = NULL, ...) {
 #' and digital elevation model layers.
 #' @importFrom terra rast writeRaster ext
 #' @importFrom data.table fread fwrite data.table
-#' @import uuid
+#' @importFrom uuid UUIDgenerate
 #' @export
 normal_input_postgis <- function(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE) {
   
