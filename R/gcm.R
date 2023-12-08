@@ -304,6 +304,7 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm_ts(), ssp = list_ssp
 #' @param col_num An integer vector. Positions of elements to retrieve in label. Label is split
 #' by "_" before processing.
 #' @return A character vector of unique values.
+#' @importFrom data.table fread
 list_unique <- function(files, col_num) {
   collection <- character()
   for (file in files) {
