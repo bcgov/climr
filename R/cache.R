@@ -7,7 +7,7 @@
 #' @importFrom tools R_user_dir
 #' @export
 cache_path <- function() {
-  getOption("climRpnw.cache.path", default = tools::R_user_dir("climr", "cache"))
+  getOption("climRpnw.cache.path", default = R_user_dir("climr", "cache"))
 }
 
 #' Check if package local cache exists

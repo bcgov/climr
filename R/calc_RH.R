@@ -25,8 +25,8 @@ calc_RH <- function(tmin, tmax) {
 #' @importFrom data.table fifelse
 calc_PET <- function(tave, tmin, tmax, alt){
   D <- 0.5*(calc_SVP(tmax) - calc_SVP(tmin)) - calc_SVP(tmin - 2.5)
-  pet <- data.table::fifelse(tave > 10, 93 * D * exp(alt/9300),
-                             data.table::fifelse(tave > -5, (6.2 * tave + 31) * D * exp(alt/9300), 0))
+  pet <- fifelse(tave > 10, 93 * D * exp(alt/9300),
+                 fifelse(tave > -5, (6.2 * tave + 31) * D * exp(alt/9300), 0))
   return(pet)
 }
 
