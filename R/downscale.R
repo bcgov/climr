@@ -23,6 +23,11 @@
 #' @importFrom pool poolClose
 #' @importFrom terra rast extract sources ext xres yres crop
 #' @importFrom data.table getDTthreads setDTthreads rbindlist setkey
+#' 
+#' @examples {
+#' ##TODO.
+#' }
+#' 
 #' @export
 
 climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), historic_period = NULL, historic_ts = NULL,
