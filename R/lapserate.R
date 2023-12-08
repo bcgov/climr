@@ -1,8 +1,15 @@
-# Recycle the borders of matrix to expand the matrix by one cell in each directions
-# It will help later with the offset approach.
+
+#' Expand matrix using recycled borders
+#' 
+#' Recycle the borders of matrix to expand the matrix by one cell in each directions
+#' It will help later with the offset approach.
+#' 
 #' @param mat A matrix to recycle borders from.
 #' @param nr The number of rows in the matrix.
 #' @param nc The number of columns in the matrix.
+#' 
+#' @return expanded `mat`.
+#' 
 #' @noRd
 recycle_borders <- function(mat, nr, nc) {
   
@@ -36,16 +43,25 @@ recycle_borders <- function(mat, nr, nc) {
   
 }
 
-# This returns a single matrix containing the sums of matching row, cell
-# in the list of matrices.
+#' Sum matrices in a list
+#' 
+#' Returns a single matrix containing the sums of matching row, cell
+#' in the list of matrices.
 #' @param x A list of matrices of the same dimensions
+#' 
+#' @return a `matrix`.
 #' @noRd
 sum_matrix <- function(x) {
+  ## TODO: test that matrix dimensions are always the same.
   Reduce(`+`, x)
 }
 
-# This returns a list of matrices corresponding to the products of
-# individual corresponding cells from each x matrices and y matrices
+#' Cell-by-cell multiplication of matrices in a list
+#' 
+#' Returns a list of matrices corresponding to the products of
+#'   individual corresponding cells from each \eqn(x_{i}) matrix and \eqn(y_{i}) matrix,
+#'   where *i* is the ith matrix in each list.
+#' 
 #' @param x A list of matrices of the same dimensions.
 #' @param y A list of matrices of the same dimensions as x and the same
 #' length as x.
@@ -54,8 +70,12 @@ prod_matrix <- function(x, y) {
   mapply(`*`, x, y, SIMPLIFY = FALSE)
 }
 
-# This returns a list of matrices corresponding to the differences of
-# individual corresponding cells from each x matrices and y matrices
+#' Cell-by-cell subtraction of matrices in a list
+#' 
+#' Returns a list of matrices corresponding to the differences of
+#'   individual corresponding cells from each \eqn(x_{i}) matrix and \eqn(y_{i}) matrix,
+#'   where *i* is the ith matrix in each list.
+#'   
 #' @param x A list of matrices of the same dimensions.
 #' @param y A list of matrices of the same dimensions as x and the same
 #' length as x.
@@ -64,8 +84,9 @@ delta_matrix <- function(x, y) {
   mapply(`-`, x, y, SIMPLIFY = FALSE)
 }
 
-# This returns a list of matrices after applying exponent `exp` to each
-# matrix cells
+#' Matrix exponentiation to *e* (`exp`)
+#'  This returns a list of matrices after applying exponent `exp` to each
+#'  matrix cell
 #' @param x A list of matrices.
 #' @param exp A numeric vector of length 1.
 #' @noRd
@@ -73,22 +94,29 @@ sup <- function(x, exp) {
   lapply(x, `^`, exp)
 }
 
-# This returns the fitted simple linear regression values using 
-# a pre-calculated beta coefficient matrix.
+#' Return LM predictions
+#' 
+#' Returns the predicted simple linear regression values using 
+#'   a pre-calculated beta coefficient matrix.
 #' @param x A list of matrices of the same dimensions.
-#' @param beta_coef A matrix of the same dimensions as a matrix in x.
+#' @param beta_coef A matrix of beta coefficients, with the same dimensions as 
+#'   the matrices in x.
 #' @noRd
 fitted <- function(x, beta_coef) {
   lapply(x, function(x) x*beta_coef)
 }
 
-# This compute a list of matrices. Each matrix represents differences between
-# surrounding cells and the reference cells.
-# It uses an offset approach to compute surrounding cells in each directions.
-#' @param mat A matrix previously ran through `recycle_borders`
+#' Differences between reference and neighbouring cells
+#' 
+#' Computes a list of matrices, where each represents the differences between
+#'   each cell and its immediate neighbours.
+#'   It uses an offset approach to compute surrounding cells in each directions.
+#'   
+#' @param mat the output matrix of `recycle_borders`
 #' @param nr The number of rows in the original matrix used by `recycle_borders`
 #' @param nc The number of columns in the original matrix used by `recycle_borders`
-#' @param NA_replace A boolean. Should NA delta results be replaced by zeros. Default to TRUE.
+#' @param NA_replace A boolean. Should NA delta results be replaced by zeros. 
+#'   Defaults to TRUE.
 #' @noRd
 deltas <- function(mat, nr, nc, NA_replace = TRUE) {
   
@@ -126,6 +154,7 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 #' @param NA_replace A boolean. Should NA lapse rate results be replaced by zeros. Default to TRUE.
 #' @param nthread An integer. Number of parallel threads to use to compute lapse rates.
 #' @param rasterize Return an object of the same class category as normal with the same extend.
+#' 
 #' @details Formulas
 #' Simple linear regression without the intercept term
 #' beta_coef = sum(xy) / sum(x²)
@@ -133,8 +162,10 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 #' rss = sum(ε²), sum of squared (y minus fitted), sum of absolute errors
 #' R² = mss / (mss + rss)
 #' Lapse rate = beta_coef * R²
-#' @return Lapse rate values.
-#' @importFrom terra as.list as.matrix ext nlyr  compareGeom resample rast crs
+
+#' @return SpatRaster of lapse rate values.
+#' 
+#' @importFrom terra as.list as.matrix ext nlyr compareGeom resample rast crs
 #' @importFrom parallel makeForkCluster makePSOCKcluster stopCluster parLapply
 #' @export
 lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize = TRUE) {
