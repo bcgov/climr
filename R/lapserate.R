@@ -122,7 +122,7 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 
 #' Lapse rate computation
 #' @param normal Normal rasters to compute lapse rates for. Build with this package functions.
-#' @param dem A digital elevation model with matching normal extent.
+#' @template dem
 #' @param NA_replace A boolean. Should NA lapse rate results be replaced by zeros. Default to TRUE.
 #' @param nthread An integer. Number of parallel threads to use to compute lapse rates.
 #' @param rasterize Return an object of the same class category as normal with the same extend.

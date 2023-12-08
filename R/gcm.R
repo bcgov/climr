@@ -1,18 +1,13 @@
 
 
 #' Create gcm input for `downscale` using data on Postgis database.
-#' @param dbCon A db connection object created by `data_connect`.
-#' @param bbox Numeric vector of length 4 giving bounding box of study region, create by `get_bb()`
-#' @param gcm A character vector. Label of the global circulation models to use.
-#' Can be obtained from `list_gcm()`. Default to `list_gcm()`.
-#' @param ssp A character vector. Label of the shared socioeconomic pathways to use.
-#' Can be obtained from `list_ssp()`. Default to `list_ssp()`.
-#' @param period A character vector. Label of the period to use.
-#' Can be obtained from `list_period()`. Default to `list_period()`.
-#' @param max_run An integer. Maximum number of model runs to include.
-#' A value of 0 is `ensembleMean` only. Runs are included in the order they are found in the
-#' models data untile `max_run` is reached. Default to 0L.
-#' @param cache Logical specifying whether to cache new data locally or no. Default `TRUE`
+#' @template dbCon
+#' @template bbox
+#' @template gcm
+#' @template ssp
+#' @template period
+#' @template max_run
+#' @template cache
 #' @return An object to use with `downscale`. A list of `SpatRaster` with, possibly, multiple layers.
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
@@ -103,15 +98,12 @@ gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_s
 
 
 #' Create gcm historic timeseries input for `downscale`
-#' @param dbCon A db connection object created by `data_connect`.
-#' @param bbox Numeric vector of length 4 giving bounding box of study region, create by `get_bb()`
-#' @param gcm A character vector. Label of the global circulation models to use.
-#' Can be obtained from `list_gcm()`. Default to `list_gcm()`.
+#' @template dbCon
+#' @template bbox
+#' @template gcm
 #' @param years Numeric vector of desired years. Must be in `1851:2015`.
 #' Can be obtained from `list_period()`. Default to `list_period()`.
-#' @param max_run An integer. Maximum number of model runs to include.
-#' A value of 0 is `ensembleMean` only. Runs are included in the order they are found in the
-#' models data untile `max_run` is reached. Default to 0L.
+#' @template max_run
 #' @param cache Logical specifying whether to cache new data locally or no. Default `TRUE`
 #' @return An object to use with `downscale`. A list of `SpatRaster` with, possibly, multiple layers.
 #' @importFrom terra rast writeRaster ext nlyr
@@ -203,16 +195,12 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 # period <- 2020:2050
 
 #' Create gcm timeseries input for `downscale` using data on Postgis database.
-#' @param dbCon A db connection object created by `data_connect`.
-#' @param bbox Numeric vector of length 4 giving bounding box of study region, create by `get_bb()`
-#' @param gcm A character vector. Label of the global circulation models to use.
-#' Can be obtained from `list_gcm()`. Default to `list_gcm()`.
-#' @param ssp A character vector. Label of the shared socioeconomic pathways to use.
-#' Can be obtained from `list_ssp()`. Default to `list_ssp()`.
+#' @template dbCon
+#' @template bbox
+#' @template gcm
+#' @template ssp
 #' @param years Numeric or character vector in in `2020:2100`
-#' @param max_run An integer. Maximum number of model runs to include.
-#' A value of 0 is `ensembleMean` only. Runs are included in the order they are found in the
-#' models data untile `max_run` is reached. Default to 0L.
+#' @template max_run 
 #' @param cache Logical specifying whether to cache new data locally or no. Default `TRUE`
 #' @return An object to use with `downscale`. A list of `SpatRaster` with, possibly, multiple layers.
 #' @importFrom terra rast writeRaster ext nlyr
@@ -387,7 +375,7 @@ list_gcm_period <- function() {
 }
 
 #' List available runs for given GCM
-#' @param dbCon database connection
+#' @template dbCon
 #' @param gcm Character vector to specify requested GCMs
 #' @importFrom RPostgres dbGetQuery
 #' @export

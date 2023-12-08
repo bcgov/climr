@@ -1,7 +1,10 @@
 
 #' Create historic input for `downscale`.
-#' @param period A character vector. Label of the period to use.
-#' Can be obtained from `list_period()`. Default to `list_period()`.
+#' @template dbCon
+#' @template bbox
+#' @template period
+#' @template cache
+#' 
 #' @return An object to use with `downscale`. A `SpatRaster` with, possibly, multiple layers.
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
@@ -65,8 +68,8 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 
 
 #' Create historic timeseries input for `downscale`.
-#' @param dbCon Database connection
-#' @param bbox Bounding box of data, from `get_bb`
+#' @template dbCon
+#' @template bbox
 #' @param years Years to retrieve timeseries for, in `1902:2022`. Default `2010:2022`
 #' @return An object to use with `downscale`. A `SpatRaster` with, possibly, multiple layers.
 #' @importFrom terra rast writeRaster ext nlyr

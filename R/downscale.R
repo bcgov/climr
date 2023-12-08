@@ -5,11 +5,11 @@
 #' @param historic_period Which historic period. Default `NULL`
 #' @param historic_ts Historic years requested. Must be in `1902:2015`. Default `NULL`
 #' @param gcm_models Vector of GCM names. Options are `list_gcm()`. Used for gcm periods, gcm timeseries, and historic timeseries. Default `NULL`
-#' @param ssp vector of emission scenarios. Default is all (`c("ssp126", "ssp245", "ssp370", "ssp585")`). Used for future periods and timeseries.
+#' @template ssp
 #' @param gcm_period Requested future periods. Options are `list_period()`
 #' @param gcm_ts_years Requested future timeseries years. Must be in `2015:2100`
 #' @param gcm_hist_years Requested historic modelled years. Must be in `1851:2010`
-#' @param max_run Integer. Maximum number of runs for each model. Default `0L` returns ensemble mean.
+#' @template max_run
 #' @param return_normal Logical. Return downscaled normal period (1961-1990). Default `TRUE`
 #' @param vars Character vector of climate variables. Options are `list_vars()`
 #' @param cache Logical. Cache data locally? Default `TRUE`
