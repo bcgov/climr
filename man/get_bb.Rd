@@ -7,7 +7,7 @@
 get_bb(in_xyz)
 }
 \arguments{
-\item{in_xyz}{data.table (or data.frame) of points to downscale}
+\item{in_xyz}{\code{data.table} (or \code{data.frame}) of points to downscale}
 }
 \value{
 bounding box (e.g. c(51,50,-121,-122))

@@ -31,7 +31,8 @@ climr_downscale(
 
 \item{gcm_models}{Vector of GCM names. Options are \code{list_gcm()}. Used for gcm periods, gcm timeseries, and historic timeseries. Default \code{NULL}}
 
-\item{ssp}{vector of emission scenarios. Default is all (\code{c("ssp126", "ssp245", "ssp370", "ssp585")}). Used for future periods and timeseries.}
+\item{ssp}{A character vector. Label of the shared socioeconomic pathways to use.
+See available options with \code{list_ssp()}. Defaults to \code{list_ssp()}.}
 
 \item{gcm_period}{Requested future periods. Options are \code{list_period()}}
 
@@ -39,7 +40,9 @@ climr_downscale(
 
 \item{gcm_hist_years}{Requested historic modelled years. Must be in \code{1851:2010}}
 
-\item{max_run}{Integer. Maximum number of runs for each model. Default \code{0L} returns ensemble mean.}
+\item{max_run}{integer. Maximum number of model runs to include.
+A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
+are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
 \item{return_normal}{Logical. Return downscaled normal period (1961-1990). Default \code{TRUE}}
 
@@ -48,10 +51,17 @@ climr_downscale(
 \item{cache}{Logical. Cache data locally? Default \code{TRUE}}
 }
 \value{
-Data.frame of downscaled climate variables for each location. Historic, normal, and future periods are all returned in one table.
+\code{data.frame} of downscaled climate variables for each location.
+Historic, normal, and future periods are all returned in one table.
 }
 \description{
 Downscale and Calculate climate variables for points of interest
+}
+\examples{
+{
+##TODO.
+}
+
 }
 \author{
 Kiri Daust
