@@ -5,9 +5,10 @@
 #' @param bands Which raster bands to return. Default 37:73
 #' @param boundary Numeric vector of length 4 (ymax,ymin,xmax,xmin). Default `NULL`
 #' @return terra rast 
-#' @import terra
-#' @import RPostgres
-#' @import DBI
+#' @importFrom data.table setDT copy cbind
+#' @importFrom terra rast merge
+#' @importFrom RPostgres dbQuoteIdentifier dbGetQuery
+#' @importFrom DBI dbQuoteIdentifier dbGetQuery
 #' @export
 
 pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
