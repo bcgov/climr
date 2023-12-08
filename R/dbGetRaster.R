@@ -4,7 +4,7 @@
 #' @param rast Character. Name of column which stores raster data. Defaul to `rast`
 #' @param bands Which raster bands to return. Default 37:73
 #' @param boundary Numeric vector of length 4 (ymax,ymin,xmax,xmin). Default `NULL`
-#' @return terra rast 
+#' @template boundary
 #' @importFrom data.table setDT copy cbind
 #' @importFrom data.table setDT copy
 #' @importFrom terra rast merge

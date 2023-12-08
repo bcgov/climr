@@ -32,7 +32,7 @@ calc_PET <- function(tave, tmin, tmax, alt){
 # }
 
 # es: saturated vapour pressure at a temperature t
-# t: air temperature
+#' @template t
 calc_es <- function(t) {
   
   svp <- calc_SVP(t)
@@ -42,7 +42,7 @@ calc_es <- function(t) {
   
 }
 
-# Saturated Vapour Pressure
+#' @template t
 calc_SVP <- function(t){
   
   return(0.6105 * exp((17.273*t)/(t+237.3)))
