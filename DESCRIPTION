@@ -24,14 +24,16 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
-    terra,
-    parallel,
     data.table,
+    DBI,
     gh,
-    RPostgres,
+    methods,
+    parallel,
     pool,
-    uuid,
-    methods
+    RPostgres,
+    terra,
+    sf,
+    uuid
 Depends: 
     R (>= 4.0)
 Suggests: 

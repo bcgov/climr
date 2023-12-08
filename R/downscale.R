@@ -17,6 +17,8 @@
 #' @author Kiri Daust
 #' @importFrom sf st_as_sf st_join
 #' @importFrom pool poolClose
+#' @importFrom terra rast extract sources ext xres yres crop
+#' @importFrom data.table getDTthreads setDTthreads rbindlist setkey
 #' @export
 
 climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), historic_period = NULL, historic_ts = NULL,
@@ -268,8 +270,8 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
 
 #' Simple downscale
 #' @noRd
-#' 
-#xyzID <- xyz
+#' @import data.table
+#' @importFrom terra crop ext xres yres extract
 
 downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_ts, return_normal, vars, ppt_lr = FALSE) {
   #print(xyzID)

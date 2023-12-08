@@ -6,6 +6,7 @@
 #' @param boundary Numeric vector of length 4 (ymax,ymin,xmax,xmin). Default `NULL`
 #' @return terra rast 
 #' @importFrom data.table setDT copy cbind
+#' @importFrom data.table setDT copy
 #' @importFrom terra rast merge
 #' @importFrom RPostgres dbQuoteIdentifier dbGetQuery
 #' @importFrom DBI dbQuoteIdentifier dbGetQuery

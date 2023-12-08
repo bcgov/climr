@@ -14,7 +14,7 @@
 #' models data untile `max_run` is reached. Default to 0L.
 #' @param cache Logical specifying whether to cache new data locally or no. Default `TRUE`
 #' @return An object to use with `downscale`. A list of `SpatRaster` with, possibly, multiple layers.
-#' @importFrom terra rast
+#' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @importFrom uuid UUIDgenerate
@@ -114,7 +114,7 @@ gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_s
 #' models data untile `max_run` is reached. Default to 0L.
 #' @param cache Logical specifying whether to cache new data locally or no. Default `TRUE`
 #' @return An object to use with `downscale`. A list of `SpatRaster` with, possibly, multiple layers.
-#' @importFrom terra rast
+#' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @import uuid
@@ -215,7 +215,7 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 #' models data untile `max_run` is reached. Default to 0L.
 #' @param cache Logical specifying whether to cache new data locally or no. Default `TRUE`
 #' @return An object to use with `downscale`. A list of `SpatRaster` with, possibly, multiple layers.
-#' @importFrom terra rast
+#' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @import uuid
