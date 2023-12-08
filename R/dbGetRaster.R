@@ -1,11 +1,13 @@
 #' Download raster with bounding box from PostGIS
 #' @param conn a DBI or RPostgres connection object
-#' @param name Character. Table name in database
-#' @param rast Character. Name of column which stores raster data. Defaul to `rast`
-#' @param bands Which raster bands to return. Default 37:73
-#' @param boundary Numeric vector of length 4 (ymax,ymin,xmax,xmin). Default `NULL`
+#' @param name character. Table name in database
+#' @param rast character. Name of column which stores raster data. 
+#'   Defaults to "rast"
+#' @param bands Which raster bands to return. Default 37:73.
 #' @template boundary
 #' @importFrom data.table setDT copy cbind
+#' @return A SpatRaster
+#' 
 #' @importFrom data.table setDT copy
 #' @importFrom terra rast merge
 #' @importFrom RPostgres dbQuoteIdentifier dbGetQuery
