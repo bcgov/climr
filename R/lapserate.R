@@ -67,6 +67,8 @@ sum_matrix <- function(x) {
 #' length as x.
 #' @noRd
 prod_matrix <- function(x, y) {
+  ## TODO: check that list lengths are the same
+  ## TODO: check that matrix dimensions are the same
   mapply(`*`, x, y, SIMPLIFY = FALSE)
 }
 
@@ -81,6 +83,8 @@ prod_matrix <- function(x, y) {
 #' length as x.
 #' @noRd
 delta_matrix <- function(x, y) {
+  ## TODO: check that list lengths are the same
+  ## TODO: check that matrix dimensions are the same
   mapply(`-`, x, y, SIMPLIFY = FALSE)
 }
 
@@ -103,6 +107,8 @@ sup <- function(x, exp) {
 #'   the matrices in x.
 #' @noRd
 fitted <- function(x, beta_coef) {
+  ## TODO: no intercept?
+  ## TODO: test matrix dimensions match
   lapply(x, function(x) x*beta_coef)
 }
 
