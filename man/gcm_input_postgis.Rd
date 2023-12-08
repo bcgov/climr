@@ -17,22 +17,22 @@ gcm_input_postgis(
 \arguments{
 \item{dbCon}{A db connection object created by \code{data_connect}.}
 
-\item{bbox}{Numeric vector of length 4 giving bounding box of study region, create by \code{get_bb()}}
+\item{bbox}{Numeric vector of length 4 giving bounding box of study region, created by \code{get_bb()}.}
 
 \item{gcm}{A character vector. Label of the global circulation models to use.
 Can be obtained from \code{list_gcm()}. Default to \code{list_gcm()}.}
 
 \item{ssp}{A character vector. Label of the shared socioeconomic pathways to use.
-Can be obtained from \code{list_ssp()}. Default to \code{list_ssp()}.}
+See available options with \code{list_ssp()}. Defaults to \code{list_ssp()}.}
 
 \item{period}{A character vector. Label of the period to use.
 Can be obtained from \code{list_period()}. Default to \code{list_period()}.}
 
-\item{max_run}{An integer. Maximum number of model runs to include.
-A value of 0 is \code{ensembleMean} only. Runs are included in the order they are found in the
-models data untile \code{max_run} is reached. Default to 0L.}
+\item{max_run}{integer. Maximum number of model runs to include.
+A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
+are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
-\item{cache}{Logical specifying whether to cache new data locally or no. Default \code{TRUE}}
+\item{cache}{Logical specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 }
 \value{
 An object to use with \code{downscale}. A list of \code{SpatRaster} with, possibly, multiple layers.

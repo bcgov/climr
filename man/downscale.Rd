@@ -49,5 +49,7 @@ xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = r
 normal <- normal_input()
 gcm_input <- gcm_input(list_gcm()[3], list_ssp()[1], list_period()[2])
 downscale(xyz, normal, gcm)
+historic <- historic_input()
+out <- downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)
 }
 }

@@ -9,7 +9,8 @@ lapse_rate(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize = TRUE)
 \arguments{
 \item{normal}{Normal rasters to compute lapse rates for. Build with this package functions.}
 
-\item{dem}{A digital elevation model with matching normal extent.}
+\item{dem}{A digital elevation model SpatRaster. Only needed if normal is a
+SpatRaster. Defaults to \code{NULL}.}
 
 \item{NA_replace}{A boolean. Should NA lapse rate results be replaced by zeros. Default to TRUE.}
 
@@ -18,7 +19,7 @@ lapse_rate(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize = TRUE)
 \item{rasterize}{Return an object of the same class category as normal with the same extend.}
 }
 \value{
-Lapse rate values.
+SpatRaster of lapse rate values.
 }
 \description{
 Lapse rate computation

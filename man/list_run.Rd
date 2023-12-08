@@ -7,7 +7,7 @@
 list_run(dbCon, gcm)
 }
 \arguments{
-\item{dbCon}{database connection}
+\item{dbCon}{A db connection object created by \code{data_connect}.}
 
 \item{gcm}{Character vector to specify requested GCMs}
 }

@@ -11,14 +11,15 @@ normal_input(normal = list_normal()[1], dem = NULL, ...)
 Can be obtained from \code{list_normal()}. For SpatRaster, 36 layers normal climate variables with
 names PPT01:PPT12, Tmax01:Tmax12 and Tmin01:Tmin12. Default to \code{list_normal()[1]}.}
 
-\item{dem}{A digital elevation model SpatRaster. Only needed if normal is a SpatRaster.
-Default to NULL.}
+\item{dem}{A digital elevation model SpatRaster. Only needed if normal is a
+SpatRaster. Defaults to \code{NULL}.}
 
-\item{...}{Other arguments for lapse rates calculation. See \code{?lapse_rate}.}
+\item{...}{Other arguments passed \code{\link[=lapse_rate]{lapse_rate()}} for lapse rates calculation.}
 }
 \value{
-A normal baseline to use with \code{downscale}. A \code{SpatRaster} containing normals, lapse rates
-and digital elevation model layers.
+A normal baseline to use with \code{downscale}.
+A \code{SpatRaster} containing normals, lapse rates and digital elevation model
+layers.
 }
 \description{
 Create normal baseline input for \code{downscale}
