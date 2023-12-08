@@ -103,7 +103,7 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
       }
     }
     rast_vals <- suppressWarnings(melt(rast_vals, id.vars = c()))
-    rout <- terra::rast(nrows = info$rows, ncols = info$cols, xmin = info$xmn, 
+    rout <- rast(nrows = info$rows, ncols = info$cols, xmin = info$xmn, 
                         xmax = info$xmx, ymin = info$ymn, ymax = info$ymx, nlyrs = length(bands),
                         crs = paste0("EPSG:",projID), vals = rast_vals$value)
     
@@ -132,7 +132,7 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
     r_list <- lapply(boundary_ls, FUN = make_raster)
     r_list <- r_list[!sapply(r_list,is.null)]
     if(length(r_list) > 1){
-      rout <- terra::merge(sprc(r_list))
+      rout <- merge(sprc(r_list))
     }else{
       rout <- r_list[[1]]
     }

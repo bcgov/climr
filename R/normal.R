@@ -23,7 +23,7 @@ normal_input <- function(normal = list_normal()[1], dem = NULL, ...) {
       normal
     )
     file_tif <- list.files(dir_normal, full.names = TRUE, pattern = "\\.tif")
-    res <- terra::rast(file_tif)
+    res <- rast(file_tif)
     attr(res, "builder") <- "climRpnw"
     # Return preprocessed raster
     return(res)
@@ -34,9 +34,9 @@ normal_input <- function(normal = list_normal()[1], dem = NULL, ...) {
   
   # Actual writing
   f <- tempfile(fileext = "tif")
-  terra::writeRaster(c(normal, lr, dem), f, overwrite = TRUE, gdal="COMPRESS=NONE")
+  writeRaster(c(normal, lr, dem), f, overwrite = TRUE, gdal="COMPRESS=NONE")
   
-  res <- terra::rast(f)
+  res <- rast(f)
   attr(res, "builder") <- "climRpnw"
   
   return(res)
@@ -66,7 +66,7 @@ normal_input_postgis <- function(dbCon, bbox = NULL, normal = "normal_na", cache
     if(isin){
       message("Retrieving from cache...")
       oldid <- bnds$uid[i]
-      res <- terra::rast(paste0(cache_path(),"/normal/",normal,"/",oldid,".tif"))
+      res <- rast(paste0(cache_path(),"/normal/",normal,"/",oldid,".tif"))
       attr(res, "builder") <- "climRpnw"
       return(res)
     }
@@ -90,12 +90,12 @@ normal_input_postgis <- function(dbCon, bbox = NULL, normal = "normal_na", cache
   attr(res, "builder") <- "climRpnw"
   if(cache){
     message("Caching data...")
-    uid <- uuid::UUIDgenerate()
+    uid <- UUIDgenerate()
     if(!dir.exists(paste0(cache_path(),"/normal/",normal))) dir.create(paste0(cache_path(),"/normal/",normal), recursive = TRUE)
-    terra::writeRaster(res, paste0(cache_path(),"/normal/",normal,"/",uid,".tif"))
-    rastext <- terra::ext(res)
-    temp <- data.table::data.table(uid = uid, ymax = rastext[4]+0.1, ymin = rastext[3]-0.1, xmax = rastext[2]+0.1, xmin = rastext[1]-0.1)
-    data.table::fwrite(temp, file = paste0(cache_path(),"/normal/",normal,"/meta_data.csv"), append = TRUE)
+    writeRaster(res, paste0(cache_path(),"/normal/",normal,"/",uid,".tif"))
+    rastext <- ext(res)
+    temp <- data.table(uid = uid, ymax = rastext[4]+0.1, ymin = rastext[3]-0.1, xmax = rastext[2]+0.1, xmin = rastext[1]-0.1)
+    fwrite(temp, file = paste0(cache_path(),"/normal/",normal,"/meta_data.csv"), append = TRUE)
   }
   # Return preprocessed raster
   return(res)

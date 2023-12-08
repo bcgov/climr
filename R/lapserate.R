@@ -143,28 +143,28 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
   normal_names <- names(normal)
   
   # Validation
-  if (terra::nlyr(normal) != 36L || !all(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3))) %in% names(normal))) {
+  if (nlyr(normal) != 36L || !all(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3))) %in% names(normal))) {
     stop(
       "Normal raster does not have the required 36 layers. Required layers are ",
       paste(sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3)))), collapse = ", "),
       "."
     )
   }
-  if (terra::nlyr(dem) != 1L) {
+  if (nlyr(dem) != 1L) {
     stop(
       "Digital elevation model raster has to have one layer only."
     )
   }
   # Matching geometries check
-  if (!terra::compareGeom(normal, dem)) {
+  if (!compareGeom(normal, dem)) {
     warning("Normal and Digital elevation model rasters have different extents. They must be the same. Resampling dem to match.")
-    dem <- terra::resample(dem, normal, method = "bilinear")
+    dem <- resample(dem, normal, method = "bilinear")
   }
   
   # Compute everything related to the dem and independant of normal
   n_r <- nrow(dem)
   n_c <- ncol(dem)
-  x_i <- shush(terra::as.matrix(dem, wide = TRUE))
+  x_i <- shush(as.matrix(dem, wide = TRUE))
   # Expand and recycle borders
   x_i <- recycle_borders(x_i, n_r, n_c)
   # Compute surrounding cells deltas
@@ -217,7 +217,7 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
     
     res <- parallel::parLapply(
       cl = cl,
-      X = shush(lapply(terra::as.list(normal), terra::as.matrix, wide = TRUE)),
+      X = shush(lapply(as.list(normal), as.matrix, wide = TRUE)),
       fun = lapse_rate_redux,
       x_i = x_i,
       n_r = n_r,
@@ -231,7 +231,7 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
     
     # Use regular lapply
     res <- lapply(
-      X = shush(lapply(terra::as.list(normal), terra::as.matrix, wide = TRUE)),
+      X = shush(lapply(as.list(normal), as.matrix, wide = TRUE)),
       FUN = lapse_rate_redux,
       x_i = x_i,
       n_r = n_r,
@@ -246,15 +246,15 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
   # Transform back into SpatRaster
   if (isTRUE(rasterize)) {
     res <- shush(
-      terra::rast(
+      rast(
         lapply(
           res,
-          terra::rast,
-          extent = terra::ext(normal)
+          rast,
+          extent = ext(normal)
         )
       )
     )
-    terra::crs(res) <- terra::crs(normal)
+    crs(res) <- crs(normal)
   }
   
   # Set names of lapse rates to match normal

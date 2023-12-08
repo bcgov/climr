@@ -31,7 +31,7 @@ gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_s
     
     if(dir.exists(paste0(cache_path(),"/gcm/",gcmcode))){
       bnds <- fread(paste0(cache_path(),"/gcm/",gcmcode,"/meta_area.csv"))
-      data.table::setorder(bnds, -numlay)
+      setorder(bnds, -numlay)
       for(i in 1:nrow(bnds)){
         isin <- is_in_bbox(bbox, matrix(bnds[i,2:5]))
         if(isin) break
@@ -42,7 +42,7 @@ gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_s
         ssps <- fread(paste0(cache_path(),"/gcm/",gcmcode,"/meta_ssp.csv"))
         if(all(period %in% periods[uid == oldid,period]) & all(ssp %in% ssps[uid == oldid,ssp]) & max_run <= bnds[uid == oldid, max_run]){
           message("Retrieving from cache...")
-          gcm_rast <- terra::rast(paste0(cache_path(),"/gcm/",gcmcode,"/",oldid,".tif"))
+          gcm_rast <- rast(paste0(cache_path(),"/gcm/",gcmcode,"/",oldid,".tif"))
           runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers where mod = '",gcm_nm,"'"))$run)
           sel_runs <- runs[1:(max_run+1L)]
           
@@ -72,17 +72,17 @@ gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_s
     
     if(cache){
       message("Caching data...")
-      uid <- uuid::UUIDgenerate()
+      uid <- UUIDgenerate()
       if(!dir.exists(paste0(cache_path(), "/gcm/",gcmcode))) dir.create(paste0(cache_path(), "/gcm/",gcmcode), recursive = TRUE)
-      terra::writeRaster(gcm_rast, paste0(cache_path(),"/gcm/",gcmcode, "/", uid,".tif"))
-      rastext <- terra::ext(gcm_rast)
-      t1 <- data.table::data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1], 
-                                   numlay = terra::nlyr(gcm_rast),  max_run = max_run)
-      t2 <- data.table::data.table(uid = rep(uid, length(period)),period = period)
-      t3 <- data.table::data.table(uid = rep(uid, length(ssp)),ssp = ssp)
-      data.table::fwrite(t1, file = paste0(cache_path(),"/gcm/",gcmcode,"/meta_area.csv"), append = TRUE)
-      data.table::fwrite(t2, file = paste0(cache_path(),"/gcm/",gcmcode,"/meta_period.csv"), append = TRUE)
-      data.table::fwrite(t3, file = paste0(cache_path(),"/gcm/",gcmcode,"/meta_ssp.csv"), append = TRUE)
+      writeRaster(gcm_rast, paste0(cache_path(),"/gcm/",gcmcode, "/", uid,".tif"))
+      rastext <- ext(gcm_rast)
+      t1 <- data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1], 
+                                   numlay = nlyr(gcm_rast),  max_run = max_run)
+      t2 <- data.table(uid = rep(uid, length(period)),period = period)
+      t3 <- data.table(uid = rep(uid, length(ssp)),ssp = ssp)
+      fwrite(t1, file = paste0(cache_path(),"/gcm/",gcmcode,"/meta_area.csv"), append = TRUE)
+      fwrite(t2, file = paste0(cache_path(),"/gcm/",gcmcode,"/meta_period.csv"), append = TRUE)
+      fwrite(t3, file = paste0(cache_path(),"/gcm/",gcmcode,"/meta_ssp.csv"), append = TRUE)
     }
     
     return(gcm_rast)
@@ -127,7 +127,7 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
     
     if(dir.exists(paste0(cache_path(),"/gcmhist/",gcmcode))){
       bnds <- fread(paste0(cache_path(),"/gcmhist/",gcmcode,"/meta_area.csv"))
-      data.table::setorder(bnds, -numlay)
+      setorder(bnds, -numlay)
       for(i in 1:nrow(bnds)){
         isin <- is_in_bbox(bbox, matrix(bnds[i,2:5]))
         if(isin) break
@@ -137,7 +137,7 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
         yeardat <- fread(paste0(cache_path(),"/gcmhist/",gcmcode,"/meta_years.csv"))
         if(all(years %in% yeardat[uid == oldid,years]) & max_run <= bnds[uid == oldid, max_run]){
           message("Retrieving from cache...")
-          gcm_rast <- terra::rast(paste0(cache_path(),"/gcmhist/",gcmcode,"/",oldid,".tif"))
+          gcm_rast <- rast(paste0(cache_path(),"/gcmhist/",gcmcode,"/",oldid,".tif"))
           runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers_hist where mod = '",gcm_nm,"'"))$run)
           sel_runs <- runs[1:(max_run+1L)]
           
@@ -166,15 +166,15 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
     
     if(cache){
       message("Caching data...")
-      uid <- uuid::UUIDgenerate()
+      uid <- UUIDgenerate()
       if(!dir.exists(paste0(cache_path(), "/gcmhist/",gcmcode))) dir.create(paste0(cache_path(), "/gcmhist/",gcmcode), recursive = TRUE)
-      terra::writeRaster(gcm_rast, paste0(cache_path(),"/gcmhist/",gcmcode, "/", uid,".tif"))
-      rastext <- terra::ext(gcm_rast)
-      t1 <- data.table::data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1], 
-                                   numlay = terra::nlyr(gcm_rast),  max_run = max_run)
-      t2 <- data.table::data.table(uid = rep(uid, length(years)),years = years)
-      data.table::fwrite(t1, file = paste0(cache_path(),"/gcmhist/",gcmcode,"/meta_area.csv"), append = TRUE)
-      data.table::fwrite(t2, file = paste0(cache_path(),"/gcmhist/",gcmcode,"/meta_years.csv"), append = TRUE)
+      writeRaster(gcm_rast, paste0(cache_path(),"/gcmhist/",gcmcode, "/", uid,".tif"))
+      rastext <- ext(gcm_rast)
+      t1 <- data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1], 
+                                   numlay = nlyr(gcm_rast),  max_run = max_run)
+      t2 <- data.table(uid = rep(uid, length(years)),years = years)
+      fwrite(t1, file = paste0(cache_path(),"/gcmhist/",gcmcode,"/meta_area.csv"), append = TRUE)
+      fwrite(t2, file = paste0(cache_path(),"/gcmhist/",gcmcode,"/meta_years.csv"), append = TRUE)
     }
     
     return(gcm_rast)
@@ -225,7 +225,7 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm_ts(), ssp = list_ssp
     
     if(dir.exists(paste0(cache_path(),"/gcmts/",gcmcode))){
       bnds <- fread(paste0(cache_path(),"/gcmts/",gcmcode,"/meta_area.csv"))
-      data.table::setorder(bnds, -numlay)
+      setorder(bnds, -numlay)
       for(i in 1:nrow(bnds)){
         isin <- is_in_bbox(bbox, matrix(bnds[i,2:5]))
         if(isin) break
@@ -236,7 +236,7 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm_ts(), ssp = list_ssp
         ssps <- fread(paste0(cache_path(),"/gcmts/",gcmcode,"/meta_ssp.csv"))
         if(all(period %in% periods[uid == oldid,period]) & all(ssp %in% ssps[uid == oldid,ssp]) & max_run <= bnds[uid == oldid, max_run]){
           message("Retrieving from cache...")
-          gcm_rast <- terra::rast(paste0(cache_path(),"/gcmts/",gcmcode,"/",oldid,".tif"))
+          gcm_rast <- rast(paste0(cache_path(),"/gcmts/",gcmcode,"/",oldid,".tif"))
           runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers_ts where mod = '",gcm_nm,"'"))$run)
           sel_runs <- runs[1:(max_run+1L)]
           
@@ -274,17 +274,17 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm_ts(), ssp = list_ssp
     
     if(cache){
       message("Caching data...")
-      uid <- uuid::UUIDgenerate()
+      uid <- UUIDgenerate()
       if(!dir.exists(paste0(cache_path(), "/gcmts/",gcmcode))) dir.create(paste0(cache_path(), "/gcmts/",gcmcode), recursive = TRUE)
-      terra::writeRaster(gcm_rast, paste0(cache_path(),"/gcmts/",gcmcode, "/", uid,".tif"))
-      rastext <- terra::ext(gcm_rast)
-      t1 <- data.table::data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1], 
-                                   numlay = terra::nlyr(gcm_rast), max_run = max_run)
-      t2 <- data.table::data.table(uid = rep(uid, length(period)),period = period)
-      t3 <- data.table::data.table(uid = rep(uid, length(ssp)),ssp = ssp)
-      data.table::fwrite(t1, file = paste0(cache_path(),"/gcmts/",gcmcode,"/meta_area.csv"), append = TRUE)
-      data.table::fwrite(t2, file = paste0(cache_path(),"/gcmts/",gcmcode,"/meta_period.csv"), append = TRUE)
-      data.table::fwrite(t3, file = paste0(cache_path(),"/gcmts/",gcmcode,"/meta_ssp.csv"), append = TRUE)
+      writeRaster(gcm_rast, paste0(cache_path(),"/gcmts/",gcmcode, "/", uid,".tif"))
+      rastext <- ext(gcm_rast)
+      t1 <- data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1], 
+                                   numlay = nlyr(gcm_rast), max_run = max_run)
+      t2 <- data.table(uid = rep(uid, length(period)),period = period)
+      t3 <- data.table(uid = rep(uid, length(ssp)),ssp = ssp)
+      fwrite(t1, file = paste0(cache_path(),"/gcmts/",gcmcode,"/meta_area.csv"), append = TRUE)
+      fwrite(t2, file = paste0(cache_path(),"/gcmts/",gcmcode,"/meta_period.csv"), append = TRUE)
+      fwrite(t3, file = paste0(cache_path(),"/gcmts/",gcmcode,"/meta_ssp.csv"), append = TRUE)
     }
     
     return(gcm_rast)
@@ -308,7 +308,7 @@ list_unique <- function(files, col_num) {
   collection <- character()
   for (file in files) {
     # Read in csv file with headers
-    values <- data.table::fread(file, header = TRUE)
+    values <- fread(file, header = TRUE)
     # Remove reference lines
     values <- values[which(!grepl("_reference_", values[["x"]], fixed = TRUE)),]
     # Split and extract sub part of x according to col_num

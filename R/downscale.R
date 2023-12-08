@@ -49,8 +49,8 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
     normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache) 
   }else{
     if(ncol(xyz) == 3) xyz$ID <- 1:nrow(xyz)
-    bc_outline <- terra::rast(system.file("extdata", "bc_outline.tif", package="climRdev"))
-    pnts <- terra::extract(bc_outline,xyz[,1:2], method = "simple")
+    bc_outline <- rast(system.file("extdata", "bc_outline.tif", package="climRdev"))
+    pnts <- extract(bc_outline,xyz[,1:2], method = "simple")
     bc_ids <- xyz[,4][!is.na(pnts$PPT01)]
     if(length(bc_ids) >= 1){
       xyz_save <- xyz
@@ -216,17 +216,17 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
       
       # Set DT threads to 1 in parallel to avoid overloading CPU
       # Not needed for forking, not taking any chances
-      dt_nt <- data.table::getDTthreads()
-      data.table::setDTthreads(1)
-      on.exit(data.table::setDTthreads(dt_nt))
+      dt_nt <- getDTthreads()
+      setDTthreads(1)
+      on.exit(setDTthreads(dt_nt))
       
       # Reload SpatRaster pointers
-      normal <- terra::rast(normal_path)
+      normal <- rast(normal_path)
       gcm <- lapply(gcm_paths, function(x) {
-        terra::rast(x[["source"]], lyrs = x[["lyrs"]])
+        rast(x[["source"]], lyrs = x[["lyrs"]])
       })
       historic <- lapply(historic_paths, function(x) {
-        terra::rast(x[["source"]], lyrs = x[["lyrs"]])
+        rast(x[["source"]], lyrs = x[["lyrs"]])
       })
       
       # Downscale
@@ -236,18 +236,18 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
     }
     
     # Parallel processing and recombine
-    res <- data.table::rbindlist(
+    res <- rbindlist(
       parallel::parLapply(
         cl = cl,
         X = xyz,
         fun = threaded_downscale_,
-        normal_path = terra::sources(normal),
+        normal_path = sources(normal),
         gcm_paths = lapply(gcm, function(x) {
-          s <- terra::sources(x, bands = TRUE)
+          s <- sources(x, bands = TRUE)
           list(source = unique(s[["source"]]), lyrs = s[["bands"]])
         }),
         hist_paths = lapply(historic, function(x) {
-          s <- terra::sources(x, bands = TRUE)
+          s <- sources(x, bands = TRUE)
           list(source = unique(s[["source"]]), lyrs = s[["bands"]])
         }),
         vars = vars,
@@ -263,7 +263,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
     
   }
   
-  data.table::setkey(res, "ID")
+  setkey(res, "ID")
   return(res)
   
 }
@@ -276,17 +276,17 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
 downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_ts, return_normal, vars, ppt_lr = FALSE) {
   #print(xyzID)
   # Define normal extent
-  ex <- terra::ext(
+  ex <- ext(
     c(
-      min(xyzID[,1L]) - terra::xres(normal)*2,
-      max(xyzID[,1L]) + terra::xres(normal)*2,
-      min(xyzID[,2L]) - terra::yres(normal)*2,
-      max(xyzID[,2L]) + terra::yres(normal)*2
+      min(xyzID[,1L]) - xres(normal)*2,
+      max(xyzID[,1L]) + xres(normal)*2,
+      min(xyzID[,2L]) - yres(normal)*2,
+      max(xyzID[,2L]) + yres(normal)*2
     )
   )
   
   # crop normal raster (while also loading it to memory)
-  normal <- terra::crop(normal, ex, snap = "out")
+  normal <- crop(normal, ex, snap = "out")
   
   # Normal value extraction
   # possible garbage output :
@@ -297,7 +297,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
   
   # stack before extracting
   res <- 
-    terra::extract(
+    extract(
       x = normal,
       y = xyzID[,1L:2L],
       method = "bilinear"
@@ -335,18 +335,18 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
     
     # Define gcm extent. res*2 To make sure we capture surrounding
     # cells for bilinear interpolation.
-    ex <- terra::ext(
+    ex <- ext(
       c(
-        min(xyzID[,1L]) - terra::xres(gcm_)*2,
-        max(xyzID[,1L]) + terra::xres(gcm_)*2,
-        min(xyzID[,2L]) - terra::yres(gcm_)*2,
-        max(xyzID[,2L]) + terra::yres(gcm_)*2
+        min(xyzID[,1L]) - xres(gcm_)*2,
+        max(xyzID[,1L]) + xres(gcm_)*2,
+        min(xyzID[,2L]) - yres(gcm_)*2,
+        max(xyzID[,2L]) + yres(gcm_)*2
       )
     )
     # Extract gcm bilinear interpolations
     # Cropping will reduce the size of data to load in memory
-    gcm_ <- terra::crop(gcm_, ex, snap = "out")
-    gcm_ <- terra::extract(x = gcm_, y = xyzID[,1L:2L], method = "bilinear")
+    gcm_ <- crop(gcm_, ex, snap = "out")
+    gcm_ <- extract(x = gcm_, y = xyzID[,1L:2L], method = "bilinear")
     
     # Create match set to match with res names
     labels <- vapply(
@@ -361,18 +361,18 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
     gcm_[,-c(1L, ppt_ + 1L)] <- gcm_[,-c(1L, ppt_ + 1L)] + res[,match(labels[-ppt_], names(res))] ##Temperature
     
     # Reshape (melt / dcast) to obtain final form
-    ref_dt <- data.table::tstrsplit(nm, "_")
+    ref_dt <- tstrsplit(nm, "_")
     # Recombine PERIOD into one field
     if(!timeseries){
       ref_dt[[6]] <- paste(ref_dt[[6]], ref_dt[[7]], sep = "_")
       ref_dt[7] <- NULL
     }
     # Transform ref_dt to data.table for remerging
-    data.table::setDT(ref_dt)
-    data.table::setnames(ref_dt, c("GCM", "VAR", "MONTH", "SSP", "RUN", "PERIOD"))
-    data.table::set(ref_dt, j = "variable", value = nm)
-    data.table::set(ref_dt, j = "GCM", value = gsub(".", "-", ref_dt[["GCM"]], fixed = TRUE))
-    data.table::setkey(ref_dt, "variable")
+    setDT(ref_dt)
+    setnames(ref_dt, c("GCM", "VAR", "MONTH", "SSP", "RUN", "PERIOD"))
+    set(ref_dt, j = "variable", value = nm)
+    set(ref_dt, j = "GCM", value = gsub(".", "-", ref_dt[["GCM"]], fixed = TRUE))
+    setkey(ref_dt, "variable")
     
     # Set Latitude and possibly ID
     gcm_[["Lat"]] <- xyzID[,2L]
@@ -382,15 +382,15 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
     }
     
     # Melt gcm_ and set the same key for merging
-    gcm_ <- data.table::melt(
-      data.table::setDT(gcm_),
+    gcm_ <- melt(
+      setDT(gcm_),
       id.vars = c("ID", "Lat", "Elev"),
       variable.factor = FALSE
     )
-    data.table::setkey(gcm_, "variable")
+    setkey(gcm_, "variable")
     
     # Finally, dcast back to final form to get original 36 columns
-    gcm_ <- data.table::dcast(
+    gcm_ <- dcast(
       # The merge with shared keys is as simple as that
       gcm_[ref_dt,],
       ID + GCM + SSP + RUN + PERIOD + Lat + Elev ~ VAR + MONTH,
@@ -408,18 +408,18 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
     
     # Define gcm extent. res*2 To make sure we capture surrounding
     # cells for bilinear interpolation.
-    ex <- terra::ext(
+    ex <- ext(
       c(
-        min(xyzID[,1L]) - terra::xres(gcm_)*2,
-        max(xyzID[,1L]) + terra::xres(gcm_)*2,
-        min(xyzID[,2L]) - terra::yres(gcm_)*2,
-        max(xyzID[,2L]) + terra::yres(gcm_)*2
+        min(xyzID[,1L]) - xres(gcm_)*2,
+        max(xyzID[,1L]) + xres(gcm_)*2,
+        min(xyzID[,2L]) - yres(gcm_)*2,
+        max(xyzID[,2L]) + yres(gcm_)*2
       )
     )
     # Extract gcm bilinear interpolations
     # Cropping will reduce the size of data to load in memory
-    gcm_ <- terra::crop(gcm_, ex, snap = "out")
-    gcm_ <- terra::extract(x = gcm_, y = xyzID[,1L:2L], method = "bilinear")
+    gcm_ <- crop(gcm_, ex, snap = "out")
+    gcm_ <- extract(x = gcm_, y = xyzID[,1L:2L], method = "bilinear")
     
     # Create match set to match with res names
     labels <- vapply(
@@ -434,14 +434,14 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
     gcm_[,-c(1L, ppt_ + 1L)] <- gcm_[,-c(1L, ppt_ + 1L)] + res[,match(labels[-ppt_], names(res))] ##Temperature
     
     # Reshape (melt / dcast) to obtain final form
-    ref_dt <- data.table::tstrsplit(nm, "_")
+    ref_dt <- tstrsplit(nm, "_")
 
     # Transform ref_dt to data.table for remerging
-    data.table::setDT(ref_dt)
-    data.table::setnames(ref_dt, c("GCM", "VAR", "MONTH", "RUN", "PERIOD"))
-    data.table::set(ref_dt, j = "variable", value = nm)
-    data.table::set(ref_dt, j = "GCM", value = gsub(".", "-", ref_dt[["GCM"]], fixed = TRUE))
-    data.table::setkey(ref_dt, "variable")
+    setDT(ref_dt)
+    setnames(ref_dt, c("GCM", "VAR", "MONTH", "RUN", "PERIOD"))
+    set(ref_dt, j = "variable", value = nm)
+    set(ref_dt, j = "GCM", value = gsub(".", "-", ref_dt[["GCM"]], fixed = TRUE))
+    setkey(ref_dt, "variable")
     
     # Set Latitude and possibly ID
     gcm_[["Lat"]] <- xyzID[,2L]
@@ -451,14 +451,14 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
     }
     
     # Melt gcm_ and set the same key for merging
-    gcm_ <- data.table::melt(
-      data.table::setDT(gcm_),
+    gcm_ <- melt(
+      setDT(gcm_),
       id.vars = c("ID", "Lat", "Elev"),
       variable.factor = FALSE
     )
-    data.table::setkey(gcm_, "variable")
+    setkey(gcm_, "variable")
     
-    gcm_ <- data.table::dcast(
+    gcm_ <- dcast(
       gcm_[ref_dt,],
       ID + GCM + RUN + PERIOD + Lat + Elev ~ VAR + MONTH,
       value.var = "value",
@@ -476,18 +476,18 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
     
     # Define gcm extent. res*2 To make sure we capture surrounding
     # cells for bilinear interpolation.
-    ex <- terra::ext(
+    ex <- ext(
       c(
-        min(xyzID[,1L]) - terra::xres(historic_)*2,
-        max(xyzID[,1L]) + terra::xres(historic_)*2,
-        min(xyzID[,2L]) - terra::yres(historic_)*2,
-        max(xyzID[,2L]) + terra::yres(historic_)*2
+        min(xyzID[,1L]) - xres(historic_)*2,
+        max(xyzID[,1L]) + xres(historic_)*2,
+        min(xyzID[,2L]) - yres(historic_)*2,
+        max(xyzID[,2L]) + yres(historic_)*2
       )
     )
     # Extract gcm bilinear interpolations
     # Cropping will reduce the size of data to load in memory
-    historic_ <- terra::crop(historic_, ex, snap = "out")
-    historic_ <- terra::extract(x = historic_, y = xyzID[,1L:2L], method = "bilinear")
+    historic_ <- crop(historic_, ex, snap = "out")
+    historic_ <- extract(x = historic_, y = xyzID[,1L:2L], method = "bilinear")
     
     # Create match set to match with res names
     labels <- nm
@@ -501,18 +501,18 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
     
     
     # Reshape (melt / dcast) to obtain final form
-    ref_dt <- data.table::tstrsplit(nm, "_")
-    data.table::setDT(ref_dt)
+    ref_dt <- tstrsplit(nm, "_")
+    setDT(ref_dt)
     if(timeseries){
-      data.table::setnames(ref_dt, c("VAR","PERIOD"))
-      data.table::set(ref_dt, j = "variable", value = nm)
+      setnames(ref_dt, c("VAR","PERIOD"))
+      set(ref_dt, j = "variable", value = nm)
     }else{
-      data.table::setnames(ref_dt, c("VAR"))
-      data.table::set(ref_dt, j = "variable", value = nm)
-      data.table::set(ref_dt, j = "PERIOD", value = "2001_2020")
+      setnames(ref_dt, c("VAR"))
+      set(ref_dt, j = "variable", value = nm)
+      set(ref_dt, j = "PERIOD", value = "2001_2020")
     }
     
-    data.table::setkey(ref_dt, "variable")
+    setkey(ref_dt, "variable")
     # Set Latitude and possibly ID
     historic_[["Lat"]] <- xyzID[,2L]
     historic_[["Elev"]] <- xyzID[,3L]
@@ -521,15 +521,15 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
     }
     
     # Melt gcm_ and set the same key for merging
-    historic_ <- data.table::melt(
-      data.table::setDT(historic_),
+    historic_ <- melt(
+      setDT(historic_),
       id.vars = c("ID", "Lat", "Elev"),
       variable.factor = FALSE
     )
-    data.table::setkey(historic_, "variable")
+    setkey(historic_, "variable")
     
     # Finally, dcast back to final form to get original 36 columns
-    historic_ <- data.table::dcast(
+    historic_ <- dcast(
       # The merge with shared keys is as simple as that
       historic_[ref_dt,],
       ID + PERIOD + Lat + Elev ~ VAR,
@@ -542,28 +542,28 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
   
   if (!is.null(gcm)) {
     # Process each gcm and rbind resulting tables
-    res_gcm <- data.table::rbindlist(
+    res_gcm <- rbindlist(
       lapply(gcm, process_one_gcm, res = res, xyzID = xyzID, timeseries = FALSE),
       use.names = TRUE
     )
   } else res_gcm <- NULL
   if (!is.null(gcm_ts)) {
     # Process each gcm and rbind resulting tables
-    res_gcmts <- data.table::rbindlist(
+    res_gcmts <- rbindlist(
       lapply(gcm_ts, process_one_gcm, res = res, xyzID = xyzID, timeseries = TRUE),
       use.names = TRUE
     )
   } else res_gcmts <- NULL
   if (!is.null(gcm_hist)) {
     # Process each gcm and rbind resulting tables
-    res_gcm_hist <- data.table::rbindlist(
+    res_gcm_hist <- rbindlist(
       lapply(gcm_hist, process_one_gcm_hist, res = res, xyzID = xyzID),
       use.names = TRUE
     )
   } else res_gcm_hist <- NULL
   if(!is.null(historic)) {
     #print(historic)
-    res_hist <- data.table::rbindlist(
+    res_hist <- rbindlist(
       lapply(historic, process_one_historic, res = res, xyzID = xyzID, timeseries = FALSE),
       use.names = TRUE
     )
@@ -572,7 +572,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
   }
   if(!is.null(historic_ts)) {
     #print(historic)
-    res_hist_ts <- data.table::rbindlist(
+    res_hist_ts <- rbindlist(
       lapply(historic_ts, process_one_historic, res = res, xyzID = xyzID, timeseries = TRUE),
       use.names = TRUE
     )
@@ -585,12 +585,12 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
     labels <- nm
     normal_ <- res
     # Reshape (melt / dcast) to obtain final form
-    ref_dt <- data.table::tstrsplit(nm, "_")
-    data.table::setDT(ref_dt)
-    data.table::setnames(ref_dt, c("VAR"))
-    data.table::set(ref_dt, j = "variable", value = nm)
-    data.table::set(ref_dt, j = "PERIOD", value = "1961_1990")
-    data.table::setkey(ref_dt, "variable")
+    ref_dt <- tstrsplit(nm, "_")
+    setDT(ref_dt)
+    setnames(ref_dt, c("VAR"))
+    set(ref_dt, j = "variable", value = nm)
+    set(ref_dt, j = "PERIOD", value = "1961_1990")
+    setkey(ref_dt, "variable")
     # Set Latitude and possibly ID
     normal_[["Lat"]] <- xyzID[,2L]
     normal_[["Elev"]] <- xyzID[,3L]
@@ -599,15 +599,15 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
     }
     
     # Melt gcm_ and set the same key for merging
-    normal_ <- data.table::melt(
-      data.table::setDT(normal_),
+    normal_ <- melt(
+      setDT(normal_),
       id.vars = c("ID", "Lat", "Elev"),
       variable.factor = FALSE
     )
-    data.table::setkey(normal_, "variable")
+    setkey(normal_, "variable")
     
     # Finally, dcast back to final form to get original 36 columns
-    normal_ <- data.table::dcast(
+    normal_ <- dcast(
       # The merge with shared keys is as simple as that
       normal_[ref_dt,],
       ID + PERIOD + Lat + Elev ~ VAR,
