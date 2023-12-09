@@ -11,6 +11,8 @@ pgGetTerra(conn, name, tile, rast = "rast", bands = 37:73, boundary = NULL)
 
 \item{name}{character. Table name in database}
 
+\item{tile}{TODO}
+
 \item{rast}{character. Name of column which stores raster data.
 Defaults to "rast"}
 
