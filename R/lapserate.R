@@ -171,7 +171,7 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 
 #' @return SpatRaster of lapse rate values.
 #' 
-#' @importFrom terra as.list as.matrix ext nlyr compareGeom resample rast crs
+#' @importFrom terra as.list as.matrix ext nlyr compareGeom resample rast crs crs<-
 #' @importFrom parallel makeForkCluster makePSOCKcluster stopCluster parLapply
 #' @export
 lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize = TRUE) {
