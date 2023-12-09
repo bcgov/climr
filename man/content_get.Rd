@@ -10,7 +10,7 @@ content_get(path, source = c("github"), ...)
 
 content_get_gh(
   path,
-  repo = getOption("climRpnw.gh.repo", default = "bcgov/climR-pnw"),
+  repo = getOption("climr.gh.repo", default = "bcgov/climR-pnw"),
   ref = "data"
 )
 
@@ -25,7 +25,7 @@ content_get_void(...)
 \item{...}{Extra arguments for \code{content_get} source dependent functions.}
 
 \item{repo}{Repository name prefixed with organisation name and separated by a \code{/}.
-Default to option "climRpnw.gh.repo" value if set, or "bcgov/climR-pnw". This is
+Default to option "climr.gh.repo" value if set, or "bcgov/climR-pnw". This is
 the source root.}
 
 \item{ref}{The name of the commit/branch/tag. Default NULL means it uses the repository’s default branch.}
