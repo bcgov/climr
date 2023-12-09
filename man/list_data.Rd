@@ -8,8 +8,8 @@ list_data(subdirectory)
 }
 \arguments{
 \item{subdirectory}{A character. A subdirectory of \code{data_path()}. Restrict listing to only
-this particular subdirectory. Use \code{getOption("climRpnw.gcm.path")} or
-\code{getOption("climRpnw.normal.path")}.}
+this particular subdirectory. Use \code{getOption("climr.gcm.path")} or
+\code{getOption("climr.normal.path")}.}
 }
 \description{
 List package local cache files
