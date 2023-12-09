@@ -26,7 +26,7 @@
 #'                       ppt_lr = FALSE, nthread = 1L) {
 #'   
 #'   # Make sure normal was built using normal_input
-#'   if (!isTRUE(attr(normal, "builder") == "climRpnw")) {
+#'   if (!isTRUE(attr(normal, "builder") == "climr")) {
 #'     stop(
 #'       "Please use this package `normal_input` function to create `normal`.",
 #'       " See `?normal_input` for details."
@@ -34,7 +34,7 @@
 #'   }
 #'   
 #'   # Make sure gcm was built using gcm_input
-#'   if (!is.null(gcm) && !isTRUE(attr(gcm, "builder") == "climRpnw")) {
+#'   if (!is.null(gcm) && !isTRUE(attr(gcm, "builder") == "climr")) {
 #'     stop(
 #'       "Please use this package `gcm_input` function to create `gcm`.",
 #'       " See `?gcm_input` for details."
