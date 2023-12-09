@@ -40,6 +40,11 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
   dbCon <- data_connect()
   thebb <- get_bb(xyz) ##get bounding box based on input points
   
+  if(ncol(xyz) > 4){ ##remove extraneous columns
+    xyz <- xyz[,1:4]
+  }
+  xyz <- as.data.frame(xyz) ##input needs to be a data.frame, not data.table. This is something we could change in the future
+  
   message("Getting normals...")
   if(which_normal == "NorAm"){
     normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache) 
