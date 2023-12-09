@@ -21,6 +21,12 @@ calc_RH <- function(tmin, tmax) {
 #' Calculate Potential Evapotranspiration
 #' 
 #' Based on simplified Penman - Monteith method from Hogg (1997)
+#' 
+#' @param tave monthly average minimum air temperature
+#' @param tmin monthly mean minimum air temperature
+#' @param tmax monthly mean maximum air temperature
+#' @param alt numeric. ?
+#' 
 #' @references Hogg, E.H. (1997). Temporal scaling of moisture and the forest-grassland boundary in western Canada. Agricultural and Forest Meteorology, Research on Forest Environmental Influences in a Changing World, 84, 115–122.
 #' @importFrom data.table fifelse
 calc_PET <- function(tave, tmin, tmax, alt){

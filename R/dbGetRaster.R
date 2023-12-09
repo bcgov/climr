@@ -1,6 +1,7 @@
 #' Download raster with bounding box from PostGIS
 #' @param conn a DBI or RPostgres connection object
 #' @param name character. Table name in database
+#' @param tile TODO
 #' @param rast character. Name of column which stores raster data. 
 #'   Defaults to "rast"
 #' @param bands Which raster bands to return. Default 37:73.

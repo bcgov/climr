@@ -45,6 +45,7 @@ normal_input <- function(normal = list_normal()[1], dem = NULL, ...) {
 #' @template dbCon
 #' @template bbox
 #' @template normal
+#' @template cache
 #' 
 #' @return A normal baseline to use with `downscale`. A `SpatRaster` containing normals, lapse rates
 #' and digital elevation model layers.
