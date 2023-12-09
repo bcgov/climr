@@ -58,9 +58,9 @@ ssh_exec_wait(session, command = c("cd /share",
                                    "ls",
                                    "raster2pgsql -s 4326 -I -C -M Normal_1961_1990MP.wlrdem.tif -t 50x50 normal_wna > normal_wna.sql"))
 
-curr_per <- rast("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climRpnw/inputs_pkg/historic/Historic_2001_2020/2001_2020.tif")
+curr_per <- rast("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climr/inputs_pkg/historic/Historic_2001_2020/2001_2020.tif")
 plot(curr_per[[35]])
-scp_upload(session, paste0("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climRpnw/inputs_pkg/historic/Historic_2001_2020/2001_2020.tif"), to = "/share")
+scp_upload(session, paste0("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climr/inputs_pkg/historic/Historic_2001_2020/2001_2020.tif"), to = "/share")
 pgisfn <- paste0("raster2pgsql -s 4326 -I -C -M 2001_2020.tif -t 6x6 historic_periods > 2001_2020.sql")
 
 metadt <- data.table(period = "2001_2020",fullnm = names(curr_per))
@@ -83,16 +83,16 @@ ssh_exec_wait(session, command = c("cd /share",
                                    "su postgres",
                                    "psql -d climr -f normal_wna.sql"))
 
-allgcms <- list.files("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climRpnw/inputs_pkg/gcm/")
+allgcms <- list.files("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climr/inputs_pkg/gcm/")
 nms <- c("gcm_access","gcm_bcc","gcm_canesm","gcm_cnrm","gcm_ecearth","gcm_gfdl","gcm_giss","gcm_inm","gcm_ipsl","gcm_miroc6","gcm_mpi1","gcm_mpi2","gcm_ukesm")
 
 t1 <- data.frame(GCM = list_gcm(), dbname = nms)
 
-temp <- rast(paste0("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climRpnw/inputs_pkg/gcm/",gcm,"/gcmData.",gcm,".deltas.tif"))
+temp <- rast(paste0("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climr/inputs_pkg/gcm/",gcm,"/gcmData.",gcm,".deltas.tif"))
 
 for(i in 2:13){
   gcm <- allgcms[i]
-  scp_upload(session, paste0("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climRpnw/inputs_pkg/gcm/",gcm,"/gcmData.",gcm,".deltas.tif"), to = "/share")
+  scp_upload(session, paste0("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climr/inputs_pkg/gcm/",gcm,"/gcmData.",gcm,".deltas.tif"), to = "/share")
   pgisfn <- paste0("raster2pgsql -s 4326 -I -C -M gcmData.",gcm,".deltas.tif -t 6x6 ",nms[i]," > ", nms[i],".sql")
   ssh_exec_wait(session, command = c("cd /share",
                                      "ls",
@@ -119,7 +119,7 @@ dbExecute(conn, "create index on historic_ts_layers(period)")
 for(i in 2:13){
   gcm <- allgcms[i]
   cat(gcm,"\n")
-  temp <- rast(paste0("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climRpnw/inputs_pkg/gcm/",gcm,"/gcmData.",gcm,".deltas.tif"))
+  temp <- rast(paste0("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climr/inputs_pkg/gcm/",gcm,"/gcmData.",gcm,".deltas.tif"))
   metadat <- names(temp)
   test <- data.table(strsplit(metadat, "_", fixed = T))
 

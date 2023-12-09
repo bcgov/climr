@@ -18,12 +18,12 @@ normal_input <- function(normal = list_normal()[1], dem = NULL, ...) {
     # Where are normal files for this normal
     dir_normal <- file.path(
       data_path(),
-      getOption("climRpnw.normal.path", default = "inputs_pkg/normal"),
+      getOption("climr.normal.path", default = "inputs_pkg/normal"),
       normal
     )
     file_tif <- list.files(dir_normal, full.names = TRUE, pattern = "\\.tif")
     res <- rast(file_tif)
-    attr(res, "builder") <- "climRpnw"
+    attr(res, "builder") <- "climr"
     # Return preprocessed raster
     return(res)
   }
@@ -36,7 +36,7 @@ normal_input <- function(normal = list_normal()[1], dem = NULL, ...) {
   writeRaster(c(normal, lr, dem), f, overwrite = TRUE, gdal="COMPRESS=NONE")
   
   res <- rast(f)
-  attr(res, "builder") <- "climRpnw"
+  attr(res, "builder") <- "climr"
   
   return(res)
 }
@@ -68,7 +68,7 @@ normal_input_postgis <- function(dbCon, bbox = NULL, normal = "normal_na", cache
       message("Retrieving from cache...")
       oldid <- bnds$uid[i]
       res <- rast(paste0(cache_path(),"/normal/",normal,"/",oldid,".tif"))
-      attr(res, "builder") <- "climRpnw"
+      attr(res, "builder") <- "climr"
       return(res)
     }
   }
@@ -88,7 +88,7 @@ normal_input_postgis <- function(dbCon, bbox = NULL, normal = "normal_na", cache
                   "lr_Tmin03", "lr_Tmin04", "lr_Tmin05", "lr_Tmin06", "lr_Tmin07", 
                   "lr_Tmin08", "lr_Tmin09", "lr_Tmin10", "lr_Tmin11", "lr_Tmin12", 
                   "dem2_WNA")
-  attr(res, "builder") <- "climRpnw"
+  attr(res, "builder") <- "climr"
   if(cache){
     message("Caching data...")
     uid <- UUIDgenerate()

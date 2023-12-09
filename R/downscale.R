@@ -63,7 +63,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
     normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache) 
   }else{
     if(ncol(xyz) == 3) xyz$ID <- 1:nrow(xyz)
-    bc_outline <- rast(system.file("extdata", "bc_outline.tif", package="climRdev"))
+    bc_outline <- rast(system.file("extdata", "bc_outline.tif", package="climr"))
     pnts <- extract(bc_outline,xyz[,1:2], method = "simple")
     bc_ids <- xyz[,4][!is.na(pnts$PPT01)]
     if(length(bc_ids) >= 1){
@@ -196,7 +196,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
                       ppt_lr = FALSE, nthread = 1L) {
   
   # Make sure normal was built using normal_input
-  if (!isTRUE(attr(normal, "builder") == "climRpnw")) {
+  if (!isTRUE(attr(normal, "builder") == "climr")) {
     stop(
       "Please use this package `normal_input` function to create `normal`.",
       " See `?normal_input` for details."
@@ -204,7 +204,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
   }
   
   # Make sure gcm was built using gcm_input
-  if (!is.null(gcm) && !isTRUE(attr(gcm, "builder") == "climRpnw")) {
+  if (!is.null(gcm) && !isTRUE(attr(gcm, "builder") == "climr")) {
     stop(
       "Please use this package `gcm_input` function to create `gcm`.",
       " See `?gcm_input` for details."
