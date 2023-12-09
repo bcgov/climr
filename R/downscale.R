@@ -160,6 +160,10 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' @param normal Reference normal baseline input from `normal_input`.
 #' @param gcm Global Circulation Models input from `gcm_input`. Default to NULL.
 #' @param historic Historic time period input from `historic_input`. Default to NULL
+#' @param gcm_ts TODO
+#' @param gcm_hist TODO
+#' @param historic_ts TODO
+#' @param return_normal TODO
 #' @param vars A character vector of climate variables to compute. Supported variables
 #' can be obtained with `list_variables()`. Definitions can be found in this package
 #' `variables` dataset. Default to monthly PPT, Tmax, Tmin.

@@ -70,6 +70,7 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 #' Create historic timeseries input for `downscale`.
 #' @template dbCon
 #' @template bbox
+#' @template cache
 #' @param years Years to retrieve timeseries for, in `1902:2022`. Default `2010:2022`
 #' @return An object to use with `downscale`. A `SpatRaster` with, possibly, multiple layers.
 #' @importFrom terra rast writeRaster ext nlyr
