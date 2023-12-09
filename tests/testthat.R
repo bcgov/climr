@@ -1,4 +1,4 @@
 library(testthat)
-library(climRpnw)
+library(climr)
 
-test_check("climRpnw")
+test_check("climr")
