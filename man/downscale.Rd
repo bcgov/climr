@@ -27,6 +27,14 @@ downscale(
 
 \item{historic}{Historic time period input from \code{historic_input}. Default to NULL}
 
+\item{gcm_ts}{TODO}
+
+\item{gcm_hist}{TODO}
+
+\item{historic_ts}{TODO}
+
+\item{return_normal}{TODO}
+
 \item{vars}{A character vector of climate variables to compute. Supported variables
 can be obtained with \code{list_variables()}. Definitions can be found in this package
 \code{variables} dataset. Default to monthly PPT, Tmax, Tmin.}

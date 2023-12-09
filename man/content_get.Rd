@@ -3,6 +3,7 @@
 \name{content_get}
 \alias{content_get}
 \alias{content_get_gh}
+\alias{content_get_void}
 \title{Get content from source}
 \usage{
 content_get(path, source = c("github"), ...)
@@ -12,6 +13,8 @@ content_get_gh(
   repo = getOption("climRpnw.gh.repo", default = "bcgov/climR-pnw"),
   ref = "data"
 )
+
+content_get_void(...)
 }
 \arguments{
 \item{path}{File path relative to repo root without starting \code{/}.}
@@ -19,7 +22,7 @@ content_get_gh(
 \item{source}{A character. Name of the content source. Only supports
 "github" as of now.}
 
-\item{...}{Extra arguments passed to \code{\link[=content_get]{content_get()}}.}
+\item{...}{Extra arguments for \code{content_get} source dependent functions.}
 
 \item{repo}{Repository name prefixed with organisation name and separated by a \code{/}.
 Default to option "climRpnw.gh.repo" value if set, or "bcgov/climR-pnw". This is
@@ -28,8 +31,8 @@ the source root.}
 \item{ref}{The name of the commit/branch/tag. Default NULL means it uses the repository’s default branch.}
 }
 \value{
-A data.table with columns "url", "path" (relative
-to \code{path}) and "uid" (unique identifier).
+A 3 columns data.table, \code{url}, \code{path} relative
+to data path and unique identifier \code{uid}.
 
 A list of metadata about files in a repository directory or the content of a file. See
 https://docs.github.com/en/rest/reference/repos#get-repository-content for details.
