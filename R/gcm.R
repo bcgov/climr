@@ -89,7 +89,7 @@ gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_s
   }
   
   res <- lapply(gcm, process_one_gcm, ssp = ssp, period = period)
-  attr(res, "builder") <- "climRpnw" 
+  attr(res, "builder") <- "climr" 
   
   # Return a list of SpatRaster, one element for each model
   return(res)
@@ -181,7 +181,7 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
   }
   
   res <- lapply(gcm, process_one_gcm, years = years)
-  attr(res, "builder") <- "climRpnw" 
+  attr(res, "builder") <- "climr" 
   
   # Return a list of SpatRaster, one element for each model
   return(res)
@@ -291,7 +291,7 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm_ts(), ssp = list_ssp
   }
   
   res <- lapply(gcm, process_one_gcm, ssp = ssp, period = period)
-  attr(res, "builder") <- "climRpnw" 
+  attr(res, "builder") <- "climr" 
   
   # Return a list of SpatRaster, one element for each model
   return(res)
@@ -341,7 +341,7 @@ list_parse <- function(gcm, col_num = 1) {
   files <- list.files(
     file.path(
       data_path(),
-      getOption("climRpnw.gcm.path", default = "inputs_pkg/gcm")
+      getOption("climr.gcm.path", default = "inputs_pkg/gcm")
     ),
     recursive = TRUE,
     full.names = TRUE,

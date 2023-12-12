@@ -3,7 +3,7 @@
 
 #' Update external package data
 #' @param gcm A character. Relative path from the source root to global circulation models files folder.
-#' Default to option value "climRpnw.gcm.path" if set, or "inputs_pkg/gcmData".
+#' Default to option value "climr.gcm.path" if set, or "inputs_pkg/gcmData".
 #' @param normal A character. Relative path from the source root to base normal files folder.
 #' @param quiet A logical. If `TRUE`, suppress status messages (if any), and the progress bar.
 #' @param ... Others parameters such as `source` or `repo` for content getting functions.
@@ -12,15 +12,15 @@
 #' @export
 data_update <- function(
   ...,
-  gcm = getOption("climRpnw.gcm.path", default = "inputs_pkg/gcm"),
-  historic = getOption("climRpnw.historic.path", default = "inputs_pkg/historic"),
-  normal = getOption("climRpnw.normal.path", default = "inputs_pkg/normal"),
+  gcm = getOption("climr.gcm.path", default = "inputs_pkg/gcm"),
+  historic = getOption("climr.historic.path", default = "inputs_pkg/historic"),
+  normal = getOption("climr.normal.path", default = "inputs_pkg/normal"),
   quiet = !interactive()) {
   
   # Reset options value if provided by user. They will be used to retrieve data by other functions.
-  options("climRpnw.gcm.path" = gcm)
-  options("climRpnw.normal.path" = normal)
-  options("climRpnw.historic.path" = historic)
+  options("climr.gcm.path" = gcm)
+  options("climr.normal.path" = normal)
+  options("climr.historic.path" = historic)
   
   # Retrieve gcm file list
   gcm_files <- content_get(path = gcm, ...)
@@ -105,13 +105,13 @@ data_download <- function(url, path, uid, quiet = !interactive()) {
 #' a temporary folder that will be used for this session only.
 #' @export
 data_path <- function(...) {
-  use_cache <- getOption("climRpnw.session.cache.ask.response", default = cache_ask(...))
+  use_cache <- getOption("climr.session.cache.ask.response", default = cache_ask(...))
   if (use_cache) {
     return(cache_path())
   } else {
     # Create temp path and return it subsequently if it is already set for this session.
-    path <- getOption("climRpnw.session.tmp.path", default = file.path(tempdir(), "climRpnw"))
-    options("climRpnw.session.tmp.path" = path)
+    path <- getOption("climr.session.tmp.path", default = file.path(tempdir(), "climr"))
+    options("climr.session.tmp.path" = path)
     return(path)
   }
 }
@@ -139,11 +139,11 @@ data_delete <- function(ask = interactive()) {
   uid_delete()
   # Unset options
   options(
-    "climRpnw.session.tmp.path" = NULL,
-    "climRpnw.gcm.path" = NULL,
-    "climRpnw.normal.path" = NULL,
-    "climRpnw.historic.path" = NULL,
-    "climRpnw.session.cache.ask.response" = NULL
+    "climr.session.tmp.path" = NULL,
+    "climr.gcm.path" = NULL,
+    "climr.normal.path" = NULL,
+    "climr.historic.path" = NULL,
+    "climr.session.cache.ask.response" = NULL
   )
   
   return(invisible(TRUE))
@@ -153,7 +153,7 @@ data_delete <- function(ask = interactive()) {
 data_check <- function() {
   if (!length(c(list_gcm(), list_normal()))) {
     response <- utils::askYesNo(
-      "climRpnw could not find data to use for this package. Do you want to download it now?",
+      "climr could not find data to use for this package. Do you want to download it now?",
       prompts = c("Yes", "No", "Cancel")
     )
     if (!isTRUE(response)) {
@@ -168,8 +168,8 @@ data_check <- function() {
 
 #' List package local cache files
 #' @param subdirectory A character. A subdirectory of `data_path()`. Restrict listing to only
-#' this particular subdirectory. Use `getOption("climRpnw.gcm.path")` or
-#' `getOption("climRpnw.normal.path")`.
+#' this particular subdirectory. Use `getOption("climr.gcm.path")` or
+#' `getOption("climr.normal.path")`.
 #' @export
 list_data <- function(subdirectory) {
   dir <- data_path()
@@ -192,7 +192,7 @@ data_prepare <- function() {
     # Load normal files
     dir_normal <- file.path(
       data_path(),
-      getOption("climRpnw.normal.path", default = "inputs_pkg/normal"),
+      getOption("climr.normal.path", default = "inputs_pkg/normal"),
       n
     )
     dir_dem <- file.path(dir_normal, "dem")
@@ -242,7 +242,7 @@ data_prepare <- function() {
     # Load normal files
     dir_gcm <- file.path(
       data_path(),
-      getOption("climRpnw.gcm.path", default = "inputs_pkg/gcm"),
+      getOption("climr.gcm.path", default = "inputs_pkg/gcm"),
       g
     )
     
@@ -323,7 +323,7 @@ data_prepare <- function() {
     # Load normal files
     dir_hist <- file.path(
       data_path(),
-      getOption("climRpnw.historic.path", default = "inputs_pkg/historic"),
+      getOption("climr.historic.path", default = "inputs_pkg/historic"),
       h
     )
     

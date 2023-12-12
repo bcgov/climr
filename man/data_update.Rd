@@ -6,9 +6,9 @@
 \usage{
 data_update(
   ...,
-  gcm = getOption("climRpnw.gcm.path", default = "inputs_pkg/gcm"),
-  historic = getOption("climRpnw.historic.path", default = "inputs_pkg/historic"),
-  normal = getOption("climRpnw.normal.path", default = "inputs_pkg/normal"),
+  gcm = getOption("climr.gcm.path", default = "inputs_pkg/gcm"),
+  historic = getOption("climr.historic.path", default = "inputs_pkg/historic"),
+  normal = getOption("climr.normal.path", default = "inputs_pkg/normal"),
   quiet = !interactive()
 )
 }
@@ -16,7 +16,7 @@ data_update(
 \item{...}{Others parameters such as \code{source} or \code{repo} for content getting functions.}
 
 \item{gcm}{A character. Relative path from the source root to global circulation models files folder.
-Default to option value "climRpnw.gcm.path" if set, or "inputs_pkg/gcmData".}
+Default to option value "climr.gcm.path" if set, or "inputs_pkg/gcmData".}
 
 \item{normal}{A character. Relative path from the source root to base normal files folder.}
 
