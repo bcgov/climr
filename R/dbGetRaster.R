@@ -14,7 +14,6 @@
 #' @importFrom RPostgres dbQuoteIdentifier dbGetQuery
 #' @importFrom DBI dbQuoteIdentifier dbGetQuery
 #' @export
-
 pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
                        boundary = NULL) {
   ## Check and prepare the schema.name
