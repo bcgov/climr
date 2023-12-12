@@ -8,7 +8,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' climr:::calc_PAS(4, 2)
+#' climr:::calc_PAS(4, 2, 600)
 #' }
 calc_PAS <- function(m, tm, ppt) {
   
