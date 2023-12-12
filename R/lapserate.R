@@ -137,12 +137,7 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
     west      = mat[c(-1L, -(nr + 2L)), -(nc + 1L):-(nc + 2L)] - ref
   )
 
-  # Replace NA/NaN by 0
   # Only the deltas are replaced by 0.
-  NArep <- function(x) {
-    x[is.na(x)] <- 0L
-    return(x)
-  }
   if (isTRUE(NA_replace)) {
     res <- lapply(res, NArep)
   }
@@ -288,3 +283,14 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
 
   return(res)
 }
+
+#' Replace NA/NaN by 0
+#'
+#' @param x a vector of values.
+#'
+#' @return `x` with NAs replaced by 0s
+NArep <- function(x) {
+  x[is.na(x)] <- 0L
+  return(x)
+}
+
