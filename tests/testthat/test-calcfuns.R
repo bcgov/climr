@@ -11,11 +11,13 @@ test_that("calc_* functions work", {
 
   climr:::calc_DD_above_18(2, -14, "All")
 
-  t_min_list <- list("1" = -35, "2" = -32, "3" = -25, "4" = -10, 
-                     "5" = -5, "6" = 3,  "7" = 15, "8" = 17, "9" = 10, "10" = -5,
-                     "11" = -20, "12" = -30)
-  
-  climr:::calc_bFFP(td = 30, NFFD= 10, t_min_list = t_min_list)
+  t_min_list <- list(
+    "1" = -35, "2" = -32, "3" = -25, "4" = -10,
+    "5" = -5, "6" = 3, "7" = 15, "8" = 17, "9" = 10, "10" = -5,
+    "11" = -20, "12" = -30
+  )
+
+  climr:::calc_bFFP(td = 30, NFFD = 10, t_min_list = t_min_list)
 
   climr:::calc_eFFP(NFFD = 10, t_min_list = t_min_list)
 

@@ -40,7 +40,7 @@ writeRaster(grad_diff,"Chelsa_test.tif")
 # cell_nums <- cells(ch2)
 # tmaxls <- list()
 # nms <- sprintf("Tmax%02d", 1:12)
-# for(i in 1:length(files)){
+# for(i in 1:length(files)) {
 #   cat(".")
 #   ch <- rast(files[i])
 #   ch2 <- crop(ch, bc2)
@@ -56,7 +56,7 @@ writeRaster(grad_diff,"Chelsa_test.tif")
 # 
 # tminls <- list()
 # nms <- sprintf("Tmin%02d", 1:12)
-# for(i in 1:length(files)){
+# for(i in 1:length(files)) {
 #   cat(".")
 #   ch <- rast(files[i])
 #   ch2 <- crop(ch, bc2)
@@ -72,7 +72,7 @@ writeRaster(grad_diff,"Chelsa_test.tif")
 # files <- files[-1]
 # pptls <- list()
 # nms <- sprintf("PPT%02d", 2:12)
-# for(i in 1:length(files)){
+# for(i in 1:length(files)) {
 #   cat(".")
 #   ch <- rast(files[i])
 #   ch2 <- crop(ch, bc2)

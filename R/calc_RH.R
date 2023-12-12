@@ -10,33 +10,33 @@
 #' climr:::calc_RH(tmin = 10, tmax = 40)
 #' }
 calc_RH <- function(tmin, tmax) {
-  
   es_tmin <- calc_SVP(tmin)
   es_tmax <- calc_SVP(tmax)
-  es_avg = (es_tmin + es_tmax)/2
-  return(100 * es_tmin/es_avg)
-  
+  es_avg <- (es_tmin + es_tmax) / 2
+  return(100 * es_tmin / es_avg)
 }
 
 #' Calculate Potential Evapotranspiration
-#' 
+#'
 #' Based on simplified Penman - Monteith method from Hogg (1997)
-#' 
+#'
 #' @param tave monthly average minimum air temperature
 #' @param tmin monthly mean minimum air temperature
 #' @param tmax monthly mean maximum air temperature
 #' @param alt numeric. ?
-#' 
+#'
 #' @references Hogg, E.H. (1997). Temporal scaling of moisture and the forest-grassland boundary in western Canada. Agricultural and Forest Meteorology, Research on Forest Environmental Influences in a Changing World, 84, 115–122.
 #' @importFrom data.table fifelse
-calc_PET <- function(tave, tmin, tmax, alt){
-  D <- 0.5*(.calc_SVP(tmax) - .calc_SVP(tmin)) - .calc_SVP(tmin - 2.5)
-  pet <- fifelse(tave > 10, 93 * D * exp(alt/9300),
-                 fifelse(tave > -5, (6.2 * tave + 31) * D * exp(alt/9300), 0))
+calc_PET <- function(tave, tmin, tmax, alt) {
+  D <- 0.5 * (.calc_SVP(tmax) - .calc_SVP(tmin)) - .calc_SVP(tmin - 2.5)
+  pet <- fifelse(
+    tave > 10, 93 * D * exp(alt / 9300),
+    fifelse(tave > -5, (6.2 * tave + 31) * D * exp(alt / 9300), 0)
+  )
   return(pet)
 }
 
-# calc_cmi <- function(ppt, pet){
+# calc_cmi <- function(ppt, pet) {
 #   return(ppt - pet)
 # }
 
@@ -46,11 +46,12 @@ calc_PET <- function(tave, tmin, tmax, alt){
 calc_SVP <- function(t) {
   svp <- .calc_SVP(t)
   i <- which(t < 0)
-  svp[i] <- svp[i] * (1 + ( t[i] * 0.01) )
+  svp[i] <- svp[i] * (1 + (t[i] * 0.01))
   return(svp)
 }
 
+#' internal utility function
 #' @template t
-.calc_SVP <- function(t){
-  return(0.6105 * exp((17.273*t)/(t+237.3)))
+.calc_SVP <- function(t) {
+  return(0.6105 * exp((17.273 * t) / (t + 237.3)))
 }

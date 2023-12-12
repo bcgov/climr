@@ -1,5 +1,3 @@
-
-
 #' Create gcm input for `downscale` using data on Postgis database.
 #' @template dbCon
 #' @template bbox
@@ -16,84 +14,91 @@
 #' @import data.table
 #' @export
 gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), period = list_period(), max_run = 0L, cache = TRUE) {
+  dbnames <- structure(list(
+    GCM = c(
+      "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5",
+      "CNRM-ESM2-1", "EC-Earth3", "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0",
+      "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL"
+    ),
+    dbname = c(
+      "gcm_access", "gcm_bcc", "gcm_canesm", "gcm_cnrm",
+      "gcm_ecearth", "gcm_gfdl", "gcm_giss", "gcm_inm", "gcm_ipsl",
+      "gcm_miroc6", "gcm_mpi1", "gcm_mpi2", "gcm_ukesm"
+    )
+  ), class = "data.frame", row.names = c(NA, -13L))
 
-  dbnames <- structure(list(GCM = c("ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5", 
-                                    "CNRM-ESM2-1", "EC-Earth3", "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0", 
-                                    "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL"), 
-                            dbname = c("gcm_access", "gcm_bcc", "gcm_canesm", "gcm_cnrm", 
-                "gcm_ecearth", "gcm_gfdl", "gcm_giss", "gcm_inm", "gcm_ipsl", 
-                "gcm_miroc6", "gcm_mpi1", "gcm_mpi2", "gcm_ukesm")), class = "data.frame", row.names = c(NA, -13L))
-  
   # Load each file individually + select layers
-  process_one_gcm <- function(gcm_nm, ssp, period) { ##need to update to all GCMs
+  process_one_gcm <- function(gcm_nm, ssp, period) { ## need to update to all GCMs
     gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
-    gcm_nm <- gsub("-",".",gcm_nm)
-    
-    if(dir.exists(paste0(cache_path(),"/gcm/",gcmcode))){
-      bnds <- fread(paste0(cache_path(),"/gcm/",gcmcode,"/meta_area.csv"))
+    gcm_nm <- gsub("-", ".", gcm_nm)
+
+    if (dir.exists(paste0(cache_path(), "/gcm/", gcmcode))) {
+      bnds <- fread(paste0(cache_path(), "/gcm/", gcmcode, "/meta_area.csv"))
       setorder(bnds, -numlay)
-      for(i in 1:nrow(bnds)){
-        isin <- is_in_bbox(bbox, matrix(bnds[i,2:5]))
-        if(isin) break
+      for (i in 1:nrow(bnds)) {
+        isin <- is_in_bbox(bbox, matrix(bnds[i, 2:5]))
+        if (isin) break
       }
-      if(isin){
+      if (isin) {
         oldid <- bnds$uid[i]
-        periods <- fread(paste0(cache_path(),"/gcm/",gcmcode,"/meta_period.csv"))
-        ssps <- fread(paste0(cache_path(),"/gcm/",gcmcode,"/meta_ssp.csv"))
-        if(all(period %in% periods[uid == oldid,period]) & all(ssp %in% ssps[uid == oldid,ssp]) & max_run <= bnds[uid == oldid, max_run]){
+        periods <- fread(paste0(cache_path(), "/gcm/", gcmcode, "/meta_period.csv"))
+        ssps <- fread(paste0(cache_path(), "/gcm/", gcmcode, "/meta_ssp.csv"))
+        if (all(period %in% periods[uid == oldid, period]) & all(ssp %in% ssps[uid == oldid, ssp]) & max_run <= bnds[uid == oldid, max_run]) {
           message("Retrieving from cache...")
-          gcm_rast <- rast(paste0(cache_path(),"/gcm/",gcmcode,"/",oldid,".tif"))
-          runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers where mod = '",gcm_nm,"'"))$run)
-          sel_runs <- runs[1:(max_run+1L)]
-          
+          gcm_rast <- rast(paste0(cache_path(), "/gcm/", gcmcode, "/", oldid, ".tif"))
+          runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers where mod = '", gcm_nm, "'"))$run)
+          sel_runs <- runs[1:(max_run + 1L)]
+
           layinfo <- data.table(fullnm = names(gcm_rast))
-          layinfo[,c("Mod","Var","Month","Scenario","Run","Period1","Period2") := tstrsplit(fullnm, "_")]
-          layinfo[,Period := paste(Period1,Period2, sep = "_")]
+          layinfo[, c("Mod", "Var", "Month", "Scenario", "Run", "Period1", "Period2") := tstrsplit(fullnm, "_")]
+          layinfo[, Period := paste(Period1, Period2, sep = "_")]
           layinfo[, laynum := seq_along(fullnm)]
-          sel <- layinfo[Scenario %in% ssp & Period %in% period & Run %in% sel_runs,laynum]
+          sel <- layinfo[Scenario %in% ssp & Period %in% period & Run %in% sel_runs, laynum]
           return(gcm_rast[[sel]])
-        }else{
+        } else {
           message("Not fully cached :( Will download more")
         }
-        
       }
     }
-    
-    runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers where mod = '",gcm_nm,"'"))$run)
-    sel_runs <- runs[1:(max_run+1L)]
-    
-    q <- paste0("select fullnm, laynum from esm_layers where mod = '",gcm_nm,"' and scenario in ('",paste(ssp,collapse = "','"),
-                "') and period in ('",paste(period,collapse = "','"),"') and run in ('",paste(sel_runs, collapse = "','"),"')")
-    #print(q)
+
+    runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers where mod = '", gcm_nm, "'"))$run)
+    sel_runs <- runs[1:(max_run + 1L)]
+
+    q <- paste0(
+      "select fullnm, laynum from esm_layers where mod = '", gcm_nm, "' and scenario in ('", paste(ssp, collapse = "','"),
+      "') and period in ('", paste(period, collapse = "','"), "') and run in ('", paste(sel_runs, collapse = "','"), "')"
+    )
+    # print(q)
     layerinfo <- dbGetQuery(dbCon, q)
     message("Downloading GCM anomalies")
     gcm_rast <- pgGetTerra(dbCon, gcmcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
     names(gcm_rast) <- layerinfo$fullnm
-    
-    if(cache){
+
+    if (cache) {
       message("Caching data...")
       uid <- UUIDgenerate()
-      if(!dir.exists(paste0(cache_path(), "/gcm/",gcmcode))) dir.create(paste0(cache_path(), "/gcm/",gcmcode), recursive = TRUE)
-      writeRaster(gcm_rast, paste0(cache_path(),"/gcm/",gcmcode, "/", uid,".tif"))
+      if (!dir.exists(paste0(cache_path(), "/gcm/", gcmcode))) dir.create(paste0(cache_path(), "/gcm/", gcmcode), recursive = TRUE)
+      writeRaster(gcm_rast, paste0(cache_path(), "/gcm/", gcmcode, "/", uid, ".tif"))
       rastext <- ext(gcm_rast)
-      t1 <- data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1], 
-                                   numlay = nlyr(gcm_rast),  max_run = max_run)
-      t2 <- data.table(uid = rep(uid, length(period)),period = period)
-      t3 <- data.table(uid = rep(uid, length(ssp)),ssp = ssp)
-      fwrite(t1, file = paste0(cache_path(),"/gcm/",gcmcode,"/meta_area.csv"), append = TRUE)
-      fwrite(t2, file = paste0(cache_path(),"/gcm/",gcmcode,"/meta_period.csv"), append = TRUE)
-      fwrite(t3, file = paste0(cache_path(),"/gcm/",gcmcode,"/meta_ssp.csv"), append = TRUE)
+      t1 <- data.table(
+        uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1],
+        numlay = nlyr(gcm_rast), max_run = max_run
+      )
+      t2 <- data.table(uid = rep(uid, length(period)), period = period)
+      t3 <- data.table(uid = rep(uid, length(ssp)), ssp = ssp)
+      fwrite(t1, file = paste0(cache_path(), "/gcm/", gcmcode, "/meta_area.csv"), append = TRUE)
+      fwrite(t2, file = paste0(cache_path(), "/gcm/", gcmcode, "/meta_period.csv"), append = TRUE)
+      fwrite(t3, file = paste0(cache_path(), "/gcm/", gcmcode, "/meta_ssp.csv"), append = TRUE)
     }
-    
+
     return(gcm_rast)
   }
-  
+
   res <- lapply(gcm, process_one_gcm, ssp = ssp, period = period)
-  attr(res, "builder") <- "climr" 
-  
+  attr(res, "builder") <- "climr"
+
   # Return a list of SpatRaster, one element for each model
   return(res)
-  
 }
 
 
@@ -113,79 +118,84 @@ gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_s
 #' @import data.table
 #' @export
 gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:1950, max_run = 0L, cache = TRUE) {
-  
-  dbnames <- structure(list(GCM = c("ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5", 
-                                    "CNRM-ESM2-1", "EC-Earth3", "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0", 
-                                    "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL"), 
-                            dbname = c("access_hist", "bcc_hist", "canesm_hist", "cnrm_hist", 
-                                       "ec_earth_hist", "gfdl_hist", "giss_hist", "inm_hist", "ipsl_hist", 
-                                       "miroc6_hist", "mpi_hist", "mri_hist", "ukesm_hist")), class = "data.frame", row.names = c(NA, -13L))
-  
+  dbnames <- structure(list(
+    GCM = c(
+      "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5",
+      "CNRM-ESM2-1", "EC-Earth3", "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0",
+      "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL"
+    ),
+    dbname = c(
+      "access_hist", "bcc_hist", "canesm_hist", "cnrm_hist",
+      "ec_earth_hist", "gfdl_hist", "giss_hist", "inm_hist", "ipsl_hist",
+      "miroc6_hist", "mpi_hist", "mri_hist", "ukesm_hist"
+    )
+  ), class = "data.frame", row.names = c(NA, -13L))
+
   # Load each file individually + select layers
-  process_one_gcm <- function(gcm_nm, years) { ##need to update to all GCMs
+  process_one_gcm <- function(gcm_nm, years) { ## need to update to all GCMs
     gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
-    
-    if(dir.exists(paste0(cache_path(),"/gcmhist/",gcmcode))){
-      bnds <- fread(paste0(cache_path(),"/gcmhist/",gcmcode,"/meta_area.csv"))
+
+    if (dir.exists(paste0(cache_path(), "/gcmhist/", gcmcode))) {
+      bnds <- fread(paste0(cache_path(), "/gcmhist/", gcmcode, "/meta_area.csv"))
       setorder(bnds, -numlay)
-      for(i in 1:nrow(bnds)){
-        isin <- is_in_bbox(bbox, matrix(bnds[i,2:5]))
-        if(isin) break
+      for (i in 1:nrow(bnds)) {
+        isin <- is_in_bbox(bbox, matrix(bnds[i, 2:5]))
+        if (isin) break
       }
-      if(isin){
+      if (isin) {
         oldid <- bnds$uid[i]
-        yeardat <- fread(paste0(cache_path(),"/gcmhist/",gcmcode,"/meta_years.csv"))
-        if(all(years %in% yeardat[uid == oldid,years]) & max_run <= bnds[uid == oldid, max_run]){
+        yeardat <- fread(paste0(cache_path(), "/gcmhist/", gcmcode, "/meta_years.csv"))
+        if (all(years %in% yeardat[uid == oldid, years]) & max_run <= bnds[uid == oldid, max_run]) {
           message("Retrieving from cache...")
-          gcm_rast <- rast(paste0(cache_path(),"/gcmhist/",gcmcode,"/",oldid,".tif"))
-          runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers_hist where mod = '",gcm_nm,"'"))$run)
-          sel_runs <- runs[1:(max_run+1L)]
-          
+          gcm_rast <- rast(paste0(cache_path(), "/gcmhist/", gcmcode, "/", oldid, ".tif"))
+          runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers_hist where mod = '", gcm_nm, "'"))$run)
+          sel_runs <- runs[1:(max_run + 1L)]
+
           layinfo <- data.table(fullnm = names(gcm_rast))
-          layinfo[,c( "Mod", "Var","Month","Run","Year") := tstrsplit(fullnm, "_")]
+          layinfo[, c("Mod", "Var", "Month", "Run", "Year") := tstrsplit(fullnm, "_")]
           layinfo[, laynum := seq_along(Year)]
-          sel <- layinfo[Year %in% years & Run %in% sel_runs,laynum]
+          sel <- layinfo[Year %in% years & Run %in% sel_runs, laynum]
           return(gcm_rast[[sel]])
-        }else{
+        } else {
           message("Not fully cached :( Will download more")
         }
-        
       }
     }
-    
-    runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers_hist where mod = '",gcm_nm,"'"))$run)
-    sel_runs <- runs[1:(max_run+1L)]
-    
-    q <- paste0("select mod, var, month, run, year, laynum from esm_layers_hist where mod = '",gcm_nm,"' and year in ('",paste(years,collapse = "','"),"') and run in ('",paste(sel_runs, collapse = "','"),"')")
-    #print(q)
+
+    runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers_hist where mod = '", gcm_nm, "'"))$run)
+    sel_runs <- runs[1:(max_run + 1L)]
+
+    q <- paste0("select mod, var, month, run, year, laynum from esm_layers_hist where mod = '", gcm_nm, "' and year in ('", paste(years, collapse = "','"), "') and run in ('", paste(sel_runs, collapse = "','"), "')")
+    # print(q)
     layerinfo <- as.data.table(dbGetQuery(dbCon, q))
-    layerinfo[,fullnm := paste(mod, var,month,run,year, sep = "_")]
+    layerinfo[, fullnm := paste(mod, var, month, run, year, sep = "_")]
     message("Downloading GCM anomalies")
     gcm_rast <- pgGetTerra(dbCon, gcmcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
     names(gcm_rast) <- layerinfo$fullnm
-    
-    if(cache){
+
+    if (cache) {
       message("Caching data...")
       uid <- UUIDgenerate()
-      if(!dir.exists(paste0(cache_path(), "/gcmhist/",gcmcode))) dir.create(paste0(cache_path(), "/gcmhist/",gcmcode), recursive = TRUE)
-      writeRaster(gcm_rast, paste0(cache_path(),"/gcmhist/",gcmcode, "/", uid,".tif"))
+      if (!dir.exists(paste0(cache_path(), "/gcmhist/", gcmcode))) dir.create(paste0(cache_path(), "/gcmhist/", gcmcode), recursive = TRUE)
+      writeRaster(gcm_rast, paste0(cache_path(), "/gcmhist/", gcmcode, "/", uid, ".tif"))
       rastext <- ext(gcm_rast)
-      t1 <- data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1], 
-                                   numlay = nlyr(gcm_rast),  max_run = max_run)
-      t2 <- data.table(uid = rep(uid, length(years)),years = years)
-      fwrite(t1, file = paste0(cache_path(),"/gcmhist/",gcmcode,"/meta_area.csv"), append = TRUE)
-      fwrite(t2, file = paste0(cache_path(),"/gcmhist/",gcmcode,"/meta_years.csv"), append = TRUE)
+      t1 <- data.table(
+        uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1],
+        numlay = nlyr(gcm_rast), max_run = max_run
+      )
+      t2 <- data.table(uid = rep(uid, length(years)), years = years)
+      fwrite(t1, file = paste0(cache_path(), "/gcmhist/", gcmcode, "/meta_area.csv"), append = TRUE)
+      fwrite(t2, file = paste0(cache_path(), "/gcmhist/", gcmcode, "/meta_years.csv"), append = TRUE)
     }
-    
+
     return(gcm_rast)
   }
-  
+
   res <- lapply(gcm, process_one_gcm, years = years)
-  attr(res, "builder") <- "climr" 
-  
+  attr(res, "builder") <- "climr"
+
   # Return a list of SpatRaster, one element for each model
   return(res)
-  
 }
 
 
@@ -200,7 +210,7 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 #' @template gcm
 #' @template ssp
 #' @param years Numeric or character vector in in `2020:2100`
-#' @template max_run 
+#' @template max_run
 #' @param cache Logical specifying whether to cache new data locally or no. Default `TRUE`
 #' @return An object to use with `downscale`. A list of `SpatRaster` with, possibly, multiple layers.
 #' @importFrom terra rast writeRaster ext nlyr
@@ -210,92 +220,99 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 #' @import data.table
 #' @export
 gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm_ts(), ssp = list_ssp(), years = list_years_ts(), max_run = 0L, cache = TRUE) {
-  
   period <- years
-  dbnames <- structure(list(GCM = c("ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5", 
-                                    "CNRM-ESM2-1", "EC-Earth3", "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0", 
-                                    "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL"), 
-                            dbname = c("gcmts_access", "gcmts_bcc", "gcmts_canesm", "gcmts_cnrm", 
-                                       "gcmts_ecearth", "gcmts_gfdl", "gcmts_giss", "gcmts_inm", "gcmts_ipsl", 
-                                       "gcmts_miroc6", "gcmts_mpi1", "gcmts_mpi2", "gcmts_ukesm")), class = "data.frame", row.names = c(NA, -13L))
-  if(nrow(dbnames) < 1) stop("That isn't a valid GCM")
+  dbnames <- structure(list(
+    GCM = c(
+      "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5",
+      "CNRM-ESM2-1", "EC-Earth3", "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0",
+      "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL"
+    ),
+    dbname = c(
+      "gcmts_access", "gcmts_bcc", "gcmts_canesm", "gcmts_cnrm",
+      "gcmts_ecearth", "gcmts_gfdl", "gcmts_giss", "gcmts_inm", "gcmts_ipsl",
+      "gcmts_miroc6", "gcmts_mpi1", "gcmts_mpi2", "gcmts_ukesm"
+    )
+  ), class = "data.frame", row.names = c(NA, -13L))
+  if (nrow(dbnames) < 1) stop("That isn't a valid GCM")
   # Load each file individually + select layers
-  process_one_gcm <- function(gcm_nm, ssp, period) { ##need to update to all GCMs
+  process_one_gcm <- function(gcm_nm, ssp, period) { ## need to update to all GCMs
     gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
-    
-    if(dir.exists(paste0(cache_path(),"/gcmts/",gcmcode))){
-      bnds <- fread(paste0(cache_path(),"/gcmts/",gcmcode,"/meta_area.csv"))
+
+    if (dir.exists(paste0(cache_path(), "/gcmts/", gcmcode))) {
+      bnds <- fread(paste0(cache_path(), "/gcmts/", gcmcode, "/meta_area.csv"))
       setorder(bnds, -numlay)
-      for(i in 1:nrow(bnds)){
-        isin <- is_in_bbox(bbox, matrix(bnds[i,2:5]))
-        if(isin) break
+      for (i in 1:nrow(bnds)) {
+        isin <- is_in_bbox(bbox, matrix(bnds[i, 2:5]))
+        if (isin) break
       }
-      if(isin){
+      if (isin) {
         oldid <- bnds$uid[i]
-        periods <- fread(paste0(cache_path(),"/gcmts/",gcmcode,"/meta_period.csv"))
-        ssps <- fread(paste0(cache_path(),"/gcmts/",gcmcode,"/meta_ssp.csv"))
-        if(all(period %in% periods[uid == oldid,period]) & all(ssp %in% ssps[uid == oldid,ssp]) & max_run <= bnds[uid == oldid, max_run]){
+        periods <- fread(paste0(cache_path(), "/gcmts/", gcmcode, "/meta_period.csv"))
+        ssps <- fread(paste0(cache_path(), "/gcmts/", gcmcode, "/meta_ssp.csv"))
+        if (all(period %in% periods[uid == oldid, period]) & all(ssp %in% ssps[uid == oldid, ssp]) & max_run <= bnds[uid == oldid, max_run]) {
           message("Retrieving from cache...")
-          gcm_rast <- rast(paste0(cache_path(),"/gcmts/",gcmcode,"/",oldid,".tif"))
-          runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers_ts where mod = '",gcm_nm,"'"))$run)
-          sel_runs <- runs[1:(max_run+1L)]
-          
+          gcm_rast <- rast(paste0(cache_path(), "/gcmts/", gcmcode, "/", oldid, ".tif"))
+          runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers_ts where mod = '", gcm_nm, "'"))$run)
+          sel_runs <- runs[1:(max_run + 1L)]
+
           layinfo <- data.table(fullnm = names(gcm_rast))
-          layinfo[,c("Mod","Var","Month","Scenario","Run","Year") := tstrsplit(fullnm, "_")]
+          layinfo[, c("Mod", "Var", "Month", "Scenario", "Run", "Year") := tstrsplit(fullnm, "_")]
           layinfo[, laynum := seq_along(fullnm)]
-          sel <- layinfo[Scenario %in% ssp & Year %in% period & Run %in% sel_runs,laynum]
+          sel <- layinfo[Scenario %in% ssp & Year %in% period & Run %in% sel_runs, laynum]
           return(gcm_rast[[sel]])
-        }else{
+        } else {
           message("Not fully cached :( Will download more")
         }
-        
       }
     }
 
-    runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers_ts where mod = '",gcm_nm,"'"))$run)
-    if(length(runs) < 1) stop("That GCM isn't in our database yet.")
-    sel_runs <- runs[1:(max_run+1L)]
-    
-    q <- paste0("select fullnm, laynum from esm_layers_ts where mod = '",gcm_nm,"' and scenario in ('",paste(ssp,collapse = "','"),
-                "') and period in ('",paste(period,collapse = "','"),"') and run in ('",paste(sel_runs, collapse = "','"),"')")
-    #print(q)
+    runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers_ts where mod = '", gcm_nm, "'"))$run)
+    if (length(runs) < 1) stop("That GCM isn't in our database yet.")
+    sel_runs <- runs[1:(max_run + 1L)]
+
+    q <- paste0(
+      "select fullnm, laynum from esm_layers_ts where mod = '", gcm_nm, "' and scenario in ('", paste(ssp, collapse = "','"),
+      "') and period in ('", paste(period, collapse = "','"), "') and run in ('", paste(sel_runs, collapse = "','"), "')"
+    )
+    # print(q)
     layerinfo <- dbGetQuery(dbCon, q)
     message("Downloading GCM anomalies")
     message("Precip...")
-    gcm_rast_ppt <- pgGetTerra(dbCon, paste0(gcmcode,"_ppt"), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
-    names(gcm_rast_ppt) <- gsub("Tmax","PPT", layerinfo$fullnm)
+    gcm_rast_ppt <- pgGetTerra(dbCon, paste0(gcmcode, "_ppt"), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
+    names(gcm_rast_ppt) <- gsub("Tmax", "PPT", layerinfo$fullnm)
     message("Tmax...")
-    gcm_rast_tmax <- pgGetTerra(dbCon, paste0(gcmcode,"_tmax"), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
+    gcm_rast_tmax <- pgGetTerra(dbCon, paste0(gcmcode, "_tmax"), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
     names(gcm_rast_tmax) <- layerinfo$fullnm
     message("Tmin...")
-    gcm_rast_tmin <- pgGetTerra(dbCon, paste0(gcmcode,"_tmin"), tile = FALSE,  bands = layerinfo$laynum, boundary = bbox)
-    names(gcm_rast_tmin) <- gsub("Tmax","Tmin", layerinfo$fullnm)
+    gcm_rast_tmin <- pgGetTerra(dbCon, paste0(gcmcode, "_tmin"), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
+    names(gcm_rast_tmin) <- gsub("Tmax", "Tmin", layerinfo$fullnm)
     gcm_rast <- c(gcm_rast_ppt, gcm_rast_tmax, gcm_rast_tmin)
-    
-    if(cache){
+
+    if (cache) {
       message("Caching data...")
       uid <- UUIDgenerate()
-      if(!dir.exists(paste0(cache_path(), "/gcmts/",gcmcode))) dir.create(paste0(cache_path(), "/gcmts/",gcmcode), recursive = TRUE)
-      writeRaster(gcm_rast, paste0(cache_path(),"/gcmts/",gcmcode, "/", uid,".tif"))
+      if (!dir.exists(paste0(cache_path(), "/gcmts/", gcmcode))) dir.create(paste0(cache_path(), "/gcmts/", gcmcode), recursive = TRUE)
+      writeRaster(gcm_rast, paste0(cache_path(), "/gcmts/", gcmcode, "/", uid, ".tif"))
       rastext <- ext(gcm_rast)
-      t1 <- data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1], 
-                                   numlay = nlyr(gcm_rast), max_run = max_run)
-      t2 <- data.table(uid = rep(uid, length(period)),period = period)
-      t3 <- data.table(uid = rep(uid, length(ssp)),ssp = ssp)
-      fwrite(t1, file = paste0(cache_path(),"/gcmts/",gcmcode,"/meta_area.csv"), append = TRUE)
-      fwrite(t2, file = paste0(cache_path(),"/gcmts/",gcmcode,"/meta_period.csv"), append = TRUE)
-      fwrite(t3, file = paste0(cache_path(),"/gcmts/",gcmcode,"/meta_ssp.csv"), append = TRUE)
+      t1 <- data.table(
+        uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1],
+        numlay = nlyr(gcm_rast), max_run = max_run
+      )
+      t2 <- data.table(uid = rep(uid, length(period)), period = period)
+      t3 <- data.table(uid = rep(uid, length(ssp)), ssp = ssp)
+      fwrite(t1, file = paste0(cache_path(), "/gcmts/", gcmcode, "/meta_area.csv"), append = TRUE)
+      fwrite(t2, file = paste0(cache_path(), "/gcmts/", gcmcode, "/meta_period.csv"), append = TRUE)
+      fwrite(t3, file = paste0(cache_path(), "/gcmts/", gcmcode, "/meta_ssp.csv"), append = TRUE)
     }
-    
+
     return(gcm_rast)
   }
-  
+
   res <- lapply(gcm, process_one_gcm, ssp = ssp, period = period)
-  attr(res, "builder") <- "climr" 
-  
+  attr(res, "builder") <- "climr"
+
   # Return a list of SpatRaster, one element for each model
   return(res)
-  
 }
 
 
@@ -327,13 +344,12 @@ list_unique <- function(files, col_num) {
 
 #' Read and parse gcm models csv files
 #' @param gcm An optional character vector. Limit list to provided global circulation models.
-#' @param col_num An integer vector. 
+#' @param col_num An integer vector.
 #' @return A character vector of unique values.
 list_parse <- function(gcm, col_num = 1) {
-  
-  #Default pattern csv extension
+  # Default pattern csv extension
   pattern <- "\\.csv$"
-  
+
   # In case we need to filter gcm
   if (!missing(gcm)) {
     pattern <- paste0("(", paste0(gcm, collapse = "|"), ").*", pattern)
@@ -347,7 +363,7 @@ list_parse <- function(gcm, col_num = 1) {
     full.names = TRUE,
     pattern = pattern
   )
-  
+
   # Extract all different unique values
   list_unique(files, col_num)
 }
@@ -355,23 +371,24 @@ list_parse <- function(gcm, col_num = 1) {
 #' List available global circulation models
 #' @export
 list_gcm <- function() {
-  c("ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5", "EC-Earth3", "GISS-E2-1-G", 
+  c(
+    "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5", "EC-Earth3", "GISS-E2-1-G",
     "INM-CM5-0", "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0"
   )
-  #sort(dbGetQuery(dbCon, "SELECT DISTINCT mod FROM esm_layers_ts")[,1])
+  # sort(dbGetQuery(dbCon, "SELECT DISTINCT mod FROM esm_layers_ts")[,1])
 }
 
 #' List available shared socioeconomic pathways
 #' @export
 list_ssp <- function() {
-  #sort(dbGetQuery(dbCon, "SELECT DISTINCT scenario FROM esm_layers")[,1])
+  # sort(dbGetQuery(dbCon, "SELECT DISTINCT scenario FROM esm_layers")[,1])
   c("ssp126", "ssp245", "ssp370", "ssp585")
 }
 
 #' List available period
 #' @export
 list_gcm_period <- function() {
-  #sort(dbGetQuery(dbCon, "SELECT DISTINCT period FROM esm_layers")[,1])
+  # sort(dbGetQuery(dbCon, "SELECT DISTINCT period FROM esm_layers")[,1])
   c("2001_2020", "2021_2040", "2041_2060", "2061_2080", "2081_2100")
 }
 
@@ -381,5 +398,5 @@ list_gcm_period <- function() {
 #' @importFrom RPostgres dbGetQuery
 #' @export
 list_run <- function(dbCon, gcm) {
-  sort(dbGetQuery(dbCon, paste0("SELECT DISTINCT run FROM esm_layers WHERE mod IN ('",paste(gcm, collapse = "','","')")))[,1])
+  sort(dbGetQuery(dbCon, paste0("SELECT DISTINCT run FROM esm_layers WHERE mod IN ('", paste(gcm, collapse = "','", "')")))[, 1])
 }
