@@ -7,7 +7,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' climr:::calc_RH(tmin_mean = 10, tmax_mean = 40)
+#' climr:::calc_RH(tmin = 10, tmax = 40)
 #' }
 calc_RH <- function(tmin, tmax) {
   

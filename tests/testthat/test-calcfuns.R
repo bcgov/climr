@@ -25,5 +25,5 @@ test_that("calc_* functions work", {
 
   climr:::calc_PAS(4, 2, 600)
 
-  climr:::calc_RH(tmin_mean = 10, tmax_mean = 40)
+  climr:::calc_RH(tmin = 10, tmax = 40)
 })
