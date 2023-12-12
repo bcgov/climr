@@ -84,7 +84,7 @@ ggplot(res2[RUN != "ensembleMean" & GCM != "Observed",],aes(x = PERIOD, y = PPT,
 thebb <- get_bb(in_xyz) ##get bounding box based on input points
 dbCon <- data_connect()
 ##get normal
-normalbc <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = TRUE) 
+normalbc <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = TRUE) 
 plot(normalbc[[13]])
 
 ##gcm annomalies

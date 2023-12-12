@@ -58,9 +58,9 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 
   message("Getting normals...")
   if (which_normal == "NorAm") {
-    normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
+    normal <- normal_input(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
   } else if (which_normal == "BC") {
-    normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache)
+    normal <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache)
   } else {
     if (ncol(xyz) == 3) xyz$ID <- 1:nrow(xyz)
     bc_outline <- rast(system.file("extdata", "bc_outline.tif", package = "climr"))
@@ -71,9 +71,9 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
       xyz <- xyz[!is.na(pnts$PPT01),]
       thebb_bc <- get_bb(xyz)
       message("for BC...")
-      normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb_bc, cache = cache)
+      normal <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb_bc, cache = cache)
     } else {
-      normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
+      normal <- normal_input(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
     }
   }
 
@@ -145,7 +145,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
     na_xyz <- xyz_save[!xyz_save[, 4] %in% bc_ids,]
     thebb <- get_bb(na_xyz)
     message("Now North America...")
-    normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
+    normal <- normal_input(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
 
     results_na <- downscale(
       xyz = na_xyz,
