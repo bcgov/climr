@@ -11,7 +11,7 @@
 #' @importFrom data.table fread fwrite data.table
 #' @importFrom uuid UUIDgenerate
 #' @export
-normal_input_postgis <- function(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE) {
+normal_input <- function(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE) {
   ## check cached
   if (dir.exists(paste0(cache_path(), "/normal/", normal))) {
     bnds <- fread(paste0(cache_path(), "/normal/", normal, "/meta_data.csv"))
