@@ -24,7 +24,7 @@ minyear <- 2020
 maxyear <- 2100
 
 gcm <- gcms[1]
-for(gcm in gcms[-c(1:4)]){
+for(gcm in gcms[-c(1:4)]) {
   
   #process the climate elements
   dir <- paste("C:\\Users\\kdaust\\LocalFiles\\CMIP6_GCMs", gcm, sep="\\")
@@ -39,14 +39,14 @@ for(gcm in gcms[-c(1:4)]){
   
   # run=runs[1]
   element=elements[3]
-  for(element in elements){
+  for(element in elements) {
     
     # read in the raw time series for the historical runs
     s <- which(element.list==element & scenario.list=="historical")
     files.ref <- files[s]
     runs.ref <- unique(run.list[s])
     run.ref <- runs.ref[1]
-    for(run.ref in runs.ref){
+    for(run.ref in runs.ref) {
       files.run <- files.ref[grep(run.ref, files.ref)]
       if(gcm=="AWI-CM-1-1-MR") files.run <- files.run[which(str_sub(files.run, -9,-6)%in%startyear.ref:2014)]
       if(gcm=="EC-Earth3") files.run <- files.run[which(str_sub(files.run, -9,-6)%in%startyear.ref:2014)]
@@ -58,7 +58,7 @@ for(gcm in gcms[-c(1:4)]){
       ref.months <- month(dates)
 
       m=1
-      for(m in 1:12){
+      for(m in 1:12) {
         r <- temp[[ref.months == m]]
         if(element=="pr") r <- r*86400*monthdays[m] else r <- r-273.15  #convert units to /month (86400 seconds / day) and to degrees C from Kelvins
         
@@ -75,7 +75,7 @@ for(gcm in gcms[-c(1:4)]){
     
     # compile reference period mean
     m=1
-    for(m in 1:12){
+    for(m in 1:12) {
       ref <- mean(get(paste("ref", monthcodes[m], sep=".")))
       ref.ensembleMean <- if(m==1) ref else c(ref.ensembleMean, ref)
     }
@@ -85,22 +85,22 @@ for(gcm in gcms[-c(1:4)]){
     
     # compile future periods
     scenario <- "ssp245"
-    for(scenario in scenarios[-1]){
+    for(scenario in scenarios[-1]) {
         s <- which(element.list==element & scenario.list==scenario)
         files.proj <- files[s]
         runs.proj <- unique(run.list[s])
         run.proj <- runs.proj[2]
         run_list <- list()
-        for(run.proj in runs.proj){
+        for(run.proj in runs.proj) {
           files.run <- files.proj[grep(run.proj, files.proj)]
           #if(gcm=="EC-Earth3") files.run <- files.run[which(str_sub(files.run, -9,-6)%in%year)]
           #if(gcm=="MPI-ESM1-2-HR") files.run <- files.run[which(str_sub(files.run, -9,-6)%in%(startyear-5):(endyear+5))]
           temp <- terra::rast(paste(dir, files.run, sep="\\"))
           proj.months <- month(time(temp))
           proj.yrs <- year(time(temp))
-          if(element == "pr"){
+          if(element == "pr") {
             temp <- temp * 86400 * mean(monthdays)
-            # for(m in 1:12){
+            # for(m in 1:12) {
             #   temp[[which(proj.months == m)]] <- temp[[which(proj.months == m)]] * 86400 * monthdays[m]
             # }
           }else{

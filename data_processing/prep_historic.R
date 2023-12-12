@@ -15,7 +15,7 @@ conn <- dbConnect(RPostgres::Postgres(),dbname = 'climr',
 
 
 
-for(gcm_nm in allgcms[-c(1:6)]){
+for(gcm_nm in allgcms[-c(1:6)]) {
   cat(gcm_nm,"\n")
   mod.files <- list.files(paste0("C:/Users/kdaust/LocalFiles/ProcessedGCMs/gcm/historic/",gcm_nm,"/"), full.names = TRUE, pattern = "\\.deltas.tif", all.files = TRUE)
   rt <- rast(mod.files)
@@ -33,7 +33,7 @@ for(gcm_nm in allgcms[-c(1:6)]){
 }
 dbExecute(conn,"create index on esm_layers_hist(mod,run,year)")
 
-for(gcm_nm in allgcms[-c(1:4)]){
+for(gcm_nm in allgcms[-c(1:4)]) {
   ###gcm time series
   cat(gcm_nm)
   mod.files <- list.files(paste0("C:/Users/kdaust/LocalFiles/ProcessedGCMs/gcm/historic/",gcm_nm,"/"), full.names = TRUE, pattern = "\\.tif", all.files = TRUE)
@@ -103,7 +103,7 @@ library(ssh)
 
 session <- ssh_connect("root@146.190.244.244")
 
-for(gcm_nm in allgcms[-c(1,2,3,4)]){
+for(gcm_nm in allgcms[-c(1,2,3,4)]) {
   cat(gcm_nm)
   scp_upload(session, file.path(paste0("C:/Users/kdaust/LocalFiles/ProcessedGCMs/gcm/historic/",gcm_nm), sprintf("gcmData.%s.deltas.tif", gcm_nm)), 
              to = "/share/gcm_historic")
@@ -133,7 +133,7 @@ template <- rast("C:/Users/kdaust/AppData/Local/R/cache/R/climr/inputs_pkg/histo
 yr <- 1902
 years <- 1902:2022
 
-for(yr in years){
+for(yr in years) {
   cat(yr,"...\n")
   files <- list.files(paste0("C:/DataFiles/wna_normal/Year_",yr,"MP"), full.names = T)
   files <- files[!grepl("Rad|Tave",files)]
@@ -149,7 +149,7 @@ for(yr in years){
   #plot(alldelta[[1]])
   names(alldelta) <- paste0(names(alldelta),"_",yr)
   
-  if(yr == years[1]){
+  if(yr == years[1]) {
     all_hist <- copy(alldelta)
   }else{
     add(all_hist) <- alldelta

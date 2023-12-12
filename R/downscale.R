@@ -14,7 +14,7 @@
 #' @param vars Character vector of climate variables. Options are `list_vars()`
 #' @param cache Logical. Cache data locally? Default `TRUE`
 
-#' @return `data.frame` of downscaled climate variables for each location. 
+#' @return `data.frame` of downscaled climate variables for each location.
 #'   Historic, normal, and future periods are all returned in one table.
 
 #' @author Kiri Daust
@@ -23,18 +23,18 @@
 #' @importFrom pool poolClose
 #' @importFrom terra rast extract sources ext xres yres crop
 #' @importFrom data.table getDTthreads setDTthreads rbindlist setkey
-#' 
+#'
 #' @examples {
-#' ##TODO.
+#'   ## TODO.
 #' }
-#' 
+#'
 #' @export
 
 climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), historic_period = NULL, historic_ts = NULL,
-                            gcm_models = NULL, ssp = c("ssp126", "ssp245", "ssp370", "ssp585"), 
-                            gcm_period = NULL, gcm_ts_years = NULL, gcm_hist_years = NULL, max_run = 0L, return_normal = TRUE, 
-                            vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3)))), cache = TRUE){
-  # xyz <- coords 
+                            gcm_models = NULL, ssp = c("ssp126", "ssp245", "ssp370", "ssp585"),
+                            gcm_period = NULL, gcm_ts_years = NULL, gcm_hist_years = NULL, max_run = 0L, return_normal = TRUE,
+                            vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))), cache = TRUE) {
+  # xyz <- coords
   # which_normal = "auto"
   # historic_period = NULL
   # historic_ts = NULL
@@ -46,111 +46,119 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
   # return_normal = TRUE
   # cache = TRUE
   # vars = c("PPT","CMI","PET07")
-  
+
   message("Welcome to climr!")
   dbCon <- data_connect()
-  thebb <- get_bb(xyz) ##get bounding box based on input points
-  
-  if(ncol(xyz) > 4){ ##remove extraneous columns
-    xyz <- xyz[,1:4]
+  thebb <- get_bb(xyz) ## get bounding box based on input points
+
+  if (ncol(xyz) > 4) { ## remove extraneous columns
+    xyz <- xyz[, 1:4]
   }
-  xyz <- as.data.frame(xyz) ##input needs to be a data.frame, not data.table. This is something we could change in the future
-  
+  xyz <- as.data.frame(xyz) ## input needs to be a data.frame, not data.table. This is something we could change in the future
+
   message("Getting normals...")
-  if(which_normal == "NorAm"){
-    normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache) 
-  }else if(which_normal == "BC"){
-    normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache) 
-  }else{
-    if(ncol(xyz) == 3) xyz$ID <- 1:nrow(xyz)
-    bc_outline <- rast(system.file("extdata", "bc_outline.tif", package="climr"))
-    pnts <- extract(bc_outline,xyz[,1:2], method = "simple")
-    bc_ids <- xyz[,4][!is.na(pnts$PPT01)]
-    if(length(bc_ids) >= 1){
+  if (which_normal == "NorAm") {
+    normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
+  } else if (which_normal == "BC") {
+    normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache)
+  } else {
+    if (ncol(xyz) == 3) xyz$ID <- 1:nrow(xyz)
+    bc_outline <- rast(system.file("extdata", "bc_outline.tif", package = "climr"))
+    pnts <- extract(bc_outline, xyz[, 1:2], method = "simple")
+    bc_ids <- xyz[, 4][!is.na(pnts$PPT01)]
+    if (length(bc_ids) >= 1) {
       xyz_save <- xyz
       xyz <- xyz[!is.na(pnts$PPT01),]
       thebb_bc <- get_bb(xyz)
       message("for BC...")
-      normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb_bc, cache = cache) 
-    }else{
+      normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb_bc, cache = cache)
+    } else {
       normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
     }
   }
-  
-  
-  if(!is.null(historic_period)){
+
+
+  if (!is.null(historic_period)) {
     message("Getting historic...")
     historic_period <- historic_input(dbCon, bbox = thebb, period = historic_period, cache = cache)
-  } 
-  if(!is.null(historic_ts)) historic_ts <- historic_input_ts(dbCon, bbox = thebb, years = historic_ts, cache = cache)
-  
-  if(!is.null(gcm_models)){
-    if(!is.null(gcm_period)){
+  }
+  if (!is.null(historic_ts)) historic_ts <- historic_input_ts(dbCon, bbox = thebb, years = historic_ts, cache = cache)
+
+  if (!is.null(gcm_models)) {
+    if (!is.null(gcm_period)) {
       message("Getting GCMs...")
-      gcm <- gcm_input_postgis(dbCon, bbox = thebb, gcm = gcm_models, 
-                               ssp = ssp, 
-                               period = gcm_period,
-                               max_run = max_run,
-                               cache = cache)
-    }else{
+      gcm <- gcm_input_postgis(dbCon,
+        bbox = thebb, gcm = gcm_models,
+        ssp = ssp,
+        period = gcm_period,
+        max_run = max_run,
+        cache = cache
+      )
+    } else {
       gcm <- NULL
     }
-    if(!is.null(gcm_ts_years)){
-      gcm_ts <- gcm_ts_input(dbCon, bbox = thebb, gcm = gcm_models, 
-                             ssp = ssp, 
-                             years = gcm_ts_years,
-                             max_run = max_run,
-                             cache = cache)
-    }else{
+    if (!is.null(gcm_ts_years)) {
+      gcm_ts <- gcm_ts_input(dbCon,
+        bbox = thebb, gcm = gcm_models,
+        ssp = ssp,
+        years = gcm_ts_years,
+        max_run = max_run,
+        cache = cache
+      )
+    } else {
       gcm_ts <- NULL
     }
-    if(!is.null(gcm_hist_years)){
-      gcm_hist <- gcm_hist_input(dbCon, bbox = thebb, gcm = gcm_models, 
-                                 years = gcm_hist_years,
-                                 max_run = max_run,
-                                 cache = cache)
-    }else{
+    if (!is.null(gcm_hist_years)) {
+      gcm_hist <- gcm_hist_input(dbCon,
+        bbox = thebb, gcm = gcm_models,
+        years = gcm_hist_years,
+        max_run = max_run,
+        cache = cache
+      )
+    } else {
       gcm_hist <- NULL
     }
-  }else{
+  } else {
     gcm <- gcm_ts <- gcm_hist <- NULL
   }
-  
+
   message("Downscaling!!")
   results <- downscale(
     xyz = xyz,
     normal = normal,
     historic = historic_period,
     historic_ts = historic_ts,
-    gcm = gcm, 
+    gcm = gcm,
     gcm_ts = gcm_ts,
     gcm_hist = gcm_hist,
     return_normal = return_normal,
     vars = vars
   )
- 
-  if(which_normal %in% c("BC","NorAm")) return(results)
-  if(length(bc_ids) == nrow(xyz_save) | length(bc_ids) < 1){
+
+  if (which_normal %in% c("BC", "NorAm")) {
+    return(results)
+  }
+  if (length(bc_ids) == nrow(xyz_save) | length(bc_ids) < 1) {
     poolClose(dbCon)
     return(results)
-  }else{
-    na_xyz <- xyz_save[!xyz_save[,4] %in% bc_ids,]
+  } else {
+    na_xyz <- xyz_save[!xyz_save[, 4] %in% bc_ids,]
     thebb <- get_bb(na_xyz)
     message("Now North America...")
     normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
-    
+
     results_na <- downscale(
       xyz = na_xyz,
       normal = normal,
       historic = historic_period,
       historic_ts = historic_ts,
-      gcm = gcm, 
+      gcm = gcm,
       gcm_ts = gcm_ts,
       gcm_hist = gcm_hist,
       return_normal = return_normal,
       vars = vars
     )
-    
+
     res_all <- rbind(results, results_na)
     poolClose(dbCon)
     return(res_all)
@@ -190,11 +198,9 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' historic <- historic_input()
 #' out <- downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)
 #' }
-
 downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, gcm_hist = NULL, historic_ts = NULL, return_normal = FALSE,
-                      vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"),sort(rep(1:12,3)))),
+                      vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))),
                       ppt_lr = FALSE, nthread = 1L) {
-  
   # Make sure normal was built using normal_input
   if (!isTRUE(attr(normal, "builder") == "climr")) {
     stop(
@@ -202,7 +208,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
       " See `?normal_input` for details."
     )
   }
-  
+
   # Make sure gcm was built using gcm_input
   if (!is.null(gcm) && !isTRUE(attr(gcm, "builder") == "climr")) {
     stop(
@@ -210,36 +216,38 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
       " See `?gcm_input` for details."
     )
   }
-  
+
   if (nthread > 1) {
     # initiate cluster
-    if (Sys.info()['sysname'] != "Windows") {
+    if (Sys.info()["sysname"] != "Windows") {
       cl <- parallel::makeForkCluster(nthread)
     } else {
       cl <- parallel::makePSOCKcluster(nthread)
     }
     # destroy cluster on exit
     on.exit(parallel::stopCluster(cl), add = TRUE)
-    
+
     # Pre setting ID for recycling later
-    xyz[,4L] <- seq_len(nrow(xyz))
+    xyz[, 4L] <- seq_len(nrow(xyz))
     # Reordering on y axis for smaller cropped area and faster
     # sequential reads
-    xyz <- xyz[order(xyz[,2L]),]
+    xyz <- xyz[order(xyz[, 2L]),]
     # Split before parallel processing
     xyz <- lapply(
       parallel::splitIndices(nrow(xyz), length(cl)),
-      function(x) {xyz[x,]}
+      function(x) {
+        xyz[x,]
+      }
     )
-    
-    threaded_downscale_ <- function(xyz, normal_path, gcm_paths, historic_paths, vars, ppt_lr) { ##add gcm_ts here
-      
+
+    threaded_downscale_ <- function(xyz, normal_path, gcm_paths, historic_paths, vars, ppt_lr) { ## add gcm_ts here
+
       # Set DT threads to 1 in parallel to avoid overloading CPU
       # Not needed for forking, not taking any chances
       dt_nt <- getDTthreads()
       setDTthreads(1)
       on.exit(setDTthreads(dt_nt))
-      
+
       # Reload SpatRaster pointers
       normal <- rast(normal_path)
       gcm <- lapply(gcm_paths, function(x) {
@@ -248,13 +256,13 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
       historic <- lapply(historic_paths, function(x) {
         rast(x[["source"]], lyrs = x[["lyrs"]])
       })
-      
+
       # Downscale
       res <- downscale_(xyz, normal, gcm, historic, return_normal, vars, ppt_lr)
-      
+
       return(res)
     }
-    
+
     # Parallel processing and recombine
     res <- rbindlist(
       parallel::parLapply(
@@ -275,17 +283,13 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
       ),
       use.names = TRUE
     )
-    
   } else {
-    
     # Downscale without parallel processing
     res <- downscale_(xyz, normal, gcm, historic, gcm_ts, gcm_hist, historic_ts, return_normal, vars, ppt_lr)
-    
   }
-  
+
   setkey(res, "ID")
   return(res)
-  
 }
 
 #' Simple downscale
@@ -294,96 +298,98 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
 #' @importFrom terra crop ext xres yres extract
 
 downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_ts, return_normal, vars, ppt_lr = FALSE) {
-  #print(xyzID)
+  # print(xyzID)
   # Define normal extent
   ex <- ext(
     c(
-      min(xyzID[,1L]) - xres(normal)*2,
-      max(xyzID[,1L]) + xres(normal)*2,
-      min(xyzID[,2L]) - yres(normal)*2,
-      max(xyzID[,2L]) + yres(normal)*2
+      min(xyzID[, 1L]) - xres(normal) * 2,
+      max(xyzID[, 1L]) + xres(normal) * 2,
+      min(xyzID[, 2L]) - yres(normal) * 2,
+      max(xyzID[, 2L]) + yres(normal) * 2
     )
   )
-  
+
   # crop normal raster (while also loading it to memory)
   normal <- crop(normal, ex, snap = "out")
-  
+
   # Normal value extraction
   # possible garbage output :
   # Error in (function (x)  : attempt to apply non-function
   # Error in x$.self$finalize() : attempt to apply non-function
   # Can ignore, trying to suppress messages with `shush`
   # https://github.com/rspatial/terra/issues/287
-  
+
   # stack before extracting
-  res <- 
+  res <-
     extract(
       x = normal,
-      y = xyzID[,1L:2L],
+      y = xyzID[, 1L:2L],
       method = "bilinear"
     )
-  
-  
+
+
   # Compute elevation differences between provided points elevation and normal
   # Dem at position 74 (ID column + 36 normal layers + 36 lapse rate layers + 1 dem layer)
-  elev_delta <- xyzID[,3L] - res[, 74L]
-  #print(elev_delta)
-  #print(res)
+  elev_delta <- xyzID[, 3L] - res[, 74L]
+  # print(elev_delta)
+  # print(res)
   # Compute individual point lapse rate adjustments
   # Lapse rate position 38:73 (ID column + 36 normal layers + 36 lapse rate layers)
-  lr <- elev_delta * res[, 38L:73L] ##do we need anything other than the lapse rate?
-  
+  lr <- elev_delta * res[, 38L:73L] ## do we need anything other than the lapse rate?
+
   # Replace any NAs left with 0s
   lr[is.na(lr)] <- 0L
-  
+
   # Remove lapse rates and digital elevation model from res
-  res[,38L:74L] <- NULL
-  
+  res[, 38L:74L] <- NULL
+
   # Combine results (ignoring ID column)
   if (isTRUE(ppt_lr)) {
-    res[,-1L] <- res[,-1L] + lr
+    res[, -1L] <- res[, -1L] + lr
   } else {
     ppt <- grep("^PPT", names(normal)[1L:36L], invert = TRUE)
     res[, ppt + 1L] <- res[, ppt + 1L] + lr[, ppt]
   }
-  
+
   # Process one GCM stacked layers
   process_one_gcm <- function(gcm_, res, xyzID, timeseries) {
-    ##gcm_ <- gcm[[1]]
+    ## gcm_ <- gcm[[1]]
     # Store names for later use
     nm <- names(gcm_)
-    
+
     # Define gcm extent. res*2 To make sure we capture surrounding
     # cells for bilinear interpolation.
     ex <- ext(
       c(
-        min(xyzID[,1L]) - xres(gcm_)*2,
-        max(xyzID[,1L]) + xres(gcm_)*2,
-        min(xyzID[,2L]) - yres(gcm_)*2,
-        max(xyzID[,2L]) + yres(gcm_)*2
+        min(xyzID[, 1L]) - xres(gcm_) * 2,
+        max(xyzID[, 1L]) + xres(gcm_) * 2,
+        min(xyzID[, 2L]) - yres(gcm_) * 2,
+        max(xyzID[, 2L]) + yres(gcm_) * 2
       )
     )
     # Extract gcm bilinear interpolations
     # Cropping will reduce the size of data to load in memory
     gcm_ <- crop(gcm_, ex, snap = "out")
-    gcm_ <- extract(x = gcm_, y = xyzID[,1L:2L], method = "bilinear")
-    
+    gcm_ <- extract(x = gcm_, y = xyzID[, 1L:2L], method = "bilinear")
+
     # Create match set to match with res names
     labels <- vapply(
       strsplit(nm, "_"),
-      function(x) {paste0(x[2:3], collapse = "")},
+      function(x) {
+        paste0(x[2:3], collapse = "")
+      },
       character(1)
     )
-    
+
     # Add matching column to gcm_
-    ppt_ <- grep("PPT",labels)
-    gcm_[,ppt_ + 1L] <- gcm_[,ppt_ + 1L] * res[,match(labels[ppt_], names(res))] ##PPT
-    gcm_[,-c(1L, ppt_ + 1L)] <- gcm_[,-c(1L, ppt_ + 1L)] + res[,match(labels[-ppt_], names(res))] ##Temperature
-    
+    ppt_ <- grep("PPT", labels)
+    gcm_[, ppt_ + 1L] <- gcm_[, ppt_ + 1L] * res[, match(labels[ppt_], names(res))] ## PPT
+    gcm_[, -c(1L, ppt_ + 1L)] <- gcm_[, -c(1L, ppt_ + 1L)] + res[, match(labels[-ppt_], names(res))] ## Temperature
+
     # Reshape (melt / dcast) to obtain final form
     ref_dt <- tstrsplit(nm, "_")
     # Recombine PERIOD into one field
-    if(!timeseries){
+    if (!timeseries) {
       ref_dt[[6]] <- paste(ref_dt[[6]], ref_dt[[7]], sep = "_")
       ref_dt[7] <- NULL
     }
@@ -393,14 +399,14 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
     set(ref_dt, j = "variable", value = nm)
     set(ref_dt, j = "GCM", value = gsub(".", "-", ref_dt[["GCM"]], fixed = TRUE))
     setkey(ref_dt, "variable")
-    
+
     # Set Latitude and possibly ID
-    gcm_[["Lat"]] <- xyzID[,2L]
-    gcm_[["Elev"]] <- xyzID[,3L]
+    gcm_[["Lat"]] <- xyzID[, 2L]
+    gcm_[["Elev"]] <- xyzID[, 3L]
     if (ncol(xyzID) == 4L) {
       gcm_[["ID"]] <- xyzID[, 4L]
     }
-    
+
     # Melt gcm_ and set the same key for merging
     gcm_ <- melt(
       setDT(gcm_),
@@ -408,7 +414,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
       variable.factor = FALSE
     )
     setkey(gcm_, "variable")
-    
+
     # Finally, dcast back to final form to get original 36 columns
     gcm_ <- dcast(
       # The merge with shared keys is as simple as that
@@ -417,42 +423,44 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
       value.var = "value",
       sep = ""
     )
-    
+
     return(gcm_)
   }
-  
+
   process_one_gcm_hist <- function(gcm_, res, xyzID) {
-    ##gcm_ <- gcm[[1]]
+    ## gcm_ <- gcm[[1]]
     # Store names for later use
     nm <- names(gcm_)
-    
+
     # Define gcm extent. res*2 To make sure we capture surrounding
     # cells for bilinear interpolation.
     ex <- ext(
       c(
-        min(xyzID[,1L]) - xres(gcm_)*2,
-        max(xyzID[,1L]) + xres(gcm_)*2,
-        min(xyzID[,2L]) - yres(gcm_)*2,
-        max(xyzID[,2L]) + yres(gcm_)*2
+        min(xyzID[, 1L]) - xres(gcm_) * 2,
+        max(xyzID[, 1L]) + xres(gcm_) * 2,
+        min(xyzID[, 2L]) - yres(gcm_) * 2,
+        max(xyzID[, 2L]) + yres(gcm_) * 2
       )
     )
     # Extract gcm bilinear interpolations
     # Cropping will reduce the size of data to load in memory
     gcm_ <- crop(gcm_, ex, snap = "out")
-    gcm_ <- extract(x = gcm_, y = xyzID[,1L:2L], method = "bilinear")
-    
+    gcm_ <- extract(x = gcm_, y = xyzID[, 1L:2L], method = "bilinear")
+
     # Create match set to match with res names
     labels <- vapply(
       strsplit(nm, "_"),
-      function(x) {paste0(x[2:3], collapse = "")},
+      function(x) {
+        paste0(x[2:3], collapse = "")
+      },
       character(1)
     )
-    
+
     # Add matching column to gcm_
-    ppt_ <- grep("PPT",labels)
-    gcm_[,ppt_ + 1L] <- gcm_[,ppt_ + 1L] * res[,match(labels[ppt_], names(res))] ##PPT
-    gcm_[,-c(1L, ppt_ + 1L)] <- gcm_[,-c(1L, ppt_ + 1L)] + res[,match(labels[-ppt_], names(res))] ##Temperature
-    
+    ppt_ <- grep("PPT", labels)
+    gcm_[, ppt_ + 1L] <- gcm_[, ppt_ + 1L] * res[, match(labels[ppt_], names(res))] ## PPT
+    gcm_[, -c(1L, ppt_ + 1L)] <- gcm_[, -c(1L, ppt_ + 1L)] + res[, match(labels[-ppt_], names(res))] ## Temperature
+
     # Reshape (melt / dcast) to obtain final form
     ref_dt <- tstrsplit(nm, "_")
 
@@ -462,14 +470,14 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
     set(ref_dt, j = "variable", value = nm)
     set(ref_dt, j = "GCM", value = gsub(".", "-", ref_dt[["GCM"]], fixed = TRUE))
     setkey(ref_dt, "variable")
-    
+
     # Set Latitude and possibly ID
-    gcm_[["Lat"]] <- xyzID[,2L]
-    gcm_[["Elev"]] <- xyzID[,3L]
+    gcm_[["Lat"]] <- xyzID[, 2L]
+    gcm_[["Elev"]] <- xyzID[, 3L]
     if (ncol(xyzID) == 4L) {
       gcm_[["ID"]] <- xyzID[, 4L]
     }
-    
+
     # Melt gcm_ and set the same key for merging
     gcm_ <- melt(
       setDT(gcm_),
@@ -477,69 +485,69 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
       variable.factor = FALSE
     )
     setkey(gcm_, "variable")
-    
+
     gcm_ <- dcast(
       gcm_[ref_dt,],
       ID + GCM + RUN + PERIOD + Lat + Elev ~ VAR + MONTH,
       value.var = "value",
       sep = ""
     )
-    
+
     return(gcm_)
   }
-  
-  
+
+
   process_one_historic <- function(historic_, res, xyzID, timeseries) {
-    #print(historic_)
+    # print(historic_)
     # Store names for later use
     nm <- names(historic_)
-    
+
     # Define gcm extent. res*2 To make sure we capture surrounding
     # cells for bilinear interpolation.
     ex <- ext(
       c(
-        min(xyzID[,1L]) - xres(historic_)*2,
-        max(xyzID[,1L]) + xres(historic_)*2,
-        min(xyzID[,2L]) - yres(historic_)*2,
-        max(xyzID[,2L]) + yres(historic_)*2
+        min(xyzID[, 1L]) - xres(historic_) * 2,
+        max(xyzID[, 1L]) + xres(historic_) * 2,
+        min(xyzID[, 2L]) - yres(historic_) * 2,
+        max(xyzID[, 2L]) + yres(historic_) * 2
       )
     )
     # Extract gcm bilinear interpolations
     # Cropping will reduce the size of data to load in memory
     historic_ <- crop(historic_, ex, snap = "out")
-    historic_ <- extract(x = historic_, y = xyzID[,1L:2L], method = "bilinear")
-    
+    historic_ <- extract(x = historic_, y = xyzID[, 1L:2L], method = "bilinear")
+
     # Create match set to match with res names
     labels <- nm
-    if(timeseries){
-      labels <- gsub("_.*","",labels)
+    if (timeseries) {
+      labels <- gsub("_.*", "", labels)
     }
-    
-    ppt_ <- grep("PPT",labels)
-    historic_[,ppt_ + 1L] <- historic_[,ppt_ + 1L] * res[,match(labels[ppt_], names(res))] ##PPT
-    historic_[,-c(1L, ppt_ + 1L)] <- historic_[,-c(1L, ppt_ + 1L)] + res[,match(labels[-ppt_], names(res))] ##Temperature
-    
-    
+
+    ppt_ <- grep("PPT", labels)
+    historic_[, ppt_ + 1L] <- historic_[, ppt_ + 1L] * res[, match(labels[ppt_], names(res))] ## PPT
+    historic_[, -c(1L, ppt_ + 1L)] <- historic_[, -c(1L, ppt_ + 1L)] + res[, match(labels[-ppt_], names(res))] ## Temperature
+
+
     # Reshape (melt / dcast) to obtain final form
     ref_dt <- tstrsplit(nm, "_")
     setDT(ref_dt)
-    if(timeseries){
-      setnames(ref_dt, c("VAR","PERIOD"))
+    if (timeseries) {
+      setnames(ref_dt, c("VAR", "PERIOD"))
       set(ref_dt, j = "variable", value = nm)
-    }else{
+    } else {
       setnames(ref_dt, c("VAR"))
       set(ref_dt, j = "variable", value = nm)
       set(ref_dt, j = "PERIOD", value = "2001_2020")
     }
-    
+
     setkey(ref_dt, "variable")
     # Set Latitude and possibly ID
-    historic_[["Lat"]] <- xyzID[,2L]
-    historic_[["Elev"]] <- xyzID[,3L]
+    historic_[["Lat"]] <- xyzID[, 2L]
+    historic_[["Elev"]] <- xyzID[, 3L]
     if (ncol(xyzID) == 4L) {
       historic_[["ID"]] <- xyzID[, 4L]
     }
-    
+
     # Melt gcm_ and set the same key for merging
     historic_ <- melt(
       setDT(historic_),
@@ -547,7 +555,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
       variable.factor = FALSE
     )
     setkey(historic_, "variable")
-    
+
     # Finally, dcast back to final form to get original 36 columns
     historic_ <- dcast(
       # The merge with shared keys is as simple as that
@@ -556,33 +564,39 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
       value.var = "value",
       sep = ""
     )
-    
+
     return(historic_)
   }
-  
+
   if (!is.null(gcm)) {
     # Process each gcm and rbind resulting tables
     res_gcm <- rbindlist(
       lapply(gcm, process_one_gcm, res = res, xyzID = xyzID, timeseries = FALSE),
       use.names = TRUE
     )
-  } else res_gcm <- NULL
+  } else {
+    res_gcm <- NULL
+  }
   if (!is.null(gcm_ts)) {
     # Process each gcm and rbind resulting tables
     res_gcmts <- rbindlist(
       lapply(gcm_ts, process_one_gcm, res = res, xyzID = xyzID, timeseries = TRUE),
       use.names = TRUE
     )
-  } else res_gcmts <- NULL
+  } else {
+    res_gcmts <- NULL
+  }
   if (!is.null(gcm_hist)) {
     # Process each gcm and rbind resulting tables
     res_gcm_hist <- rbindlist(
       lapply(gcm_hist, process_one_gcm_hist, res = res, xyzID = xyzID),
       use.names = TRUE
     )
-  } else res_gcm_hist <- NULL
-  if(!is.null(historic)) {
-    #print(historic)
+  } else {
+    res_gcm_hist <- NULL
+  }
+  if (!is.null(historic)) {
+    # print(historic)
     res_hist <- rbindlist(
       lapply(historic, process_one_historic, res = res, xyzID = xyzID, timeseries = FALSE),
       use.names = TRUE
@@ -590,8 +604,8 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
   } else {
     res_hist <- NULL
   }
-  if(!is.null(historic_ts)) {
-    #print(historic)
+  if (!is.null(historic_ts)) {
+    # print(historic)
     res_hist_ts <- rbindlist(
       lapply(historic_ts, process_one_historic, res = res, xyzID = xyzID, timeseries = TRUE),
       use.names = TRUE
@@ -599,8 +613,8 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
   } else {
     res_hist_ts <- NULL
   }
-  
-  if(return_normal){
+
+  if (return_normal) {
     nm <- names(res)[-1]
     labels <- nm
     normal_ <- res
@@ -612,12 +626,12 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
     set(ref_dt, j = "PERIOD", value = "1961_1990")
     setkey(ref_dt, "variable")
     # Set Latitude and possibly ID
-    normal_[["Lat"]] <- xyzID[,2L]
-    normal_[["Elev"]] <- xyzID[,3L]
+    normal_[["Lat"]] <- xyzID[, 2L]
+    normal_[["Elev"]] <- xyzID[, 3L]
     if (ncol(xyzID) == 4L) {
       normal_[["ID"]] <- xyzID[, 4L]
     }
-    
+
     # Melt gcm_ and set the same key for merging
     normal_ <- melt(
       setDT(normal_),
@@ -625,7 +639,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
       variable.factor = FALSE
     )
     setkey(normal_, "variable")
-    
+
     # Finally, dcast back to final form to get original 36 columns
     normal_ <- dcast(
       # The merge with shared keys is as simple as that
@@ -634,15 +648,13 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
       value.var = "value",
       sep = ""
     )
-  }else{
+  } else {
     normal_ <- NULL
   }
   res <- rbind(res_gcm, res_gcmts, res_gcm_hist, res_hist, res_hist_ts, normal_, use.names = TRUE, fill = TRUE)
-  #print(names(res))
+  # print(names(res))
   # Compute extra climate variables, assign by reference
   append_clim_vars(res, vars)
-  
-  return(res)
-  
-}
 
+  return(res)
+}
