@@ -102,6 +102,12 @@ normal_input_postgis <- function(dbCon, bbox = NULL, normal = "normal_na", cache
   return(res)
 }
 
+#' TODO add documentation here
+#'
+#' @param newbb 
+#' @param oldbb 
+#'
+#' @return
 is_in_bbox <- function(newbb, oldbb) {
   if (newbb[1] < oldbb[1] & newbb[2] > oldbb[2] & newbb[3] < oldbb[3] & newbb[4] > oldbb[4]) {
     TRUE
