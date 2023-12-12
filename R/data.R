@@ -1,3 +1,6 @@
+## TODO: THESE FUNCTIONS SHOULD BE DEPRECATED
+## TODO: check that their removal doesn't break the code
+
 #' Update external package data
 #' @param gcm A character. Relative path from the source root to global circulation models files folder.
 #' Default to option value "climRpnw.gcm.path" if set, or "inputs_pkg/gcmData".

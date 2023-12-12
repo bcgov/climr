@@ -2,7 +2,7 @@
 % Please edit documentation in R/database.R
 \name{data_connect}
 \alias{data_connect}
-\title{Connect to postgis database}
+\title{Connect to PostGIS database}
 \usage{
 data_connect()
 }
@@ -10,5 +10,5 @@ data_connect()
 pool object of database connection
 }
 \description{
-Connect to postgis database
+Connect to PostGIS database
 }

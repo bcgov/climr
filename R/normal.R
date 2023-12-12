@@ -1,12 +1,11 @@
 #' Create normal baseline input for `downscale`
-#' @param normal A character or a SpatRaster. For character, label of the normal baseline to use.
-#' Can be obtained from `list_normal()`. For SpatRaster, 36 layers normal climate variables with
-#' names PPT01:PPT12, Tmax01:Tmax12 and Tmin01:Tmin12. Default to `list_normal()[1]`.
-#' @param dem A digital elevation model SpatRaster. Only needed if normal is a SpatRaster.
-#' Default to NULL.
-#' @param ... Other arguments for lapse rates calculation. See `?lapse_rate`.
-#' @return A normal baseline to use with `downscale`. A `SpatRaster` containing normals, lapse rates
-#' and digital elevation model layers.
+#' @template normal
+#' @template dem
+#' @param ... Other arguments passed [lapse_rate()] for lapse rates calculation. 
+#' 
+#' @return A normal baseline to use with `downscale`. 
+#'   A `SpatRaster` containing normals, lapse rates and digital elevation model
+#'   layers.
 #' @importFrom terra rast writeRaster
 #' @export
 normal_input <- function(normal = list_normal()[1], dem = NULL, ...) {
@@ -23,7 +22,7 @@ normal_input <- function(normal = list_normal()[1], dem = NULL, ...) {
       normal
     )
     file_tif <- list.files(dir_normal, full.names = TRUE, pattern = "\\.tif")
-    res <- terra::rast(file_tif)
+    res <- rast(file_tif)
     attr(res, "builder") <- "climRpnw"
     # Return preprocessed raster
     return(res)
@@ -34,25 +33,26 @@ normal_input <- function(normal = list_normal()[1], dem = NULL, ...) {
   
   # Actual writing
   f <- tempfile(fileext = "tif")
-  terra::writeRaster(c(normal, lr, dem), f, overwrite = TRUE, gdal="COMPRESS=NONE")
+  writeRaster(c(normal, lr, dem), f, overwrite = TRUE, gdal="COMPRESS=NONE")
   
-  res <- terra::rast(f)
+  res <- rast(f)
   attr(res, "builder") <- "climRpnw"
   
   return(res)
 }
 
 #' Create normal baseline input for `downscale` from postgis database.
-#' @param dbCon A db connection object created by `data_connect`.
-#' @param bbox Numeric vector of length 4 giving bounding box of study region, create by `get_bb()`
-#' @param normal A character or a SpatRaster. For character, label of the normal baseline to use.
-#' Can be obtained from `list_normal()`. For SpatRaster, 36 layers normal climate variables with
-#' names PPT01:PPT12, Tmax01:Tmax12 and Tmin01:Tmin12. Default to `list_normal()[1]`.
+#' @template dbCon
+#' @template bbox
+#' @template normal
+#' @template cache
+#' 
 #' @return A normal baseline to use with `downscale`. A `SpatRaster` containing normals, lapse rates
 #' and digital elevation model layers.
+#' 
 #' @importFrom terra rast writeRaster ext
 #' @importFrom data.table fread fwrite data.table
-#' @import uuid
+#' @importFrom uuid UUIDgenerate
 #' @export
 normal_input_postgis <- function(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE) {
   
@@ -67,7 +67,7 @@ normal_input_postgis <- function(dbCon, bbox = NULL, normal = "normal_na", cache
     if(isin){
       message("Retrieving from cache...")
       oldid <- bnds$uid[i]
-      res <- terra::rast(paste0(cache_path(),"/normal/",normal,"/",oldid,".tif"))
+      res <- rast(paste0(cache_path(),"/normal/",normal,"/",oldid,".tif"))
       attr(res, "builder") <- "climRpnw"
       return(res)
     }
@@ -91,12 +91,12 @@ normal_input_postgis <- function(dbCon, bbox = NULL, normal = "normal_na", cache
   attr(res, "builder") <- "climRpnw"
   if(cache){
     message("Caching data...")
-    uid <- uuid::UUIDgenerate()
+    uid <- UUIDgenerate()
     if(!dir.exists(paste0(cache_path(),"/normal/",normal))) dir.create(paste0(cache_path(),"/normal/",normal), recursive = TRUE)
-    terra::writeRaster(res, paste0(cache_path(),"/normal/",normal,"/",uid,".tif"))
-    rastext <- terra::ext(res)
-    temp <- data.table::data.table(uid = uid, ymax = rastext[4]+0.1, ymin = rastext[3]-0.1, xmax = rastext[2]+0.1, xmin = rastext[1]-0.1)
-    data.table::fwrite(temp, file = paste0(cache_path(),"/normal/",normal,"/meta_data.csv"), append = TRUE)
+    writeRaster(res, paste0(cache_path(),"/normal/",normal,"/",uid,".tif"))
+    rastext <- ext(res)
+    temp <- data.table(uid = uid, ymax = rastext[4]+0.1, ymin = rastext[3]-0.1, xmax = rastext[2]+0.1, xmin = rastext[1]-0.1)
+    fwrite(temp, file = paste0(cache_path(),"/normal/",normal,"/meta_data.csv"), append = TRUE)
   }
   # Return preprocessed raster
   return(res)

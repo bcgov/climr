@@ -7,8 +7,14 @@
 historic_input(dbCon, bbox = NULL, period = list_historic(), cache = TRUE)
 }
 \arguments{
+\item{dbCon}{A db connection object created by \code{data_connect}.}
+
+\item{bbox}{Numeric vector of length 4 giving bounding box of study region, created by \code{get_bb()}.}
+
 \item{period}{A character vector. Label of the period to use.
 Can be obtained from \code{list_period()}. Default to \code{list_period()}.}
+
+\item{cache}{Logical specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 }
 \value{
 An object to use with \code{downscale}. A \code{SpatRaster} with, possibly, multiple layers.

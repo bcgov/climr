@@ -1,3 +1,6 @@
+## TODO: THESE FUNCTIONS SHOULD BE DEPRECATED
+## TODO: check that their removal doesn't break the code
+
 #' Get content from source
 #' @param path File path relative to repo root without starting `/`.
 #' @param source A character. Name of the content source. Only supports

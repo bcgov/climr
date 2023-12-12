@@ -1,13 +1,16 @@
 
 #' Create historic input for `downscale`.
-#' @param period A character vector. Label of the period to use.
-#' Can be obtained from `list_period()`. Default to `list_period()`.
+#' @template dbCon
+#' @template bbox
+#' @template period
+#' @template cache
+#' 
 #' @return An object to use with `downscale`. A `SpatRaster` with, possibly, multiple layers.
-#' @importFrom terra rast
+#' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
-#' @import data.table
-#' @import uuid
+#' @importFrom data.table fread setorder data.table fwrite
+#' @importFrom uuid UUIDgenerate
 #' @export
 historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache = TRUE) {
   
@@ -18,18 +21,18 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
   dbcode <- dbnames$dbname[dbnames$PERIOD %in% period]
   
   if(dir.exists(paste0(cache_path(),"/historic/",dbcode))){
-    bnds <- data.table::fread(paste0(cache_path(),"/historic/",dbcode,"/meta_area.csv"))
-    data.table::setorder(bnds, -numlay)
+    bnds <- fread(paste0(cache_path(),"/historic/",dbcode,"/meta_area.csv"))
+    setorder(bnds, -numlay)
     for(i in 1:nrow(bnds)){
       isin <- is_in_bbox(bbox, matrix(bnds[i,2:5]))
       if(isin) break
     }
     if(isin){
       oldid <- bnds$uid[i]
-      periods <- data.table::fread(paste0(cache_path(),"/historic/",dbcode,"/meta_period.csv"))
+      periods <- fread(paste0(cache_path(),"/historic/",dbcode,"/meta_period.csv"))
       if(all(period %in% periods[uid == oldid,period]) ){
         message("Retrieving from cache...")
-        hist_rast <- terra::rast(paste0(cache_path(),"/historic/",dbcode,"/",oldid,".tif"))
+        hist_rast <- rast(paste0(cache_path(),"/historic/",dbcode,"/",oldid,".tif"))
         attr(hist_rast, "builder") <- "climRpnw" 
         return(list(hist_rast))
       }else{
@@ -41,22 +44,22 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
   
   q <- paste0("select fullnm, laynum from historic_layers where period in ('",paste(period, collapse = "','"),"')")
   #print(q)
-  layerinfo <- RPostgres::dbGetQuery(dbCon, q)
+  layerinfo <- dbGetQuery(dbCon, q)
   message("Downloading historic anomalies")
   hist_rast <- pgGetTerra(dbCon, dbcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
   names(hist_rast) <- layerinfo$fullnm
   
   if(cache){
     message("Caching data...")
-    uid <- uuid::UUIDgenerate()
+    uid <- UUIDgenerate()
     if(!dir.exists(paste0(cache_path(), "/historic/",dbcode))) dir.create(paste0(cache_path(), "/historic/",dbcode), recursive = TRUE)
-    terra::writeRaster(hist_rast, paste0(cache_path(),"/historic/",dbcode, "/", uid,".tif"))
-    rastext <- terra::ext(hist_rast)
-    t1 <- data.table::data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1], 
-                                 numlay = terra::nlyr(hist_rast))
-    t2 <- data.table::data.table(uid = rep(uid, length(period)),period = period)
-    data.table::fwrite(t1, file = paste0(cache_path(),"/historic/",dbcode,"/meta_area.csv"), append = TRUE)
-    data.table::fwrite(t2, file = paste0(cache_path(),"/historic/",dbcode,"/meta_period.csv"), append = TRUE)
+    writeRaster(hist_rast, paste0(cache_path(),"/historic/",dbcode, "/", uid,".tif"))
+    rastext <- ext(hist_rast)
+    t1 <- data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1], 
+                                 numlay = nlyr(hist_rast))
+    t2 <- data.table(uid = rep(uid, length(period)),period = period)
+    fwrite(t1, file = paste0(cache_path(),"/historic/",dbcode,"/meta_area.csv"), append = TRUE)
+    fwrite(t2, file = paste0(cache_path(),"/historic/",dbcode,"/meta_period.csv"), append = TRUE)
   }
   
   attr(hist_rast, "builder") <- "climRpnw" 
@@ -65,15 +68,16 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 
 
 #' Create historic timeseries input for `downscale`.
-#' @param dbCon Database connection
-#' @param bbox Bounding box of data, from `get_bb`
+#' @template dbCon
+#' @template bbox
+#' @template cache
 #' @param years Years to retrieve timeseries for, in `1902:2022`. Default `2010:2022`
 #' @return An object to use with `downscale`. A `SpatRaster` with, possibly, multiple layers.
-#' @importFrom terra rast
+#' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
-#' @import data.table
-#' @import uuid
+#' @importFrom data.table fread setorder data.table fwrite
+#' @importFrom uuid UUIDgenerate
 #' @export
 #' 
 historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRUE) {
@@ -82,18 +86,18 @@ historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRU
   ts_name <- "climatebc"
   
   if(dir.exists(paste0(cache_path(),"/historic_ts/",ts_name))){
-    bnds <- data.table::fread(paste0(cache_path(),"/historic_ts/",ts_name,"/meta_area.csv"))
-    data.table::setorder(bnds, -numlay)
+    bnds <- fread(paste0(cache_path(),"/historic_ts/",ts_name,"/meta_area.csv"))
+    setorder(bnds, -numlay)
     for(i in 1:nrow(bnds)){
       isin <- is_in_bbox(bbox, matrix(bnds[i,2:5]))
       if(isin) break
     }
     if(isin){
       oldid <- bnds$uid[i]
-      periods <- data.table::fread(paste0(cache_path(),"/historic_ts/",ts_name,"/meta_period.csv"))
+      periods <- fread(paste0(cache_path(),"/historic_ts/",ts_name,"/meta_period.csv"))
       if(all(years %in% periods[uid == oldid,period]) ){
         message("Retrieving from cache...")
-        hist_rast <- terra::rast(paste0(cache_path(),"/historic_ts/",ts_name,"/",oldid,".tif"))
+        hist_rast <- rast(paste0(cache_path(),"/historic_ts/",ts_name,"/",oldid,".tif"))
         attr(hist_rast, "builder") <- "climRpnw" 
         return(list(hist_rast))
       }else{
@@ -105,22 +109,22 @@ historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRU
   
   q <- paste0("select fullnm, laynum from historic_ts_layers where period in ('",paste(years, collapse = "','"),"')")
   #print(q)
-  layerinfo <- RPostgres::dbGetQuery(dbCon, q)
+  layerinfo <- dbGetQuery(dbCon, q)
   message("Downloading historic anomalies")
   hist_rast <- pgGetTerra(dbCon, dbcode,tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
   names(hist_rast) <- layerinfo$fullnm
   
   if(cache){
     message("Caching data...")
-    uid <- uuid::UUIDgenerate()
+    uid <- UUIDgenerate()
     if(!dir.exists(paste0(cache_path(), "/historic_ts/",ts_name))) dir.create(paste0(cache_path(), "/historic_ts/",ts_name), recursive = TRUE)
-    terra::writeRaster(hist_rast, paste0(cache_path(),"/historic_ts/",ts_name, "/", uid,".tif"))
-    rastext <- terra::ext(hist_rast)
-    t1 <- data.table::data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1], 
-                                 numlay = terra::nlyr(hist_rast))
-    t2 <- data.table::data.table(uid = rep(uid, length(years)),period = years)
-    data.table::fwrite(t1, file = paste0(cache_path(),"/historic_ts/",ts_name,"/meta_area.csv"), append = TRUE)
-    data.table::fwrite(t2, file = paste0(cache_path(),"/historic_ts/",ts_name,"/meta_period.csv"), append = TRUE)
+    writeRaster(hist_rast, paste0(cache_path(),"/historic_ts/",ts_name, "/", uid,".tif"))
+    rastext <- ext(hist_rast)
+    t1 <- data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1], 
+                                 numlay = nlyr(hist_rast))
+    t2 <- data.table(uid = rep(uid, length(years)),period = years)
+    fwrite(t1, file = paste0(cache_path(),"/historic_ts/",ts_name,"/meta_area.csv"), append = TRUE)
+    fwrite(t2, file = paste0(cache_path(),"/historic_ts/",ts_name,"/meta_period.csv"), append = TRUE)
   }
   
   attr(hist_rast, "builder") <- "climRpnw" 

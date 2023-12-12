@@ -13,6 +13,6 @@ The full path of the package local cache.
 Return package local cache path
 }
 \details{
-By default, it uses \code{tools::R_user_dir}. The cache location can be
+By default, it uses \code{\link[tools:userdir]{tools::R_user_dir()}}. The cache location can be
 set using the \code{climRpnw.cache.path} option with \code{options("climRpnw.cache.path" = "your_path")}.
 }
