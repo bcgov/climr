@@ -124,11 +124,11 @@ files <- list.files("C:/DataFiles/wna_normal/Year_1902MP", full.names = T)
 dat <- rast(files)
 plot(dat)
 
-normal <- rast("C:/Users/kdaust/AppData/Local/R/cache/R/climRpnw/inputs_pkg/normal/Normal_1961_1990MP/Normal_1961_1990MP.wlrdem.tif")
+normal <- rast("C:/Users/kdaust/AppData/Local/R/cache/R/climr/inputs_pkg/normal/Normal_1961_1990MP/Normal_1961_1990MP.wlrdem.tif")
 test <- dat - normal$Tmax07
 plot(test)
 
-template <- rast("C:/Users/kdaust/AppData/Local/R/cache/R/climRpnw/inputs_pkg/historic/Historic_2001_2020/2001_2020.tif")
+template <- rast("C:/Users/kdaust/AppData/Local/R/cache/R/climr/inputs_pkg/historic/Historic_2001_2020/2001_2020.tif")
 
 yr <- 1902
 years <- 1902:2022

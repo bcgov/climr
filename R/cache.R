@@ -2,12 +2,12 @@
 
 #' Return package local cache path
 #' @details By default, it uses [tools::R_user_dir()]. The cache location can be
-#' set using the `climRpnw.cache.path` option with `options("climRpnw.cache.path" = "your_path")`.
+#' set using the `climr.cache.path` option with `options("climr.cache.path" = "your_path")`.
 #' @return The full path of the package local cache.
 #' @importFrom tools R_user_dir
 #' @export
 cache_path <- function() {
-  getOption("climRpnw.cache.path", default = R_user_dir("climr", "cache"))
+  getOption("climr.cache.path", default = R_user_dir("climr", "cache"))
 }
 
 #' Check if package local cache exists
@@ -30,7 +30,7 @@ cache_ask <- function(ask = interactive()) {
       stop("Cancelled by user.", call. = FALSE)
     } else {
       # To avoid asking again in the same session
-      options("climRpnw.session.cache.ask.response" = response)
+      options("climr.session.cache.ask.response" = response)
       return(response)
     }
   } else {

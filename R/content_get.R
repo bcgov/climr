@@ -19,7 +19,7 @@ content_get <- function(path, source = c("github"), ...) {
 }
 
 #' @param repo Repository name prefixed with organisation name and separated by a `/`.
-#' Default to option "climRpnw.gh.repo" value if set, or "bcgov/climR-pnw". This is
+#' Default to option "climr.gh.repo" value if set, or "bcgov/climR-pnw". This is
 #' the source root.
 #' @param ref The name of the commit/branch/tag. Default NULL means it uses the repository’s default branch.
 #' @return A list of metadata about files in a repository directory or the content of a file. See 
@@ -27,7 +27,7 @@ content_get <- function(path, source = c("github"), ...) {
 #' @importFrom gh gh
 #' @rdname content_get
 content_get_gh <- function(path,
-                           repo = getOption("climRpnw.gh.repo", default = "bcgov/climR-pnw"),
+                           repo = getOption("climr.gh.repo", default = "bcgov/climR-pnw"),
                            ref = "data") {
   
   if (FALSE) { type <- NULL }
