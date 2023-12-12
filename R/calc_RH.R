@@ -50,6 +50,7 @@ calc_SVP <- function(t) {
   return(svp)
 }
 
+#' internal utility function
 #' @template t
 .calc_SVP <- function(t){
   return(0.6105 * exp((17.273*t)/(t+237.3)))
