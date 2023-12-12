@@ -19,6 +19,6 @@ Calculate Degree-Day Below 18 (DD<18)
 }
 \examples{
 \dontrun{
-calc_DD_below_18(2, -14)
+climr:::calc_DD_below_18(2, -14)
 }
 }

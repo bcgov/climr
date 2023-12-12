@@ -41,7 +41,7 @@ calc_DD_m_below <- function(tm, k, a, b, t0, beta, c){
 #'
 #' @examples
 #' \dontrun{
-#' calc_DD_below_0(2, -14)
+#' climr:::calc_DD_below_0(2, -14)
 #' }
 calc_DD_below_0 <- function(m, tm){
   
@@ -69,7 +69,7 @@ calc_DD_below_0 <- function(m, tm){
 #'
 #' @examples
 #' \dontrun{
-#' calc_DD_above_5(2, -14, "All")
+#' climr:::calc_DD_above_5(2, -14, "All")
 #' }
 calc_DD_above_5 <- function(m, tm, region){
   
@@ -100,7 +100,7 @@ calc_DD_above_5 <- function(m, tm, region){
 #'
 #' @examples
 #' \dontrun{
-#' calc_DD_below_18(2, -14)
+#' climr:::calc_DD_below_18(2, -14)
 #' }
 calc_DD_below_18 <- function(m, tm){
   
@@ -129,7 +129,7 @@ calc_DD_below_18 <- function(m, tm){
 #'
 #' @examples
 #' \dontrun{
-#' calc_DD_above_18(2, -14, "All")
+#' climr:::calc_DD_above_18(2, -14, "All")
 #' }
 calc_DD_above_18 <- function(m, tm, region){
   

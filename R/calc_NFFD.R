@@ -7,7 +7,7 @@
 #' 
 #' @examples
 #' \dontrun{
-#' calc_NFFD(3, 2.05)
+#' climr:::calc_NFFD(3, 2.05)
 #' }
 calc_NFFD <- function(m, tm) {
   

@@ -13,7 +13,7 @@
 #' "5" = -5, "6" = 3,  "7" = 15, "8" = 17, "9" = 10, "10" = -5,
 #' "11" = -20, "12" = -30)
 #' 
-#' calc_bFFP(td = 30, NFFD= 10, t_min_list = t_min_list)
+#' climr:::calc_bFFP(td = 30, NFFD= 10, t_min_list = t_min_list)
 #' }
 calc_bFFP <- function(td, NFFD, t_min_list) {
   
@@ -42,7 +42,7 @@ calc_bFFP <- function(td, NFFD, t_min_list) {
 #' "5" = -5, "6" = 3,  "7" = 15, "8" = 17, "9" = 10, "10" = -5,
 #' "11" = -20, "12" = -30)
 #' 
-#' calc_eFFP(NFFD = 10, t_min_list = t_min_list)
+#' climr:::calc_eFFP(NFFD = 10, t_min_list = t_min_list)
 #' }
 calc_eFFP <- function(NFFD, t_min_list) {
   
@@ -65,7 +65,7 @@ calc_eFFP <- function(NFFD, t_min_list) {
 #'
 #' @examples
 #' \dontrun{
-#' calc_FFP(bFFP = 214.5964, eFFP = 265.4581)
+#' climr:::calc_FFP(bFFP = 214.5964, eFFP = 265.4581)
 #' }
 calc_FFP <-function(bFFP, eFFP) {
   eFFP - bFFP
