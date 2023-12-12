@@ -240,29 +240,6 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
       }
     )
 
-    threaded_downscale_ <- function(xyz, normal_path, gcm_paths, historic_paths, vars, ppt_lr) { ## add gcm_ts here
-
-      # Set DT threads to 1 in parallel to avoid overloading CPU
-      # Not needed for forking, not taking any chances
-      dt_nt <- getDTthreads()
-      setDTthreads(1)
-      on.exit(setDTthreads(dt_nt))
-
-      # Reload SpatRaster pointers
-      normal <- rast(normal_path)
-      gcm <- lapply(gcm_paths, function(x) {
-        rast(x[["source"]], lyrs = x[["lyrs"]])
-      })
-      historic <- lapply(historic_paths, function(x) {
-        rast(x[["source"]], lyrs = x[["lyrs"]])
-      })
-
-      # Downscale
-      res <- downscale_(xyz, normal, gcm, historic, return_normal, vars, ppt_lr)
-
-      return(res)
-    }
-
     # Parallel processing and recombine
     res <- rbindlist(
       parallel::parLapply(
@@ -352,6 +329,38 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
   }
 
   # Process one GCM stacked layers
+#' TODO: fill documentation here
+#'
+#' @param xyz 
+#' @param normal_path 
+#' @param gcm_paths 
+#' @param historic_paths 
+#' @param vars 
+#' @param ppt_lr 
+#'
+#' @return
+threaded_downscale_ <- function(xyz, normal_path, gcm_paths, historic_paths, vars, ppt_lr) { ## add gcm_ts here
+  
+  # Set DT threads to 1 in parallel to avoid overloading CPU
+  # Not needed for forking, not taking any chances
+  dt_nt <- getDTthreads()
+  setDTthreads(1)
+  on.exit(setDTthreads(dt_nt))
+  
+  # Reload SpatRaster pointers
+  normal <- rast(normal_path)
+  gcm <- lapply(gcm_paths, function(x) {
+    rast(x[["source"]], lyrs = x[["lyrs"]])
+  })
+  historic <- lapply(historic_paths, function(x) {
+    rast(x[["source"]], lyrs = x[["lyrs"]])
+  })
+  
+  # Downscale
+  res <- downscale_(xyz, normal, gcm, historic, return_normal, vars, ppt_lr)
+  
+  return(res)
+}
   process_one_gcm <- function(gcm_, res, xyzID, timeseries) {
     ## gcm_ <- gcm[[1]]
     # Store names for later use
