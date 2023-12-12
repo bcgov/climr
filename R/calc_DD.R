@@ -12,7 +12,6 @@ calc_DD_m_above <- function(tm, k, a, b, t0, beta, c){
   DD_m[i] <- c + beta * tm[i]
   
   return(DD_m)
-  
 }
 
 #' @noRd

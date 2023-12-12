@@ -27,6 +27,14 @@ downscale(
 
 \item{historic}{Historic time period input from \code{historic_input}. Default to NULL}
 
+\item{gcm_ts}{TODO}
+
+\item{gcm_hist}{TODO}
+
+\item{historic_ts}{TODO}
+
+\item{return_normal}{TODO}
+
 \item{vars}{A character vector of climate variables to compute. Supported variables
 can be obtained with \code{list_variables()}. Definitions can be found in this package
 \code{variables} dataset. Default to monthly PPT, Tmax, Tmin.}
@@ -49,5 +57,7 @@ xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = r
 normal <- normal_input()
 gcm_input <- gcm_input(list_gcm()[3], list_ssp()[1], list_period()[2])
 downscale(xyz, normal, gcm)
+historic <- historic_input()
+out <- downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)
 }
 }

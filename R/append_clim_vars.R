@@ -1,6 +1,8 @@
 #' Add extra climate variables to a data.table
 #' @param dt A data.table with TminXX, TmaxXX, PPTXX for XX in 01 to 12.
 #' @param vars A character vector of climate variables to compute.
+#' 
+#' @importFrom data.table set setcolorder
 append_clim_vars <- function(dt, vars) {
   
   # Return variable or create it if not found in dt
@@ -286,7 +288,7 @@ append_clim_vars <- function(dt, vars) {
 }
 
 #' List climate variables
-#' @param only_extra A boolean. Should Tmin, Tmax and PPT be excluded? Default to FALSE.
+#' @param only_extra A boolean. Should Tmin, Tmax and PPT be excluded? Defaults to FALSE.
 #' @export
 list_variables <- function(only_extra = FALSE) {
   if (FALSE) { variables <- NULL }

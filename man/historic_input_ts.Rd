@@ -7,11 +7,13 @@
 historic_input_ts(dbCon, bbox = NULL, years = 2010:2022, cache = TRUE)
 }
 \arguments{
-\item{dbCon}{Database connection}
+\item{dbCon}{A db connection object created by \code{data_connect}.}
 
-\item{bbox}{Bounding box of data, from \code{get_bb}}
+\item{bbox}{Numeric vector of length 4 giving bounding box of study region, created by \code{get_bb()}.}
 
 \item{years}{Years to retrieve timeseries for, in \code{1902:2022}. Default \code{2010:2022}}
+
+\item{cache}{Logical specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 }
 \value{
 An object to use with \code{downscale}. A \code{SpatRaster} with, possibly, multiple layers.
