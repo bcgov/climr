@@ -19,6 +19,6 @@ Calculate Relative Humidity (RH)
 }
 \examples{
 \dontrun{
-calc_RH(tmin_mean = 10, tmax_mean = 40)
+climr:::calc_RH(tmin_mean = 10, tmax_mean = 40)
 }
 }

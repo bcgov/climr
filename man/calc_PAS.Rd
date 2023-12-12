@@ -21,6 +21,6 @@ Calculate Precipitation As Snow (PAS)
 }
 \examples{
 \dontrun{
-calc_PAS(4, 2)
+climr:::calc_PAS(4, 2)
 }
 }

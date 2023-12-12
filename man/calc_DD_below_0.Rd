@@ -19,6 +19,6 @@ Calculate Degree-Day Below 0 (DD<0)
 }
 \examples{
 \dontrun{
-calc_DD_below_0(2, -14)
+climr:::calc_DD_below_0(2, -14)
 }
 }

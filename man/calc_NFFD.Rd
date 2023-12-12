@@ -19,6 +19,6 @@ Calculate Number of Frost Free Days (NFFD)
 }
 \examples{
 \dontrun{
-calc_NFFD(3, 2.05)
+climr:::calc_NFFD(3, 2.05)
 }
 }
