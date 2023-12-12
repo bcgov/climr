@@ -11,26 +11,25 @@
 #' Instead, data is downloaded, optionally cached, when you need to run functions.
 #' @export
 data_update <- function(
-  ...,
-  gcm = getOption("climr.gcm.path", default = "inputs_pkg/gcm"),
-  historic = getOption("climr.historic.path", default = "inputs_pkg/historic"),
-  normal = getOption("climr.normal.path", default = "inputs_pkg/normal"),
-  quiet = !interactive()) {
-  
+    ...,
+    gcm = getOption("climr.gcm.path", default = "inputs_pkg/gcm"),
+    historic = getOption("climr.historic.path", default = "inputs_pkg/historic"),
+    normal = getOption("climr.normal.path", default = "inputs_pkg/normal"),
+    quiet = !interactive()) {
   # Reset options value if provided by user. They will be used to retrieve data by other functions.
   options("climr.gcm.path" = gcm)
   options("climr.normal.path" = normal)
   options("climr.historic.path" = historic)
-  
+
   # Retrieve gcm file list
   gcm_files <- content_get(path = gcm, ...)
-  
+
   # Retrieve normal file list
   normal_files <- content_get(path = normal, ...)
-  
+
   # Retrieve historic file list
   historic_files <- content_get(path = historic, ...)
-  
+
   # Do the actual download of files
   data_get(
     files = data.table::rbindlist(
@@ -42,9 +41,8 @@ data_update <- function(
     ),
     quiet = quiet
   )
-  
+
   return(invisible(TRUE))
-  
 }
 
 #' Process a list of files.
@@ -68,19 +66,18 @@ data_get <- function(files, quiet = !interactive()) {
 #' @param quiet A logical. If `TRUE`, suppress status messages (if any), and the progress bar.
 #' @importFrom utils download.file
 data_download <- function(url, path, uid, quiet = !interactive()) {
-  
   # If file uid  on local disk is the same, skip download
   existing <- uid_check(path, uid)
   if (all(existing)) {
     return(invisible(TRUE))
   }
-  
+
   # Determine where to save the downloaded file
   dest <- file.path(data_path(), path[!existing])
-  
+
   # Create directory if it does not already exist
   lapply(unique(dirname(dest)), dir.create, recursive = TRUE, showWarnings = FALSE)
-  
+
   # Download files
   download.file(
     url = url[!existing],
@@ -89,13 +86,13 @@ data_download <- function(url, path, uid, quiet = !interactive()) {
     quiet = quiet,
     mode = "wb"
   )
-  
+
   # Update uid db
   uid_update(path[!existing], uid[!existing])
-  
+
   # Decompress, precompute and cache data
   data_prepare()
-  
+
   return(invisible(TRUE))
 }
 
@@ -120,7 +117,6 @@ data_path <- function(...) {
 #' @param ask A boolean. Ask before deleting files. Default to `interactive()`.
 #' @export
 data_delete <- function(ask = interactive()) {
-  
   if (isTRUE(ask)) {
     response <- utils::askYesNo(
       paste0("The following files will be deleted :\n", paste0(list_data(), collapse = "\n")),
@@ -132,7 +128,7 @@ data_delete <- function(ask = interactive()) {
       return(invisible(FALSE))
     }
   }
-  
+
   # Remove cache directory
   unlink(data_path(ask = FALSE), recursive = TRUE)
   # Reset files list uid database
@@ -145,7 +141,7 @@ data_delete <- function(ask = interactive()) {
     "climr.historic.path" = NULL,
     "climr.session.cache.ask.response" = NULL
   )
-  
+
   return(invisible(TRUE))
 }
 
@@ -183,12 +179,10 @@ list_data <- function(subdirectory) {
 #' @importFrom terra writeRaster rast
 #' @export
 data_prepare <- function() {
-
   normals <- list_normal()
-  
+
   # Loop for each normal
   for (n in normals) {
-    
     # Load normal files
     dir_normal <- file.path(
       data_path(),
@@ -196,7 +190,7 @@ data_prepare <- function() {
       n
     )
     dir_dem <- file.path(dir_normal, "dem")
-    
+
     nm <- data.table::fread(list.files(dir_normal, full.names = TRUE, pattern = "\\.csv"), header = TRUE)[["x"]]
     r <- terra::rast(list.files(dir_normal, full.names = TRUE, pattern = "\\.nc"))
     names(r) <- nm
@@ -204,11 +198,11 @@ data_prepare <- function() {
     # to reduce storage size. This removes the mod to get original values back.
     r <- r / c(1L, 10L)[startsWith(names(r), "T") + 1L]
     r[r < -1000] <- NA
-    
+
     nm <- data.table::fread(list.files(dir_dem, full.names = TRUE, pattern = "\\.csv"), header = TRUE)[["x"]]
     d <- terra::rast(list.files(dir_dem, full.names = TRUE, pattern = "\\.nc"))
     names(d) <- nm
-    
+
     message("Computing lapse rates for normal: ", n)
     lr <- lapse_rate(
       normal = r,
@@ -217,35 +211,33 @@ data_prepare <- function() {
       nthread = 2,
       rasterize = TRUE
     )
-    names(lr) <- paste0("lr_",names(lr))
-    
+    names(lr) <- paste0("lr_", names(lr))
+
     message(
       "Saving uncompresseed normal + lapse rates + dem to: ",
       file.path(dir_normal, sprintf("%s.wlrdem.tif", n))
     )
-    
+
     # Actual writing
     terra::writeRaster(
       c(r, lr, d),
       file.path(dir_normal, sprintf("%s.wlrdem.tif", n)),
       overwrite = TRUE,
-      gdal="COMPRESS=NONE"
+      gdal = "COMPRESS=NONE"
     )
-    
   }
-  
+
   gcms <- list_gcm()
-  
+
   # Loop for each gcm
   for (g in gcms) {
-    
     # Load normal files
     dir_gcm <- file.path(
       data_path(),
       getOption("climr.gcm.path", default = "inputs_pkg/gcm"),
       g
     )
-    
+
     nm <- data.table::rbindlist(
       lapply(
         list.files(dir_gcm, full.names = TRUE, pattern = "\\.csv"),
@@ -257,11 +249,11 @@ data_prepare <- function() {
     nm <- gsub("_pr_", "_PPT_", nm, fixed = TRUE)
     nm <- gsub("_tasmax_", "_Tmax_", nm, fixed = TRUE)
     nm <- gsub("_tasmin_", "_Tmin_", nm, fixed = TRUE)
-        
+
     r <- terra::rast(list.files(dir_gcm, full.names = TRUE, pattern = "\\.nc"))
     names(r) <- nm
-    
-    ppt_layers <- grep("_PPT_",nm,fixed = TRUE)
+
+    ppt_layers <- grep("_PPT_", nm, fixed = TRUE)
     r_ppt <- r[[ppt_layers]]
     r_temp <- r[[-ppt_layers]]
     # Substract reference layers, only keep deltas, plus load in memory instead of disk
@@ -272,16 +264,16 @@ data_prepare <- function() {
     ref_layers <- grep("_reference_", nm_ptt, fixed = TRUE)
     names(ref_layers) <- gsub("^([^_]+_[^_]+_[^_]+_).*$", "\\1", nm_ptt[ref_layers])
     matching_ref <- ref_layers[gsub("^([^_]+_[^_]+_[^_]+_).*$", "\\1", nm_ptt)]
-    
+
     # Reference layers positions
     # They will be used to avoid computing deltas of
     # reference layers with themselves
     uniq_ref <- sort(unique(matching_ref))
-    
+
     # Substract reference layer, this takes a few seconds as all
     # data have to be loaded in memory from disk
     r_ppt <- r_ppt[[-uniq_ref]] / r_ppt[[matching_ref[-uniq_ref]]]
-    
+
     message("Computing deltas for tmin and tmax")
     # Find matching reference layer for each layer
     # Reference layers will match with themselves
@@ -289,44 +281,42 @@ data_prepare <- function() {
     ref_layers <- grep("_reference_", nm_temp, fixed = TRUE)
     names(ref_layers) <- gsub("^([^_]+_[^_]+_[^_]+_).*$", "\\1", nm_temp[ref_layers])
     matching_ref <- ref_layers[gsub("^([^_]+_[^_]+_[^_]+_).*$", "\\1", nm_temp)]
-    
+
     # Reference layers positions
     # They will be used to avoid computing deltas of
     # reference layers with themselves
     uniq_ref <- sort(unique(matching_ref))
-    
+
     # Substract reference layer, this takes a few seconds as all
     # data have to be loaded in memory from disk
     r_temp <- r_temp[[-uniq_ref]] - r_temp[[matching_ref[-uniq_ref]]]
     r <- c(r_ppt, r_temp)
-    
+
     message(
       "Saving uncompressed gcm deltas to: ",
       file.path(dir_gcm, sprintf("gcmData.%s.deltas.tif", g))
     )
-    
+
     # Actual writing
     terra::writeRaster(
       r,
       file.path(dir_gcm, sprintf("gcmData.%s.deltas.tif", g)),
       overwrite = TRUE,
-      gdal="COMPRESS=NONE"
+      gdal = "COMPRESS=NONE"
     )
-    
   }
-  
+
   histper <- list_historic()
-  
+
   # Loop for each gcm
   for (h in histper) {
-    
     # Load normal files
     dir_hist <- file.path(
       data_path(),
       getOption("climr.historic.path", default = "inputs_pkg/historic"),
       h
     )
-    
+
     # nm <- data.table::rbindlist(
     #   lapply(
     #     list.files(dir_hist, full.names = TRUE, pattern = "\\.csv"),
@@ -334,18 +324,18 @@ data_prepare <- function() {
     #     header = TRUE
     #   )
     # )[["x"]]
-    
+
     # nm <- gsub("PPT","PPT_",nm)
     # nm <- gsub("Tmax","Tmax_",nm)
     # nm <- gsub("Tmin","Tmin_",nm)
     # r <- terra::rast(list.files(dir_hist, full.names = TRUE, pattern = "\\.tif"))
     # names(r) <- nm
-    
+
     message(
       "Saving uncompressed historic deltas to: ",
       file.path(dir_hist, sprintf("gcmData.%s.deltas.tif", h))
     )
-    
+
     # Actual writing
     # terra::writeRaster(
     #   r,
@@ -353,11 +343,9 @@ data_prepare <- function() {
     #   overwrite = TRUE,
     #   gdal="COMPRESS=NONE"
     # )
-    
   }
-  
+
   message("Done")
-  
+
   return(invisible(TRUE))
-  
 }

@@ -22,29 +22,34 @@ content_get <- function(path, source = c("github"), ...) {
 #' Default to option "climr.gh.repo" value if set, or "bcgov/climR-pnw". This is
 #' the source root.
 #' @param ref The name of the commit/branch/tag. Default NULL means it uses the repository’s default branch.
-#' @return A list of metadata about files in a repository directory or the content of a file. See 
+#' @return A list of metadata about files in a repository directory or the content of a file. See
 #' https://docs.github.com/en/rest/reference/repos#get-repository-content for details.
 #' @importFrom gh gh
 #' @rdname content_get
 content_get_gh <- function(path,
                            repo = getOption("climr.gh.repo", default = "bcgov/climR-pnw"),
                            ref = "data") {
-  
-  if (FALSE) { type <- NULL }
-  
+  if (FALSE) {
+    type <- NULL
+  }
+
   res <- gh::gh(
     "GET /repos/{repo}/contents/{path}{ref}",
-    repo = repo, path = path, ref = if (!is.null(ref)) {paste0("?ref=", ref)} else {""},
+    repo = repo, path = path, ref = if (!is.null(ref)) {
+      paste0("?ref=", ref)
+    } else {
+      ""
+    },
     .accept = "application/vnd.github.v3+json", .token = gh::gh_token()
   )
-  
+
   # When file is a subdirectory, get content inside, otherwise extract download_url, path and sha.
   #
   # A sha value is a unique identifier that git uses to distinguish files and the content.
   # It is the results of applying a sha1 algorithm to the file content + metadata.
   # It is returned by the GitHub API and will be used in this package to manage files update.
   # This package use it as a uid for files.
-  
+
   dt <- suppressWarnings(
     data.table::rbindlist(
       lapply(
@@ -59,7 +64,7 @@ content_get_gh <- function(path,
   # Recursively download from folders
   dt <- data.table::rbindlist(
     c(
-      list(dt[!type %in% "dir"][,-4L]),
+      list(dt[!type %in% "dir"][, -4L]),
       lapply(
         dt[type %in% "dir"][["path"]],
         content_get_gh,
@@ -68,9 +73,8 @@ content_get_gh <- function(path,
       )
     )
   )
-  
+
   return(dt)
-  
 }
 
 #' @rdname content_get

@@ -90,7 +90,7 @@ t1 <- data.frame(GCM = list_gcm(), dbname = nms)
 
 temp <- rast(paste0("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climr/inputs_pkg/gcm/",gcm,"/gcmData.",gcm,".deltas.tif"))
 
-for(i in 2:13){
+for(i in 2:13) {
   gcm <- allgcms[i]
   scp_upload(session, paste0("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climr/inputs_pkg/gcm/",gcm,"/gcmData.",gcm,".deltas.tif"), to = "/share")
   pgisfn <- paste0("raster2pgsql -s 4326 -I -C -M gcmData.",gcm,".deltas.tif -t 6x6 ",nms[i]," > ", nms[i],".sql")
@@ -116,7 +116,7 @@ setnames(metadt, old = "Orig", new = "fullnm")
 dbWriteTable(conn, name = "historic_ts_layers", metadt, row.names = FALSE)
 dbExecute(conn, "create index on historic_ts_layers(period)")
 
-for(i in 2:13){
+for(i in 2:13) {
   gcm <- allgcms[i]
   cat(gcm,"\n")
   temp <- rast(paste0("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climr/inputs_pkg/gcm/",gcm,"/gcmData.",gcm,".deltas.tif"))
