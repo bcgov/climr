@@ -88,7 +88,7 @@ normalbc <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cach
 plot(normalbc[[13]])
 
 ##gcm annomalies
-gcm <- gcm_input_postgis(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "EC-Earth3"), 
+gcm <- gcm_input(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "EC-Earth3"), 
                          ssp = c("ssp370"), 
                          period = c("2021_2040","2041_2060","2061_2080"),
                          max_run = 0,

@@ -51,6 +51,9 @@ point location, general circulation model, shared socioeconomic pathway, run and
 \description{
 Downscale target rasters to points of interest
 }
+\details{
+Additional details... TODO.
+}
 \examples{
 \dontrun{
 dbCon <- data_connect()

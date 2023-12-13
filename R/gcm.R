@@ -13,7 +13,7 @@
 #' @importFrom uuid UUIDgenerate
 #' @import data.table
 #' @export
-gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), period = list_period(), max_run = 0L, cache = TRUE) {
+gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), period = list_period(), max_run = 0L, cache = TRUE) {
   dbnames <- structure(list(
     GCM = c(
       "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5",
