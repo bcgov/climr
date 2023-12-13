@@ -4,10 +4,20 @@
 \alias{make_raster}
 \title{Make raster from a boundary}
 \usage{
-make_raster(boundary)
+make_raster(boundary, conn, rastque, nameque, projID, bands)
 }
 \arguments{
-\item{boundary}{Numeric vector of length 4 (ymax,ymin,xmax,xmin). Defaults to \code{NULL}.}
+\item{boundary}{}
+
+\item{conn}{}
+
+\item{rastque}{}
+
+\item{nameque}{}
+
+\item{projID}{}
+
+\item{bands}{}
 }
 \value{
 a SpatRaster

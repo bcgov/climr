@@ -169,6 +169,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 
 
 #' Downscale target rasters to points of interest
+#' 
 #' @param xyz A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).
 #' @param normal Reference normal baseline input from `normal_input`.
 #' @param gcm Global Circulation Models input from `gcm_input`. Default to NULL.
@@ -182,19 +183,25 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' `variables` dataset. Default to monthly PPT, Tmax, Tmin.
 #' @param ppt_lr A boolean. Apply lapse rate adjustment to precipitations. Default to FALSE.
 #' @param nthread An integer. Number of parallel threads to use to do computations. Default to 1L.
+#' 
 #' @import data.table
 #' @importFrom terra extract rast sources ext xres yres crop
 #' @importFrom parallel makeForkCluster makePSOCKcluster stopCluster splitIndices parLapply
+#' 
 #' @return A downscaled dataset. If `gcm` is NULL, this is just the downscaled `normal`
 #' at point locations. If `gcm` is provided, this returns a downscaled dataset for each
 #' point location, general circulation model, shared socioeconomic pathway, run and period.
+#' 
 #' @export
 #' @examples
 #' \dontrun{
 #' dbCon <- data_connect()
 #' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
-#' thebb <- get_bb(xyz) ##get bounding box based on input points
-#' normal <- normal_input(dbCon = dbCon, bbox = thebb, cache = TRUE) 
+#' ## get bounding box based on input points
+#' thebb <- get_bb(xyz)
+#' normal <- normal_input(dbCon = dbCon, bbox = thebb, cache = TRUE)
+#' 
+#' ## pick one GCM, one SSP and one period from the list of available options 
 #' gcm_input <- gcm_input(list_gcm()[3], list_ssp()[1], list_period()[2])
 #' downscale(xyz, normal, gcm)
 #' historic <- historic_input()
