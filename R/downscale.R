@@ -6,7 +6,7 @@
 #' @param historic_ts Historic years requested. Must be in `1902:2015`. Default `NULL`
 #' @param gcm_models Vector of GCM names. Options are `list_gcm()`. Used for gcm periods, gcm timeseries, and historic timeseries. Default `NULL`
 #' @template ssp
-#' @param gcm_period Requested future periods. Options are `list_period()`
+#' @param gcm_period Requested future periods. Options are `list_gcm_period()`
 #' @param gcm_ts_years Requested future timeseries years. Must be in `2015:2100`
 #' @param gcm_hist_years Requested historic modelled years. Must be in `1851:2010`
 #' @template max_run
@@ -205,7 +205,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' normal <- normal_input(dbCon = dbCon, bbox = thebb, cache = TRUE)
 #' 
 #' ## pick one GCM, one SSP and one period from the list of available options 
-#' gcm_input <- gcm_input(list_gcm()[3], list_ssp()[1], list_period()[2])
+#' gcm_input <- gcm_input(list_gcm()[3], list_ssp()[1], list_gcm_period()[2])
 #' downscale(xyz, normal, gcm)
 #' historic <- historic_input()
 #' out <- downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)

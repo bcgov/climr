@@ -63,7 +63,7 @@ thebb <- get_bb(xyz)
 normal <- normal_input(dbCon = dbCon, bbox = thebb, cache = TRUE)
 
 ## pick one GCM, one SSP and one period from the list of available options 
-gcm_input <- gcm_input(list_gcm()[3], list_ssp()[1], list_period()[2])
+gcm_input <- gcm_input(list_gcm()[3], list_ssp()[1], list_gcm_period()[2])
 downscale(xyz, normal, gcm)
 historic <- historic_input()
 out <- downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)

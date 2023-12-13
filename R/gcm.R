@@ -13,7 +13,7 @@
 #' @importFrom uuid UUIDgenerate
 #' @import data.table
 #' @export
-gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), period = list_period(), max_run = 0L, cache = TRUE) {
+gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), period = list_gcm_period(), max_run = 0L, cache = TRUE) {
   dbnames <- structure(list(
     GCM = c(
       "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5",
@@ -107,7 +107,7 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 #' @template bbox
 #' @template gcm
 #' @param years Numeric vector of desired years. Must be in `1851:2015`.
-#' Can be obtained from `list_period()`. Default to `list_period()`.
+#' Can be obtained from `list_gcm_period()`. Default to `list_gcm_period()`.
 #' @template max_run
 #' @param cache Logical specifying whether to cache new data locally or no. Default `TRUE`
 #' @return An object to use with `downscale`. A list of `SpatRaster` with, possibly, multiple layers.
@@ -222,7 +222,7 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 #' @import uuid
 #' @import data.table
 #' @export
-gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), years = list_years_ts(), max_run = 0L, cache = TRUE) {
+gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), years = list_gcm_period(), max_run = 0L, cache = TRUE) {
   period <- years
   dbnames <- structure(list(
     GCM = c(
