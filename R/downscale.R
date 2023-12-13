@@ -87,7 +87,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
   if (!is.null(gcm_models)) {
     if (!is.null(gcm_period)) {
       message("Getting GCMs...")
-      gcm <- gcm_input_postgis(dbCon,
+      gcm <- gcm_input(dbCon,
         bbox = thebb, gcm = gcm_models,
         ssp = ssp,
         period = gcm_period,
