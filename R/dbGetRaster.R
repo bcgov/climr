@@ -1,10 +1,10 @@
 #' Download raster with bounding box from PostGIS
-#' @param conn a DBI or RPostgres connection object
+#' @template conn
 #' @param name character. Table name in database
 #' @param tile TODO
 #' @param rast character. Name of column which stores raster data.
 #'   Defaults to "rast"
-#' @param bands Which raster bands to return. Default 37:73.
+#' @template bands
 #' @template boundary
 
 #' @return A SpatRaster
@@ -186,12 +186,12 @@ get_bb <- function(in_xyz) {
 #' Used internally to access the PostGRS database and
 #' create a SpatRaster using a given spatial boundary
 #'
-#' @param boundary 
-#' @param conn 
-#' @param rastque 
-#' @param nameque 
-#' @param projID 
-#' @param bands 
+#' @template boundary 
+#' @template conn
+#' @param rastque rast query name obtained with e.g. `dbQuoteIdentifier(conn, "rast")`
+#' @param nameque schema.name
+#' @param projID projID in data.base
+#' @template bands 
 #'
 #' @return a SpatRaster
 #'
