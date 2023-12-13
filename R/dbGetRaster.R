@@ -77,7 +77,7 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
     )
   } else {
     if (!tile) {
-      rout <- make_raster(boundary)
+      rout <- make_raster(boundary, conn, rastque, nameque, projID, bands)
       return(rout)
     }
     max_dist <- 5
@@ -97,7 +97,10 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
     }
     
     
-    r_list <- lapply(boundary_ls, FUN = make_raster)
+    r_list <- lapply(boundary_ls, FUN = make_raster, 
+                     conn = conn, rastque = rastque, 
+                     nameque = nameque, projID = projID, 
+                     bands = bands)
     r_list <- r_list[!sapply(r_list, is.null)]
     if (length(r_list) > 1) {
       rout <- merge(sprc(r_list))
@@ -178,19 +181,24 @@ get_bb <- function(in_xyz) {
 }
 
 
+
 #' Make raster from a boundary
 #'
 #' Used internally to access the PostGRS database and
 #' create a SpatRaster using a given spatial boundary
 #'
-#' @template boundary
+#' @param boundary 
+#' @param conn 
+#' @param rastque 
+#' @param nameque 
+#' @param projID 
+#' @param bands 
 #'
 #' @return a SpatRaster
 #'
 #' @importFrom DBI dbGetQuery
 #' @importFrom terra rast
-#'
-make_raster <- function(boundary) {
+make_raster <- function(boundary, conn, rastque, nameque, projID, bands) {
   cat(".")
   info <- dbGetQuery(conn, paste0(
     "select
