@@ -4,10 +4,20 @@
 \alias{make_raster}
 \title{Make raster from a boundary}
 \usage{
-make_raster(boundary)
+make_raster(boundary, conn, rastque, nameque, projID, bands)
 }
 \arguments{
 \item{boundary}{Numeric vector of length 4 (ymax,ymin,xmax,xmin). Defaults to \code{NULL}.}
+
+\item{conn}{a DBI or RPostgres connection object}
+
+\item{rastque}{rast query name obtained with e.g. \code{dbQuoteIdentifier(conn, "rast")}}
+
+\item{nameque}{schema.name}
+
+\item{projID}{projID in data.base}
+
+\item{bands}{Which raster bands to return. Default 37:73.}
 }
 \value{
 a SpatRaster
