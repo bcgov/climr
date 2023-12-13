@@ -26,8 +26,6 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
   
   projID <- dbGetQuery(conn, paste0("select ST_SRID(", rastque, ") as srid from ", nameque, " where rid = 1;"))$srid[1]
   
-  
-  
   if (length(bands) > 1664) { ## maximum number of columns
     info <- dbGetQuery(conn, paste0(
       "select
