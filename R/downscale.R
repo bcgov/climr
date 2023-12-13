@@ -1,5 +1,8 @@
 #' Downscale and Calculate climate variables for points of interest
-
+#' 
+#' @details
+#' Additional details... TODO.
+#' 
 #' @param xyz three or four column data.frame: long, lat, elev, (id)
 #' @param which_normal Select which normal layer to use. Default is "auto", which selects the highest resolution normal for each point
 #' @param historic_period Which historic period. Default `NULL`
