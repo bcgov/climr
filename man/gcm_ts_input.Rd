@@ -7,7 +7,7 @@
 gcm_ts_input(
   dbCon,
   bbox = NULL,
-  gcm = list_gcm_ts(),
+  gcm = list_gcm(),
   ssp = list_ssp(),
   years = list_years_ts(),
   max_run = 0L,

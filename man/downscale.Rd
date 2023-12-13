@@ -53,8 +53,13 @@ Downscale target rasters to points of interest
 }
 \examples{
 \dontrun{
+dbCon <- data_connect()
 xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
-normal <- normal_input()
+## get bounding box based on input points
+thebb <- get_bb(xyz)
+normal <- normal_input(dbCon = dbCon, bbox = thebb, cache = TRUE)
+
+## pick one GCM, one SSP and one period from the list of available options 
 gcm_input <- gcm_input(list_gcm()[3], list_ssp()[1], list_period()[2])
 downscale(xyz, normal, gcm)
 historic <- historic_input()
