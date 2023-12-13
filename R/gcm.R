@@ -210,7 +210,7 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 #' @template bbox
 #' @template gcm
 #' @template ssp
-#' @param years Numeric or character vector in in `2020:2100`
+#' @param years Numeric or character vector in `2020:2100`. Defaults to `2020:2030`.
 #' @template max_run
 #' @param cache Logical specifying whether to cache new data locally or no. Default `TRUE`
 #' 
@@ -222,7 +222,7 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 #' @import uuid
 #' @import data.table
 #' @export
-gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), years = list_gcm_period(), max_run = 0L, cache = TRUE) {
+gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), years = 2020:2030, max_run = 0L, cache = TRUE) {
   period <- years
   dbnames <- structure(list(
     GCM = c(
