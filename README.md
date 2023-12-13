@@ -69,6 +69,11 @@ e0156720.
 remotes::install_github("bcgov/climr")
 ```
 
+If you want to install the development version:
+``` r
+remotes::install_github("bcgov/climr@devl")
+```
+
 ## Example Usage
 
 ``` r
