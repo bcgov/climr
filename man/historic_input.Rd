@@ -12,7 +12,7 @@ historic_input(dbCon, bbox = NULL, period = list_historic(), cache = TRUE)
 \item{bbox}{Numeric vector of length 4 giving bounding box of study region, created by \code{get_bb()}.}
 
 \item{period}{A character vector. Label of the period to use.
-Can be obtained from \code{list_period()}. Default to \code{list_period()}.}
+Can be obtained from \code{list_gcm_period()}. Default to \code{list_gcm_period()}.}
 
 \item{cache}{Logical specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 }
