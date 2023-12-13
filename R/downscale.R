@@ -170,6 +170,9 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 
 #' Downscale target rasters to points of interest
 #' 
+#' @details
+#' Additional details... TODO.
+#' 
 #' @param xyz A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).
 #' @param normal Reference normal baseline input from `normal_input`.
 #' @param gcm Global Circulation Models input from `gcm_input`. Default to NULL.
