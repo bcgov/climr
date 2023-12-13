@@ -57,6 +57,9 @@ Historic, normal, and future periods are all returned in one table.
 \description{
 Downscale and Calculate climate variables for points of interest
 }
+\details{
+Additional details... TODO.
+}
 \examples{
 {
   ## TODO.
