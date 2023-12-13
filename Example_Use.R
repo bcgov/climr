@@ -84,11 +84,11 @@ ggplot(res2[RUN != "ensembleMean" & GCM != "Observed",],aes(x = PERIOD, y = PPT,
 thebb <- get_bb(in_xyz) ##get bounding box based on input points
 dbCon <- data_connect()
 ##get normal
-normalbc <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = TRUE) 
+normalbc <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = TRUE) 
 plot(normalbc[[13]])
 
 ##gcm annomalies
-gcm <- gcm_input_postgis(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "EC-Earth3"), 
+gcm <- gcm_input(dbCon, bbox = thebb, gcm = c("ACCESS-ESM1-5", "EC-Earth3"), 
                          ssp = c("ssp370"), 
                          period = c("2021_2040","2041_2060","2061_2080"),
                          max_run = 0,
