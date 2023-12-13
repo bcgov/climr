@@ -9,7 +9,7 @@ gcm_ts_input(
   bbox = NULL,
   gcm = list_gcm(),
   ssp = list_ssp(),
-  years = list_gcm_period(),
+  years = 2020:2030,
   max_run = 0L,
   cache = TRUE
 )
@@ -25,7 +25,7 @@ Can be obtained from \code{list_gcm()}. Default to \code{list_gcm()}.}
 \item{ssp}{A character vector. Label of the shared socioeconomic pathways to use.
 See available options with \code{list_ssp()}. Defaults to \code{list_ssp()}.}
 
-\item{years}{Numeric or character vector in in \code{2020:2100}}
+\item{years}{Numeric or character vector in \code{2020:2100}. Defaults to \code{2020:2030}.}
 
 \item{max_run}{integer. Maximum number of model runs to include.
 A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
