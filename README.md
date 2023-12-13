@@ -48,6 +48,11 @@ Wang T., A. Hamann, D. Spittlehouse, and C. Carroll. 2016. <a href='https://doi.
 remotes::install_github("bcgov/climr")
 ```
 
+If you want to install the development version:
+``` r
+remotes::install_github("bcgov/climr@devl")
+```
+
 ## Example Usage
 
 ``` r
