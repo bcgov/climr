@@ -191,8 +191,10 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' @export
 #' @examples
 #' \dontrun{
+#' dbCon <- data_connect()
 #' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
-#' normal <- normal_input()
+#' thebb <- get_bb(xyz) ##get bounding box based on input points
+#' normal <- normal_input(dbCon = dbCon, bbox = thebb, cache = TRUE) 
 #' gcm_input <- gcm_input(list_gcm()[3], list_ssp()[1], list_period()[2])
 #' downscale(xyz, normal, gcm)
 #' historic <- historic_input()
