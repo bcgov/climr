@@ -205,6 +205,7 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 # period <- 2020:2050
 
 #' Create gcm timeseries input for `downscale` using data on Postgis database.
+#' 
 #' @template dbCon
 #' @template bbox
 #' @template gcm
@@ -212,14 +213,16 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 #' @param years Numeric or character vector in in `2020:2100`
 #' @template max_run
 #' @param cache Logical specifying whether to cache new data locally or no. Default `TRUE`
+#' 
 #' @return An object to use with `downscale`. A list of `SpatRaster` with, possibly, multiple layers.
+#' 
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @import uuid
 #' @import data.table
 #' @export
-gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm_ts(), ssp = list_ssp(), years = list_years_ts(), max_run = 0L, cache = TRUE) {
+gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), years = list_years_ts(), max_run = 0L, cache = TRUE) {
   period <- years
   dbnames <- structure(list(
     GCM = c(
