@@ -203,15 +203,21 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' \dontrun{
 #' dbCon <- data_connect()
 #' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
+#' 
 #' ## get bounding box based on input points
 #' thebb <- get_bb(xyz)
 #' normal <- normal_input(dbCon = dbCon, bbox = thebb, cache = TRUE)
 #' 
 #' ## pick one GCM, one SSP and one period from the list of available options 
-#' gcm_input <- gcm_input(dbCon, thebb, gcm = list_gcm()[3], list_ssp()[1], list_gcm_period()[2])
+#' gcm <- gcm_input(dbCon, thebb, gcm = list_gcm()[3], list_ssp()[1], list_gcm_period()[2])
+#' 
+#' ## notice coarseness of the data
+#' terra::plot(gcm[[1]])
+#' 
 #' downscale(xyz, normal, gcm)
 #' historic <- historic_input(dbCon, thebb)
-#' out <- downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)
+#' 
+#' downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)
 #' }
 downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, gcm_hist = NULL, historic_ts = NULL, return_normal = FALSE,
                       vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))),
