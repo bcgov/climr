@@ -7,17 +7,17 @@
 make_raster(boundary, conn, rastque, nameque, projID, bands)
 }
 \arguments{
-\item{boundary}{}
+\item{boundary}{Numeric vector of length 4 (ymax,ymin,xmax,xmin). Defaults to \code{NULL}.}
 
-\item{conn}{}
+\item{conn}{a DBI or RPostgres connection object}
 
-\item{rastque}{}
+\item{rastque}{rast query name obtained with e.g. \code{dbQuoteIdentifier(conn, "rast")}}
 
-\item{nameque}{}
+\item{nameque}{schema.name}
 
-\item{projID}{}
+\item{projID}{projID in data.base}
 
-\item{bands}{}
+\item{bands}{Which raster bands to return. Default 37:73.}
 }
 \value{
 a SpatRaster

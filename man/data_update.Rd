@@ -18,6 +18,8 @@ data_update(
 \item{gcm}{A character. Relative path from the source root to global circulation models files folder.
 Default to option value "climr.gcm.path" if set, or "inputs_pkg/gcmData".}
 
+\item{historic}{blah blah}
+
 \item{normal}{A character. Relative path from the source root to base normal files folder.}
 
 \item{quiet}{A logical. If \code{TRUE}, suppress status messages (if any), and the progress bar.}
