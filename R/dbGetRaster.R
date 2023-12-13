@@ -21,14 +21,14 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
   name1 <- name
   nameque <- paste(name1, collapse = ".")
   namechar <- gsub("'", "''", paste(gsub('^"|"$', "", name1), collapse = "."))
-
+  
   ## rast query name
   rastque <- dbQuoteIdentifier(conn, rast)
-
+  
   projID <- dbGetQuery(conn, paste0("select ST_SRID(", rastque, ") as srid from ", nameque, " where rid = 1;"))$srid[1]
-
-
-
+  
+  
+  
   if (length(bands) > 1664) { ## maximum number of columns
     info <- dbGetQuery(conn, paste0(
       "select
@@ -52,7 +52,7 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
       bands_temp <- bands[brks[i]:(brks[i + 1] - 1)]
       bandqs1 <- paste0("UNNEST(ST_Dumpvalues(rast, ", bands_temp, ")) as vals_", bands_temp)
       bandqs2 <- paste0("ST_Union(rast", rastque, ",", bands_temp, ") rast_", bands_temp)
-
+      
       rast_vals_temp <- dbGetQuery(conn, paste0(
         "SELECT ", paste(bandqs1, collapse = ","),
         " from (SELECT ST_Union(rast) rast FROM ", nameque, " WHERE ST_Intersects(",
@@ -84,7 +84,7 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
     # if(boundary[1] - boundary[2] > max_dist | boundary[3] - boundary[4] > max_dist) {
     x_seq <- unique(c(seq(boundary[2], boundary[1], by = max_dist), boundary[1]))
     y_seq <- unique(c(seq(boundary[4], boundary[3], by = max_dist), boundary[3]))
-
+    
     boundary_ls <- list()
     if (length(x_seq) < 2 | length(y_seq) < 2) {
       boundary_ls[["11"]] <- boundary
@@ -95,8 +95,8 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
         }
       }
     }
-
-
+    
+    
     r_list <- lapply(boundary_ls, FUN = make_raster)
     r_list <- r_list[!sapply(r_list, is.null)]
     if (length(r_list) > 1) {
@@ -194,15 +194,15 @@ make_raster <- function(boundary) {
   cat(".")
   info <- dbGetQuery(conn, paste0(
     "select
-            st_xmax(st_envelope(rast)) as xmx,
-            st_xmin(st_envelope(rast)) as xmn,
-            st_ymax(st_envelope(rast)) as ymx,
-            st_ymin(st_envelope(rast)) as ymn,
-            st_width(rast) as cols,
-            st_height(rast) as rows
-            from
-            (select st_union(", rastque, ",", 1, ") rast from ", nameque, "\n
-            WHERE ST_Intersects(",
+              st_xmax(st_envelope(rast)) as xmx,
+              st_xmin(st_envelope(rast)) as xmn,
+              st_ymax(st_envelope(rast)) as ymx,
+              st_ymin(st_envelope(rast)) as ymn,
+              st_width(rast) as cols,
+              st_height(rast) as rows
+              from
+              (select st_union(", rastque, ",", 1, ") rast from ", nameque, "\n
+              WHERE ST_Intersects(",
     rastque, ",ST_SetSRID(ST_GeomFromText('POLYGON((", boundary[4],
     " ", boundary[1], ",", boundary[4], " ", boundary[2],
     ",\n  ", boundary[3], " ", boundary[2], ",", boundary[3],
