@@ -10,11 +10,10 @@
 #' @return A SpatRaster
 #'
 #' @importFrom data.table setDT copy
-#' @importFrom terra rast merge
+#' @importFrom terra rast merge sprc
 #' @importFrom RPostgres dbQuoteIdentifier dbGetQuery
 #' @importFrom DBI dbQuoteIdentifier dbGetQuery
 #' @export
-
 pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
                        boundary = NULL) {
   ## Check and prepare the schema.name
