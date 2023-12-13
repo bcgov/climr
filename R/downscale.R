@@ -210,7 +210,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' ## pick one GCM, one SSP and one period from the list of available options 
 #' gcm_input <- gcm_input(dbCon, thebb, gcm = list_gcm()[3], list_ssp()[1], list_gcm_period()[2])
 #' downscale(xyz, normal, gcm)
-#' historic <- historic_input()
+#' historic <- historic_input(dbCon, thebb)
 #' out <- downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)
 #' }
 downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, gcm_hist = NULL, historic_ts = NULL, return_normal = FALSE,
