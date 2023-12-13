@@ -1,12 +1,15 @@
 #' Downscale and Calculate climate variables for points of interest
-
+#' 
+#' @details
+#' Additional details... TODO.
+#' 
 #' @param xyz three or four column data.frame: long, lat, elev, (id)
 #' @param which_normal Select which normal layer to use. Default is "auto", which selects the highest resolution normal for each point
 #' @param historic_period Which historic period. Default `NULL`
 #' @param historic_ts Historic years requested. Must be in `1902:2015`. Default `NULL`
 #' @param gcm_models Vector of GCM names. Options are `list_gcm()`. Used for gcm periods, gcm timeseries, and historic timeseries. Default `NULL`
 #' @template ssp
-#' @param gcm_period Requested future periods. Options are `list_period()`
+#' @param gcm_period Requested future periods. Options are `list_gcm_period()`
 #' @param gcm_ts_years Requested future timeseries years. Must be in `2015:2100`
 #' @param gcm_hist_years Requested historic modelled years. Must be in `1851:2010`
 #' @template max_run
@@ -58,9 +61,9 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 
   message("Getting normals...")
   if (which_normal == "NorAm") {
-    normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
+    normal <- normal_input(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
   } else if (which_normal == "BC") {
-    normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache)
+    normal <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache)
   } else {
     if (ncol(xyz) == 3) xyz$ID <- 1:nrow(xyz)
     bc_outline <- rast(system.file("extdata", "bc_outline.tif", package = "climr"))
@@ -71,9 +74,9 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
       xyz <- xyz[!is.na(pnts$PPT01),]
       thebb_bc <- get_bb(xyz)
       message("for BC...")
-      normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_bc", bbox = thebb_bc, cache = cache)
+      normal <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb_bc, cache = cache)
     } else {
-      normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
+      normal <- normal_input(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
     }
   }
 
@@ -87,7 +90,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
   if (!is.null(gcm_models)) {
     if (!is.null(gcm_period)) {
       message("Getting GCMs...")
-      gcm <- gcm_input_postgis(dbCon,
+      gcm <- gcm_input(dbCon,
         bbox = thebb, gcm = gcm_models,
         ssp = ssp,
         period = gcm_period,
@@ -145,7 +148,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
     na_xyz <- xyz_save[!xyz_save[, 4] %in% bc_ids,]
     thebb <- get_bb(na_xyz)
     message("Now North America...")
-    normal <- normal_input_postgis(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
+    normal <- normal_input(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
 
     results_na <- downscale(
       xyz = na_xyz,
@@ -169,6 +172,10 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 
 
 #' Downscale target rasters to points of interest
+#' 
+#' @details
+#' Additional details... TODO.
+#' 
 #' @param xyz A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).
 #' @param normal Reference normal baseline input from `normal_input`.
 #' @param gcm Global Circulation Models input from `gcm_input`. Default to NULL.
@@ -182,21 +189,35 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' `variables` dataset. Default to monthly PPT, Tmax, Tmin.
 #' @param ppt_lr A boolean. Apply lapse rate adjustment to precipitations. Default to FALSE.
 #' @param nthread An integer. Number of parallel threads to use to do computations. Default to 1L.
+#' 
 #' @import data.table
 #' @importFrom terra extract rast sources ext xres yres crop
 #' @importFrom parallel makeForkCluster makePSOCKcluster stopCluster splitIndices parLapply
+#' 
 #' @return A downscaled dataset. If `gcm` is NULL, this is just the downscaled `normal`
 #' at point locations. If `gcm` is provided, this returns a downscaled dataset for each
 #' point location, general circulation model, shared socioeconomic pathway, run and period.
+#' 
 #' @export
 #' @examples
 #' \dontrun{
+#' dbCon <- data_connect()
 #' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
-#' normal <- normal_input()
-#' gcm_input <- gcm_input(list_gcm()[3], list_ssp()[1], list_period()[2])
+#' 
+#' ## get bounding box based on input points
+#' thebb <- get_bb(xyz)
+#' normal <- normal_input(dbCon = dbCon, bbox = thebb, cache = TRUE)
+#' 
+#' ## pick one GCM, one SSP and one period from the list of available options 
+#' gcm <- gcm_input(dbCon, thebb, gcm = list_gcm()[3], list_ssp()[1], list_gcm_period()[2])
+#' 
+#' ## notice coarseness of the data
+#' terra::plot(gcm[[1]])
+#' 
 #' downscale(xyz, normal, gcm)
-#' historic <- historic_input()
-#' out <- downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)
+#' historic <- historic_input(dbCon, thebb)
+#' 
+#' downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)
 #' }
 downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, gcm_hist = NULL, historic_ts = NULL, return_normal = FALSE,
                       vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))),

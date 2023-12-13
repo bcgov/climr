@@ -13,7 +13,7 @@
 #' @importFrom uuid UUIDgenerate
 #' @import data.table
 #' @export
-gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), period = list_period(), max_run = 0L, cache = TRUE) {
+gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), period = list_gcm_period(), max_run = 0L, cache = TRUE) {
   dbnames <- structure(list(
     GCM = c(
       "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5",
@@ -107,7 +107,7 @@ gcm_input_postgis <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_s
 #' @template bbox
 #' @template gcm
 #' @param years Numeric vector of desired years. Must be in `1851:2015`.
-#' Can be obtained from `list_period()`. Default to `list_period()`.
+#' Can be obtained from `list_gcm_period()`. Default to `list_gcm_period()`.
 #' @template max_run
 #' @param cache Logical specifying whether to cache new data locally or no. Default `TRUE`
 #' @return An object to use with `downscale`. A list of `SpatRaster` with, possibly, multiple layers.
@@ -205,21 +205,24 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 # period <- 2020:2050
 
 #' Create gcm timeseries input for `downscale` using data on Postgis database.
+#' 
 #' @template dbCon
 #' @template bbox
 #' @template gcm
 #' @template ssp
-#' @param years Numeric or character vector in in `2020:2100`
+#' @param years Numeric or character vector in `2020:2100`. Defaults to `2020:2030`.
 #' @template max_run
 #' @param cache Logical specifying whether to cache new data locally or no. Default `TRUE`
+#' 
 #' @return An object to use with `downscale`. A list of `SpatRaster` with, possibly, multiple layers.
+#' 
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @import uuid
 #' @import data.table
 #' @export
-gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm_ts(), ssp = list_ssp(), years = list_years_ts(), max_run = 0L, cache = TRUE) {
+gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), years = 2020:2030, max_run = 0L, cache = TRUE) {
   period <- years
   dbnames <- structure(list(
     GCM = c(

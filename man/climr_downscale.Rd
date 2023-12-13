@@ -34,7 +34,7 @@ climr_downscale(
 \item{ssp}{A character vector. Label of the shared socioeconomic pathways to use.
 See available options with \code{list_ssp()}. Defaults to \code{list_ssp()}.}
 
-\item{gcm_period}{Requested future periods. Options are \code{list_period()}}
+\item{gcm_period}{Requested future periods. Options are \code{list_gcm_period()}}
 
 \item{gcm_ts_years}{Requested future timeseries years. Must be in \code{2015:2100}}
 
@@ -57,9 +57,12 @@ Historic, normal, and future periods are all returned in one table.
 \description{
 Downscale and Calculate climate variables for points of interest
 }
+\details{
+Additional details... TODO.
+}
 \examples{
 {
-##TODO.
+  ## TODO.
 }
 
 }

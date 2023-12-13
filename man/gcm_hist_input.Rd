@@ -22,7 +22,7 @@ gcm_hist_input(
 Can be obtained from \code{list_gcm()}. Default to \code{list_gcm()}.}
 
 \item{years}{Numeric vector of desired years. Must be in \code{1851:2015}.
-Can be obtained from \code{list_period()}. Default to \code{list_period()}.}
+Can be obtained from \code{list_gcm_period()}. Default to \code{list_gcm_period()}.}
 
 \item{max_run}{integer. Maximum number of model runs to include.
 A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they

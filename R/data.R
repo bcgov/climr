@@ -4,6 +4,7 @@
 #' Update external package data
 #' @param gcm A character. Relative path from the source root to global circulation models files folder.
 #' Default to option value "climr.gcm.path" if set, or "inputs_pkg/gcmData".
+#' @param historic blah blah
 #' @param normal A character. Relative path from the source root to base normal files folder.
 #' @param quiet A logical. If `TRUE`, suppress status messages (if any), and the progress bar.
 #' @param ... Others parameters such as `source` or `repo` for content getting functions.
