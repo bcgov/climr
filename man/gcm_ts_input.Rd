@@ -9,7 +9,7 @@ gcm_ts_input(
   bbox = NULL,
   gcm = list_gcm(),
   ssp = list_ssp(),
-  years = list_years_ts(),
+  years = list_gcm_period(),
   max_run = 0L,
   cache = TRUE
 )

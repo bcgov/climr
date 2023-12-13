@@ -9,7 +9,7 @@ gcm_input(
   bbox = NULL,
   gcm = list_gcm(),
   ssp = list_ssp(),
-  period = list_period(),
+  period = list_gcm_period(),
   max_run = 0L,
   cache = TRUE
 )
@@ -26,7 +26,7 @@ Can be obtained from \code{list_gcm()}. Default to \code{list_gcm()}.}
 See available options with \code{list_ssp()}. Defaults to \code{list_ssp()}.}
 
 \item{period}{A character vector. Label of the period to use.
-Can be obtained from \code{list_period()}. Default to \code{list_period()}.}
+Can be obtained from \code{list_gcm_period()}. Default to \code{list_gcm_period()}.}
 
 \item{max_run}{integer. Maximum number of model runs to include.
 A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
