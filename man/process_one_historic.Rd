@@ -7,13 +7,13 @@
 process_one_historic(historic_, res, xyzID, timeseries)
 }
 \arguments{
-\item{historic_}{}
+\item{historic_}{TODO}
 
-\item{res}{}
+\item{res}{TODO}
 
-\item{xyzID}{}
+\item{xyzID}{TODO}
 
-\item{timeseries}{}
+\item{timeseries}{TODO}
 }
 \value{
 \code{data.table}

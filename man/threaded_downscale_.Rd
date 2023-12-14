@@ -15,19 +15,21 @@ threaded_downscale_(
 )
 }
 \arguments{
-\item{xyz}{}
+\item{xyz}{A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).}
 
-\item{normal_path}{}
+\item{normal_path}{TODO}
 
-\item{gcm_paths}{}
+\item{gcm_paths}{TODO}
 
-\item{historic_paths}{}
+\item{historic_paths}{TODO}
 
-\item{vars}{}
+\item{vars}{A character vector of climate variables to compute. Supported variables
+can be obtained with \code{list_variables()}. Definitions can be found in this package
+\code{variables} dataset. Default to monthly PPT, Tmax, Tmin.}
 
-\item{ppt_lr}{}
+\item{ppt_lr}{A boolean. Apply lapse rate adjustment to precipitations. Default to FALSE.}
 
-\item{return_normal}{}
+\item{return_normal}{TODO}
 }
 \value{
 \code{data.table}

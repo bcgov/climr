@@ -8,19 +8,19 @@ For the lapse rate, x is the elevation, and y is the normal}
 lapse_rate_redux(y_i, x_i, n_r, n_c, n_sc, sum_xx, NA_replace)
 }
 \arguments{
-\item{y_i}{}
+\item{y_i}{TODO}
 
-\item{x_i}{}
+\item{x_i}{TODO}
 
-\item{n_r}{}
+\item{n_r}{TODO}
 
-\item{n_c}{}
+\item{n_c}{TODO}
 
-\item{n_sc}{}
+\item{n_sc}{TODO}
 
-\item{sum_xx}{}
+\item{sum_xx}{TODO}
 
-\item{NA_replace}{}
+\item{NA_replace}{TODO}
 }
 \value{
 \code{data.table}
