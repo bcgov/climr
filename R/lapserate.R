@@ -7,7 +7,7 @@
 #' @param nr The number of rows in the matrix.
 #' @param nc The number of columns in the matrix.
 #'
-#' @return expanded `mat`.
+#' @return a `matrix`. The expanded `mat`.
 #'
 #' @noRd
 recycle_borders <- function(mat, nr, nc) {
@@ -62,6 +62,9 @@ sum_matrix <- function(x) {
 #' @param x A list of matrices of the same dimensions.
 #' @param y A list of matrices of the same dimensions as x and the same
 #' length as x.
+#' 
+#' @return a `list` of matrices. 
+#' 
 #' @noRd
 prod_matrix <- function(x, y) {
   ## TODO: check that list lengths are the same
@@ -78,6 +81,9 @@ prod_matrix <- function(x, y) {
 #' @param x A list of matrices of the same dimensions.
 #' @param y A list of matrices of the same dimensions as x and the same
 #' length as x.
+#' 
+#' @return a `list` of matrices. 
+#' 
 #' @noRd
 delta_matrix <- function(x, y) {
   ## TODO: check that list lengths are the same
@@ -88,8 +94,12 @@ delta_matrix <- function(x, y) {
 #' Matrix exponentiation to *e* (`exp`)
 #'  This returns a list of matrices after applying exponent `exp` to each
 #'  matrix cell
+#'  
 #' @param x A list of matrices.
 #' @param exp A numeric vector of length 1.
+#' 
+#' @return a `list` of matrices. 
+#' 
 #' @noRd
 sup <- function(x, exp) {
   lapply(x, `^`, exp)
@@ -99,9 +109,13 @@ sup <- function(x, exp) {
 #'
 #' Returns the predicted simple linear regression values using
 #'   a pre-calculated beta coefficient matrix.
+#'   
 #' @param x A list of matrices of the same dimensions.
 #' @param beta_coef A matrix of beta coefficients, with the same dimensions as
 #'   the matrices in x.
+#'   
+#' @return a `list` of predicted values. 
+#'   
 #' @noRd
 fitted <- function(x, beta_coef) {
   ## TODO: no intercept?
@@ -120,6 +134,9 @@ fitted <- function(x, beta_coef) {
 #' @param nc The number of columns in the original matrix used by `recycle_borders`
 #' @param NA_replace A boolean. Should NA delta results be replaced by zeros.
 #'   Defaults to TRUE.
+#'  
+#' @return a `list` of matrices.  
+#'   
 #' @noRd
 deltas <- function(mat, nr, nc, NA_replace = TRUE) {
   # Reference values
@@ -146,6 +163,7 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 }
 
 #' Lapse rate computation
+#' 
 #' @param normal Normal rasters to compute lapse rates for. Build with this package functions.
 #' @template dem
 #' @param NA_replace A boolean. Should NA lapse rate results be replaced by zeros. Default to TRUE.
@@ -153,12 +171,12 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 #' @param rasterize Return an object of the same class category as normal with the same extend.
 #'
 #' @details Formulas
-#' Simple linear regression without the intercept term
-#' beta_coef = sum(xy) / sum(x²)
-#' mss = sum(x * beta_coef)², sum of squared fitted values
-#' rss = sum(ε²), sum of squared (y minus fitted), sum of absolute errors
-#' R² = mss / (mss + rss)
-#' Lapse rate = beta_coef * R²
+#'   Simple linear regression without the intercept term
+#'   beta_coef = sum(xy) / sum(x²)
+#'   mss = sum(x * beta_coef)², sum of squared fitted values
+#'   rss = sum(ε²), sum of squared (y minus fitted), sum of absolute errors
+#'   R² = mss / (mss + rss)
+#'   Lapse rate = beta_coef * R²
 
 #' @return SpatRaster of lapse rate values.
 #'
@@ -268,11 +286,10 @@ NArep <- function(x) {
 }
 
 
-
 #' TODO: add documentation here
 
 #' For the lapse rate, x is the elevation, and y is the normal
-
+#' 
 #' @param y_i TODO
 #' @param x_i TODO
 #' @param n_r TODO

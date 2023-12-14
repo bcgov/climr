@@ -172,7 +172,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' Downscale target rasters to points of interest
 #' 
 #' @details
-#' Additional details... TODO.
+#'   Additional details... TODO.
 #' 
 #' @param xyz A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).
 #' @param normal Reference normal baseline input from `normal_input`.
@@ -183,8 +183,8 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' @param historic_ts TODO
 #' @param return_normal TODO
 #' @param vars A character vector of climate variables to compute. Supported variables
-#' can be obtained with `list_variables()`. Definitions can be found in this package
-#' `variables` dataset. Default to monthly PPT, Tmax, Tmin.
+#'   can be obtained with `list_variables()`. Definitions can be found in this package
+#'  `variables` dataset. Default to monthly PPT, Tmax, Tmin.
 #' @param ppt_lr A boolean. Apply lapse rate adjustment to precipitations. Default to FALSE.
 #' @param nthread An integer. Number of parallel threads to use to do computations. Default to 1L.
 #' 
@@ -192,9 +192,10 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' @importFrom terra extract rast sources ext xres yres crop
 #' @importFrom parallel makeForkCluster makePSOCKcluster stopCluster splitIndices parLapply
 #' 
-#' @return A downscaled dataset. If `gcm` is NULL, this is just the downscaled `normal`
-#' at point locations. If `gcm` is provided, this returns a downscaled dataset for each
-#' point location, general circulation model, shared socioeconomic pathway, run and period.
+#' @return A `data.table` with downscaled climate variables. If `gcm` is NULL, 
+#'   this is just the downscaled `normal` at point locations. If `gcm` is provided,
+#'   this returns a downscaled dataset for each point location, general circulation 
+#'   model (GCM), shared socioeconomic pathway (SSP), run and period.
 #' 
 #' @export
 #' @examples
@@ -214,6 +215,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' 
 #' downscale(xyz, normal, gcm)
 #' historic <- historic_input(dbCon, thebb)
+#' terra::plot(historic[[1]])
 #' 
 #' downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)
 #' }
@@ -289,7 +291,11 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
 }
 
 #' Simple downscale
+#' 
 #' @noRd
+#' 
+#' @return a `data.table`.
+#' 
 #' @import data.table
 #' @importFrom terra crop ext xres yres extract
 downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_ts, return_normal, vars, ppt_lr = FALSE) {
@@ -445,7 +451,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
 #' @param gcm_paths TODO
 #' @param historic_paths TODO
 #'
-#' @return `data.table`
+#' @return A `data.table`
 threaded_downscale_ <- function(xyz, normal_path, gcm_paths, historic_paths, vars, ppt_lr, return_normal) { ## add gcm_ts here
   
   # Set DT threads to 1 in parallel to avoid overloading CPU

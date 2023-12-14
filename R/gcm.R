@@ -1,4 +1,5 @@
 #' Create gcm input for `downscale` using data on Postgis database.
+#' 
 #' @template dbCon
 #' @template bbox
 #' @template gcm
@@ -6,7 +7,10 @@
 #' @template period
 #' @template max_run
 #' @template cache
-#' @return An object to use with `downscale`. A list of `SpatRaster` with, possibly, multiple layers.
+#' 
+#' @return A `list` of SpatRasters, each with possibly multiple layers, that can
+#'   be used with `downscale`.
+#' 
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
@@ -33,7 +37,10 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 #'   Can be obtained from `list_gcm_period()`. Default to `list_gcm_period()`.
 #' @template max_run
 #' @template cache
-#' @return An object to use with `downscale`. A list of `SpatRaster` with, possibly, multiple layers.
+#' 
+#' @return A `list` of SpatRasters, each with possibly multiple layers, that can
+#'   be used with `downscale`.
+#' 
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
@@ -67,7 +74,8 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 #' @template max_run
 #' @template cache
 #' 
-#' @return An object to use with `downscale`. A list of `SpatRaster` with, possibly, multiple layers.
+#' @return A `list` of SpatRasters, each with possibly multiple layers, that can
+#'   be used with `downscale`.
 #' 
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
@@ -89,10 +97,13 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(),
 
 
 #' Read and parse gcm models csv files
+#' 
 #' @param files A character vector. File paths.
 #' @param col_num An integer vector. Positions of elements to retrieve in label. Label is split
 #'   by "_" before processing.
+#'   
 #' @return A character vector of unique values.
+#' 
 #' @importFrom data.table fread
 list_unique <- function(files, col_num) {
   collection <- character()
@@ -115,8 +126,10 @@ list_unique <- function(files, col_num) {
 }
 
 #' Read and parse gcm models csv files
+#' 
 #' @param gcm An optional character vector. Limit list to provided global circulation models.
 #' @param col_num An integer vector.
+#' 
 #' @return A character vector of unique values.
 list_parse <- function(gcm, col_num = 1) {
   # Default pattern csv extension
@@ -141,6 +154,7 @@ list_parse <- function(gcm, col_num = 1) {
 }
 
 #' List available global circulation models
+#' 
 #' @export
 list_gcm <- function() {
   c(
@@ -151,23 +165,27 @@ list_gcm <- function() {
 }
 
 #' List available shared socioeconomic pathways
+#' 
 #' @export
 list_ssp <- function() {
   # sort(dbGetQuery(dbCon, "SELECT DISTINCT scenario FROM esm_layers")[,1])
   c("ssp126", "ssp245", "ssp370", "ssp585")
 }
 
-#' List available period
+#' List available periods
+#' 
 #' @export
 list_gcm_period <- function() {
   # sort(dbGetQuery(dbCon, "SELECT DISTINCT period FROM esm_layers")[,1])
   c("2001_2020", "2021_2040", "2041_2060", "2061_2080", "2081_2100")
 }
 
-#' List available runs for given GCM
+#' List available runs for a given GCM
+#' 
 #' @template dbCon
 #' @param gcm Character vector to specify requested GCMs
 #' @importFrom RPostgres dbGetQuery
+#' 
 #' @export
 list_run <- function(dbCon, gcm) {
   sort(dbGetQuery(dbCon, paste0("SELECT DISTINCT run FROM esm_layers WHERE mod IN ('", paste(gcm, collapse = "','", "')")))[, 1])
@@ -186,7 +204,7 @@ list_run <- function(dbCon, gcm) {
 #' @template dbCon
 #' @template cache
 #'
-#' @return Spat Raster
+#' @return SpatRaster
 process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnames, dbCon, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   gcm_nm <- gsub("-", ".", gcm_nm)

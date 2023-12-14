@@ -6,7 +6,6 @@
 #' @importFrom RPostgres Postgres
 #'
 #' @export
-
 data_connect <- function() {
   pool <- tryCatch(
     {
