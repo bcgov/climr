@@ -7,9 +7,9 @@
 is_in_bbox(newbb, oldbb)
 }
 \arguments{
-\item{newbb}{}
+\item{newbb}{TODO}
 
-\item{oldbb}{}
+\item{oldbb}{TODO}
 }
 \value{
 logical

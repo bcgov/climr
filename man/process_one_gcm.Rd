@@ -7,13 +7,13 @@
 process_one_gcm(gcm_, res, xyzID, timeseries)
 }
 \arguments{
-\item{gcm_}{}
+\item{gcm_}{TODO}
 
-\item{res}{}
+\item{res}{TODO}
 
-\item{xyzID}{}
+\item{xyzID}{TODO}
 
-\item{timeseries}{}
+\item{timeseries}{TODO}
 }
 \value{
 \code{data.table}

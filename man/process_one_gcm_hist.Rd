@@ -7,11 +7,11 @@
 process_one_gcm_hist(gcm_, res, xyzID)
 }
 \arguments{
-\item{gcm_}{}
+\item{gcm_}{TODO}
 
-\item{res}{}
+\item{res}{TODO}
 
-\item{xyzID}{}
+\item{xyzID}{TODO}
 }
 \value{
 \code{data.table}
