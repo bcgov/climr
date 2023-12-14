@@ -30,7 +30,7 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
   # Load each file individually + select layers
   res <- lapply(gcm, process_one_gcm2, ssp = ssp, period = period)
   attr(res, "builder") <- "climr"
-
+  
   # Return a list of SpatRaster, one element for each model
   return(res)
 }
@@ -41,7 +41,7 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 #' @template bbox
 #' @template gcm
 #' @param years Numeric vector of desired years. Must be in `1851:2015`.
-#' Can be obtained from `list_gcm_period()`. Default to `list_gcm_period()`.
+#'   Can be obtained from `list_gcm_period()`. Default to `list_gcm_period()`.
 #' @template max_run
 #' @param cache Logical specifying whether to cache new data locally or no. Default `TRUE`
 #' @return An object to use with `downscale`. A list of `SpatRaster` with, possibly, multiple layers.
@@ -68,7 +68,7 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
   # Load each file individually + select layers
   res <- lapply(gcm, process_one_gcm3, years = years)
   attr(res, "builder") <- "climr"
-
+  
   # Return a list of SpatRaster, one element for each model
   return(res)
 }
@@ -115,7 +115,7 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(),
   # Load each file individually + select layers
   res <- lapply(gcm, process_one_gcm4, ssp = ssp, period = period)
   attr(res, "builder") <- "climr"
-
+  
   # Return a list of SpatRaster, one element for each model
   return(res)
 }
@@ -124,7 +124,7 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(),
 #' Read and parse gcm models csv files
 #' @param files A character vector. File paths.
 #' @param col_num An integer vector. Positions of elements to retrieve in label. Label is split
-#' by "_" before processing.
+#'   by "_" before processing.
 #' @return A character vector of unique values.
 #' @importFrom data.table fread
 list_unique <- function(files, col_num) {
@@ -154,7 +154,7 @@ list_unique <- function(files, col_num) {
 list_parse <- function(gcm, col_num = 1) {
   # Default pattern csv extension
   pattern <- "\\.csv$"
-
+  
   # In case we need to filter gcm
   if (!missing(gcm)) {
     pattern <- paste0("(", paste0(gcm, collapse = "|"), ").*", pattern)
@@ -168,7 +168,7 @@ list_parse <- function(gcm, col_num = 1) {
     full.names = TRUE,
     pattern = pattern
   )
-
+  
   # Extract all different unique values
   list_unique(files, col_num)
 }
