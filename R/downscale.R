@@ -450,9 +450,10 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
 #' @param historic_paths 
 #' @param vars 
 #' @param ppt_lr 
+#' @param return_normal
 #'
 #' @return `data.table`
-threaded_downscale_ <- function(xyz, normal_path, gcm_paths, historic_paths, vars, ppt_lr) { ## add gcm_ts here
+threaded_downscale_ <- function(xyz, normal_path, gcm_paths, historic_paths, vars, ppt_lr, return_normal) { ## add gcm_ts here
   
   # Set DT threads to 1 in parallel to avoid overloading CPU
   # Not needed for forking, not taking any chances

@@ -4,7 +4,15 @@
 \alias{threaded_downscale_}
 \title{TODO: fill documentation here}
 \usage{
-threaded_downscale_(xyz, normal_path, gcm_paths, historic_paths, vars, ppt_lr)
+threaded_downscale_(
+  xyz,
+  normal_path,
+  gcm_paths,
+  historic_paths,
+  vars,
+  ppt_lr,
+  return_normal
+)
 }
 \arguments{
 \item{xyz}{}
@@ -18,6 +26,8 @@ threaded_downscale_(xyz, normal_path, gcm_paths, historic_paths, vars, ppt_lr)
 \item{vars}{}
 
 \item{ppt_lr}{}
+
+\item{return_normal}{}
 }
 \value{
 \code{data.table}
