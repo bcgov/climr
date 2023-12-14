@@ -273,13 +273,13 @@ NArep <- function(x) {
 
 #' For the lapse rate, x is the elevation, and y is the normal
 
-#' @param y_i 
-#' @param x_i 
-#' @param n_r 
-#' @param n_c 
-#' @param n_sc 
-#' @param sum_xx 
-#' @param NA_replace 
+#' @param y_i TODO
+#' @param x_i TODO
+#' @param n_r TODO
+#' @param n_c TODO
+#' @param n_sc TODO
+#' @param sum_xx TODO
+#' @param NA_replace TODO
 #'
 #' @return `data.table`
 lapse_rate_redux <- function(y_i, x_i, n_r, n_c, n_sc, sum_xx, NA_replace) {

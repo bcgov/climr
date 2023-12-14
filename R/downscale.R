@@ -443,14 +443,10 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
 
 
 #' TODO: fill documentation here
-#'
-#' @param xyz 
-#' @param normal_path 
-#' @param gcm_paths 
-#' @param historic_paths 
-#' @param vars 
-#' @param ppt_lr 
-#' @param return_normal
+#' @inheritParams downscale
+#' @param normal_path TODO
+#' @param gcm_paths TODO
+#' @param historic_paths TODO
 #'
 #' @return `data.table`
 threaded_downscale_ <- function(xyz, normal_path, gcm_paths, historic_paths, vars, ppt_lr, return_normal) { ## add gcm_ts here
@@ -478,10 +474,10 @@ threaded_downscale_ <- function(xyz, normal_path, gcm_paths, historic_paths, var
 
 #' TODO: fill documentation here
 #'
-#' @param gcm_ 
-#' @param res 
-#' @param xyzID 
-#' @param timeseries 
+#' @param gcm_ TODO
+#' @param res TODO
+#' @param xyzID TODO
+#' @param timeseries TODO
 #'
 #' @return `data.table`
 process_one_gcm <- function(gcm_, res, xyzID, timeseries) {
@@ -562,9 +558,9 @@ process_one_gcm <- function(gcm_, res, xyzID, timeseries) {
 
 #' TODO: fill documentation here
 #'
-#' @param gcm_ 
-#' @param res 
-#' @param xyzID 
+#' @param gcm_ TODO
+#' @param res TODO
+#' @param xyzID TODO
 #'
 #' @return `data.table`
 process_one_gcm_hist <- function(gcm_, res, xyzID) {
@@ -638,10 +634,10 @@ process_one_gcm_hist <- function(gcm_, res, xyzID) {
 
 #' TODO: fill documentation here
 #'
-#' @param historic_ 
-#' @param res 
-#' @param xyzID 
-#' @param timeseries 
+#' @param historic_ TODO
+#' @param res TODO
+#' @param xyzID TODO
+#' @param timeseries TODO
 #'
 #' @return `data.table`
 process_one_historic <- function(historic_, res, xyzID, timeseries) {
