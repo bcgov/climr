@@ -181,7 +181,6 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 #' @return SpatRaster of lapse rate values.
 #'
 #' @importFrom terra as.list as.matrix ext nlyr compareGeom resample rast crs crs<-
-#' @importFrom parallel makeForkCluster makePSOCKcluster stopCluster parLapply
 #' @export
 lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize = TRUE) {
   # Transform normal to list, capture names before
@@ -220,6 +219,17 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
   sum_xx <- sum_matrix(sup(x_i, 2))
 
   if (isTRUE(nthread > 1L)) {
+    if (!requireNamespace("parallel")) {
+      message("nthreads is >1, but 'parallel' package is not available.")
+      message("Setting nthreads to 1 and running computations in sequential mode.")
+      message("If you wish to parallelise please run install.packages('parallel')")
+      nthread <- 1L
+    }
+  }
+  
+  if (isTRUE(nthread > 1L)) {
+    message("Parallelising lapse rate computations across ", nthread, " threads")
+    
     # initiate cluster
     if (Sys.info()["sysname"] != "Windows") {
       cl <- parallel::makeForkCluster(nthread)
