@@ -9,6 +9,9 @@ list_variables(only_extra = FALSE)
 \arguments{
 \item{only_extra}{A boolean. Should Tmin, Tmax and PPT be excluded? Defaults to FALSE.}
 }
+\value{
+a character vector
+}
 \description{
 List climate variables
 }

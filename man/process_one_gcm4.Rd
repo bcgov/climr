@@ -37,6 +37,9 @@ projections) and their corresponding names in the PostGIS data base. See climr::
 
 \item{cache}{Logical specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 }
+\value{
+a SpatRaster
+}
 \description{
 TODO: add documentation here
 }

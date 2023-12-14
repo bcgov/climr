@@ -190,7 +190,6 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' 
 #' @import data.table
 #' @importFrom terra extract rast sources ext xres yres crop
-#' @importFrom parallel makeForkCluster makePSOCKcluster stopCluster splitIndices parLapply
 #' 
 #' @return A `data.table` with downscaled climate variables. If `gcm` is NULL, 
 #'   this is just the downscaled `normal` at point locations. If `gcm` is provided,
@@ -238,7 +237,18 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
     )
   }
   
-  if (nthread > 1) {
+  if (isTRUE(nthread > 1L)) {
+    if (!requireNamespace("parallel")) {
+      message("nthreads is >1, but 'parallel' package is not available.")
+      message("Setting nthreads to 1 and running computations in sequential mode.")
+      message("If you wish to parallelise please run install.packages('parallel')")
+      nthread <- 1L
+    }
+  }
+  
+  if (isTRUE(nthread > 1L)) {
+    message("Parallelising downscaling computations across ", nthread, " threads")
+    
     # initiate cluster
     if (Sys.info()["sysname"] != "Windows") {
       cl <- parallel::makeForkCluster(nthread)

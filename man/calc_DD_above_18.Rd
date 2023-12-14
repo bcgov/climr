@@ -14,7 +14,7 @@ calc_DD_above_18(m, tm, region)
 \item{region}{one of either "All", "South west", "The rest"}
 }
 \value{
-Degree-Day Above 18
+Degree-Days Above 18
 }
 \description{
 Calculate Degree-Day Above 18 (DD>18)

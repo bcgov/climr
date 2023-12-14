@@ -2,7 +2,7 @@
 % Please edit documentation in R/gcm.R
 \name{list_run}
 \alias{list_run}
-\title{List available runs for given GCM}
+\title{List available runs for a given GCM}
 \usage{
 list_run(dbCon, gcm)
 }
@@ -12,5 +12,5 @@ list_run(dbCon, gcm)
 \item{gcm}{Character vector to specify requested GCMs}
 }
 \description{
-List available runs for given GCM
+List available runs for a given GCM
 }
