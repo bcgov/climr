@@ -1,5 +1,4 @@
 ## `param` data object (internal)
-
 library(data.table)
 
 base <- "data-raw/derivedVariables/optimizedParameterTables"
