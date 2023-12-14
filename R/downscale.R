@@ -49,16 +49,16 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
   # return_normal = TRUE
   # cache = TRUE
   # vars = c("PPT","CMI","PET07")
-
+  
   message("Welcome to climr!")
   dbCon <- data_connect()
   thebb <- get_bb(xyz) ## get bounding box based on input points
-
+  
   if (ncol(xyz) > 4) { ## remove extraneous columns
     xyz <- xyz[, 1:4]
   }
   xyz <- as.data.frame(xyz) ## input needs to be a data.frame, not data.table. This is something we could change in the future
-
+  
   message("Getting normals...")
   if (which_normal == "NorAm") {
     normal <- normal_input(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
@@ -79,44 +79,44 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
       normal <- normal_input(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
     }
   }
-
-
+  
+  
   if (!is.null(historic_period)) {
     message("Getting historic...")
     historic_period <- historic_input(dbCon, bbox = thebb, period = historic_period, cache = cache)
   }
   if (!is.null(historic_ts)) historic_ts <- historic_input_ts(dbCon, bbox = thebb, years = historic_ts, cache = cache)
-
+  
   if (!is.null(gcm_models)) {
     if (!is.null(gcm_period)) {
       message("Getting GCMs...")
       gcm <- gcm_input(dbCon,
-        bbox = thebb, gcm = gcm_models,
-        ssp = ssp,
-        period = gcm_period,
-        max_run = max_run,
-        cache = cache
+                       bbox = thebb, gcm = gcm_models,
+                       ssp = ssp,
+                       period = gcm_period,
+                       max_run = max_run,
+                       cache = cache
       )
     } else {
       gcm <- NULL
     }
     if (!is.null(gcm_ts_years)) {
       gcm_ts <- gcm_ts_input(dbCon,
-        bbox = thebb, gcm = gcm_models,
-        ssp = ssp,
-        years = gcm_ts_years,
-        max_run = max_run,
-        cache = cache
+                             bbox = thebb, gcm = gcm_models,
+                             ssp = ssp,
+                             years = gcm_ts_years,
+                             max_run = max_run,
+                             cache = cache
       )
     } else {
       gcm_ts <- NULL
     }
     if (!is.null(gcm_hist_years)) {
       gcm_hist <- gcm_hist_input(dbCon,
-        bbox = thebb, gcm = gcm_models,
-        years = gcm_hist_years,
-        max_run = max_run,
-        cache = cache
+                                 bbox = thebb, gcm = gcm_models,
+                                 years = gcm_hist_years,
+                                 max_run = max_run,
+                                 cache = cache
       )
     } else {
       gcm_hist <- NULL
@@ -124,7 +124,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
   } else {
     gcm <- gcm_ts <- gcm_hist <- NULL
   }
-
+  
   message("Downscaling!!")
   results <- downscale(
     xyz = xyz,
@@ -137,7 +137,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
     return_normal = return_normal,
     vars = vars
   )
-
+  
   if (which_normal %in% c("BC", "NorAm")) {
     return(results)
   }
@@ -149,7 +149,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
     thebb <- get_bb(na_xyz)
     message("Now North America...")
     normal <- normal_input(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
-
+    
     results_na <- downscale(
       xyz = na_xyz,
       normal = normal,
@@ -161,7 +161,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
       return_normal = return_normal,
       vars = vars
     )
-
+    
     res_all <- rbind(results, results_na)
     poolClose(dbCon)
     return(res_all)
@@ -229,7 +229,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
       " See `?normal_input` for details."
     )
   }
-
+  
   # Make sure gcm was built using gcm_input
   if (!is.null(gcm) && !isTRUE(attr(gcm, "builder") == "climr")) {
     stop(
@@ -237,7 +237,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
       " See `?gcm_input` for details."
     )
   }
-
+  
   if (nthread > 1) {
     # initiate cluster
     if (Sys.info()["sysname"] != "Windows") {
@@ -247,7 +247,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
     }
     # destroy cluster on exit
     on.exit(parallel::stopCluster(cl), add = TRUE)
-
+    
     # Pre setting ID for recycling later
     xyz[, 4L] <- seq_len(nrow(xyz))
     # Reordering on y axis for smaller cropped area and faster
@@ -260,7 +260,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
         xyz[x,]
       }
     )
-
+    
     # Parallel processing and recombine
     res <- rbindlist(
       parallel::parLapply(
@@ -285,7 +285,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
     # Downscale without parallel processing
     res <- downscale_(xyz, normal, gcm, historic, gcm_ts, gcm_hist, historic_ts, return_normal, vars, ppt_lr)
   }
-
+  
   setkey(res, "ID")
   return(res)
 }
@@ -306,17 +306,17 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
       max(xyzID[, 2L]) + yres(normal) * 2
     )
   )
-
+  
   # crop normal raster (while also loading it to memory)
   normal <- crop(normal, ex, snap = "out")
-
+  
   # Normal value extraction
   # possible garbage output :
   # Error in (function (x)  : attempt to apply non-function
   # Error in x$.self$finalize() : attempt to apply non-function
   # Can ignore, trying to suppress messages with `shush`
   # https://github.com/rspatial/terra/issues/287
-
+  
   # stack before extracting
   res <-
     extract(
@@ -324,8 +324,8 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
       y = xyzID[, 1L:2L],
       method = "bilinear"
     )
-
-
+  
+  
   # Compute elevation differences between provided points elevation and normal
   # Dem at position 74 (ID column + 36 normal layers + 36 lapse rate layers + 1 dem layer)
   elev_delta <- xyzID[, 3L] - res[, 74L]
@@ -334,13 +334,13 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
   # Compute individual point lapse rate adjustments
   # Lapse rate position 38:73 (ID column + 36 normal layers + 36 lapse rate layers)
   lr <- elev_delta * res[, 38L:73L] ## do we need anything other than the lapse rate?
-
+  
   # Replace any NAs left with 0s
   lr[is.na(lr)] <- 0L
-
+  
   # Remove lapse rates and digital elevation model from res
   res[, 38L:74L] <- NULL
-
+  
   # Combine results (ignoring ID column)
   if (isTRUE(ppt_lr)) {
     res[, -1L] <- res[, -1L] + lr
@@ -348,7 +348,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
     ppt <- grep("^PPT", names(normal)[1L:36L], invert = TRUE)
     res[, ppt + 1L] <- res[, ppt + 1L] + lr[, ppt]
   }
-
+  
   # Process one GCM stacked layers
   if (!is.null(gcm)) {
     # Process each gcm and rbind resulting tables
@@ -395,7 +395,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
   } else {
     res_hist_ts <- NULL
   }
-
+  
   if (return_normal) {
     nm <- names(res)[-1]
     labels <- nm
@@ -413,7 +413,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
     if (ncol(xyzID) == 4L) {
       normal_[["ID"]] <- xyzID[, 4L]
     }
-
+    
     # Melt gcm_ and set the same key for merging
     normal_ <- melt(
       setDT(normal_),
@@ -421,7 +421,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
       variable.factor = FALSE
     )
     setkey(normal_, "variable")
-
+    
     # Finally, dcast back to final form to get original 36 columns
     normal_ <- dcast(
       # The merge with shared keys is as simple as that
@@ -437,7 +437,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
   # print(names(res))
   # Compute extra climate variables, assign by reference
   append_clim_vars(res, vars)
-
+  
   return(res)
 }
 
@@ -557,6 +557,7 @@ process_one_gcm <- function(gcm_, res, xyzID, timeseries) {
   
   return(gcm_)
 }
+
 
 #' TODO: fill documentation here
 #'
