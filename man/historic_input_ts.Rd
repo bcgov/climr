@@ -16,7 +16,8 @@ historic_input_ts(dbCon, bbox = NULL, years = 2010:2022, cache = TRUE)
 \item{cache}{Logical specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 }
 \value{
-An object to use with \code{downscale}. A \code{SpatRaster} with, possibly, multiple layers.
+A \code{list} of SpatRasters, each with possibly multiple layers, that can
+be used with \code{downscale}.
 }
 \description{
 Create historic timeseries input for \code{downscale}.

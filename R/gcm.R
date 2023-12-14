@@ -355,7 +355,7 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
 #' @template dbCon 
 #' @template cache 
 #'
-#' @return
+#' @return a SpatRaster
 process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   

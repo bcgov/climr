@@ -12,7 +12,7 @@ calc_DD_below_0(m, tm)
 \item{tm}{monthly mean temperature for the \code{m} month}
 }
 \value{
-Degree-Day Below 0
+Degree-Days Below 0
 }
 \description{
 Calculate Degree-Day Below 0 (DD<0)

@@ -44,9 +44,10 @@ can be obtained with \code{list_variables()}. Definitions can be found in this p
 \item{nthread}{An integer. Number of parallel threads to use to do computations. Default to 1L.}
 }
 \value{
-A downscaled dataset. If \code{gcm} is NULL, this is just the downscaled \code{normal}
-at point locations. If \code{gcm} is provided, this returns a downscaled dataset for each
-point location, general circulation model, shared socioeconomic pathway, run and period.
+A \code{data.table} with downscaled climate variables. If \code{gcm} is NULL,
+this is just the downscaled \code{normal} at point locations. If \code{gcm} is provided,
+this returns a downscaled dataset for each point location, general circulation
+model (GCM), shared socioeconomic pathway (SSP), run and period.
 }
 \description{
 Downscale target rasters to points of interest
@@ -71,6 +72,7 @@ terra::plot(gcm[[1]])
 
 downscale(xyz, normal, gcm)
 historic <- historic_input(dbCon, thebb)
+terra::plot(historic[[1]])
 
 downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)
 }
