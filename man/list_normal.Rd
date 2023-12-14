@@ -2,10 +2,14 @@
 % Please edit documentation in R/normal.R
 \name{list_normal}
 \alias{list_normal}
-\title{List available normal}
+\title{List available normals}
 \usage{
 list_normal()
 }
+\value{
+a character vector.
+}
 \description{
-List available normal
+Currently available normals span North America ("normal_na") or
+British Columbia ("normal_bc")
 }

@@ -6,6 +6,9 @@
 \usage{
 cache_exists()
 }
+\value{
+logical
+}
 \description{
 Check if package local cache exists
 }

@@ -7,7 +7,7 @@
 cache_path()
 }
 \value{
-The full path of the package local cache.
+character. The full path of the package local cache.
 }
 \description{
 Return package local cache path

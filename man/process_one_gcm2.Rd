@@ -38,7 +38,7 @@ corresponding names in the PostGIS data base.  See climr:::dbnames}
 \item{cache}{Logical specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 }
 \value{
-Spat Raster
+SpatRaster
 }
 \description{
 TODO: add documentation here

@@ -32,7 +32,7 @@ can be obtained with \code{list_variables()}. Definitions can be found in this p
 \item{return_normal}{TODO}
 }
 \value{
-\code{data.table}
+A \code{data.table}
 }
 \description{
 TODO: fill documentation here

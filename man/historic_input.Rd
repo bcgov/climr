@@ -17,7 +17,8 @@ Can be obtained from \code{list_gcm_period()}. Default to \code{list_gcm_period(
 \item{cache}{Logical specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 }
 \value{
-An object to use with \code{downscale}. A \code{SpatRaster} with, possibly, multiple layers.
+A \code{list} of SpatRasters, each with possibly multiple layers, that can
+be used with \code{downscale}.
 }
 \description{
 Create historic input for \code{downscale}.
