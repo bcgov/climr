@@ -137,12 +137,7 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
     west      = mat[c(-1L, -(nr + 2L)), -(nc + 1L):-(nc + 2L)] - ref
   )
 
-  # Replace NA/NaN by 0
   # Only the deltas are replaced by 0.
-  NArep <- function(x) {
-    x[is.na(x)] <- 0L
-    return(x)
-  }
   if (isTRUE(NA_replace)) {
     res <- lapply(res, NArep)
   }
@@ -206,33 +201,6 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
   # Sums of x squared
   sum_xx <- sum_matrix(sup(x_i, 2))
 
-  # For the lapse rate, x is the elevation, and y is the normal
-  lapse_rate_redux <- function(y_i, x_i, n_r, n_c, n_sc, sum_xx, NA_replace) {
-    # Expand and recycle borders
-    y_i <- recycle_borders(y_i, n_r, n_c)
-    # Compute surrounding cells deltas
-    y_i <- deltas(y_i, n_r, n_c)
-    # This is the regression coefficient matrix
-    beta_coef <- sum_matrix(prod_matrix(x_i, y_i)) / sum_xx
-    # We need the fitted values to compute the
-    # coefficient of determination
-    f <- fitted(x_i, beta_coef)
-    # We use the same approach as stats::summary.lm
-    # applied to a list matrices
-    mss <- sum_matrix(sup(f, 2))
-    rss <- sum_matrix(sup(delta_matrix(y_i, f), 2))
-    # We can combine the resulting matrices to get the
-    # coefficient of determination and multiply by beta coefficient
-    lapse_rate <- beta_coef * mss / (mss + rss)
-
-    if (isTRUE(NA_replace)) {
-      lapse_rate[is.na(lapse_rate)] <- 0L
-    }
-
-    # And we can return the lapse rate
-    return(lapse_rate)
-  }
-
   if (isTRUE(nthread > 1L)) {
     # initiate cluster
     if (Sys.info()["sysname"] != "Windows") {
@@ -287,4 +255,55 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
   names(res) <- normal_names
 
   return(res)
+}
+
+#' Replace NA/NaN by 0
+#'
+#' @param x a vector of values.
+#'
+#' @return `x` with NAs replaced by 0s
+NArep <- function(x) {
+  x[is.na(x)] <- 0L
+  return(x)
+}
+
+
+
+#' TODO: add documentation here
+
+#' For the lapse rate, x is the elevation, and y is the normal
+
+#' @param y_i TODO
+#' @param x_i TODO
+#' @param n_r TODO
+#' @param n_c TODO
+#' @param n_sc TODO
+#' @param sum_xx TODO
+#' @param NA_replace TODO
+#'
+#' @return `data.table`
+lapse_rate_redux <- function(y_i, x_i, n_r, n_c, n_sc, sum_xx, NA_replace) {
+  # Expand and recycle borders
+  y_i <- recycle_borders(y_i, n_r, n_c)
+  # Compute surrounding cells deltas
+  y_i <- deltas(y_i, n_r, n_c)
+  # This is the regression coefficient matrix
+  beta_coef <- sum_matrix(prod_matrix(x_i, y_i)) / sum_xx
+  # We need the fitted values to compute the
+  # coefficient of determination
+  f <- fitted(x_i, beta_coef)
+  # We use the same approach as stats::summary.lm
+  # applied to a list matrices
+  mss <- sum_matrix(sup(f, 2))
+  rss <- sum_matrix(sup(delta_matrix(y_i, f), 2))
+  # We can combine the resulting matrices to get the
+  # coefficient of determination and multiply by beta coefficient
+  lapse_rate <- beta_coef * mss / (mss + rss)
+  
+  if (isTRUE(NA_replace)) {
+    lapse_rate[is.na(lapse_rate)] <- 0L
+  }
+  
+  # And we can return the lapse rate
+  return(lapse_rate)
 }

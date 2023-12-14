@@ -1,4 +1,8 @@
 #' Be quiet
+#' Suppress messaging
+#' 
+#' @param expr expression to evaluate in quite mode.
+#'
 #' @noRd
 shush <- function(expr) {
   suppressMessages(
