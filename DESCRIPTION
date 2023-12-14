@@ -27,16 +27,16 @@ Imports:
     data.table,
     DBI,
     gh,
-    parallel,
     pool,
     RPostgres,
     terra,
     sf,
     uuid
-Depends: 
-    R (>= 4.0)
 Suggests: 
+    parallel,
     rmarkdown,
     testthat (>= 3.0.0)
+Depends: 
+    R (>= 4.0)
 Config/testthat/edition: 3
 LazyData: true
