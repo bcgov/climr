@@ -451,7 +451,7 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
 #' @param vars 
 #' @param ppt_lr 
 #'
-#' @return
+#' @return `data.table`
 threaded_downscale_ <- function(xyz, normal_path, gcm_paths, historic_paths, vars, ppt_lr) { ## add gcm_ts here
   
   # Set DT threads to 1 in parallel to avoid overloading CPU
@@ -482,7 +482,7 @@ threaded_downscale_ <- function(xyz, normal_path, gcm_paths, historic_paths, var
 #' @param xyzID 
 #' @param timeseries 
 #'
-#' @return
+#' @return `data.table`
 process_one_gcm <- function(gcm_, res, xyzID, timeseries) {
   ## gcm_ <- gcm[[1]]
   # Store names for later use
@@ -565,7 +565,7 @@ process_one_gcm <- function(gcm_, res, xyzID, timeseries) {
 #' @param res 
 #' @param xyzID 
 #'
-#' @return
+#' @return `data.table`
 process_one_gcm_hist <- function(gcm_, res, xyzID) {
   ## gcm_ <- gcm[[1]]
   # Store names for later use
@@ -642,7 +642,7 @@ process_one_gcm_hist <- function(gcm_, res, xyzID) {
 #' @param xyzID 
 #' @param timeseries 
 #'
-#' @return
+#' @return `data.table`
 process_one_historic <- function(historic_, res, xyzID, timeseries) {
   # print(historic_)
   # Store names for later use
