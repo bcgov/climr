@@ -1,11 +1,12 @@
-#' Create normal baseline input for `downscale` from postgis database.
+#' Create normal baseline input for `downscale` from PostGIS database.
+#' 
 #' @template dbCon
 #' @template bbox
 #' @template normal
 #' @template cache
 #'
-#' @return A normal baseline to use with `downscale`. A `SpatRaster` containing normals, lapse rates
-#' and digital elevation model layers.
+#' @return A `SpatRaster` containing normals, lapse rates
+#'   and digital elevation model layers, that can be used with `downscale`. 
 #'
 #' @importFrom terra rast writeRaster ext
 #' @importFrom data.table fread fwrite data.table
@@ -74,7 +75,13 @@ is_in_bbox <- function(newbb, oldbb) {
   }
 }
 
-#' List available normal
+#' List available normals
+#' 
+#' Currently available normals span North America ("normal_na") or
+#'   British Columbia ("normal_bc")
+#'   
+#' @return a character vector.
+#' 
 #' @export
 list_normal <- function() {
   c("normal_na", "normal_bc")

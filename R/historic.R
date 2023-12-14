@@ -1,10 +1,13 @@
 #' Create historic input for `downscale`.
+#' 
 #' @template dbCon
 #' @template bbox
 #' @template period
 #' @template cache
 #'
-#' @return An object to use with `downscale`. A `SpatRaster` with, possibly, multiple layers.
+#' @return A `list` of SpatRasters, each with possibly multiple layers, that can
+#'   be used with `downscale`.
+#'   
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
@@ -69,18 +72,21 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 
 
 #' Create historic timeseries input for `downscale`.
+#' 
 #' @template dbCon
 #' @template bbox
 #' @template cache
 #' @param years Years to retrieve timeseries for, in `1902:2022`. Default `2010:2022`
-#' @return An object to use with `downscale`. A `SpatRaster` with, possibly, multiple layers.
+#' 
+#' @return A `list` of SpatRasters, each with possibly multiple layers, that can
+#'   be used with `downscale`.
+#' 
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @importFrom data.table fread setorder data.table fwrite
 #' @importFrom uuid UUIDgenerate
 #' @export
-#'
 historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRUE) {
   dbcode <- "historic_ts"
   ts_name <- "climatebc"
@@ -175,7 +181,6 @@ historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRU
 
 #' List available historic periods
 #' @export
-
 list_historic <- function() {
   return("2001_2020")
 }

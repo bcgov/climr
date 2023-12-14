@@ -1,9 +1,12 @@
 # Cache utility
 
 #' Return package local cache path
+#' 
 #' @details By default, it uses [tools::R_user_dir()]. The cache location can be
 #' set using the `climr.cache.path` option with `options("climr.cache.path" = "your_path")`.
-#' @return The full path of the package local cache.
+#' 
+#' @return character. The full path of the package local cache.
+#' 
 #' @importFrom tools R_user_dir
 #' @export
 cache_path <- function() {
@@ -11,14 +14,20 @@ cache_path <- function() {
 }
 
 #' Check if package local cache exists
+#' 
+#' @return logical
 cache_exists <- function() {
   file.exists(cache_path())
 }
 
 #' Ask if user want to use local cache, otherwise use a temporary directory.
-#' @param ask A boolean. Ask before deleting files. Default to `interactive()`.
-#' @importFrom utils askYesNo
+#' 
 #' @noRd
+#' @param ask A boolean. Ask before deleting files. Default to `interactive()`.
+#' 
+#' @return logical
+#' 
+#' @importFrom utils askYesNo
 cache_ask <- function(ask = interactive()) {
   # Only ask if cache does not already exists
   if (!cache_exists() && isTRUE(ask)) {
