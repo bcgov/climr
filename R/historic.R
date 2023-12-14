@@ -12,13 +12,13 @@
 #' @importFrom uuid UUIDgenerate
 #' @export
 historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache = TRUE) {
-  dbnames <- structure(list(
+  dbnames2 <- structure(list(
     PERIOD = c("2001_2020"),
     dbname = c("historic_periods")
   ), class = "data.frame", row.names = c(NA, -13L))
 
 
-  dbcode <- dbnames$dbname[dbnames$PERIOD %in% period]
+  dbcode <- dbnames2$dbname[dbnames2$PERIOD %in% period]
 
   if (dir.exists(paste0(cache_path(), "/historic/", dbcode))) {
     bnds <- fread(paste0(cache_path(), "/historic/", dbcode, "/meta_area.csv"))
