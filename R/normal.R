@@ -62,8 +62,8 @@ normal_input <- function(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE)
 
 #' TODO add documentation here
 #'
-#' @param newbb 
-#' @param oldbb 
+#' @param newbb TODO
+#' @param oldbb TODO
 #'
 #' @return logical
 is_in_bbox <- function(newbb, oldbb) {
