@@ -2,7 +2,7 @@
 % Please edit documentation in R/normal.R
 \name{normal_input}
 \alias{normal_input}
-\title{Create normal baseline input for \code{downscale} from postgis database.}
+\title{Create normal baseline input for \code{downscale} from PostGIS database.}
 \usage{
 normal_input(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE)
 }
@@ -18,9 +18,9 @@ names PPT01:PPT12, Tmax01:Tmax12 and Tmin01:Tmin12. Default to \code{list_normal
 \item{cache}{Logical specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 }
 \value{
-A normal baseline to use with \code{downscale}. A \code{SpatRaster} containing normals, lapse rates
-and digital elevation model layers.
+A \code{SpatRaster} containing normals, lapse rates
+and digital elevation model layers, that can be used with \code{downscale}.
 }
 \description{
-Create normal baseline input for \code{downscale} from postgis database.
+Create normal baseline input for \code{downscale} from PostGIS database.
 }

@@ -2,10 +2,10 @@
 % Please edit documentation in R/gcm.R
 \name{list_gcm_period}
 \alias{list_gcm_period}
-\title{List available period}
+\title{List available periods}
 \usage{
 list_gcm_period()
 }
 \description{
-List available period
+List available periods
 }

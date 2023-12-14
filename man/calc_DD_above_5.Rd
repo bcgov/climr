@@ -14,7 +14,7 @@ calc_DD_above_5(m, tm, region)
 \item{region}{one of either "All", "West", "East"}
 }
 \value{
-Degree-Day Above 5
+Degree-Days Above 5
 }
 \description{
 Calculate Degree-Day Above 5 (DD>5)
