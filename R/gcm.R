@@ -28,7 +28,9 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
   ), class = "data.frame", row.names = c(NA, -13L))
 
   # Load each file individually + select layers
-  res <- lapply(gcm, process_one_gcm2, ssp = ssp, period = period)
+  res <- lapply(gcm, process_one_gcm2, ssp = ssp, period = period,
+                bbox = bbox, dbnames = dbnames, dbCon = dbCon, 
+                max_run = max_run, cache = cache)
   attr(res, "builder") <- "climr"
   
   # Return a list of SpatRaster, one element for each model
@@ -66,7 +68,9 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
   ), class = "data.frame", row.names = c(NA, -13L))
 
   # Load each file individually + select layers
-  res <- lapply(gcm, process_one_gcm3, years = years)
+  res <- lapply(gcm, process_one_gcm3, years = years,
+                dbCon = dbCon, bbox = bbox, dbnames = dbnames, 
+                max_run = max_run, cache = cache)
   attr(res, "builder") <- "climr"
   
   # Return a list of SpatRaster, one element for each model
@@ -113,7 +117,9 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(),
   ), class = "data.frame", row.names = c(NA, -13L))
   if (nrow(dbnames) < 1) stop("That isn't a valid GCM")
   # Load each file individually + select layers
-  res <- lapply(gcm, process_one_gcm4, ssp = ssp, period = period)
+  res <- lapply(gcm, process_one_gcm4, ssp = ssp, period = years,
+                dbnames = dbnames, bbox = bbox, dbCon = dbCon, 
+                max_run = max_run, cache = cache)
   attr(res, "builder") <- "climr"
   
   # Return a list of SpatRaster, one element for each model
@@ -209,12 +215,18 @@ list_run <- function(dbCon, gcm) {
 
 #' TODO: add documentation here
 #'
-#' @param gcm_nm 
-#' @param ssp 
-#' @param period 
+#' @template gcm_nm 
+#' @template ssp 
+#' @template bbox
+#' @template period
+#' @template max_run
+#' @param dbnames `data.frame` with the list of available GCMs and their 
+#'   corresponding names in the PostGIS data base.
+#' @template dbCon
+#' @template cache
 #'
-#' @return
-process_one_gcm2 <- function(gcm_nm, ssp, period) { ## need to update to all GCMs
+#' @return Spat Raster
+process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames, dbCon, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   gcm_nm <- gsub("-", ".", gcm_nm)
   
@@ -282,11 +294,18 @@ process_one_gcm2 <- function(gcm_nm, ssp, period) { ## need to update to all GCM
 
 #' TODO: add documentation here
 #'
-#' @param gcm_nm 
-#' @param years 
+#' @template gcm_nm 
+#' @param years Numeric vector of desired years. Must be in `1851:2015`.
+#'   Can be obtained from `list_gcm_period()`. Default to `list_gcm_period()`.
+#' @template dbCon 
+#' @template bbox 
+#' @template max_run
+#' @param dbnames `data.frame` with the list of available GCMs (historical projections) 
+#'   and their corresponding names in the PostGIS data base.
+#' @template cache 
 #'
-#' @return
-process_one_gcm3 <- function(gcm_nm, years) { ## need to update to all GCMs
+#' @return SpatRaster
+process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   
   if (dir.exists(paste0(cache_path(), "/gcmhist/", gcmcode))) {
@@ -347,12 +366,18 @@ process_one_gcm3 <- function(gcm_nm, years) { ## need to update to all GCMs
 
 #' TODO: add documentation here
 #'
-#' @param gcm_nm 
-#' @param ssp 
-#' @param period 
+#' @template gcm_nm
+#' @template ssp 
+#' @template period 
+#' @template max_run
+#' @param dbnames #' @param dbnames `data.frame` with the list of available GCMs (time series)
+#'   projections) and their corresponding names in the PostGIS data base.
+#' @template bbox 
+#' @template dbCon 
+#' @template cache 
 #'
 #' @return
-process_one_gcm4 <- function(gcm_nm, ssp, period) { ## need to update to all GCMs
+process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames, bbox, dbCon, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   
   if (dir.exists(paste0(cache_path(), "/gcmts/", gcmcode))) {
