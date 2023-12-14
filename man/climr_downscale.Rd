@@ -31,7 +31,7 @@ climr_downscale(
 
 \item{gcm_models}{Vector of GCM names. Options are \code{list_gcm()}. Used for gcm periods, gcm timeseries, and historic timeseries. Default \code{NULL}}
 
-\item{ssp}{A character vector. Label of the shared socioeconomic pathways to use.
+\item{ssp}{A character vector. Label of the shared socioeconomic pathway(s) to use.
 See available options with \code{list_ssp()}. Defaults to \code{list_ssp()}.}
 
 \item{gcm_period}{Requested future periods. Options are \code{list_gcm_period()}}

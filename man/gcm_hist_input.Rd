@@ -28,7 +28,7 @@ Can be obtained from \code{list_gcm_period()}. Default to \code{list_gcm_period(
 A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
 are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
-\item{cache}{Logical specifying whether to cache new data locally or no. Default \code{TRUE}}
+\item{cache}{Logical specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 }
 \value{
 An object to use with \code{downscale}. A list of \code{SpatRaster} with, possibly, multiple layers.

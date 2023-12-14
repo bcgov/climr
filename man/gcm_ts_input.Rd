@@ -22,7 +22,7 @@ gcm_ts_input(
 \item{gcm}{A character vector. Label of the global circulation models to use.
 Can be obtained from \code{list_gcm()}. Default to \code{list_gcm()}.}
 
-\item{ssp}{A character vector. Label of the shared socioeconomic pathways to use.
+\item{ssp}{A character vector. Label of the shared socioeconomic pathway(s) to use.
 See available options with \code{list_ssp()}. Defaults to \code{list_ssp()}.}
 
 \item{years}{Numeric or character vector in \code{2020:2100}. Defaults to \code{2020:2030}.}
@@ -31,7 +31,7 @@ See available options with \code{list_ssp()}. Defaults to \code{list_ssp()}.}
 A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
 are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
-\item{cache}{Logical specifying whether to cache new data locally or no. Default \code{TRUE}}
+\item{cache}{Logical specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 }
 \value{
 An object to use with \code{downscale}. A list of \code{SpatRaster} with, possibly, multiple layers.
