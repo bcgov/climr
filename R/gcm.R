@@ -43,7 +43,7 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 #' @param years Numeric vector of desired years. Must be in `1851:2015`.
 #'   Can be obtained from `list_gcm_period()`. Default to `list_gcm_period()`.
 #' @template max_run
-#' @param cache Logical specifying whether to cache new data locally or no. Default `TRUE`
+#' @template cache
 #' @return An object to use with `downscale`. A list of `SpatRaster` with, possibly, multiple layers.
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
@@ -87,7 +87,7 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 #' @template ssp
 #' @param years Numeric or character vector in `2020:2100`. Defaults to `2020:2030`.
 #' @template max_run
-#' @param cache Logical specifying whether to cache new data locally or no. Default `TRUE`
+#' @template cache
 #' 
 #' @return An object to use with `downscale`. A list of `SpatRaster` with, possibly, multiple layers.
 #' 
