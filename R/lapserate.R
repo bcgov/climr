@@ -281,7 +281,7 @@ NArep <- function(x) {
 #' @param sum_xx 
 #' @param NA_replace 
 #'
-#' @return
+#' @return `data.table`
 lapse_rate_redux <- function(y_i, x_i, n_r, n_c, n_sc, sum_xx, NA_replace) {
   # Expand and recycle borders
   y_i <- recycle_borders(y_i, n_r, n_c)
