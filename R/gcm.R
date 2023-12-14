@@ -14,19 +14,6 @@
 #' @import data.table
 #' @export
 gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), period = list_gcm_period(), max_run = 0L, cache = TRUE) {
-  dbnames <- structure(list(
-    GCM = c(
-      "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5",
-      "CNRM-ESM2-1", "EC-Earth3", "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0",
-      "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL"
-    ),
-    dbname = c(
-      "gcm_access", "gcm_bcc", "gcm_canesm", "gcm_cnrm",
-      "gcm_ecearth", "gcm_gfdl", "gcm_giss", "gcm_inm", "gcm_ipsl",
-      "gcm_miroc6", "gcm_mpi1", "gcm_mpi2", "gcm_ukesm"
-    )
-  ), class = "data.frame", row.names = c(NA, -13L))
-
   # Load each file individually + select layers
   res <- lapply(gcm, process_one_gcm2, ssp = ssp, period = period,
                 bbox = bbox, dbnames = dbnames, dbCon = dbCon, 
@@ -54,22 +41,9 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 #' @import data.table
 #' @export
 gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:1950, max_run = 0L, cache = TRUE) {
-  dbnames <- structure(list(
-    GCM = c(
-      "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5",
-      "CNRM-ESM2-1", "EC-Earth3", "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0",
-      "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL"
-    ),
-    dbname = c(
-      "access_hist", "bcc_hist", "canesm_hist", "cnrm_hist",
-      "ec_earth_hist", "gfdl_hist", "giss_hist", "inm_hist", "ipsl_hist",
-      "miroc6_hist", "mpi_hist", "mri_hist", "ukesm_hist"
-    )
-  ), class = "data.frame", row.names = c(NA, -13L))
-
   # Load each file individually + select layers
   res <- lapply(gcm, process_one_gcm3, years = years,
-                dbCon = dbCon, bbox = bbox, dbnames = dbnames, 
+                dbCon = dbCon, bbox = bbox, dbnames = dbnames_hist, 
                 max_run = max_run, cache = cache)
   attr(res, "builder") <- "climr"
   
@@ -102,23 +76,10 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 #' @import data.table
 #' @export
 gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), years = 2020:2030, max_run = 0L, cache = TRUE) {
-  period <- years
-  dbnames <- structure(list(
-    GCM = c(
-      "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5",
-      "CNRM-ESM2-1", "EC-Earth3", "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0",
-      "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL"
-    ),
-    dbname = c(
-      "gcmts_access", "gcmts_bcc", "gcmts_canesm", "gcmts_cnrm",
-      "gcmts_ecearth", "gcmts_gfdl", "gcmts_giss", "gcmts_inm", "gcmts_ipsl",
-      "gcmts_miroc6", "gcmts_mpi1", "gcmts_mpi2", "gcmts_ukesm"
-    )
-  ), class = "data.frame", row.names = c(NA, -13L))
-  if (nrow(dbnames) < 1) stop("That isn't a valid GCM")
+  if (nrow(dbnames_ts) < 1) stop("That isn't a valid GCM")
   # Load each file individually + select layers
   res <- lapply(gcm, process_one_gcm4, ssp = ssp, period = years,
-                dbnames = dbnames, bbox = bbox, dbCon = dbCon, 
+                dbnames = dbnames_ts, bbox = bbox, dbCon = dbCon, 
                 max_run = max_run, cache = cache)
   attr(res, "builder") <- "climr"
   
@@ -221,12 +182,12 @@ list_run <- function(dbCon, gcm) {
 #' @template period
 #' @template max_run
 #' @param dbnames `data.frame` with the list of available GCMs and their 
-#'   corresponding names in the PostGIS data base.
+#'   corresponding names in the PostGIS data base.  See climr:::dbnames
 #' @template dbCon
 #' @template cache
 #'
 #' @return Spat Raster
-process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames, dbCon, cache) { ## need to update to all GCMs
+process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnames, dbCon, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   gcm_nm <- gsub("-", ".", gcm_nm)
   
@@ -301,11 +262,11 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames, dbCon,
 #' @template bbox 
 #' @template max_run
 #' @param dbnames `data.frame` with the list of available GCMs (historical projections) 
-#'   and their corresponding names in the PostGIS data base.
+#'   and their corresponding names in the PostGIS data base. See climr:::dbnames_hist
 #' @template cache 
 #'
 #' @return SpatRaster
-process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames, cache) { ## need to update to all GCMs
+process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbnames_hist, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   
   if (dir.exists(paste0(cache_path(), "/gcmhist/", gcmcode))) {
@@ -371,13 +332,13 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames, cache
 #' @template period 
 #' @template max_run
 #' @param dbnames #' @param dbnames `data.frame` with the list of available GCMs (time series)
-#'   projections) and their corresponding names in the PostGIS data base.
+#'   projections) and their corresponding names in the PostGIS data base. See climr:::dbnames_ts
 #' @template bbox 
 #' @template dbCon 
 #' @template cache 
 #'
-#' @return SpatRaster
-process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames, bbox, dbCon, cache) { ## need to update to all GCMs
+#' @return
+process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   
   if (dir.exists(paste0(cache_path(), "/gcmts/", gcmcode))) {
