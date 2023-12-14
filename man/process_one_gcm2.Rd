@@ -4,7 +4,16 @@
 \alias{process_one_gcm2}
 \title{TODO: add documentation here}
 \usage{
-process_one_gcm2(gcm_nm, ssp, bbox, period, max_run, dbnames, dbCon, cache)
+process_one_gcm2(
+  gcm_nm,
+  ssp,
+  bbox,
+  period,
+  max_run,
+  dbnames = dbnames,
+  dbCon,
+  cache
+)
 }
 \arguments{
 \item{gcm_nm}{character. Name of GCM to use.}
@@ -22,7 +31,7 @@ A value of 0 returns the \code{ensembleMean} only. Runs are included in the orde
 are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
 \item{dbnames}{\code{data.frame} with the list of available GCMs and their
-corresponding names in the PostGIS data base.}
+corresponding names in the PostGIS data base.  See climr:::dbnames}
 
 \item{dbCon}{A db connection object created by \code{data_connect}.}
 

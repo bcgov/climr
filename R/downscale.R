@@ -169,8 +169,6 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 }
 
 
-
-
 #' Downscale target rasters to points of interest
 #' 
 #' @details
@@ -294,7 +292,6 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
 #' @noRd
 #' @import data.table
 #' @importFrom terra crop ext xres yres extract
-
 downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_ts, return_normal, vars, ppt_lr = FALSE) {
   # print(xyzID)
   # Define normal extent

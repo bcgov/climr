@@ -4,7 +4,15 @@
 \alias{process_one_gcm3}
 \title{TODO: add documentation here}
 \usage{
-process_one_gcm3(gcm_nm, years, dbCon, bbox, max_run, dbnames, cache)
+process_one_gcm3(
+  gcm_nm,
+  years,
+  dbCon,
+  bbox,
+  max_run,
+  dbnames = dbnames_hist,
+  cache
+)
 }
 \arguments{
 \item{gcm_nm}{character. Name of GCM to use.}
@@ -21,7 +29,7 @@ A value of 0 returns the \code{ensembleMean} only. Runs are included in the orde
 are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
 \item{dbnames}{\code{data.frame} with the list of available GCMs (historical projections)
-and their corresponding names in the PostGIS data base.}
+and their corresponding names in the PostGIS data base. See climr:::dbnames_hist}
 
 \item{cache}{Logical specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 }

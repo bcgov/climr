@@ -4,7 +4,16 @@
 \alias{process_one_gcm4}
 \title{TODO: add documentation here}
 \usage{
-process_one_gcm4(gcm_nm, ssp, period, max_run, dbnames, bbox, dbCon, cache)
+process_one_gcm4(
+  gcm_nm,
+  ssp,
+  period,
+  max_run,
+  dbnames = dbnames_ts,
+  bbox,
+  dbCon,
+  cache
+)
 }
 \arguments{
 \item{gcm_nm}{character. Name of GCM to use.}
@@ -20,16 +29,13 @@ A value of 0 returns the \code{ensembleMean} only. Runs are included in the orde
 are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
 \item{dbnames}{#' @param dbnames \code{data.frame} with the list of available GCMs (time series)
-projections) and their corresponding names in the PostGIS data base.}
+projections) and their corresponding names in the PostGIS data base. See climr:::dbnames_ts}
 
 \item{bbox}{Numeric vector of length 4 giving bounding box of study region, created by \code{get_bb()}.}
 
 \item{dbCon}{A db connection object created by \code{data_connect}.}
 
 \item{cache}{Logical specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
-}
-\value{
-SpatRaster
 }
 \description{
 TODO: add documentation here
