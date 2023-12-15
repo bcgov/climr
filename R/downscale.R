@@ -307,6 +307,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
 #' Simple downscale
 #' 
 #' @noRd
+#' @inheritParams downscale
 #' 
 #' @return a `data.table`.
 #' 
@@ -460,10 +461,11 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
 
 
 #' TODO: fill documentation here
-#' @inheritParams downscale
+#' 
 #' @param normal_path TODO
 #' @param gcm_paths TODO
 #' @param historic_paths TODO
+#' @param ... further arguments passed to `downscale_`
 #'
 #' @return A `data.table`
 #' 
