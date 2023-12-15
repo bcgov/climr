@@ -4,32 +4,16 @@
 \alias{threaded_downscale_}
 \title{TODO: fill documentation here}
 \usage{
-threaded_downscale_(
-  xyz,
-  normal_path,
-  gcm_paths,
-  historic_paths,
-  vars,
-  ppt_lr,
-  return_normal
-)
+threaded_downscale_(normal_path, gcm_paths, historic_paths, ...)
 }
 \arguments{
-\item{xyz}{A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).}
-
 \item{normal_path}{TODO}
 
 \item{gcm_paths}{TODO}
 
 \item{historic_paths}{TODO}
 
-\item{vars}{A character vector of climate variables to compute. Supported variables
-can be obtained with \code{list_variables()}. Definitions can be found in this package
-\code{variables} dataset. Default to monthly PPT, Tmax, Tmin.}
-
-\item{ppt_lr}{A boolean. Apply lapse rate adjustment to precipitations. Default to FALSE.}
-
-\item{return_normal}{TODO}
+\item{...}{further arguments passed to \code{downscale_}}
 }
 \value{
 A \code{data.table}
