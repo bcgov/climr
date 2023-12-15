@@ -467,6 +467,8 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
 #'
 #' @return A `data.table`
 #' 
+#' @importFrom data.table getDTthreads setDTthreads
+#' @importFrom terra rast
 threaded_downscale_ <- function(normal_path, gcm_paths, historic_paths, ...) {
   
   # Set DT threads to 1 in parallel to avoid overloading CPU
