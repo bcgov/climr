@@ -282,7 +282,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
           s <- sources(x, bands = TRUE)
           list(source = unique(s[["source"]]), lyrs = s[["bands"]])
         }),
-        hist_paths = lapply(historic, function(x) {
+        historic_paths = lapply(historic, function(x) {
           s <- sources(x, bands = TRUE)
           list(source = unique(s[["source"]]), lyrs = s[["bands"]])
         }),
