@@ -32,7 +32,6 @@
 #' }
 #'
 #' @export
-
 climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), historic_period = NULL, historic_ts = NULL,
                             gcm_models = NULL, ssp = c("ssp126", "ssp245", "ssp370", "ssp585"),
                             gcm_period = NULL, gcm_ts_years = NULL, gcm_hist_years = NULL, max_run = 0L, return_normal = TRUE,
@@ -297,7 +296,15 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
     )
   } else {
     # Downscale without parallel processing
-    res <- downscale_(xyz, normal, gcm, historic, gcm_ts, gcm_hist, historic_ts, return_normal, vars, ppt_lr)
+    res <- downscale_(xyz, 
+                      normal, 
+                      gcm, 
+                      historic, 
+                      gcm_ts, 
+                      gcm_hist, 
+                      historic_ts, 
+                      return_normal, 
+                      vars, ppt_lr)
   }
   
   setkey(res, "ID")
@@ -313,7 +320,9 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
 #' 
 #' @import data.table
 #' @importFrom terra crop ext xres yres extract
-downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_ts, return_normal, vars, ppt_lr = FALSE) {
+downscale_ <- function(xyzID, normal, gcm, historic, 
+                       gcm_ts, gcm_hist, historic_ts, return_normal, 
+                       vars, ppt_lr = FALSE) {
   # print(xyzID)
   # Define normal extent
   ex <- ext(
