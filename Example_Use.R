@@ -3,11 +3,23 @@ library(pool)
 library(data.table)
 library(terra)
 
+dbCon <- data_connect()
+xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
+
+## get bounding box based on input points
+thebb <- get_bb(xyz)
+historic <- historic_input(dbCon, thebb, period = "2001_2020")
+terra::plot(historic[[1]][[2]])
+
 ##provide or create a long, lat, elev, and optionally id, dataframe - usually read from csv file
 in_xyz <- structure(list(Long = c(-127.70521, -127.62279, -127.56235, -127.7162, 
                                   -127.18585, -127.1254, -126.94957, -126.95507), 
                          Lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025), 
-                         Elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L)), row.names = c(NA, -8L), class = "data.frame")
+                         Elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
+                         ID = LETTERS[1:8],
+                         Zone = c(rep("CWH",3),rep("CDF",5)),
+                         Subzone = c("vm1","vm2","vs1",rep("mm",3),"dk","dc")), 
+                    row.names = c(NA, -8L), class = "data.frame")
 
 ##show available variables:
 list_variables()
@@ -20,8 +32,8 @@ list_historic()
 ##it has to download the data so might take some time. It will then cache the data, so will
 ##be faster for future runs
 ds_hist <- climr_downscale(xyz = in_xyz, which_normal = "auto", 
-                       historic_ts = 1902:2005,
-                       return_normal = FALSE, ##put this to TRUE if you want the 1961-1990 period
+                       historic_period = "2001_2020",
+                       return_normal = TRUE, ##put this to TRUE if you want the 1961-1990 period
                        vars = c("PPT","CMD","CMI","Tave01","Tave07")) ##specify desired variables
 
 
