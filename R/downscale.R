@@ -32,7 +32,6 @@
 #' }
 #'
 #' @export
-
 climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), historic_period = NULL, historic_ts = NULL,
                             gcm_models = NULL, ssp = c("ssp126", "ssp245", "ssp370", "ssp585"),
                             gcm_period = NULL, gcm_ts_years = NULL, gcm_hist_years = NULL, max_run = 0L, return_normal = TRUE,
@@ -312,10 +311,14 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
           s <- sources(x, bands = TRUE)
           list(source = unique(s[["source"]]), lyrs = s[["bands"]])
         }),
-        hist_paths = lapply(historic, function(x) {
+        historic_paths = lapply(historic, function(x) {
           s <- sources(x, bands = TRUE)
           list(source = unique(s[["source"]]), lyrs = s[["bands"]])
         }),
+        gcm_hist = gcm_hist, 
+        gcm_ts = gcm_ts,
+        historic_ts = historic_ts,
+        return_normal = return_normal, 
         vars = vars,
         ppt_lr = ppt_lr
       ),
@@ -323,7 +326,15 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
     )
   } else {
     # Downscale without parallel processing
-    res <- downscale_(xyz, normal, gcm, historic, gcm_ts, gcm_hist, historic_ts, return_normal, vars, ppt_lr)
+    res <- downscale_(xyz, 
+                      normal, 
+                      gcm, 
+                      historic, 
+                      gcm_ts, 
+                      gcm_hist, 
+                      historic_ts, 
+                      return_normal, 
+                      vars, ppt_lr)
   }
   
   setkey(res, "ID")
@@ -333,12 +344,15 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
 #' Simple downscale
 #' 
 #' @noRd
+#' @inheritParams downscale
 #' 
 #' @return a `data.table`.
 #' 
 #' @import data.table
 #' @importFrom terra crop ext xres yres extract
-downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_ts, return_normal, vars, ppt_lr = FALSE) {
+downscale_ <- function(xyzID, normal, gcm, historic, 
+                       gcm_ts, gcm_hist, historic_ts, return_normal, 
+                       vars, ppt_lr = FALSE) {
   # print(xyzID)
   # Define normal extent
   ex <- ext(
@@ -486,13 +500,17 @@ downscale_ <- function(xyzID, normal, gcm, historic, gcm_ts, gcm_hist, historic_
 
 
 #' TODO: fill documentation here
-#' @inheritParams downscale
+#' 
 #' @param normal_path TODO
 #' @param gcm_paths TODO
 #' @param historic_paths TODO
+#' @param ... further arguments passed to `downscale_`
 #'
 #' @return A `data.table`
-threaded_downscale_ <- function(xyz, normal_path, gcm_paths, historic_paths, vars, ppt_lr, return_normal) { ## add gcm_ts here
+#' 
+#' @importFrom data.table getDTthreads setDTthreads
+#' @importFrom terra rast
+threaded_downscale_ <- function(normal_path, gcm_paths, historic_paths, ...) {
   
   # Set DT threads to 1 in parallel to avoid overloading CPU
   # Not needed for forking, not taking any chances
@@ -510,7 +528,7 @@ threaded_downscale_ <- function(xyz, normal_path, gcm_paths, historic_paths, var
   })
   
   # Downscale
-  res <- downscale_(xyz, normal, gcm, historic, return_normal, vars, ppt_lr)
+  res <- downscale_(normal = normal, gcm = gcm, historic = historic, ...)
   
   return(res)
 }

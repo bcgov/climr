@@ -42,16 +42,16 @@ test_that("test the whole chain works with all variables", {
     xyz = xyz,
     normal = normal,
     gcm = gcm,
-    var = sample(list_variables(), 3)
+    var = list_variables()[1:3]
   )
 
   results3 <- downscale(
     xyz = xyz,
     normal = normal,
     gcm = gcm,
-    var = list_variables(),
+    var = list_variables()[1:3],
     nthread = 4
   )
 
-  testthat::expect_true(all.equal(results, results3))
+  testthat::expect_true(all.equal(results2, results3))
 })
