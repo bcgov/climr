@@ -108,6 +108,30 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
   return(rout)
 }
 
+
+library(climr)
+library(data.table)
+library(RPostgres)
+dbCon <- data_connect()
+points <- fread("testofclimr.csv")
+
+
+dbExtractNormal <- function(dbCon, points, bands = 1:73){
+  temp <- paste(points$long,points$lat)
+  pts <- paste0("MULTIPOINT((",paste(temp, collapse = "),("),"))")
+  
+  #bandqs <- paste0("ST_Value(normal_bc.rast, geom, true) as val_")
+  bandqs <- paste0("ST_Value(normal_bc.rast, ",bands,", geom, true, 'bilinear') as val_",bands)
+  
+  q <- paste0("WITH dp as(SELECT geom FROM ST_Dump(ST_GeomFromText('", pts ,"', 4326)))
+  SELECT ",paste(bandqs,collapse = ","),"
+FROM dp
+JOIN normal_bc ON ST_Intersects(ST_ConvexHull(normal_bc.rast), dp.geom)")
+  
+  dat <- dbGetQuery(dbCon, q)
+  
+}
+
 # library(foreach)
 # dbExtractNormal <- function(dbCon, points, bands = 1:73) {
 #
