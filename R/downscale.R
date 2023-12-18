@@ -53,10 +53,22 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
   dbCon <- data_connect()
   thebb <- get_bb(xyz) ## get bounding box based on input points
   
-  if (ncol(xyz) > 4) { ## remove extraneous columns
-    xyz <- xyz[, 1:4]
-  }
   xyz <- as.data.frame(xyz) ## input needs to be a data.frame, not data.table. This is something we could change in the future
+  IDCols <- NULL
+  if (ncol(xyz) > 3) { ## remove extraneous columns
+    ##check that ids are unique
+    if(length(unique(xyz[,4])) < nrow(xyz)){
+      warning("ID field is not unique. Will reassign ID column. Extra columns will not be returned.")
+      xyz[,4] <- 1:nrow(xyz)
+    }
+    if(ncol(xyz) > 4) { ##save extra variables to join back
+      IDCols <- xyz[, -c(1:3)]
+      colnames(IDCols)[1] <- "ID"
+      setDT(IDCols)
+    }
+  }else{
+    xyz[,4] <- 1:nrow(xyz) ##assign ID column
+  }
   
   message("Getting normals...")
   if (which_normal == "NorAm") {
@@ -64,7 +76,6 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
   } else if (which_normal == "BC") {
     normal <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache)
   } else {
-    if (ncol(xyz) == 3) xyz$ID <- 1:nrow(xyz)
     bc_outline <- rast(system.file("extdata", "bc_outline.tif", package = "climr"))
     pnts <- extract(bc_outline, xyz[, 1:2], method = "simple")
     bc_ids <- xyz[, 4][!is.na(pnts$PPT01)]
@@ -138,10 +149,23 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
   )
   
   if (which_normal %in% c("BC", "NorAm")) {
+    poolClose(dbCon)
+    if(!is.null(IDCols)){
+      nm_order <- names(results)
+      nms <- names(IDCols)[-1]
+      results[IDCols, (nms) := mget(nms), on = "ID"]
+      #setcolorder(results, c(nm_order,nms))
+    }
     return(results)
   }
   if (length(bc_ids) == nrow(xyz_save) | length(bc_ids) < 1) {
     poolClose(dbCon)
+    if(!is.null(IDCols)){
+      nm_order <- names(results)
+      nms <- names(IDCols)[-1]
+      results[IDCols, (nms) := mget(nms), on = "ID"]
+      #setcolorder(results, c(nm_order,nms))
+    }
     return(results)
   } else {
     na_xyz <- xyz_save[!xyz_save[, 4] %in% bc_ids,]
@@ -162,6 +186,12 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
     )
     
     res_all <- rbind(results, results_na)
+    if(!is.null(IDCols)){
+      nm_order <- names(results)
+      nms <- names(IDCols)[-1]
+      results[IDCols, (nms) := mget(nms), on = "ID"]
+      #setcolorder(results, c(nm_order,nms))
+    }
     poolClose(dbCon)
     return(res_all)
   }
@@ -258,7 +288,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
     on.exit(parallel::stopCluster(cl), add = TRUE)
     
     # Pre setting ID for recycling later
-    xyz[, 4L] <- seq_len(nrow(xyz))
+    #xyz[, 4L] <- seq_len(nrow(xyz))
     # Reordering on y axis for smaller cropped area and faster
     # sequential reads
     xyz <- xyz[order(xyz[, 2L]),]
@@ -437,7 +467,7 @@ downscale_ <- function(xyzID, normal, gcm, historic,
     # Set Latitude and possibly ID
     normal_[["Lat"]] <- xyzID[, 2L]
     normal_[["Elev"]] <- xyzID[, 3L]
-    if (ncol(xyzID) == 4L) {
+    if (ncol(xyzID) >= 4L) {
       normal_[["ID"]] <- xyzID[, 4L]
     }
     
@@ -562,7 +592,7 @@ process_one_gcm <- function(gcm_, res, xyzID, timeseries) {
   # Set Latitude and possibly ID
   gcm_[["Lat"]] <- xyzID[, 2L]
   gcm_[["Elev"]] <- xyzID[, 3L]
-  if (ncol(xyzID) == 4L) {
+  if (ncol(xyzID) >= 4L) {
     gcm_[["ID"]] <- xyzID[, 4L]
   }
   
@@ -641,7 +671,7 @@ process_one_gcm_hist <- function(gcm_, res, xyzID) {
   # Set Latitude and possibly ID
   gcm_[["Lat"]] <- xyzID[, 2L]
   gcm_[["Elev"]] <- xyzID[, 3L]
-  if (ncol(xyzID) == 4L) {
+  if (ncol(xyzID) >= 4L) {
     gcm_[["ID"]] <- xyzID[, 4L]
   }
   
@@ -718,7 +748,7 @@ process_one_historic <- function(historic_, res, xyzID, timeseries) {
   # Set Latitude and possibly ID
   historic_[["Lat"]] <- xyzID[, 2L]
   historic_[["Elev"]] <- xyzID[, 3L]
-  if (ncol(xyzID) == 4L) {
+  if (ncol(xyzID) >= 4L) {
     historic_[["ID"]] <- xyzID[, 4L]
   }
   
