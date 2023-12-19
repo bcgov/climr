@@ -10,6 +10,8 @@ calc_DD_m_above <- function(tm, k, a, b, t0, beta, c) {
   i <- which(tm >= k)
   DD_m[i] <- c + beta * tm[i]
 
+  DD_m[is.na(tm)] <- tm[is.na(tm)] ## use tm[is.na(tm)] to respect NA type
+  
   return(DD_m)
 }
 
@@ -25,6 +27,8 @@ calc_DD_m_below <- function(tm, k, a, b, t0, beta, c) {
   i <- which(tm <= k)
   DD_m[i] <- c + beta * tm[i]
 
+  DD_m[is.na(tm)] <- tm[is.na(tm)] ## use tm[is.na(tm)] to respect NA type
+  
   return(DD_m)
 }
 
