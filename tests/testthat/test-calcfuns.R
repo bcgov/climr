@@ -45,7 +45,6 @@ test_that("calc_* functions work", {
 
 
 test_that("calc_* give sensible outputs", {
-  devtools::load_all()
   library(pool)
   library(data.table)
   library(terra)
