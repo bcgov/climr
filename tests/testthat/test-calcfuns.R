@@ -65,6 +65,7 @@ test_that("calc_* give sensible outputs", {
                    max_run = 0,
                    cache = TRUE)
   
+  set.seed(678)  ## a situation with known NAs
   n <- 20
   sample_xyz <- data.frame(lon = runif(n, xmin(normalbc$dem2_WNA), xmax(normalbc$dem2_WNA)), 
                            lat = runif(n, ymin(normalbc$dem2_WNA), ymax(normalbc$dem2_WNA)), 
