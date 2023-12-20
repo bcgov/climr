@@ -49,10 +49,10 @@ test_that("calc_* give sensible outputs", {
   library(data.table)
   library(terra)
   
-  set.seed(123)
   dbCon <- data_connect()
-  xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
   
+  ## the following includes NAs for the test
+  xyz <- data.frame(lon = c(-128, -125, -128, -125), lat = c(50, 50, 48, 48), elev = runif(4))
   thebb <- get_bb(xyz)
   
   normalbc <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = TRUE) 
@@ -64,7 +64,7 @@ test_that("calc_* give sensible outputs", {
                    max_run = 0,
                    cache = TRUE)
   
-  set.seed(678)  ## a situation with known NAs
+  set.seed(678)  ## a situation with known NAs (ocean where elev is 0)
   n <- 20
   sample_xyz <- data.frame(lon = runif(n, xmin(normalbc$dem2_WNA), xmax(normalbc$dem2_WNA)), 
                            lat = runif(n, ymin(normalbc$dem2_WNA), ymax(normalbc$dem2_WNA)), 
@@ -77,7 +77,11 @@ test_that("calc_* give sensible outputs", {
   ds_res_bc <- as.data.table(sample_xyz)[ds_res_bc, on = .(ID)]
   ds_res_bc[, .(lat, lon, elev, Tmax, PPT01, CMD, Eref)]
   
+  ## if elevation of inout climate data are NA, downscaled variables should be as well.
   expect_true(all(is.na(ds_res_bc[is.na(elev), .SD, .SDcols = list_variables()])))
+  expect_true(all(is.na(ds_res_bc[is.na(PPT01), .SD, .SDcols = list_variables()])))
+  ## conversely, if there is input data, there should be no NAs in downscaled vars
+  expect_true(all(!is.na(ds_res_bc[!is.na(PPT01), .SD, .SDcols = list_variables()])))
   
   ## TODO: more sanity checks?
 })
