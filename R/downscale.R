@@ -155,22 +155,12 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
   
   if (which_normal %in% c("BC", "NorAm")) {
     poolClose(dbCon)
-    if(!is.null(IDCols)){
-      nm_order <- names(results)
-      nms <- names(IDCols)[-1]
-      results[IDCols, (nms) := mget(nms), on = "ID"]
-      #setcolorder(results, c(nm_order,nms))
-    }
+    results <- addIDCols(IDCols, results)
     return(results)
-  }
-  if (length(bc_ids) == nrow(xyz_save) | length(bc_ids) < 1) {
+  } 
+  if ((length(bc_ids) == nrow(xyz_save) | length(bc_ids) < 1)) {
     poolClose(dbCon)
-    if(!is.null(IDCols)){
-      nm_order <- names(results)
-      nms <- names(IDCols)[-1]
-      results[IDCols, (nms) := mget(nms), on = "ID"]
-      #setcolorder(results, c(nm_order,nms))
-    }
+    results <- addIDCols(IDCols, results)
     return(results)
   } else {
     na_xyz <- xyz_save[!xyz_save[, 4] %in% bc_ids,]
@@ -192,14 +182,10 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
       plot = plot
     )
     
-    res_all <- rbind(results, results_na)
-    if(!is.null(IDCols)){
-      nm_order <- names(results)
-      nms <- names(IDCols)[-1]
-      results[IDCols, (nms) := mget(nms), on = "ID"]
-      #setcolorder(results, c(nm_order,nms))
-    }
     poolClose(dbCon)
+    res_all <- rbind(results, results_na)
+    res_all <- addIDCols(IDCols, res_all)
+    
     return(res_all)
   }
 }
@@ -785,4 +771,33 @@ process_one_historic <- function(historic_, res, xyzID, timeseries) {
   )
   
   return(historic_)
+}
+
+
+
+
+#' Add ID columns to `downscale` output.
+#'
+#' @param IDCols character. ID columns to add, or NULL if none
+#' @param results `data.table` or `SpatVector` output from `downscale`
+#'
+#' @return `results` with IDCols
+#'
+#' @importFrom terra vect crs
+#' @importFrom data.table as.data.table
+addIDCols <- function(IDCols, results) {
+  if(!is.null(IDCols)){
+    nm_order <- names(results)
+    nms <- names(IDCols)[-1]
+    
+    results2 <- as.data.table(results, geom = "XY")
+    results2[IDCols, (nms) := mget(nms), on = "ID"]
+    #setcolorder(results2, c(nm_order,nms))
+    if (is(results, "SpatVector")) {
+      results2 <- vect(results2, geom = c("x", "y"), crs = crs(results, proj = TRUE))
+    } else {
+      suppressWarnings(results2[, `:=`(x = NULL, y = NULL)])
+    }
+  }
+  return(results2)
 }
