@@ -79,6 +79,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
   } else if (which_normal == "BC") {
     normal <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache)
   } else {
+    message("Normals not specified, extracting normals for BC and keeping points with non-NA climate values")
     bc_outline <- rast(system.file("extdata", "bc_outline.tif", package = "climr"))
     pnts <- extract(bc_outline, xyz[, 1:2], method = "simple")
     bc_ids <- xyz[, 4][!is.na(pnts$PPT01)]
