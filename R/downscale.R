@@ -16,6 +16,8 @@
 #' @param return_normal Logical. Return downscaled normal period (1961-1990). Default `TRUE`
 #' @param vars Character vector of climate variables. Options are `list_vars()`
 #' @param cache Logical. Cache data locally? Default `TRUE`
+#' @template out_spatial
+#' @template plot
 
 #' @return `data.frame` of downscaled climate variables for each location.
 #'   Historic, normal, and future periods are all returned in one table.
@@ -35,7 +37,8 @@
 climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), historic_period = NULL, historic_ts = NULL,
                             gcm_models = NULL, ssp = c("ssp126", "ssp245", "ssp370", "ssp585"),
                             gcm_period = NULL, gcm_ts_years = NULL, gcm_hist_years = NULL, max_run = 0L, return_normal = TRUE,
-                            vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))), cache = TRUE) {
+                            vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))), cache = TRUE,
+                            out_spatial = FALSE, plot = NULL) {
   # xyz <- coords
   # which_normal = "auto"
   # historic_period = NULL
@@ -145,7 +148,9 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
     gcm_ts = gcm_ts,
     gcm_hist = gcm_hist,
     return_normal = return_normal,
-    vars = vars
+    vars = vars,
+    out_spatial = out_spatial,
+    plot = plot
   )
   
   if (which_normal %in% c("BC", "NorAm")) {
@@ -182,7 +187,9 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
       gcm_ts = gcm_ts,
       gcm_hist = gcm_hist,
       return_normal = return_normal,
-      vars = vars
+      vars = vars,
+      out_spatial = out_spatial,
+      plot = plot
     )
     
     res_all <- rbind(results, results_na)
@@ -216,6 +223,8 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #'  `variables` dataset. Default to monthly PPT, Tmax, Tmin.
 #' @param ppt_lr A boolean. Apply lapse rate adjustment to precipitations. Default to FALSE.
 #' @param nthread An integer. Number of parallel threads to use to do computations. Default to 1L.
+#' @template out_spatial
+#' @template plot
 #' 
 #' @import data.table
 #' @importFrom terra extract rast sources ext xres yres crop
@@ -249,7 +258,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' }
 downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, gcm_hist = NULL, historic_ts = NULL, return_normal = FALSE,
                       vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))),
-                      ppt_lr = FALSE, nthread = 1L) {
+                      ppt_lr = FALSE, nthread = 1L, out_spatial = FALSE, plot = NULL) {
   # Make sure normal was built using normal_input
   if (!isTRUE(attr(normal, "builder") == "climr")) {
     stop(
@@ -338,6 +347,12 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
   }
   
   setkey(res, "ID")
+  if (out_spatial) {
+    names(xyz)[4] <- "ID"
+    res <- as.data.table(xyz)[res, on = "ID"]
+    
+    res <- vect(res, geom = names(xyz)[1:2], crs = crs(normal, proj = TRUE))
+  }
   return(res)
 }
 
