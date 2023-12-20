@@ -11,7 +11,6 @@ calc_EMT <- function(t_min_list, td) {
 
   year_min <- do.call(pmin, t_min_list)
 
-
   -23.02164 + 0.77908 * tmin1 + 0.67048 * tmin12 + 0.01075 * year_min^2 + 0.11565 * td
 }
 
@@ -29,7 +28,6 @@ calc_EXT <- function(t_max_list, td) {
   tmax8 <- t_max_list[[8]]
 
   year_max <- do.call(pmax, t_max_list)
-
 
   10.64245 + -1.92005 * tmax7 + 0.04816 * tmax7^2 + 2.51176 * tmax8 - 0.03088 * tmax8^2 - 0.01311 * year_max^2 + 0.33167 * td - 0.001 * td^2
 }

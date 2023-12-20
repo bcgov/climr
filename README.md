@@ -30,7 +30,7 @@ To do so, it uses a remote PostGIS database, and optionally caches data locally.
 
 -   Historical observational time series (1902-2022), currently limited to the ClimateNA time series (Wang et al., 2016)
 
--   Multiple historical (1851-2010) and future (2001-2100) climate model simulations for each of 13 CMIP6 global climate models, in monthly time series and 20-year normals
+-   Multiple historical (1851-2014) and future (2015-2100) climate model simulations for each of 13 CMIP6 global climate models, in monthly time series and 20-year normals
 
 -   User selection of single or multiple climate variables, with derived variables following the ClimateNA methodology of Wang et al. (2016).
 

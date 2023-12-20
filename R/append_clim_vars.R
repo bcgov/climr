@@ -667,7 +667,9 @@ append_clim_vars <- function(dt, vars) {
   )
 
   # Append vars except default one
-  for (var in vars[!vars %in% sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))]) {
+  vars2 <- vars[!vars %in% sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))]
+  vars2 <- vars2[order(match(vars2, names(appenders)))]   ## run functions in the order of appenders
+  for (var in vars2) {
     f(var)
   }
 
