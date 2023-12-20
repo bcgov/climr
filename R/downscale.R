@@ -213,9 +213,9 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' @template plot
 #' 
 #' @import data.table
-#' @importFrom terra extract rast sources ext xres yres crop
+#' @importFrom terra extract rast sources ext xres yres crop plot as.polygons
 #' 
-#' @return A `data.table` with downscaled climate variables. If `gcm` is NULL, 
+#' @return A `data.table` or SpatVector with downscaled climate variables. If `gcm` is NULL, 
 #'   this is just the downscaled `normal` at point locations. If `gcm` is provided,
 #'   this returns a downscaled dataset for each point location, general circulation 
 #'   model (GCM), shared socioeconomic pathway (SSP), run and period.
@@ -338,6 +338,42 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
     res <- as.data.table(xyz)[res, on = "ID"]
     
     res <- vect(res, geom = names(xyz)[1:2], crs = crs(normal, proj = TRUE))
+    
+    if (!is.null(plot)) {
+      if (!plot %in% vars) {
+        stop("The variable you wish to plot was not dowscaled. Please pass a variable listed in 'vars'")
+      } 
+      ## make a mask of the normals data "extent"
+      msk <- normal[[1]]
+      msk[!is.na(msk[])] <- 1
+      msk <- as.polygons(msk)
+      
+      ## round values
+      res2 <- res
+      res2[[plot]] <- round(res2[[plot]], 4)
+      
+      ## make table of available runs
+      cols <- c("GCM", "SSP", "RUN", "PERIOD")
+      cols <- cols[cols %in% names(res2)]
+      uniqueCombos <- unique(as.data.table(res2)[, ..cols])
+      uniqueCombos <- uniqueCombos[complete.cases(uniqueCombos)]
+      s
+      if (nrow(uniqueCombos) > 1) {
+        message("Plotting results for a single period/GCM/run/SSP")
+        uniqueCombos <- uniqueCombos[1]
+        
+        res2 <- as.data.table(res2, geom = "XY")
+        res2 <- res2[uniqueCombos, on = names(uniqueCombos)]
+        res2 <- vect(res2, geom = c("x", "y"), crs = crs(res, proj = TRUE))
+      }
+      
+      plotTitle <- paste(paste(names(uniqueCombos), uniqueCombos, sep = ": "), collapse = "; ")
+      plotTitle <- paste0(plot, "\n", plotTitle)
+      plot(msk, col = "grey", main = plotTitle, legend = FALSE, mar = c(3.1, 3.1, 3.1, 7.1))
+      plot(res2, y = plot, axes = FALSE, ext = ext(msk),
+           col = palette(hcl.colors(100, "viridis")), sort = TRUE,
+           add = TRUE, type = "continuous")
+    }
   }
   return(res)
 }
