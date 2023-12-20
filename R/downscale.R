@@ -93,12 +93,13 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
     }
   }
   
-  
   if (!is.null(historic_period)) {
     message("Getting historic...")
     historic_period <- historic_input(dbCon, bbox = thebb, period = historic_period, cache = cache)
   }
-  if (!is.null(historic_ts)) historic_ts <- historic_input_ts(dbCon, bbox = thebb, years = historic_ts, cache = cache)
+  if (!is.null(historic_ts)) { 
+    historic_ts <- historic_input_ts(dbCon, bbox = thebb, years = historic_ts, cache = cache)
+  }
   
   if (!is.null(gcm_models)) {
     if (!is.null(gcm_period)) {
@@ -108,8 +109,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
                        ssp = ssp,
                        period = gcm_period,
                        max_run = max_run,
-                       cache = cache
-      )
+                       cache = cache)
     } else {
       gcm <- NULL
     }
@@ -119,8 +119,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
                              ssp = ssp,
                              years = gcm_ts_years,
                              max_run = max_run,
-                             cache = cache
-      )
+                             cache = cache)
     } else {
       gcm_ts <- NULL
     }
