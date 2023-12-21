@@ -4,6 +4,7 @@ library(data.table)
 library(terra)
 
 dbCon <- data_connect()
+on.exit(poolClose(dbCon), add = TRUE)
 
 ## a small area
 xyz <- structure(list(Long = c(-127.70521, -127.62279, -127.56235, -127.7162,

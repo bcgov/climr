@@ -1,5 +1,6 @@
 test_that("test cache in default location", {
   dbCon <- data_connect()
+  on.exit(poolClose(dbCon), add = TRUE)
   xyz <- data.frame(Long = c(-127.70521, -127.62279, -127.56235, -127.7162, 
                              -127.18585, -127.1254, -126.94957, -126.95507), 
                     Lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025), 
