@@ -179,12 +179,6 @@ historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRU
 #
 # }
 
-#' List available historic periods
-#' @export
-list_historic <- function() {
-  return("2001_2020")
-}
-
 # dat <- rast("../climR-pnw-data/inputs_pkg/historic/Historic_2001_2020/anom_2001_2020.nc")
 # nm <- fread("../climR-pnw-data/inputs_pkg/historic/Historic_2001_2020/anom_2001_2020.csv",header = T)[['x']]
 # r <- terra::rast(list.files(dir_gcm, full.names = TRUE, pattern = "\\.nc"))

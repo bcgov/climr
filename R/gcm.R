@@ -125,49 +125,8 @@ list_unique <- function(files, col_num) {
   return(sort(collection))
 }
 
-#' List available global circulation models
-#' 
-#' @param gcm An optional character vector. Limit list to provided global circulation models.
-#' 
-#' @export
-list_gcm <- function() {
-  c(
-    "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5", "EC-Earth3", "GISS-E2-1-G",
-    "INM-CM5-0", "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0"
-  )
-  # sort(dbGetQuery(dbCon, "SELECT DISTINCT mod FROM esm_layers_ts")[,1])
-}
-
-#' List available shared socioeconomic pathways
-#' 
-#' @export
-list_ssp <- function() {
-  # sort(dbGetQuery(dbCon, "SELECT DISTINCT scenario FROM esm_layers")[,1])
-  c("ssp126", "ssp245", "ssp370", "ssp585")
-}
-
-#' List available periods
-#' 
-#' @export
-list_gcm_period <- function() {
-  # sort(dbGetQuery(dbCon, "SELECT DISTINCT period FROM esm_layers")[,1])
-  c("2001_2020", "2021_2040", "2041_2060", "2061_2080", "2081_2100")
-}
-
-#' List available runs for a given GCM
-#' 
-#' @template dbCon
-#' @param gcm Character vector to specify requested GCMs
-#' @importFrom RPostgres dbGetQuery
-#' 
-#' @export
-list_run <- function(dbCon, gcm) {
-  sort(dbGetQuery(dbCon, paste0("SELECT DISTINCT run FROM esm_layers WHERE mod IN ('", paste(gcm, collapse = "','", "')")))[, 1])
-}
-
-
 #' TODO: add documentation here
-#'
+#' 
 #' @template gcm_nm 
 #' @template ssp 
 #' @template bbox
