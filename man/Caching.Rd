@@ -2,17 +2,33 @@
 % Please edit documentation in R/cache.R
 \name{cache_path}
 \alias{cache_path}
+\alias{cache_clear}
 \title{Return package local cache path}
 \usage{
 cache_path()
+
+cache_clear(what = c("gcm", "normal", "historic"))
+}
+\arguments{
+\item{what}{character. Which data folders should be cleared?
+Accepts "normal", "gcm" or both.}
 }
 \value{
 character. The full path of the package local cache.
+
+TRUE or FALSE depending on whether cache was cleared successfully
+or not.
 }
 \description{
 Return package local cache path
+
+Clear the package's local cache path
+Attempts to delete all folder/files in \code{cache_path()}.
 }
 \details{
 By default, it uses \code{\link[tools:userdir]{tools::R_user_dir()}}. The cache location can be
 set using the \code{climr.cache.path} option with \code{options("climr.cache.path" = "your_path")}.
+
+It may fail if R has no permission to delete files/folders
+in the \code{cache_path()} directory
 }
