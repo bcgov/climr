@@ -18,6 +18,19 @@
 #' @import data.table
 #' @export
 gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), period = list_gcm_period(), max_run = 0L, cache = TRUE) {
+  ## checks
+  gcm <- match.arg(gcm, list_gcm(), several.ok = TRUE)
+  ssp <- match.arg(ssp, list_ssp(), several.ok = TRUE)
+  period <- match.arg(period, list_gcm_period(), several.ok = TRUE)
+  
+  if (!is(max_run, "numeric")) {
+    stop("please pass a numeric value to 'max_runs'")
+  }
+  
+  if (!is(cache, "logical")) {
+    stop("please pass a logical value to 'cache'")
+  }
+  
   # Load each file individually + select layers
   res <- lapply(gcm, process_one_gcm2, ssp = ssp, period = period,
                 bbox = bbox, dbnames = dbnames, dbCon = dbCon, 
