@@ -125,35 +125,9 @@ list_unique <- function(files, col_num) {
   return(sort(collection))
 }
 
-#' Read and parse gcm models csv files
+#' List available global circulation models
 #' 
 #' @param gcm An optional character vector. Limit list to provided global circulation models.
-#' @param col_num An integer vector.
-#' 
-#' @return A character vector of unique values.
-list_parse <- function(gcm, col_num = 1) {
-  # Default pattern csv extension
-  pattern <- "\\.csv$"
-  
-  # In case we need to filter gcm
-  if (!missing(gcm)) {
-    pattern <- paste0("(", paste0(gcm, collapse = "|"), ").*", pattern)
-  }
-  files <- list.files(
-    file.path(
-      data_path(),
-      getOption("climr.gcm.path", default = "inputs_pkg/gcm")
-    ),
-    recursive = TRUE,
-    full.names = TRUE,
-    pattern = pattern
-  )
-  
-  # Extract all different unique values
-  list_unique(files, col_num)
-}
-
-#' List available global circulation models
 #' 
 #' @export
 list_gcm <- function() {
