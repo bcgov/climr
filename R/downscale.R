@@ -214,7 +214,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' 
 #' @import data.table
 #' @importFrom terra extract rast sources ext xres yres crop plot as.polygons
-#' @importFrom grDevices hlc.colors palette
+#' @importFrom grDevices hcl.colors palette
 #' @importFrom stats complete.cases
 #' 
 #' @return A `data.table` or SpatVector with downscaled climate variables. If `gcm` is NULL, 
