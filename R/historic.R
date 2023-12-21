@@ -67,6 +67,7 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
   }
 
   attr(hist_rast, "builder") <- "climr"
+  browser() ## TODO check list names
   return(list(hist_rast))
 }
 
@@ -135,6 +136,7 @@ historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRU
   }
 
   attr(hist_rast, "builder") <- "climr"
+  browser() ## TODO check list names
   return(list(hist_rast))
 }
 
