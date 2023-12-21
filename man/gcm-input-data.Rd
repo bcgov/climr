@@ -2,7 +2,9 @@
 % Please edit documentation in R/gcm.R
 \name{gcm_input}
 \alias{gcm_input}
-\title{Create gcm input for \code{downscale} using data on Postgis database.}
+\alias{gcm_hist_input}
+\alias{gcm_ts_input}
+\title{Create GCM inputs for \code{downscale} using data on Postgis database.}
 \usage{
 gcm_input(
   dbCon,
@@ -10,6 +12,25 @@ gcm_input(
   gcm = list_gcm(),
   ssp = list_ssp(),
   period = list_gcm_period(),
+  max_run = 0L,
+  cache = TRUE
+)
+
+gcm_hist_input(
+  dbCon,
+  bbox = NULL,
+  gcm = list_gcm(),
+  years = 1901:1950,
+  max_run = 0L,
+  cache = TRUE
+)
+
+gcm_ts_input(
+  dbCon,
+  bbox = NULL,
+  gcm = list_gcm(),
+  ssp = list_ssp(),
+  years = 2020:2030,
   max_run = 0L,
   cache = TRUE
 )
@@ -33,11 +54,20 @@ A value of 0 returns the \code{ensembleMean} only. Runs are included in the orde
 are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
 \item{cache}{Logical specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
+
+\item{years}{Numeric or character vector in \code{2020:2100}. Defaults to \code{2020:2030}.}
 }
 \value{
 A \code{list} of SpatRasters, each with possibly multiple layers, that can
 be used with \code{downscale}.
 }
 \description{
-Create gcm input for \code{downscale} using data on Postgis database.
+\code{gcm_input} creates GCM climate periods inputs, given chosen GCMs, SSPs,
+periods and runs.
+
+\code{gcm_hist_input} creates GCM \strong{historic} time series inputs, given chosen GCMs, SSPs,
+years and runs.
+
+\code{gcm_ts_input} creates GCM time series inputs, given chosen GCMs, SSPs,
+years and runs.
 }

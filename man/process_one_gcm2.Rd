@@ -2,7 +2,7 @@
 % Please edit documentation in R/gcm.R
 \name{process_one_gcm2}
 \alias{process_one_gcm2}
-\title{TODO: add documentation here}
+\title{Process one GCM at a time}
 \usage{
 process_one_gcm2(
   gcm_nm,
@@ -41,5 +41,5 @@ corresponding names in the PostGIS data base.  See climr:::dbnames}
 SpatRaster
 }
 \description{
-TODO: add documentation here
+Process one GCM at a time
 }

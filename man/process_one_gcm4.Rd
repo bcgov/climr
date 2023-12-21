@@ -2,7 +2,7 @@
 % Please edit documentation in R/gcm.R
 \name{process_one_gcm4}
 \alias{process_one_gcm4}
-\title{TODO: add documentation here}
+\title{Process one GCM time series at a time}
 \usage{
 process_one_gcm4(
   gcm_nm,
@@ -41,5 +41,5 @@ projections) and their corresponding names in the PostGIS data base. See climr::
 a SpatRaster
 }
 \description{
-TODO: add documentation here
+Process one GCM time series at a time
 }
