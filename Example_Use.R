@@ -3,6 +3,10 @@ library(pool)
 library(data.table)
 library(terra)
 
+set.seed(123)
+dbCon <- data_connect()
+xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
+
 ## get bounding box based on input points
 thebb <- get_bb(xyz)
 historic <- historic_input(dbCon, thebb, period = "2001_2020")
@@ -14,7 +18,7 @@ in_xyz <- data.frame(Long = c(-127.70521, -127.62279, -127.56235, -127.7162,
                      Lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025), 
                      Elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
                      Zone = c(rep("CWH",3), rep("CDF",5)),
-                     Subzone = c("vm1","vm2","vs1",rep("mm",3),"dk","dc")),
+                     Subzone = c("vm1","vm2","vs1",rep("mm",3),"dk","dc"))
 
 ##show available variables:
 list_variables()
@@ -29,7 +33,9 @@ list_historic()
 ds_hist <- climr_downscale(xyz = in_xyz, which_normal = "auto", 
                            historic_period = "2001_2020",
                            return_normal = TRUE, ##put this to TRUE if you want the 1961-1990 period
-                           vars = c("PPT","CMD","CMI","Tave01","Tave07")) ##specify desired variables
+                           vars = c("PPT","CMD","CMI","Tave01","Tave07"),
+                           out_spatial = TRUE, plot = "PPT") ##specify desired variables
+
 
 
 ##Future periods:
@@ -107,8 +113,8 @@ plot(gcm[[1]]$BCC.CSM2.MR_Tmax_08_ssp370_ensembleMean_2041_2060)
 set.seed(678)
 n <- 40000
 sample_xyz <- data.frame(lon = runif(n, xmin(normalbc$dem2_WNA), xmax(normalbc$dem2_WNA)), 
-                  lat = runif(n, ymin(normalbc$dem2_WNA), ymax(normalbc$dem2_WNA)), 
-                  elev = NA)
+                         lat = runif(n, ymin(normalbc$dem2_WNA), ymax(normalbc$dem2_WNA)), 
+                         elev = NA)
 sample_xyz[, 3] <- terra::extract(normalbc$dem2_WNA, sample_xyz[, 1:2], method = "bilinear")[, -1L]
 
 ##downscale function
