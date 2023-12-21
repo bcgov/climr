@@ -14,13 +14,23 @@
 #' @export
 normal_input <- function(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE) {
   ## checks
+  if (is(normal, "character")) {
+    match.arg(normal, list_normal())
+  } else {
+    if (!is(normal, "SpatRaster")) {
+      stop("'normal' must be one of 'list_normal()' or a SpatRaster with 36 layers",
+           " of normal climate variables")
+    }
+  }
+  
   if (!is(cache, "logical")) {
     stop("please pass a logical value to 'cache'")
   }
   
   ## check cached
-  if (dir.exists(paste0(cache_path(), "/normal/", normal))) {
-    bnds <- fread(paste0(cache_path(), "/normal/", normal, "/meta_data.csv"))
+  normalPath <- file.path(cache_path(), "/normal/", normal)
+  if (dir.exists(normalPath)) {
+    bnds <- fread(file.path(normalPath, "meta_data.csv"))
 
     for (i in 1:nrow(bnds)) {
       isin <- is_in_bbox(bbox, matrix(bnds[i, 2:5]))
@@ -29,7 +39,7 @@ normal_input <- function(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE)
     if (isin) {
       message("Retrieving from cache...")
       oldid <- bnds$uid[i]
-      res <- rast(paste0(cache_path(), "/normal/", normal, "/", oldid, ".tif"))
+      res <- rast(file.path(normalPath, paste0(oldid, ".tif")))
       attr(res, "builder") <- "climr"
       return(res)
     }

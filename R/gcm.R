@@ -62,9 +62,9 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 #' @export
 gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:1950, max_run = 0L, cache = TRUE) {
   # Load each file individually + select layers
-  res <- lapply(gcm, process_one_gcm3, years = years,
+  res <- sapply(gcm, process_one_gcm3, years = years,
                 dbCon = dbCon, bbox = bbox, dbnames = dbnames_hist, 
-                max_run = max_run, cache = cache)
+                max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE)
   attr(res, "builder") <- "climr"
   
   # Return a list of SpatRaster, one element for each model
@@ -99,9 +99,9 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), years = 2020:2030, max_run = 0L, cache = TRUE) {
   if (nrow(dbnames_ts) < 1) stop("That isn't a valid GCM")
   # Load each file individually + select layers
-  res <- lapply(gcm, process_one_gcm4, ssp = ssp, period = years,
+  res <- sapply(gcm, process_one_gcm4, ssp = ssp, period = years,
                 dbnames = dbnames_ts, bbox = bbox, dbCon = dbCon, 
-                max_run = max_run, cache = cache)
+                max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE)
   attr(res, "builder") <- "climr"
   
   # Return a list of SpatRaster, one element for each model
@@ -222,7 +222,9 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   gcm_nm <- gsub("-", ".", gcm_nm)
   
-  runs <- fread(paste0(cache_path(), "/run_info/gcm_period.csv"))
+  rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
+  
+  runs <- fread(file.path(rInfoPath, "gcm_period.csv"))
   runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssp, run]))
   sel_runs <- runs[1:(max_run + 1L)]
   
@@ -299,7 +301,9 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
 process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbnames_hist, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   
-  runs <- fread(paste0(cache_path(), "/run_info/gcm_hist.csv"))
+  rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
+  
+  runs <- fread(file.path(rInfoPath, "gcm_hist.csv"))
   runs <- sort(unique(runs[mod == gcm_nm, run]))
   sel_runs <- runs[1:(max_run + 1L)]
   
@@ -368,7 +372,10 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
 #' @return a SpatRaster
 process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
-  runs <- fread(paste0(cache_path(), "/run_info/gcm_ts.csv"))
+  
+  rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
+  
+  runs <- fread(file.path(rInfoPath, "gcm_ts.csv"))
   runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssp, run]))
   if (length(runs) < 1) stop("That GCM isn't in our database yet.")
   sel_runs <- runs[1:(max_run + 1L)]

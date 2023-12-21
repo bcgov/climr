@@ -27,6 +27,7 @@ Imports:
     data.table,
     DBI,
     gh,
+    methods,
     pool,
     RPostgres,
     terra,
