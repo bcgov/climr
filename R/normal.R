@@ -1,4 +1,4 @@
-#' Create normal baseline input for `downscale` from PostGIS database.
+#' Create normal baseline inputs for `downscale` from PostGIS database.
 #' 
 #' @template dbCon
 #' @template bbox
@@ -11,6 +11,7 @@
 #' @importFrom terra rast writeRaster ext
 #' @importFrom data.table fread fwrite data.table
 #' @importFrom uuid UUIDgenerate
+#' @rdname normal-input-data
 #' @export
 normal_input <- function(dbCon, bbox = NULL, normal = "normal_na",
                          cache = TRUE) {
