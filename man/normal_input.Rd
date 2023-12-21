@@ -13,7 +13,7 @@ normal_input(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE)
 
 \item{normal}{A character or a SpatRaster. For character, label of the normal baseline to use.
 Can be obtained from \code{list_normal()}. For SpatRaster, 36 layers normal climate variables with
-names PPT01:PPT12, Tmax01:Tmax12 and Tmin01:Tmin12. Default to \code{list_normal()[1]}.}
+names PPT01:PPT12, Tmax01:Tmax12 and Tmin01:Tmin12. Defaults to \code{list_normal()[1]}.}
 
 \item{cache}{Logical specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 }
