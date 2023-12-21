@@ -21,8 +21,9 @@ test_that("test the whole chain works with all variables", {
   
   sapply(normals, FUN = function(normal) {
     browser()
-    normalout <- normal_input(dbCon, thebb, normal = normal,cache = TRUE)
+    normalout <- normal_input(dbCon, thebb, normal = normal, cache = TRUE)
     
+    normalout2 <- normal_input(dbCon, thebb, normal = normalout[[1:36]], cache = TRUE)
   })
   
   
