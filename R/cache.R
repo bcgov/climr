@@ -1,14 +1,14 @@
-# Cache utility
+# Cache utilities
 
 #' Return package local cache path
-#' 
 #' @details By default, it uses [tools::R_user_dir()]. The cache location can be
 #' set using the `climr.cache.path` option with `options("climr.cache.path" = "your_path")`.
+#' 
+#' @export
 #' 
 #' @return character. The full path of the package local cache.
 #' 
 #' @importFrom tools R_user_dir
-#' @export
 cache_path <- function() {
   getOption("climr.cache.path", default = R_user_dir("climr", "cache"))
 }
