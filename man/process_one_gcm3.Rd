@@ -2,7 +2,7 @@
 % Please edit documentation in R/gcm.R
 \name{process_one_gcm3}
 \alias{process_one_gcm3}
-\title{TODO: add documentation here}
+\title{Process one historic time series at a time}
 \usage{
 process_one_gcm3(
   gcm_nm,
@@ -37,5 +37,5 @@ and their corresponding names in the PostGIS data base. See climr:::dbnames_hist
 SpatRaster
 }
 \description{
-TODO: add documentation here
+Process one historic time series at a time
 }
