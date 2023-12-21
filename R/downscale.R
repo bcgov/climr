@@ -214,6 +214,8 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' 
 #' @import data.table
 #' @importFrom terra extract rast sources ext xres yres crop plot as.polygons
+#' @importFrom grDevices hcl.colors palette
+#' @importFrom stats complete.cases
 #' 
 #' @return A `data.table` or SpatVector with downscaled climate variables. If `gcm` is NULL, 
 #'   this is just the downscaled `normal` at point locations. If `gcm` is provided,
@@ -821,6 +823,7 @@ process_one_historic <- function(historic_, res, xyzID, timeseries) {
 #'
 #' @importFrom terra vect crs
 #' @importFrom data.table as.data.table
+#' @importFrom methods is
 addIDCols <- function(IDCols, results) {
   if(!is.null(IDCols)){
     nm_order <- names(results)

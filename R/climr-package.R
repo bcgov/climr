@@ -3,21 +3,22 @@
 #' @importFrom RPostgres dbGetQuery
 #' @noRd
 .onLoad <- function(libname, pkgname) {
-  if(!dir.exists(paste0(cache_path(), "/run_info/"))){
+  rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
+  
+  if (!dir.exists(rInfoPath)){
     message("Downloading and Caching ESM run info :)")
     dbCon <- data_connect()
-    if(is.null(dbCon)){
+    if (is.null(dbCon)){
       warning("Could not connect to server. Only cached normal periods will be available.")
-    }else{
-      dir.create(paste0(cache_path(), "/run_info/"), recursive = TRUE)
+    } else {
+      dir.create(rInfoPath, recursive = TRUE)
       gcm_period_runs <- dbGetQuery(dbCon, "select distinct mod, scenario, run from esm_layers order by mod, scenario, run;")
       gcm_ts_runs <- dbGetQuery(dbCon, "select distinct mod, scenario, run from esm_layers_ts order by mod, scenario, run;")
       gcm_hist_runs <- dbGetQuery(dbCon, "select distinct mod, run from esm_layers_hist order by mod, run;")
-      fwrite(gcm_period_runs, paste0(cache_path(), "/run_info/gcm_period.csv"))
-      fwrite(gcm_ts_runs, paste0(cache_path(), "/run_info/gcm_ts.csv"))
-      fwrite(gcm_hist_runs, paste0(cache_path(), "/run_info/gcm_hist.csv"))
+      fwrite(gcm_period_runs, file.path(rInfoPath, "gcm_period.csv"))
+      fwrite(gcm_period_runs, file.path(rInfoPath, "gcm_ts.csv"))
+      fwrite(gcm_period_runs, file.path(rInfoPath, "gcm_hist.csv"))
     }
-
   }
 }
 
