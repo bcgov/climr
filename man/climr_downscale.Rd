@@ -17,7 +17,9 @@ climr_downscale(
   max_run = 0L,
   return_normal = TRUE,
   vars = sort(sprintf(c("PPT\%02d", "Tmax\%02d", "Tmin\%02d"), sort(rep(1:12, 3)))),
-  cache = TRUE
+  cache = TRUE,
+  out_spatial = FALSE,
+  plot = NULL
 )
 }
 \arguments{
@@ -49,6 +51,14 @@ are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 \item{vars}{Character vector of climate variables. Options are \code{list_vars()}}
 
 \item{cache}{Logical. Cache data locally? Default \code{TRUE}}
+
+\item{out_spatial}{logical. Should a SpatVector be returned instead of a
+\code{data.frame}.}
+
+\item{plot}{character. If \code{out_spatial} is TRUE, the name of a variable to plot.
+If the variable exists in \code{normal}, then its normal values will also be plotted.
+Otherwise, normal January total precipitation (PPT01) values will be plotted.
+Defaults to no plotting (NULL).}
 }
 \value{
 \code{data.frame} of downscaled climate variables for each location.

@@ -15,7 +15,9 @@ downscale(
   return_normal = FALSE,
   vars = sort(sprintf(c("PPT\%02d", "Tmax\%02d", "Tmin\%02d"), sort(rep(1:12, 3)))),
   ppt_lr = FALSE,
-  nthread = 1L
+  nthread = 1L,
+  out_spatial = FALSE,
+  plot = NULL
 )
 }
 \arguments{
@@ -42,9 +44,17 @@ can be obtained with \code{list_variables()}. Definitions can be found in this p
 \item{ppt_lr}{A boolean. Apply lapse rate adjustment to precipitations. Default to FALSE.}
 
 \item{nthread}{An integer. Number of parallel threads to use to do computations. Default to 1L.}
+
+\item{out_spatial}{logical. Should a SpatVector be returned instead of a
+\code{data.frame}.}
+
+\item{plot}{character. If \code{out_spatial} is TRUE, the name of a variable to plot.
+If the variable exists in \code{normal}, then its normal values will also be plotted.
+Otherwise, normal January total precipitation (PPT01) values will be plotted.
+Defaults to no plotting (NULL).}
 }
 \value{
-A \code{data.table} with downscaled climate variables. If \code{gcm} is NULL,
+A \code{data.table} or SpatVector with downscaled climate variables. If \code{gcm} is NULL,
 this is just the downscaled \code{normal} at point locations. If \code{gcm} is provided,
 this returns a downscaled dataset for each point location, general circulation
 model (GCM), shared socioeconomic pathway (SSP), run and period.
