@@ -13,6 +13,11 @@
 #' @importFrom uuid UUIDgenerate
 #' @export
 normal_input <- function(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE) {
+  ## checks
+  if (!is(cache, "logical")) {
+    stop("please pass a logical value to 'cache'")
+  }
+  
   ## check cached
   if (dir.exists(paste0(cache_path(), "/normal/", normal))) {
     bnds <- fread(paste0(cache_path(), "/normal/", normal, "/meta_data.csv"))
