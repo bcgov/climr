@@ -357,7 +357,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
       cols <- cols[cols %in% names(res2)]
       uniqueCombos <- unique(as.data.table(res2)[, ..cols])
       uniqueCombos <- uniqueCombos[complete.cases(uniqueCombos)]
-      s
+      
       if (nrow(uniqueCombos) > 1) {
         message("Plotting results for a single period/GCM/run/SSP")
         uniqueCombos <- uniqueCombos[1]
