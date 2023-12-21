@@ -4,5 +4,3 @@ utils::globalVariables(c(
   "mod", "numlay", "period", "run", "var",
   "skip_if_not_installed", "..cols" 
 ))
-
-#
