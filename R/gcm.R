@@ -131,7 +131,7 @@ list_unique <- function(files, col_num) {
   return(sort(collection))
 }
 
-#' TODO: add documentation here
+#' Process one GCM at a time
 #' 
 #' @template gcm_nm 
 #' @template ssp 
@@ -209,7 +209,7 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
   return(gcm_rast)
 }
 
-#' TODO: add documentation here
+#' Process one historic time series at a time
 #'
 #' @template gcm_nm 
 #' @param years Numeric vector of desired years. Must be in `1851:2015`.
@@ -279,7 +279,7 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
   return(gcm_rast)
 }
 
-#' TODO: add documentation here
+#' Process one GCM time series at a time
 #'
 #' @template gcm_nm
 #' @template ssp 
