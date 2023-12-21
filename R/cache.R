@@ -1,6 +1,9 @@
 # Cache utilities
 
 #' Return package local cache path
+#' 
+#' @rdname Caching
+#' 
 #' @details By default, it uses [tools::R_user_dir()]. The cache location can be
 #' set using the `climr.cache.path` option with `options("climr.cache.path" = "your_path")`.
 #' 
@@ -49,6 +52,8 @@ cache_ask <- function(ask = interactive()) {
 
 
 #' Clear the package's local cache path
+#' 
+#' @rdname Caching
 #' 
 #' Attempts to delete all folder/files in `cache_path()`.
 #' 
