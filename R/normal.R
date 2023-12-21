@@ -12,7 +12,17 @@
 #' @importFrom data.table fread fwrite data.table
 #' @importFrom uuid UUIDgenerate
 #' @export
-normal_input <- function(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE) {
+normal_input <- function(dbCon, bbox = NULL, normal = "normal_na",
+                         cache = TRUE) {
+  if (is(normal, "character")) {
+    match.arg(normal, list_normal())
+  } else {
+    if (!is(normal, "SpatRaster")) {
+      stop("'normal' must be one of 'list_normal()' or a SpatRaster with 36 layers",
+           " of normal climate variables")
+    }
+  }
+  
   ## check cached
   if (dir.exists(paste0(cache_path(), "/normal/", normal))) {
     bnds <- fread(paste0(cache_path(), "/normal/", normal, "/meta_data.csv"))
