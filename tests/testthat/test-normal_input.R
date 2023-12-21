@@ -15,7 +15,24 @@ test_that("test normal_input", {
   normals <- as.list(list_normal())
   
   sapply(normals, FUN = function(normal) {
+    browser()
     normalout <- normal_input(dbCon, thebb, normal = normal, cache = TRUE)
+    
+    expect_true(is(normalout, "SpatRaster"))
+    expect_true(!is.null(names(normalout)))
+    
+    expectednames <- c(paste0("PPT", sprintf("%02d", 1:12)),
+                      paste0("Tmax", sprintf("%02d", 1:12)),
+                      paste0("Tmin", sprintf("%02d", 1:12)))
+    expectednames <- c(expectednames, paste0("lr_", expectednames), "dem2_WNA")
+    expect_identical(setdiff(expectednames, names(normalout)), character(0))
+    expect_identical(setdiff(names(normalout), expectednames), character(0))
+    
+    bbExt <- ext(thebb[4], thebb[3], thebb[2], thebb[1])
+    outExt <- ext(normalout)
+    
+    expect_true(bbExt <= outExt)
+    
     ## TODO: using input raster is currently failing
     # normalout2 <- normal_input(dbCon, thebb, normal = normalout[[1:36]], cache = TRUE)
   })
