@@ -49,9 +49,9 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 #' @export
 gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:1950, max_run = 0L, cache = TRUE) {
   # Load each file individually + select layers
-  res <- lapply(gcm, process_one_gcm3, years = years,
+  res <- sapply(gcm, process_one_gcm3, years = years,
                 dbCon = dbCon, bbox = bbox, dbnames = dbnames_hist, 
-                max_run = max_run, cache = cache)
+                max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE)
   attr(res, "builder") <- "climr"
   
   # Return a list of SpatRaster, one element for each model
@@ -86,9 +86,9 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), years = 2020:2030, max_run = 0L, cache = TRUE) {
   if (nrow(dbnames_ts) < 1) stop("That isn't a valid GCM")
   # Load each file individually + select layers
-  res <- lapply(gcm, process_one_gcm4, ssp = ssp, period = years,
+  res <- sapply(gcm, process_one_gcm4, ssp = ssp, period = years,
                 dbnames = dbnames_ts, bbox = bbox, dbCon = dbCon, 
-                max_run = max_run, cache = cache)
+                max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE)
   attr(res, "builder") <- "climr"
   
   # Return a list of SpatRaster, one element for each model
