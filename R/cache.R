@@ -59,7 +59,8 @@ cache_ask <- function(ask = interactive()) {
 #'   It may fail if R has no permission to delete files/folders
 #'   in the `cache_path()` directory
 #' 
-#' @return NULL
+#' @return TRUE or FALSE depending on whether cache was cleared successfully
+#'   or not.
 #' @export
 cache_clear <- function(what = c("gcm", "normal", "historic")) {
   what <- match.arg(what, several.ok = TRUE)
@@ -78,5 +79,8 @@ cache_clear <- function(what = c("gcm", "normal", "historic")) {
   
   if (any(fileList %in% fileList2)) {
     warning("Unable to fully clear the cache. This may be due to restricted permissions.")
+    return(FALSE)
+  } else {
+    return(TRUE)
   }
 }
