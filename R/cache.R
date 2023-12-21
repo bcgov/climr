@@ -2,15 +2,13 @@
 
 #' Return package local cache path
 #' 
-#' @rdname Caching
-#' 
 #' @details By default, it uses [tools::R_user_dir()]. The cache location can be
 #' set using the `climr.cache.path` option with `options("climr.cache.path" = "your_path")`.
 #' 
-#' @export
-#' 
 #' @return character. The full path of the package local cache.
 #' 
+#' @export
+#' @rdname Caching
 #' @importFrom tools R_user_dir
 cache_path <- function() {
   getOption("climr.cache.path", default = R_user_dir("climr", "cache"))
@@ -52,9 +50,6 @@ cache_ask <- function(ask = interactive()) {
 
 
 #' Clear the package's local cache path
-#' 
-#' @rdname Caching
-#' 
 #' Attempts to delete all folder/files in `cache_path()`.
 #' 
 #' @param what character. Which data folders should be cleared?
@@ -66,6 +61,7 @@ cache_ask <- function(ask = interactive()) {
 #' 
 #' @return TRUE or FALSE depending on whether cache was cleared successfully
 #'   or not.
+#' @rdname Caching
 #' @export
 cache_clear <- function(what = c("gcm", "normal", "historic")) {
   what <- match.arg(what, several.ok = TRUE)
