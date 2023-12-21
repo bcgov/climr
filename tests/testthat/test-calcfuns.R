@@ -51,7 +51,7 @@ test_that("calc_* give sensible outputs", {
   
   dbCon <- data_connect()
   
-  ## the following includes NAs for the test
+  ## the following includes NAs for the test and should be small enough
   xyz <- data.frame(lon = c(-128, -125, -128, -125), lat = c(50, 50, 48, 48), elev = runif(4))
   thebb <- get_bb(xyz)
   
