@@ -12,14 +12,15 @@ test_that("test cache in default location", {
   thebb <- get_bb(xyz)
   
   expect_identical(cache_path(), R_user_dir("climr", "cache"))
+  on.exit(unlink(cache_path(), recursive = TRUE, force = TRUE), add = TRUE)
   
-  on.exit(unlink(cache_path(), recursive = TRUE, force = TRUE))
-  
+  expecteddirs <- normalizePath(file.path(cache_path(), c("gcm", "normal", "historic")), winslash = "/")
+
   cache_clear()
   normal <- normal_input(dbCon = dbCon, bbox = thebb, cache = FALSE)
-  expect_identical(length(list.files(cache_path())), 0L)
+  cachedirs <- normalizePath(list.dirs(cache_path(), recursive = FALSE), winslash = "/")
+  expect_false(any(expecteddirs %in% cachedirs))
   
-  cache_clear()
   gcm1 <- gcm_input(
     dbCon, 
     thebb,
@@ -28,7 +29,13 @@ test_that("test cache in default location", {
     period = "2041_2060",
     max_run = 1, cache = FALSE
   )
-  expect_identical(length(list.files(cache_path())), 0L)
+  cachedirs <- normalizePath(list.dirs(cache_path(), recursive = FALSE), winslash = "/")
+  expect_false(any(expecteddirs %in% cachedirs))
+  
+  ds_res <- climr_downscale(xyz, which_normal = "BC", historic_period = "2001_2020",
+                            cache = FALSE)
+  cachedirs <- normalizePath(list.dirs(cache_path(), recursive = FALSE), winslash = "/")
+  expect_false(any(expecteddirs %in% cachedirs))
   
   normal <- normal_input(dbCon = dbCon, bbox = thebb)
   expect_true("normal" %in% list.files(cache_path()))
