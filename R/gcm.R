@@ -288,6 +288,8 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
 process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbnames_hist, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   
+  rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
+  
   runs <- fread(file.path(rInfoPath, "gcm_hist.csv"))
   runs <- sort(unique(runs[mod == gcm_nm, run]))
   sel_runs <- runs[1:(max_run + 1L)]
@@ -357,6 +359,8 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
 #' @return a SpatRaster
 process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
+  
+  rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
   
   runs <- fread(file.path(rInfoPath, "gcm_ts.csv"))
   runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssp, run]))
