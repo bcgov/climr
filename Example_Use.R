@@ -3,10 +3,6 @@ library(pool)
 library(data.table)
 library(terra)
 
-set.seed(123)
-dbCon <- data_connect()
-xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
-
 ## get bounding box based on input points
 thebb <- get_bb(xyz)
 historic <- historic_input(dbCon, thebb, period = "2001_2020")
@@ -36,8 +32,7 @@ list_historic()
 ds_hist <- climr_downscale(xyz = in_xyz, which_normal = "auto", 
                            historic_period = "2001_2020",
                            return_normal = TRUE, ##put this to TRUE if you want the 1961-1990 period
-                           vars = c("PPT","CMD","CMI","Tave01","Tave07"),
-                           out_spatial = TRUE, plot = "PPT") ##specify desired variables
+                           vars = c("PPT","CMD","CMI","Tave01","Tave07")) ##specify desired variables
 
 
 ##Future periods:

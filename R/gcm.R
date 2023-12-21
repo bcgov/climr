@@ -209,6 +209,10 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   gcm_nm <- gsub("-", ".", gcm_nm)
   
+  runs <- fread(paste0(cache_path(), "/run_info/gcm_period.csv"))
+  runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssp, run]))
+  sel_runs <- runs[1:(max_run + 1L)]
+  
   if (dir.exists(paste0(cache_path(), "/gcm/", gcmcode))) {
     bnds <- fread(paste0(cache_path(), "/gcm/", gcmcode, "/meta_area.csv"))
     setorder(bnds, -numlay)
@@ -223,9 +227,6 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
       if (all(period %in% periods[uid == oldid, period]) & all(ssp %in% ssps[uid == oldid, ssp]) & max_run <= bnds[uid == oldid, max_run]) {
         message("Retrieving from cache...")
         gcm_rast <- rast(paste0(cache_path(), "/gcm/", gcmcode, "/", oldid, ".tif"))
-        runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers where mod = '", gcm_nm, "'"))$run)
-        sel_runs <- runs[1:(max_run + 1L)]
-        
         layinfo <- data.table(fullnm = names(gcm_rast))
         layinfo[, c("Mod", "Var", "Month", "Scenario", "Run", "Period1", "Period2") := tstrsplit(fullnm, "_")]
         layinfo[, Period := paste(Period1, Period2, sep = "_")]
@@ -238,8 +239,6 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
     }
   }
   
-  runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers where mod = '", gcm_nm, "'"))$run)
-  sel_runs <- runs[1:(max_run + 1L)]
   
   q <- paste0(
     "select fullnm, laynum from esm_layers where mod = '", gcm_nm, "' and scenario in ('", paste(ssp, collapse = "','"),
@@ -287,6 +286,10 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
 process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbnames_hist, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   
+  runs <- fread(paste0(cache_path(), "/run_info/gcm_hist.csv"))
+  runs <- sort(unique(runs[mod == gcm_nm, run]))
+  sel_runs <- runs[1:(max_run + 1L)]
+  
   if (dir.exists(paste0(cache_path(), "/gcmhist/", gcmcode))) {
     bnds <- fread(paste0(cache_path(), "/gcmhist/", gcmcode, "/meta_area.csv"))
     setorder(bnds, -numlay)
@@ -300,9 +303,6 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
       if (all(years %in% yeardat[uid == oldid, years]) & max_run <= bnds[uid == oldid, max_run]) {
         message("Retrieving from cache...")
         gcm_rast <- rast(paste0(cache_path(), "/gcmhist/", gcmcode, "/", oldid, ".tif"))
-        runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers_hist where mod = '", gcm_nm, "'"))$run)
-        sel_runs <- runs[1:(max_run + 1L)]
-        
         layinfo <- data.table(fullnm = names(gcm_rast))
         layinfo[, c("Mod", "Var", "Month", "Run", "Year") := tstrsplit(fullnm, "_")]
         layinfo[, laynum := seq_along(Year)]
@@ -313,9 +313,6 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
       }
     }
   }
-  
-  runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers_hist where mod = '", gcm_nm, "'"))$run)
-  sel_runs <- runs[1:(max_run + 1L)]
   
   q <- paste0("select mod, var, month, run, year, laynum from esm_layers_hist where mod = '", gcm_nm, "' and year in ('", paste(years, collapse = "','"), "') and run in ('", paste(sel_runs, collapse = "','"), "')")
   # print(q)
@@ -358,6 +355,10 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
 #' @return a SpatRaster
 process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
+  runs <- fread(paste0(cache_path(), "/run_info/gcm_ts.csv"))
+  runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssp, run]))
+  if (length(runs) < 1) stop("That GCM isn't in our database yet.")
+  sel_runs <- runs[1:(max_run + 1L)]
   
   if (dir.exists(paste0(cache_path(), "/gcmts/", gcmcode))) {
     bnds <- fread(paste0(cache_path(), "/gcmts/", gcmcode, "/meta_area.csv"))
@@ -373,9 +374,6 @@ process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts,
       if (all(period %in% periods[uid == oldid, period]) & all(ssp %in% ssps[uid == oldid, ssp]) & max_run <= bnds[uid == oldid, max_run]) {
         message("Retrieving from cache...")
         gcm_rast <- rast(paste0(cache_path(), "/gcmts/", gcmcode, "/", oldid, ".tif"))
-        runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers_ts where mod = '", gcm_nm, "'"))$run)
-        sel_runs <- runs[1:(max_run + 1L)]
-        
         layinfo <- data.table(fullnm = names(gcm_rast))
         layinfo[, c("Mod", "Var", "Month", "Scenario", "Run", "Year") := tstrsplit(fullnm, "_")]
         layinfo[, laynum := seq_along(fullnm)]
@@ -386,10 +384,6 @@ process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts,
       }
     }
   }
-  
-  runs <- sort(dbGetQuery(dbCon, paste0("select distinct run from esm_layers_ts where mod = '", gcm_nm, "'"))$run)
-  if (length(runs) < 1) stop("That GCM isn't in our database yet.")
-  sel_runs <- runs[1:(max_run + 1L)]
   
   q <- paste0(
     "select fullnm, laynum from esm_layers_ts where mod = '", gcm_nm, "' and scenario in ('", paste(ssp, collapse = "','"),
