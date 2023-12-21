@@ -90,6 +90,8 @@ test_that("test cache in custom location", {
   opts <- options("climr.cache.path" = "~/test_climr")
   on.exit(options(opts), add = TRUE)
   expect_identical(cache_path(), "~/test_climr")
+
+  expecteddirs <- suppressWarnings(normalizePath(file.path(cache_path(), c("gcm", "normal", "historic")), winslash = "/"))
   
   xyz <- data.frame(Long = c(-127.70521, -127.62279, -127.56235, -127.7162, 
                              -127.18585, -127.1254, -126.94957, -126.95507), 
