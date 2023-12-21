@@ -1,4 +1,11 @@
-#' Create gcm input for `downscale` using data on Postgis database.
+#' Create GCM inputs for `downscale` using data on Postgis database.
+#' 
+#' @return A `list` of SpatRasters, each with possibly multiple layers, that can
+#'   be used with `downscale`.
+#' 
+#' @description
+#' `gcm_input` creates GCM climate periods inputs, given chosen GCMs, SSPs, 
+#'  periods and runs.
 #' 
 #' @template dbCon
 #' @template bbox
@@ -8,14 +15,12 @@
 #' @template max_run
 #' @template cache
 #' 
-#' @return A `list` of SpatRasters, each with possibly multiple layers, that can
-#'   be used with `downscale`.
-#' 
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @importFrom uuid UUIDgenerate
 #' @import data.table
+#' @rdname gcm-input-data
 #' @export
 gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), period = list_gcm_period(), max_run = 0L, cache = TRUE) {
   # Load each file individually + select layers
@@ -29,7 +34,10 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 }
 
 
-#' Create gcm historic timeseries input for `downscale`
+#' @description
+#' `gcm_hist_input` creates GCM **historic** time series inputs, given chosen GCMs, SSPs, 
+#'  years and runs.
+#'   
 #' @template dbCon
 #' @template bbox
 #' @template gcm
@@ -38,14 +46,12 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 #' @template max_run
 #' @template cache
 #' 
-#' @return A `list` of SpatRasters, each with possibly multiple layers, that can
-#'   be used with `downscale`.
-#' 
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @import uuid
 #' @import data.table
+#' @rdname gcm-input-data
 #' @export
 gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:1950, max_run = 0L, cache = TRUE) {
   # Load each file individually + select layers
@@ -64,7 +70,9 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 # ssp <- c("ssp245","ssp370")
 # period <- 2020:2050
 
-#' Create gcm timeseries input for `downscale` using data on Postgis database.
+#' @description
+#' `gcm_ts_input` creates GCM time series inputs, given chosen GCMs, SSPs, 
+#'  years and runs.
 #' 
 #' @template dbCon
 #' @template bbox
@@ -74,14 +82,12 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 #' @template max_run
 #' @template cache
 #' 
-#' @return A `list` of SpatRasters, each with possibly multiple layers, that can
-#'   be used with `downscale`.
-#' 
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @import uuid
 #' @import data.table
+#' @rdname gcm-input-data
 #' @export
 gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), years = 2020:2030, max_run = 0L, cache = TRUE) {
   if (nrow(dbnames_ts) < 1) stop("That isn't a valid GCM")
