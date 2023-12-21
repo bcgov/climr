@@ -46,3 +46,35 @@ cache_ask <- function(ask = interactive()) {
     return(TRUE)
   }
 }
+
+
+#' Clear the package's local cache path
+#' 
+#' Attempts to delete all folder/files in `cache_path()`.
+#' 
+#' @param what character. Which data folders should be cleared?
+#'    Accepts "normal", "gcm" or both.
+#' 
+#' @details
+#'   It may fail if R has no permission to delete files/folders
+#'   in the `cache_path()` directory
+#' 
+#' @return NULL
+#' @export
+cache_clear <- function(what = c("gcm", "normal", "historic")) {
+  browser()  ## TODO: check historic folder
+  match.arg(what, several.ok = TRUE)
+  
+  fileList <- list.files(cache_path())
+  fileList <- fileList[fileList %in% what]
+  fileList <- unlist(sapply(file.path(cache_path(), fileList), list.files, 
+                            recursive = TRUE, full.names = TRUE,
+                            simplify = FALSE, USE.NAMES = FALSE))
+  unlink(fileList, recursive = TRUE, force = TRUE)
+
+  fileList2 <- list.files(cache_path(), recursive = TRUE, full.names = TRUE)
+  
+  if (any(fileList %in% fileList2)) {
+    warning("Unable to fully clear the cache. This may be due to restricted permissions.")
+  }
+}
