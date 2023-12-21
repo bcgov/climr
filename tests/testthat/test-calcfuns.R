@@ -45,9 +45,7 @@ test_that("calc_* functions work", {
 
 
 test_that("calc_* give sensible outputs", {
-  library(pool)
-  library(data.table)
-  library(terra)
+  testInit(c("data.table", "terra"))
   
   dbCon <- data_connect()
   on.exit(try(pool::poolClose(dbCon)), add = TRUE)
