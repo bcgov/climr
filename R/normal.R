@@ -84,15 +84,3 @@ is_in_bbox <- function(newbb, oldbb) {
     FALSE
   }
 }
-
-#' List available normals
-#' 
-#' Currently available normals span North America ("normal_na") or
-#'   British Columbia ("normal_bc")
-#'   
-#' @return a character vector.
-#' 
-#' @export
-list_normal <- function() {
-  c("normal_na", "normal_bc")
-}
