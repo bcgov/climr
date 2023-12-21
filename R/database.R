@@ -31,7 +31,7 @@ data_connect <- function() {
           )
         },
         error = function(f) {
-          warning(f, "Could not connect to database. Will try using cached data.")
+          warning("Could not connect to database. Will try using cached data.")
           NULL
         }
       )
