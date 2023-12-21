@@ -62,8 +62,7 @@ cache_ask <- function(ask = interactive()) {
 #' @return NULL
 #' @export
 cache_clear <- function(what = c("gcm", "normal", "historic")) {
-  browser()  ## TODO: check historic folder
-  match.arg(what, several.ok = TRUE)
+  what <- match.arg(what, several.ok = TRUE)
   
   fileList <- list.files(cache_path())
   fileList <- fileList[fileList %in% what]
