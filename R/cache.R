@@ -1,4 +1,4 @@
-# Cache utility
+# Cache utilities
 
 #' Return package local cache path
 #' 
@@ -7,8 +7,9 @@
 #' 
 #' @return character. The full path of the package local cache.
 #' 
-#' @importFrom tools R_user_dir
 #' @export
+#' @rdname Caching
+#' @importFrom tools R_user_dir
 cache_path <- function() {
   getOption("climr.cache.path", default = R_user_dir("climr", "cache"))
 }
@@ -42,6 +43,44 @@ cache_ask <- function(ask = interactive()) {
       options("climr.session.cache.ask.response" = response)
       return(response)
     }
+  } else {
+    return(TRUE)
+  }
+}
+
+
+#' Clear the package's local cache path
+#' Attempts to delete all folder/files in `cache_path()`.
+#' 
+#' @param what character. Which data folders should be cleared?
+#'    Accepts "normal", "gcm" or both.
+#' 
+#' @details
+#'   It may fail if R has no permission to delete files/folders
+#'   in the `cache_path()` directory
+#' 
+#' @return TRUE or FALSE depending on whether cache was cleared successfully
+#'   or not.
+#' @rdname Caching
+#' @export
+cache_clear <- function(what = c("gcm", "normal", "historic")) {
+  what <- match.arg(what, several.ok = TRUE)
+  
+  fileList <- list.files(cache_path())
+  fileList <- fileList[fileList %in% what]
+  fileList <- unlist(sapply(file.path(cache_path(), fileList), FUN = function(p) {
+    fileList <- list.files(p, recursive = TRUE, full.names = TRUE)
+    folderList <- list.dirs(p, recursive = TRUE, full.names = TRUE)
+    c(fileList, folderList)
+    },
+    simplify = FALSE, USE.NAMES = FALSE))
+  unlink(fileList, recursive = TRUE, force = TRUE)
+  
+  fileList2 <- list.files(cache_path(), recursive = TRUE, full.names = TRUE)
+  
+  if (any(fileList %in% fileList2)) {
+    warning("Unable to fully clear the cache. This may be due to restricted permissions.")
+    return(FALSE)
   } else {
     return(TRUE)
   }

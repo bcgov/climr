@@ -45,11 +45,10 @@ test_that("calc_* functions work", {
 
 
 test_that("calc_* give sensible outputs", {
-  library(pool)
-  library(data.table)
-  library(terra)
+  testInit(c("data.table", "terra"))
   
   dbCon <- data_connect()
+  on.exit(try(pool::poolClose(dbCon)), add = TRUE)
   
   ## the following includes NAs for the test
   xyz <- data.frame(lon = c(-128, -125, -128, -125), lat = c(50, 50, 48, 48), elev = runif(4))
