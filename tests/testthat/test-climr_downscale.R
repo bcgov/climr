@@ -1,7 +1,5 @@
 test_that("test climr_dowscale", {
-library(pool)
-library(data.table)
-library(terra)
+testInit("data.table")
 
 dbCon <- data_connect()
 on.exit(try(pool::poolClose(dbCon)), add = TRUE)
