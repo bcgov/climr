@@ -16,6 +16,8 @@
 #' @param return_normal Logical. Return downscaled normal period (1961-1990). Default `TRUE`
 #' @param vars Character vector of climate variables. Options are `list_vars()`
 #' @param cache Logical. Cache data locally? Default `TRUE`
+#' @template out_spatial
+#' @template plot
 
 #' @return `data.frame` of downscaled climate variables for each location.
 #'   Historic, normal, and future periods are all returned in one table.
@@ -35,7 +37,8 @@
 climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), historic_period = NULL, historic_ts = NULL,
                             gcm_models = NULL, ssp = c("ssp126", "ssp245", "ssp370", "ssp585"),
                             gcm_period = NULL, gcm_ts_years = NULL, gcm_hist_years = NULL, max_run = 0L, return_normal = TRUE,
-                            vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))), cache = TRUE) {
+                            vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))), cache = TRUE,
+                            out_spatial = FALSE, plot = NULL) {
   # xyz <- coords
   # which_normal = "auto"
   # historic_period = NULL
@@ -76,6 +79,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
   } else if (which_normal == "BC") {
     normal <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache)
   } else {
+    message("Normals not specified, extracting normals for BC and keeping points with non-NA climate values")
     bc_outline <- rast(system.file("extdata", "bc_outline.tif", package = "climr"))
     pnts <- extract(bc_outline, xyz[, 1:2], method = "simple")
     bc_ids <- xyz[, 4][!is.na(pnts$PPT01)]
@@ -90,12 +94,13 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
     }
   }
   
-  
   if (!is.null(historic_period)) {
     message("Getting historic...")
     historic_period <- historic_input(dbCon, bbox = thebb, period = historic_period, cache = cache)
   }
-  if (!is.null(historic_ts)) historic_ts <- historic_input_ts(dbCon, bbox = thebb, years = historic_ts, cache = cache)
+  if (!is.null(historic_ts)) { 
+    historic_ts <- historic_input_ts(dbCon, bbox = thebb, years = historic_ts, cache = cache)
+  }
   
   if (!is.null(gcm_models)) {
     if (!is.null(gcm_period)) {
@@ -105,8 +110,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
                        ssp = ssp,
                        period = gcm_period,
                        max_run = max_run,
-                       cache = cache
-      )
+                       cache = cache)
     } else {
       gcm <- NULL
     }
@@ -116,8 +120,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
                              ssp = ssp,
                              years = gcm_ts_years,
                              max_run = max_run,
-                             cache = cache
-      )
+                             cache = cache)
     } else {
       gcm_ts <- NULL
     }
@@ -145,27 +148,19 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
     gcm_ts = gcm_ts,
     gcm_hist = gcm_hist,
     return_normal = return_normal,
-    vars = vars
+    vars = vars,
+    out_spatial = out_spatial,
+    plot = plot
   )
   
   if (which_normal %in% c("BC", "NorAm")) {
     poolClose(dbCon)
-    if(!is.null(IDCols)){
-      nm_order <- names(results)
-      nms <- names(IDCols)[-1]
-      results[IDCols, (nms) := mget(nms), on = "ID"]
-      #setcolorder(results, c(nm_order,nms))
-    }
+    results <- addIDCols(IDCols, results)
     return(results)
-  }
-  if (length(bc_ids) == nrow(xyz_save) | length(bc_ids) < 1) {
+  } 
+  if ((length(bc_ids) == nrow(xyz_save) | length(bc_ids) < 1)) {
     poolClose(dbCon)
-    if(!is.null(IDCols)){
-      nm_order <- names(results)
-      nms <- names(IDCols)[-1]
-      results[IDCols, (nms) := mget(nms), on = "ID"]
-      #setcolorder(results, c(nm_order,nms))
-    }
+    results <- addIDCols(IDCols, results)
     return(results)
   } else {
     na_xyz <- xyz_save[!xyz_save[, 4] %in% bc_ids,]
@@ -182,17 +177,15 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
       gcm_ts = gcm_ts,
       gcm_hist = gcm_hist,
       return_normal = return_normal,
-      vars = vars
+      vars = vars,
+      out_spatial = out_spatial,
+      plot = plot
     )
     
-    res_all <- rbind(results, results_na)
-    if(!is.null(IDCols)){
-      nm_order <- names(results)
-      nms <- names(IDCols)[-1]
-      results[IDCols, (nms) := mget(nms), on = "ID"]
-      #setcolorder(results, c(nm_order,nms))
-    }
     poolClose(dbCon)
+    res_all <- rbind(results, results_na)
+    res_all <- addIDCols(IDCols, res_all)
+    
     return(res_all)
   }
 }
@@ -216,11 +209,13 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #'  `variables` dataset. Default to monthly PPT, Tmax, Tmin.
 #' @param ppt_lr A boolean. Apply lapse rate adjustment to precipitations. Default to FALSE.
 #' @param nthread An integer. Number of parallel threads to use to do computations. Default to 1L.
+#' @template out_spatial
+#' @template plot
 #' 
 #' @import data.table
-#' @importFrom terra extract rast sources ext xres yres crop
+#' @importFrom terra extract rast sources ext xres yres crop plot as.polygons
 #' 
-#' @return A `data.table` with downscaled climate variables. If `gcm` is NULL, 
+#' @return A `data.table` or SpatVector with downscaled climate variables. If `gcm` is NULL, 
 #'   this is just the downscaled `normal` at point locations. If `gcm` is provided,
 #'   this returns a downscaled dataset for each point location, general circulation 
 #'   model (GCM), shared socioeconomic pathway (SSP), run and period.
@@ -249,7 +244,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' }
 downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, gcm_hist = NULL, historic_ts = NULL, return_normal = FALSE,
                       vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))),
-                      ppt_lr = FALSE, nthread = 1L) {
+                      ppt_lr = FALSE, nthread = 1L, out_spatial = FALSE, plot = NULL) {
   # Make sure normal was built using normal_input
   if (!isTRUE(attr(normal, "builder") == "climr")) {
     stop(
@@ -338,6 +333,48 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
   }
   
   setkey(res, "ID")
+  if (out_spatial) {
+    names(xyz)[4] <- "ID"
+    res <- as.data.table(xyz)[res, on = "ID"]
+    
+    res <- vect(res, geom = names(xyz)[1:2], crs = crs(normal, proj = TRUE))
+    
+    if (!is.null(plot)) {
+      if (!plot %in% vars) {
+        stop("The variable you wish to plot was not dowscaled. Please pass a variable listed in 'vars'")
+      } 
+      ## make a mask of the normals data "extent"
+      msk <- normal[[1]]
+      msk[!is.na(msk[])] <- 1
+      msk <- as.polygons(msk)
+      
+      ## round values
+      res2 <- res
+      res2[[plot]] <- round(res2[[plot]], 4)
+      
+      ## make table of available runs
+      cols <- c("GCM", "SSP", "RUN", "PERIOD")
+      cols <- cols[cols %in% names(res2)]
+      uniqueCombos <- unique(as.data.table(res2)[, ..cols])
+      uniqueCombos <- uniqueCombos[complete.cases(uniqueCombos)]
+      s
+      if (nrow(uniqueCombos) > 1) {
+        message("Plotting results for a single period/GCM/run/SSP")
+        uniqueCombos <- uniqueCombos[1]
+        
+        res2 <- as.data.table(res2, geom = "XY")
+        res2 <- res2[uniqueCombos, on = names(uniqueCombos)]
+        res2 <- vect(res2, geom = c("x", "y"), crs = crs(res, proj = TRUE))
+      }
+      
+      plotTitle <- paste(paste(names(uniqueCombos), uniqueCombos, sep = ": "), collapse = "; ")
+      plotTitle <- paste0(plot, "\n", plotTitle)
+      plot(msk, col = "grey", main = plotTitle, legend = FALSE, mar = c(3.1, 3.1, 3.1, 7.1))
+      plot(res2, y = plot, axes = FALSE, ext = ext(msk),
+           col = palette(hcl.colors(100, "viridis")), sort = TRUE,
+           add = TRUE, type = "continuous")
+    }
+  }
   return(res)
 }
 
@@ -770,4 +807,33 @@ process_one_historic <- function(historic_, res, xyzID, timeseries) {
   )
   
   return(historic_)
+}
+
+
+
+
+#' Add ID columns to `downscale` output.
+#'
+#' @param IDCols character. ID columns to add, or NULL if none
+#' @param results `data.table` or `SpatVector` output from `downscale`
+#'
+#' @return `results` with IDCols
+#'
+#' @importFrom terra vect crs
+#' @importFrom data.table as.data.table
+addIDCols <- function(IDCols, results) {
+  if(!is.null(IDCols)){
+    nm_order <- names(results)
+    nms <- names(IDCols)[-1]
+    
+    results2 <- as.data.table(results, geom = "XY")
+    results2[IDCols, (nms) := mget(nms), on = "ID"]
+    #setcolorder(results2, c(nm_order,nms))
+    if (is(results, "SpatVector")) {
+      results2 <- vect(results2, geom = c("x", "y"), crs = crs(results, proj = TRUE))
+    } else {
+      suppressWarnings(results2[, `:=`(x = NULL, y = NULL)])
+    }
+  }
+  return(results2)
 }
