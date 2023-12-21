@@ -85,7 +85,7 @@ test_that("test cache in default location", {
   cachedirs <- normalizePath(list.dirs(cache_path(), recursive = FALSE), winslash = "/")
   test <- all(expecteddirs %in% cachedirs)
   expect_false(test)
-}
+})
 
 test_that("test cache in custom location", {
   options("climr.cache.path" = "~/test_climr")
@@ -124,4 +124,4 @@ test_that("test cache works within same bbox", {
   normal2 <- normal_input(dbCon = NULL, bbox = thebb)
   
   expect_true(compareGeom(normal, normal2, res = TRUE, lyrs = TRUE, stopOnError = FALSE))
-}
+})
