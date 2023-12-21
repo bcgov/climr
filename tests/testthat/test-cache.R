@@ -99,7 +99,7 @@ test_that("test cache in custom location", {
                     Zone = c(rep("CWH",3), rep("CDF",5)),
                     Subzone = c("vm1","vm2","vs1",rep("mm",3),"dk","dc"))
   
-  
+  cache_clear()
   ds_res <- climr_downscale(xyz, which_normal = "BC", historic_period = "2001_2020", 
                             gcm_models = list_gcm()[1], gcm_period = "2041_2060")
   cachedirs <- normalizePath(list.dirs(cache_path(), recursive = FALSE), winslash = "/")
