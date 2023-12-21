@@ -154,12 +154,12 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
   )
   
   if (which_normal %in% c("BC", "NorAm")) {
-    poolClose(dbCon)
+    if(!is.null(dbCon)) poolClose(dbCon)
     results <- addIDCols(IDCols, results)
     return(results)
   } 
   if ((length(bc_ids) == nrow(xyz_save) | length(bc_ids) < 1)) {
-    poolClose(dbCon)
+    if(!is.null(dbCon)) poolClose(dbCon)
     results <- addIDCols(IDCols, results)
     return(results)
   } else {
@@ -182,7 +182,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
       plot = plot
     )
     
-    poolClose(dbCon)
+    if(!is.null(dbCon)) poolClose(dbCon)
     res_all <- rbind(results, results_na)
     res_all <- addIDCols(IDCols, res_all)
     
