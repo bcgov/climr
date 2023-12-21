@@ -87,8 +87,7 @@ test_that("test cache in default location", {
 })
 
 test_that("test cache in custom location", {
-  opts <- options()
-  options("climr.cache.path" = "~/test_climr")
+  opts <- options("climr.cache.path" = "~/test_climr")
   on.exit(options(opts), add = TRUE)
   expect_identical(cache_path(), "~/test_climr")
   
