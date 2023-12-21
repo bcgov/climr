@@ -87,6 +87,23 @@ test_that("test cache in default location", {
   expect_false(test)
 }
 
+test_that("test cache in custom location", {
+  options("climr.cache.path" = "~/test_climr")
+  expect_identical(cache_path(), "~/test_climr")
+  
+  on.exit(unlink(cache_path(), recursive = TRUE, force = TRUE))
+  
+  ds_res <- climr_downscale(xyz, which_normal = "BC", historic_period = "2001_2020", 
+                            gcm_models = list_gcm()[1], gcm_period = "2041_2060")
+  cachedirs <- normalizePath(list.dirs(cache_path(), recursive = FALSE), winslash = "/")
+  test <- all(expecteddirs %in% cachedirs)
+  expect_true(test)
+  
+  cache_clear()
+  cachedirs <- normalizePath(list.dirs(cache_path(), recursive = FALSE), winslash = "/")
+  test <- all(expecteddirs %in% cachedirs)
+  expect_false(test)
+})
 
 test_that("test cache works within same bbox", {
   browser() ## TODO
