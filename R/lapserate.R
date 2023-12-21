@@ -13,10 +13,10 @@
 recycle_borders <- function(mat, nr, nc) {
   # Instantiate an extended border representation
   res <- matrix(nrow = nr + 2L, ncol = nc + 2L)
-
+  
   # Fill the representation starting with the original data in the center
   res[2L:(nr + 1L), 2L:(nc + 1L)] <- mat
-
+  
   # Recycle the borders
   # North
   res[1L, 2L:(nc + 1L)] <- mat[1L,]
@@ -26,7 +26,7 @@ recycle_borders <- function(mat, nr, nc) {
   res[2L:(nr + 1L), 1L] <- mat[, 1L]
   # East
   res[2L:(nr + 1L), nc + 2L] <- mat[, nc]
-
+  
   # Recycle the corners
   # North-West
   res[1L, 1L] <- mat[1L, 1L]
@@ -36,7 +36,7 @@ recycle_borders <- function(mat, nr, nc) {
   res[(nr + 2L), 1L] <- mat[nr, 1L]
   # South-East
   res[(nr + 2L), (nc + 2L)] <- mat[nr, nc]
-
+  
   return(res)
 }
 
@@ -141,7 +141,7 @@ fitted <- function(x, beta_coef) {
 deltas <- function(mat, nr, nc, NA_replace = TRUE) {
   # Reference values
   ref <- mat[c(-1L, -(nr + 2L)), c(-1L, -(nc + 2L))]
-
+  
   # Surrounding values
   res <- list(
     northwest = mat[-(nr + 1L):-(nr + 2L), -(nc + 1L):-(nc + 2L)] - ref,
@@ -153,12 +153,12 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
     southwest = mat[-1L:-2L, -(nc + 1L):-(nc + 2L)] - ref,
     west      = mat[c(-1L, -(nr + 2L)), -(nc + 1L):-(nc + 2L)] - ref
   )
-
+  
   # Only the deltas are replaced by 0.
   if (isTRUE(NA_replace)) {
     res <- lapply(res, NArep)
   }
-
+  
   return(res)
 }
 
@@ -185,7 +185,7 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize = TRUE) {
   # Transform normal to list, capture names before
   normal_names <- names(normal)
-
+  
   # Validation
   if (nlyr(normal) != 36L || !all(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3))) %in% names(normal))) {
     stop(
@@ -204,7 +204,7 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
     warning("Normal and Digital elevation model rasters have different extents. They must be the same. Resampling dem to match.")
     dem <- resample(dem, normal, method = "bilinear")
   }
-
+  
   # Compute everything related to the dem and independant of normal
   n_r <- nrow(dem)
   n_c <- ncol(dem)
@@ -217,7 +217,7 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
   n_sc <- length(x_i)
   # Sums of x squared
   sum_xx <- sum_matrix(sup(x_i, 2))
-
+  
   if (isTRUE(nthread > 1L)) {
     if (!requireNamespace("parallel")) {
       message("nthreads is >1, but 'parallel' package is not available.")
@@ -236,10 +236,10 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
     } else {
       cl <- parallel::makePSOCKcluster(nthread)
     }
-
+    
     # destroy cluster on exit
     on.exit(parallel::stopCluster(cl), add = TRUE)
-
+    
     res <- parallel::parLapply(
       cl = cl,
       X = shush(lapply(as.list(normal), as.matrix, wide = TRUE)),
@@ -264,7 +264,7 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
       NA_replace = NA_replace
     )
   }
-
+  
   # Transform back into SpatRaster
   if (isTRUE(rasterize)) {
     res <- shush(
@@ -278,10 +278,10 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
     )
     crs(res) <- crs(normal)
   }
-
+  
   # Set names of lapse rates to match normal
   names(res) <- normal_names
-
+  
   return(res)
 }
 
