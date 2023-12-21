@@ -67,11 +67,14 @@ cache_clear <- function(what = c("gcm", "normal", "historic")) {
   
   fileList <- list.files(cache_path())
   fileList <- fileList[fileList %in% what]
-  fileList <- unlist(sapply(file.path(cache_path(), fileList), list.files, 
-                            recursive = TRUE, full.names = TRUE,
-                            simplify = FALSE, USE.NAMES = FALSE))
+  fileList <- unlist(sapply(file.path(cache_path(), fileList), FUN = function(p) {
+    fileList <- list.files(p, recursive = TRUE, full.names = TRUE)
+    folderList <- list.dirs(p, recursive = TRUE, full.names = TRUE)
+    c(fileList, folderList)
+    },
+    simplify = FALSE, USE.NAMES = FALSE))
   unlink(fileList, recursive = TRUE, force = TRUE)
-
+  
   fileList2 <- list.files(cache_path(), recursive = TRUE, full.names = TRUE)
   
   if (any(fileList %in% fileList2)) {
