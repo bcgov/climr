@@ -1,7 +1,8 @@
 utils::globalVariables(c(
   "Period", "Period1", "Period2", "Run",
   "Scenario", "Year", "fullnm", "laynum",
-  "mod", "numlay", "period", "run", "var"
+  "mod", "numlay", "period", "run", "var",
+  "skip_if_not_installed", "..cols", 
 ))
 
 #
