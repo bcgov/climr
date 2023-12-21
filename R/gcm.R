@@ -19,9 +19,9 @@
 #' @export
 gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), period = list_gcm_period(), max_run = 0L, cache = TRUE) {
   # Load each file individually + select layers
-  res <- lapply(gcm, process_one_gcm2, ssp = ssp, period = period,
+  res <- sapply(gcm, process_one_gcm2, ssp = ssp, period = period,
                 bbox = bbox, dbnames = dbnames, dbCon = dbCon, 
-                max_run = max_run, cache = cache)
+                max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE)
   attr(res, "builder") <- "climr"
   
   # Return a list of SpatRaster, one element for each model
