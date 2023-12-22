@@ -1,18 +1,22 @@
-#' Create historic input for `downscale`.
+#' Create historic inputs for `downscale` from PostGIS database.
+#' 
+#' @description
+#' `historic_input` creates inputs from a given historic **period**.
+#' 
+#' @return A `list` of SpatRasters, each with possibly multiple layers, that can
+#'   be used with `downscale`.
 #' 
 #' @template dbCon
 #' @template bbox
 #' @template period
 #' @template cache
 #'
-#' @return A `list` of SpatRasters, each with possibly multiple layers, that can
-#'   be used with `downscale`.
-#'   
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @importFrom data.table fread setorder data.table fwrite
 #' @importFrom uuid UUIDgenerate
+#' @rdname hist-input-data
 #' @export
 historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache = TRUE) {
   dbnames2 <- structure(list(
@@ -71,21 +75,20 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 }
 
 
-#' Create historic timeseries input for `downscale`.
+#' @description
+#' `historic_input` creates inputs from a given historic **time series**.
 #' 
 #' @template dbCon
 #' @template bbox
 #' @template cache
 #' @param years Years to retrieve timeseries for, in `1902:2022`. Default `2010:2022`
 #' 
-#' @return A `list` of SpatRasters, each with possibly multiple layers, that can
-#'   be used with `downscale`.
-#' 
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @importFrom data.table fread setorder data.table fwrite
 #' @importFrom uuid UUIDgenerate
+#' @rdname hist-input-data
 #' @export
 historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRUE) {
   dbcode <- "historic_ts"
@@ -178,12 +181,6 @@ historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRU
 #   return(res)
 #
 # }
-
-#' List available historic periods
-#' @export
-list_historic <- function() {
-  return("2001_2020")
-}
 
 # dat <- rast("../climR-pnw-data/inputs_pkg/historic/Historic_2001_2020/anom_2001_2020.nc")
 # nm <- fread("../climR-pnw-data/inputs_pkg/historic/Historic_2001_2020/anom_2001_2020.csv",header = T)[['x']]

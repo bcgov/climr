@@ -1,4 +1,11 @@
-#' Create gcm input for `downscale` using data on Postgis database.
+#' Create GCM inputs for `downscale` using data on Postgis database.
+#' 
+#' @return A `list` of SpatRasters, each with possibly multiple layers, that can
+#'   be used with `downscale`.
+#' 
+#' @description
+#' `gcm_input` creates GCM climate periods inputs, given chosen GCMs, SSPs, 
+#'  periods and runs.
 #' 
 #' @template dbCon
 #' @template bbox
@@ -8,14 +15,12 @@
 #' @template max_run
 #' @template cache
 #' 
-#' @return A `list` of SpatRasters, each with possibly multiple layers, that can
-#'   be used with `downscale`.
-#' 
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @importFrom uuid UUIDgenerate
 #' @import data.table
+#' @rdname gcm-input-data
 #' @export
 gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), period = list_gcm_period(), max_run = 0L, cache = TRUE) {
   ## checks
@@ -42,7 +47,10 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 }
 
 
-#' Create gcm historic timeseries input for `downscale`
+#' @description
+#' `gcm_hist_input` creates GCM **historic** time series inputs, given chosen GCMs, SSPs, 
+#'  years and runs.
+#'   
 #' @template dbCon
 #' @template bbox
 #' @template gcm
@@ -51,14 +59,12 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 #' @template max_run
 #' @template cache
 #' 
-#' @return A `list` of SpatRasters, each with possibly multiple layers, that can
-#'   be used with `downscale`.
-#' 
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @import uuid
 #' @import data.table
+#' @rdname gcm-input-data
 #' @export
 gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:1950, max_run = 0L, cache = TRUE) {
   # Load each file individually + select layers
@@ -77,7 +83,9 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 # ssp <- c("ssp245","ssp370")
 # period <- 2020:2050
 
-#' Create gcm timeseries input for `downscale` using data on Postgis database.
+#' @description
+#' `gcm_ts_input` creates GCM time series inputs, given chosen GCMs, SSPs, 
+#'  years and runs.
 #' 
 #' @template dbCon
 #' @template bbox
@@ -87,14 +95,12 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 #' @template max_run
 #' @template cache
 #' 
-#' @return A `list` of SpatRasters, each with possibly multiple layers, that can
-#'   be used with `downscale`.
-#' 
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @import uuid
 #' @import data.table
+#' @rdname gcm-input-data
 #' @export
 gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), years = 2020:2030, max_run = 0L, cache = TRUE) {
   if (nrow(dbnames_ts) < 1) stop("That isn't a valid GCM")
@@ -138,75 +144,8 @@ list_unique <- function(files, col_num) {
   return(sort(collection))
 }
 
-#' Read and parse gcm models csv files
+#' Process one GCM at a time
 #' 
-#' @param gcm An optional character vector. Limit list to provided global circulation models.
-#' @param col_num An integer vector.
-#' 
-#' @return A character vector of unique values.
-list_parse <- function(gcm, col_num = 1) {
-  # Default pattern csv extension
-  pattern <- "\\.csv$"
-  
-  # In case we need to filter gcm
-  if (!missing(gcm)) {
-    pattern <- paste0("(", paste0(gcm, collapse = "|"), ").*", pattern)
-  }
-  files <- list.files(
-    file.path(
-      data_path(),
-      getOption("climr.gcm.path", default = "inputs_pkg/gcm")
-    ),
-    recursive = TRUE,
-    full.names = TRUE,
-    pattern = pattern
-  )
-  
-  # Extract all different unique values
-  list_unique(files, col_num)
-}
-
-#' List available global circulation models
-#' 
-#' @export
-list_gcm <- function() {
-  c(
-    "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5", "EC-Earth3", "GISS-E2-1-G",
-    "INM-CM5-0", "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0"
-  )
-  # sort(dbGetQuery(dbCon, "SELECT DISTINCT mod FROM esm_layers_ts")[,1])
-}
-
-#' List available shared socioeconomic pathways
-#' 
-#' @export
-list_ssp <- function() {
-  # sort(dbGetQuery(dbCon, "SELECT DISTINCT scenario FROM esm_layers")[,1])
-  c("ssp126", "ssp245", "ssp370", "ssp585")
-}
-
-#' List available periods
-#' 
-#' @export
-list_gcm_period <- function() {
-  # sort(dbGetQuery(dbCon, "SELECT DISTINCT period FROM esm_layers")[,1])
-  c("2001_2020", "2021_2040", "2041_2060", "2061_2080", "2081_2100")
-}
-
-#' List available runs for a given GCM
-#' 
-#' @template dbCon
-#' @param gcm Character vector to specify requested GCMs
-#' @importFrom RPostgres dbGetQuery
-#' 
-#' @export
-list_run <- function(dbCon, gcm) {
-  sort(dbGetQuery(dbCon, paste0("SELECT DISTINCT run FROM esm_layers WHERE mod IN ('", paste(gcm, collapse = "','", "')")))[, 1])
-}
-
-
-#' TODO: add documentation here
-#'
 #' @template gcm_nm 
 #' @template ssp 
 #' @template bbox
@@ -285,7 +224,7 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
   return(gcm_rast)
 }
 
-#' TODO: add documentation here
+#' Process one historic time series at a time
 #'
 #' @template gcm_nm 
 #' @param years Numeric vector of desired years. Must be in `1851:2015`.
@@ -357,7 +296,7 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
   return(gcm_rast)
 }
 
-#' TODO: add documentation here
+#' Process one GCM time series at a time
 #'
 #' @template gcm_nm
 #' @template ssp 
