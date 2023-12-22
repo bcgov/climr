@@ -1,4 +1,6 @@
 test_that("test normal_input", {
+  testInit("terra")
+  
   dbCon <- data_connect()
   ## smaller example in BC
   xyz <- data.frame(Long = c(-127.70521, -127.62279, -127.56235, -127.7162, 
@@ -32,17 +34,20 @@ test_that("test normal_input", {
     outExt <- ext(normalout)
     expect_true(bbExt <= outExt)
     
-    normal_bc <- normal_input(dbCon = dbCon, bbox = thebb, normal = "normal_bc", cache = TRUE)
-    expect_identical(nlyr(normalout), nlyr(normal_bc))
-    expect_true(all(res(normalout) > res(normal_bc)))
-    
-    expect_error(normal_input(dbCon = dbCon, bbox = thebb,
-                              normal = "normal_test", cache = TRUE))
-    
-    ## TODO: THIS IS FAILING AND IT SHOULDN'T
-    # normal_nobb <- normal_input(dbCon = dbCon, cache = TRUE)
-    
-    ## TODO: using input raster is currently failing
-    # normalout2 <- normal_input(dbCon, thebb, normal = normalout[[1:36]], cache = TRUE)
+    if (normal != "normal_bc") {
+      normal_bc <- normal_input(dbCon = dbCon, bbox = thebb, normal = "normal_bc", cache = TRUE)
+      expect_identical(nlyr(normalout), nlyr(normal_bc))
+      
+      expect_true(all(res(normalout) > res(normal_bc)))
+    }
   })
+  
+  expect_error(normal_input(dbCon = dbCon, bbox = thebb,
+                            normal = "normal_test", cache = TRUE))
+  
+  ## TODO: THIS IS FAILING AND IT SHOULDN'T
+  # normal_nobb <- normal_input(dbCon = dbCon, cache = TRUE)
+  
+  ## TODO: using input raster is currently failing
+  # normalout2 <- normal_input(dbCon, thebb, normal = normalout[[1:36]], cache = TRUE)
 })
