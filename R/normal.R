@@ -44,7 +44,7 @@ normal_input <- function(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE)
       return(res)
     }
   }
-
+  
   message("Downloading new data...")
   res <- pgGetTerra(dbCon, normal, tile = TRUE, boundary = bbox, bands = 1:73)
   names(res) <- c(
