@@ -27,11 +27,21 @@ test_that("test normal_input", {
     expectednames <- c(expectednames, paste0("lr_", expectednames), "dem2_WNA")
     expect_identical(setdiff(expectednames, names(normalout)), character(0))
     expect_identical(setdiff(names(normalout), expectednames), character(0))
+    expect_identical(crs(normalout, proj = TRUE), "+proj=longlat +datum=WGS84 +no_defs")
     
     bbExt <- ext(thebb[4], thebb[3], thebb[2], thebb[1])
     outExt <- ext(normalout)
-    
     expect_true(bbExt <= outExt)
+    
+    normal_bc <- normal_input(dbCon = dbCon, bbox = thebb, normal = "normal_bc", cache = TRUE)
+    expect_identical(nlyr(normalout), nlyr(normal_bc))
+    expect_true(all(res(normalout) > res(normal_bc)))
+    
+    expect_error(normal_input(dbCon = dbCon, bbox = thebb,
+                              normal = "normal_test", cache = TRUE))
+    
+    ## TODO: THIS IS FAILING AND IT SHOULDN'T
+    # normal_nobb <- normal_input(dbCon = dbCon, cache = TRUE)
     
     ## TODO: using input raster is currently failing
     # normalout2 <- normal_input(dbCon, thebb, normal = normalout[[1:36]], cache = TRUE)
