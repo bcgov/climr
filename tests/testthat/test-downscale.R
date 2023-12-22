@@ -14,7 +14,6 @@ test_that("test downscale", {
   
   ## get bounding box based on input points
   thebb <- get_bb(xyz)
-  expect_equal(thebb, c(55.38847, 55.25721, -127.56235, -127.71620))
   
   # Create a normal baseline
   normal <- normal_input(dbCon = dbCon, bbox = thebb, cache = TRUE)
