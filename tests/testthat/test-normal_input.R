@@ -15,7 +15,6 @@ test_that("test normal_input", {
   normals <- as.list(list_normal())
   
   sapply(normals, FUN = function(normal) {
-    browser()
     normalout <- normal_input(dbCon, thebb, normal = normal, cache = TRUE)
     
     expect_true(is(normalout, "SpatRaster"))
