@@ -34,7 +34,8 @@ test_that("test downscale", {
   set.seed(678)
   n <- 4000
   xyz <- data.frame(lon = runif(n, xmin(dem), xmax(dem)), 
-                    lat = runif(n, ymin(dem), ymax(dem)), elev = NA)
+                    lat = runif(n, ymin(dem), ymax(dem)), 
+                    elev = NA)
   xyz[, 3] <- extract(dem, xyz[, 1:2], method = "bilinear")[, -1L]
   expect_false(any(is.na(xyz)))
   
@@ -75,6 +76,5 @@ test_that("test downscale", {
     var = list_variables()[1:3],
     nthread = 2
   )
-  
   testthat::expect_true(all.equal(results2, results3))
 })
