@@ -73,7 +73,7 @@ test_that("test downscale", {
     normal = normal,
     gcm = gcm2_spp2,
     var = list_variables()[1:3],
-    nthread = 4
+    nthread = 2
   )
   
   testthat::expect_true(all.equal(results2, results3))
