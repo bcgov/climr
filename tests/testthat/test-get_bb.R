@@ -9,5 +9,5 @@ xyz <- data.frame(Long = c(-127.70521, -127.62279, -127.56235, -127.7162,
                   Subzone = c("vm1","vm2","vs1",rep("mm",3),"dk","dc"))
 
 thebb <- get_bb(xyz)
-expect_equal(thebb, c(55.38847, 55.25721, -127.56235, -127.71620))
+expect_equal(thebb, c(55.38847, 54.61025, -126.94957, -127.71620))
 })
