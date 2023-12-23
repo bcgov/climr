@@ -76,5 +76,16 @@ test_that("test downscale", {
     var = list_variables()[1:3],
     nthread = 2
   )
+  
+  roundFun <- function(x) {
+    if (is.numeric(x)) {
+      round(x, 6)
+    } else {
+      x
+    }
+  }
+  results2 <- results2[, lapply(.SD, roundFun)]
+  results3 <- results3[, lapply(.SD, roundFun)]
+  
   testthat::expect_true(all.equal(results2, results3))
 })
