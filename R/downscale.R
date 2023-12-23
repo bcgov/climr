@@ -284,11 +284,13 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
     # destroy cluster on exit
     on.exit(parallel::stopCluster(cl), add = TRUE)
     
-    # Pre setting ID for recycling later
-    #xyz[, 4L] <- seq_len(nrow(xyz))
+    ## we need to add ID's before paralellising otherwise we'll get repeated IDs
+    xyz$ID <- 1:nrow(xyz)
+    
     # Reordering on y axis for smaller cropped area and faster
     # sequential reads
     xyz <- xyz[order(xyz[, 2L]),]
+    
     # Split before parallel processing
     xyz <- lapply(
       parallel::splitIndices(nrow(xyz), length(cl)),
