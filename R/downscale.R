@@ -837,6 +837,8 @@ addIDCols <- function(IDCols, results) {
     } else {
       suppressWarnings(results2[, `:=`(x = NULL, y = NULL)])
     }
+  } else {
+    results2 <- results
   }
   return(results2)
 }
