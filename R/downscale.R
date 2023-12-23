@@ -335,9 +335,9 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
     res <- downscale_(xyz, 
                       normal, 
                       gcm, 
-                      historic, 
                       gcm_ts, 
                       gcm_hist, 
+                      historic, 
                       historic_ts, 
                       return_normal, 
                       vars, ppt_lr)
