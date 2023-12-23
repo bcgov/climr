@@ -343,7 +343,8 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
                       vars, ppt_lr)
   }
   
-  setkey(res, "ID")
+  IDcols <- names(res)[!names(res) %in% vars]
+  setkeyv(res, IDcols)
   if (out_spatial) {
     names(xyz)[4] <- "ID"
     res <- as.data.table(xyz)[res, on = "ID"]
