@@ -1,57 +1,91 @@
-test_that("test the whole chain works with all variables", {
-  skip("Run manually")
-
-  # This should run without errors
-
-  # Retrieve package data
-  data_delete(ask = FALSE)
-  data_update()
-
+test_that("test downscale", {
+  testInit("terra")
+  
+  dbCon <- data_connect()
+  
+  xyz <- data.frame(Long = c(-127.70521, -127.62279, -127.56235, -127.7162, 
+                             -127.18585, -127.1254, -126.94957, -126.95507),
+                    Lat = c(55.3557, 55.38847, 55.28537, 55.25721, 
+                            54.88135, 54.65636, 54.6913, 54.61025),
+                    Elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
+                    ID = LETTERS[1:8],
+                    Zone = c(rep("CWH",3), rep("CDF",5)),
+                    Subzone = c("vm1","vm2","vs1",rep("mm",3),"dk","dc"))
+  
+  ## get bounding box based on input points
+  thebb <- get_bb(xyz)
+  
   # Create a normal baseline
-  normal <- normal_input()
-
+  normal <- normal_input(dbCon = dbCon, bbox = thebb, cache = TRUE)
+  
   # Select GCM
-  gcm <- gcm_input(
-    gcm = c("BCC-CSM2-MR", "INM-CM5-0"),
+  gcms <- c("BCC-CSM2-MR", "INM-CM5-0")
+  gcm2_spp2 <- gcm_input(
+    dbCon, 
+    thebb,
+    gcm = gcms,
     ssp = c("ssp126", "ssp370"),
     period = "2041_2060",
     max_run = 2
   )
-
-  # Provide or create a points dataframe (lon, lat, elev)
+  
+  # Resample 4000 points from the available data
+  dem <- normal$dem2_WNA
   set.seed(678)
-  n <- 40000
-  xyz <- data.frame(lon = runif(n, -125, -120), lat = runif(n, 51, 53), elev = numeric(n))
-  xyz[, 3] <- terra::extract(normal[[73]], xyz[, 1:2], method = "bilinear")[, -1L]
-
+  n <- 4000
+  xyz <- data.frame(lon = runif(n, xmin(dem), xmax(dem)), 
+                    lat = runif(n, ymin(dem), ymax(dem)), 
+                    elev = NA)
+  xyz[, 3] <- extract(dem, xyz[, 1:2], method = "bilinear")[, -1L]
+  expect_false(any(is.na(xyz)))
+  
   # Use downscale with all variables
   results <- downscale(
     xyz = xyz,
     normal = normal,
-    gcm = gcm,
+    gcm = gcm2_spp2,
     var = list_variables()
   )
-
+  
+  ## there may be NAs if the points call on areas without data (e.g. ocean and using normal_bc, but points are being BC)
+  ## even with NAs some variables may get a 0 (e.g. DD)
+  ## sanity checks: use points in BC that we know are not NA/0
+  ##    the values should be in similar ranges to climateBC's outputs (use Tonlig Wang's downscaling method in app)
+  
+  ## fix calc_ functions to output NAs and check that NAs match absent data from normal and gcm.
+  
   # Test for creation
   testthat::expect_true(all(list_variables() %in% names(results)))
   # Test for order
   testthat::expect_equal(tail(names(results), length(list_variables())), list_variables())
-
-  # Use downscale with some variables
+  
+  ## we should sanity check the results too
+  
+  ## test parallelisation
   results2 <- downscale(
     xyz = xyz,
     normal = normal,
-    gcm = gcm,
+    gcm = gcm2_spp2,
     var = list_variables()[1:3]
   )
-
+  
   results3 <- downscale(
     xyz = xyz,
     normal = normal,
-    gcm = gcm,
+    gcm = gcm2_spp2,
     var = list_variables()[1:3],
-    nthread = 4
+    nthread = 2
   )
-
+  
+  roundFun <- function(x) {
+    if (is.numeric(x)) {
+      round(x, 6)
+    } else {
+      x
+    }
+  }
+  results2 <- results2[, lapply(.SD, roundFun)]
+  results3 <- results3[, lapply(.SD, roundFun)]
+  
   testthat::expect_true(all.equal(results2, results3))
 })

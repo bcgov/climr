@@ -284,11 +284,13 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
     # destroy cluster on exit
     on.exit(parallel::stopCluster(cl), add = TRUE)
     
-    # Pre setting ID for recycling later
-    #xyz[, 4L] <- seq_len(nrow(xyz))
+    ## we need to add ID's before paralellising otherwise we'll get repeated IDs
+    xyz$ID <- 1:nrow(xyz)
+    
     # Reordering on y axis for smaller cropped area and faster
     # sequential reads
     xyz <- xyz[order(xyz[, 2L]),]
+    
     # Split before parallel processing
     xyz <- lapply(
       parallel::splitIndices(nrow(xyz), length(cl)),
@@ -298,23 +300,32 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
     )
     
     # Parallel processing and recombine
+
+    ## pack rasters for parallelisation
+    normal <- packRasters(normal)
+    gcm <- packRasters(gcm)
+    gcm_ts <- packRasters(gcm_ts)
+    gcm_hist <- packRasters(gcm_hist) 
+    historic <- packRasters(historic)
+    historic_ts <- packRasters(historic_ts) 
+    
+    ## workaround to export function to nodes
+    unpackRasters <- unpackRasters
+    parallel::clusterExport(cl, c("unpackRasters"), envir = environment())
+    
     res <- rbindlist(
-      parallel::parLapply(
+        parallel::parLapply(
         cl = cl,
         X = xyz,
+      # lapply(xyz,  ## testing
+        # FUN = threaded_downscale_,
         fun = threaded_downscale_,
-        normal_path = sources(normal),
-        gcm_paths = lapply(gcm, function(x) {
-          s <- sources(x, bands = TRUE)
-          list(source = unique(s[["source"]]), lyrs = s[["bands"]])
-        }),
-        historic_paths = lapply(historic, function(x) {
-          s <- sources(x, bands = TRUE)
-          list(source = unique(s[["source"]]), lyrs = s[["bands"]])
-        }),
+        normal = normal, 
+        gcm = gcm, 
+        gcm_ts = gcm_ts, 
         gcm_hist = gcm_hist, 
-        gcm_ts = gcm_ts,
-        historic_ts = historic_ts,
+        historic = historic, 
+        historic_ts = historic_ts, 
         return_normal = return_normal, 
         vars = vars,
         ppt_lr = ppt_lr
@@ -326,15 +337,16 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
     res <- downscale_(xyz, 
                       normal, 
                       gcm, 
-                      historic, 
                       gcm_ts, 
                       gcm_hist, 
+                      historic, 
                       historic_ts, 
                       return_normal, 
                       vars, ppt_lr)
   }
   
-  setkey(res, "ID")
+  IDcols <- names(res)[!names(res) %in% vars]
+  setkeyv(res, IDcols)
   if (out_spatial) {
     names(xyz)[4] <- "ID"
     res <- as.data.table(xyz)[res, on = "ID"]
@@ -384,13 +396,14 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
 #' 
 #' @noRd
 #' @inheritParams downscale
+#' @param xyzID same as `xyz`, but with an added "ID" column
 #' 
 #' @return a `data.table`.
 #' 
 #' @import data.table
 #' @importFrom terra crop ext xres yres extract
-downscale_ <- function(xyzID, normal, gcm, historic, 
-                       gcm_ts, gcm_hist, historic_ts, return_normal, 
+downscale_ <- function(xyzID, normal, gcm, gcm_ts, gcm_hist, 
+                       historic, historic_ts, return_normal, 
                        vars, ppt_lr = FALSE) {
   # print(xyzID)
   # Define normal extent
@@ -538,37 +551,34 @@ downscale_ <- function(xyzID, normal, gcm, historic,
 }
 
 
-#' TODO: fill documentation here
+#' Wrapper function for `downscale_` for parallelising
 #' 
-#' @param normal_path TODO
-#' @param gcm_paths TODO
-#' @param historic_paths TODO
+#' @inheritParams downscale
 #' @param ... further arguments passed to `downscale_`
 #'
 #' @return A `data.table`
 #' 
 #' @importFrom data.table getDTthreads setDTthreads
 #' @importFrom terra rast
-threaded_downscale_ <- function(normal_path, gcm_paths, historic_paths, ...) {
-  
+threaded_downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist, historic, historic_ts, ...) {
+  ## unpack rasters
+  normal <- unpackRasters(normal)
+  gcm <- unpackRasters(gcm)
+  gcm_ts <- unpackRasters(gcm_ts)
+  gcm_hist <- unpackRasters(gcm_hist) 
+  historic <- unpackRasters(historic)
+  historic_ts <- unpackRasters(historic_ts) 
+
   # Set DT threads to 1 in parallel to avoid overloading CPU
   # Not needed for forking, not taking any chances
   dt_nt <- getDTthreads()
   setDTthreads(1)
   on.exit(setDTthreads(dt_nt))
   
-  # Reload SpatRaster pointers
-  normal <- rast(normal_path)
-  gcm <- lapply(gcm_paths, function(x) {
-    rast(x[["source"]], lyrs = x[["lyrs"]])
-  })
-  historic <- lapply(historic_paths, function(x) {
-    rast(x[["source"]], lyrs = x[["lyrs"]])
-  })
-  
   # Downscale
-  res <- downscale_(normal = normal, gcm = gcm, historic = historic, ...)
-  
+  res <- downscale_(xyzID = xyz, normal = normal, gcm = gcm, 
+                    gcm_ts = gcm_ts, gcm_hist = gcm_hist, 
+                    historic = historic, historic_ts = historic_ts, ...)
   return(res)
 }
 
@@ -841,4 +851,44 @@ addIDCols <- function(IDCols, results) {
     results2 <- results
   }
   return(results2)
+}
+
+
+#' Pack rasters for parallel computing
+#'
+#' @param ras a SpatRaster or list of SpatRasters, or `NULL`
+#'
+#' @return `NULL`, a packed SpatRaster or list of packed SpatRaters
+#'
+#' @importFrom terra wrap
+packRasters <- function(ras) {
+  if (!is.null(ras)) {
+    if (is(ras, "SpatRaster")) {
+      ras <- wrap(ras)
+    }  
+    if (is(ras, "list")) {
+      ras <- sapply(ras, wrap, USE.NAMES = TRUE, simplify = FALSE)
+    }
+  }
+ return(ras)
+}
+
+
+#' Pack rasters for parallel computing
+#'
+#' @param ras a SpatRaster or list of SpatRasters, or `NULL`
+#'
+#' @return `NULL`, a packed SpatRaster or list of packed SpatRaters
+#'
+#' @importFrom terra unwrap
+unpackRasters <- function(ras) {
+  if (!is.null(ras)) {
+    if (is(ras, "PackedSpatRaster")) {
+      ras <- unwrap(ras)
+    }  
+    if (is(ras, "list")) {
+      ras <- sapply(ras, unwrap, USE.NAMES = TRUE, simplify = FALSE)
+    }
+  }
+  return(ras)
 }
