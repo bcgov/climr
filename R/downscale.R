@@ -317,6 +317,8 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
         parallel::parLapply(
         cl = cl,
         X = xyz,
+      # lapply(xyz,  ## testing
+        # FUN = threaded_downscale_,
         fun = threaded_downscale_,
         normal = normal, 
         gcm = gcm, 
