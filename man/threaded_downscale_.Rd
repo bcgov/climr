@@ -2,16 +2,33 @@
 % Please edit documentation in R/downscale.R
 \name{threaded_downscale_}
 \alias{threaded_downscale_}
-\title{TODO: fill documentation here}
+\title{Wrapper function for \code{downscale_} for parallelising}
 \usage{
-threaded_downscale_(normal_path, gcm_paths, historic_paths, ...)
+threaded_downscale_(
+  xyz,
+  normal,
+  gcm,
+  gcm_ts,
+  gcm_hist,
+  historic,
+  historic_ts,
+  ...
+)
 }
 \arguments{
-\item{normal_path}{TODO}
+\item{xyz}{A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).}
 
-\item{gcm_paths}{TODO}
+\item{normal}{Reference normal baseline input from \code{normal_input}.}
 
-\item{historic_paths}{TODO}
+\item{gcm}{Global Circulation Models input from \code{gcm_input}. Default to NULL.}
+
+\item{gcm_ts}{TODO}
+
+\item{gcm_hist}{TODO}
+
+\item{historic}{Historic time period input from \code{historic_input}. Default to NULL}
+
+\item{historic_ts}{TODO}
 
 \item{...}{further arguments passed to \code{downscale_}}
 }
@@ -19,5 +36,5 @@ threaded_downscale_(normal_path, gcm_paths, historic_paths, ...)
 A \code{data.table}
 }
 \description{
-TODO: fill documentation here
+Wrapper function for \code{downscale_} for parallelising
 }

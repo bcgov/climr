@@ -13,8 +13,8 @@
 #' @importFrom uuid UUIDgenerate
 #' @rdname normal-input-data
 #' @export
-normal_input <- function(dbCon, bbox = NULL, normal = "normal_na",
-                         cache = TRUE) {
+normal_input <- function(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE) {
+  ## checks
   if (is(normal, "character")) {
     match.arg(normal, list_normal())
   } else {
@@ -22,6 +22,10 @@ normal_input <- function(dbCon, bbox = NULL, normal = "normal_na",
       stop("'normal' must be one of 'list_normal()' or a SpatRaster with 36 layers",
            " of normal climate variables")
     }
+  }
+  
+  if (!is(cache, "logical")) {
+    stop("please pass a logical value to 'cache'")
   }
   
   ## check cached
@@ -41,7 +45,7 @@ normal_input <- function(dbCon, bbox = NULL, normal = "normal_na",
       return(res)
     }
   }
-
+  
   message("Downloading new data...")
   res <- pgGetTerra(dbCon, normal, tile = TRUE, boundary = bbox, bands = 1:73)
   names(res) <- c(
