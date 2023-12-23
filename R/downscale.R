@@ -391,6 +391,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
 #' 
 #' @noRd
 #' @inheritParams downscale
+#' @param xyzID same as `xyz`, but with an added "ID" column
 #' 
 #' @return a `data.table`.
 #' 
@@ -545,11 +546,9 @@ downscale_ <- function(xyzID, normal, gcm, historic,
 }
 
 
-#' TODO: fill documentation here
+#' Wrapper function for `downscale_` for parallelising
 #' 
-#' @param normal_path TODO
-#' @param gcm_paths TODO
-#' @param historic_paths TODO
+#' @inheritParams downscale
 #' @param ... further arguments passed to `downscale_`
 #'
 #' @return A `data.table`
