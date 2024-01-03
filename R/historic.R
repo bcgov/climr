@@ -8,7 +8,8 @@
 #' 
 #' @template dbCon
 #' @template bbox
-#' @template period
+#' @param period  character vector. Label of the period to use. 
+#'   Can be obtained from list_historic(). Default to "2001_2020".
 #' @template cache
 #'
 #' @importFrom terra rast writeRaster ext nlyr
