@@ -2,7 +2,7 @@
 #' ## TODO: check that their removal doesn't break the code
 #' 
 #' #' Get content from source
-#' #' @param path File path relative to repo root without starting `/`.
+#' #' @param path character. ile path relative to repo root without starting `/`.
 #' #' @param source A character. Name of the content source. Only supports
 #' #' "github" as of now.
 #' #' @param ... Extra arguments for `content_get` source dependent functions.

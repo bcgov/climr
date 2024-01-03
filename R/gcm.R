@@ -54,7 +54,7 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 #' @template dbCon
 #' @template bbox
 #' @template gcm
-#' @param years Numeric vector of desired years. Must be in `1851:2015`.
+#' @param years numeric. Vector of desired years. Must be in `1851:2015`.
 #'   Can be obtained from `list_gcm_period()`. Default to `list_gcm_period()`.
 #' @template max_run
 #' @template cache
@@ -117,8 +117,8 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(),
 
 #' Read and parse gcm models csv files
 #' 
-#' @param files A character vector. File paths.
-#' @param col_num An integer vector. Positions of elements to retrieve in label. Label is split
+#' @param files character. A vector of file paths.
+#' @param col_num integer. Vector of indices of elements to retrieve in label. Label is split
 #'   by "_" before processing.
 #'   
 #' @return A character vector of unique values.
@@ -227,7 +227,7 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
 #' Process one historic time series at a time
 #'
 #' @template gcm_nm 
-#' @param years Numeric vector of desired years. Must be in `1851:2015`.
+#' @param years numeric. Vector of desired years. Must be in `1851:2015`.
 #'   Can be obtained from `list_gcm_period()`. Default to `list_gcm_period()`.
 #' @template dbCon 
 #' @template bbox 
@@ -302,8 +302,8 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
 #' @template ssp 
 #' @template period 
 #' @template max_run
-#' @param dbnames #' @param dbnames `data.frame` with the list of available GCMs (time series)
-#'   projections) and their corresponding names in the PostGIS data base. See climr:::dbnames_ts
+#' @param dbnames `data.frame` with the list of available GCMs (time series projections)
+#'   and their corresponding names in the PostGIS data base. See climr:::dbnames_ts
 #' @template bbox 
 #' @template dbCon 
 #' @template cache 

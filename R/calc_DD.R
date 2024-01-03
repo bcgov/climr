@@ -64,7 +64,7 @@ calc_DD_below_0 <- function(m, tm) {
 #'
 #' @param m month of the year
 #' @param tm monthly mean temperature for the `m` month
-#' @param region one of either "All", "West", "East"
+#' @param region character. One of either "All", "West", "East".
 #'
 #' @return Degree-Days Above 5
 #'
@@ -124,7 +124,7 @@ calc_DD_below_18 <- function(m, tm) {
 #'
 #' @param m month of the year
 #' @param tm monthly mean temperature for the `m` month
-#' @param region one of either "All", "South west", "The rest"
+#' @param region character. One of either "All", "South west", "The rest".
 #'
 #' @return Degree-Days Above 18
 #'
