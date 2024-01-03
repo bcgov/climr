@@ -1,4 +1,7 @@
-#' Downscale and Calculate climate variables for points of interest
+#' Climate variable downscaling
+#' 
+#' @description
+#' `climr_downscale` downscales and calculates climate variables for points of interest.
 #' 
 #' @details
 #' Additional details... TODO.
@@ -32,7 +35,7 @@
 #' @examples {
 #'   ## TODO.
 #' }
-#'
+#' @rdname downscaling
 #' @export
 climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), historic_period = NULL, historic_ts = NULL,
                             gcm_models = NULL, ssp = c("ssp126", "ssp245", "ssp370", "ssp585"),
@@ -191,7 +194,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 }
 
 
-#' Downscale target rasters to points of interest
+#' @description `downscale` downscales target rasters to points of interest.
 #' 
 #' @details
 #'   Additional details... TODO.
@@ -222,6 +225,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #'   this returns a downscaled dataset for each point location, general circulation 
 #'   model (GCM), shared socioeconomic pathway (SSP), run and period.
 #' 
+#' @rdname downscaling
 #' @export
 #' @examples
 #' \dontrun{
