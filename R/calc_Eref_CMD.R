@@ -39,7 +39,7 @@ calc_CMD <- function(Eref, PPT) {
 }
 
 #' PROGRAM I From Hargreaves 1985
-#' @param d julian day of the year (January 1 = 1, Decembre 31 = 365)
+#' @param d numeric. Julian day of the year (January 1 = 1, December 31 = 365).
 #' @param tmean mean temperature for that month
 #' @param latitude point latitudes
 #' @return Extraterrestrial radiation estimation in mm/day

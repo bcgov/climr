@@ -24,7 +24,7 @@ cache_exists <- function() {
 #' Ask if user want to use local cache, otherwise use a temporary directory.
 #' 
 #' @noRd
-#' @param ask A boolean. Ask before deleting files. Default to `interactive()`.
+#' @param ask logical. Ask before deleting files. Default to `interactive()`.
 #' 
 #' @return logical
 #' 

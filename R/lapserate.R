@@ -3,9 +3,9 @@
 #' Recycle the borders of matrix to expand the matrix by one cell in each directions
 #' It will help later with the offset approach.
 #'
-#' @param mat A matrix to recycle borders from.
-#' @param nr The number of rows in the matrix.
-#' @param nc The number of columns in the matrix.
+#' @param mat A `matrix` to recycle borders from.
+#' @param nr integer. The number of rows in the matrix.
+#' @param nc integer. The number of columns in the matrix.
 #'
 #' @return a `matrix`. The expanded `mat`.
 #'
@@ -44,7 +44,7 @@ recycle_borders <- function(mat, nr, nc) {
 #'
 #' Returns a single matrix containing the sums of matching row, cell
 #' in the list of matrices.
-#' @param x A list of matrices of the same dimensions
+#' @param x A `list` of matrices of the same dimensions
 #'
 #' @return a `matrix`.
 #' @noRd
@@ -59,8 +59,8 @@ sum_matrix <- function(x) {
 #'   individual corresponding cells from each \eqn(x_{i}) matrix and \eqn(y_{i}) matrix,
 #'   where *i* is the ith matrix in each list.
 #'
-#' @param x A list of matrices of the same dimensions.
-#' @param y A list of matrices of the same dimensions as x and the same
+#' @param x A `list` of matrices of the same dimensions.
+#' @param y A `list` of matrices of the same dimensions as x and the same
 #' length as x.
 #' 
 #' @return a `list` of matrices. 
@@ -78,8 +78,8 @@ prod_matrix <- function(x, y) {
 #'   individual corresponding cells from each \eqn(x_{i}) matrix and \eqn(y_{i}) matrix,
 #'   where *i* is the ith matrix in each list.
 #'
-#' @param x A list of matrices of the same dimensions.
-#' @param y A list of matrices of the same dimensions as x and the same
+#' @param x A `list` of matrices of the same dimensions.
+#' @param y A `list` of matrices of the same dimensions as x and the same
 #' length as x.
 #' 
 #' @return a `list` of matrices. 
@@ -95,8 +95,8 @@ delta_matrix <- function(x, y) {
 #'  This returns a list of matrices after applying exponent `exp` to each
 #'  matrix cell
 #'  
-#' @param x A list of matrices.
-#' @param exp A numeric vector of length 1.
+#' @param x A `list` of matrices.
+#' @param exp numeric. The exponent value.
 #' 
 #' @return a `list` of matrices. 
 #' 
@@ -110,8 +110,8 @@ sup <- function(x, exp) {
 #' Returns the predicted simple linear regression values using
 #'   a pre-calculated beta coefficient matrix.
 #'   
-#' @param x A list of matrices of the same dimensions.
-#' @param beta_coef A matrix of beta coefficients, with the same dimensions as
+#' @param x A `list` of matrices of the same dimensions.
+#' @param beta_coef A `matrix` of beta coefficients, with the same dimensions as
 #'   the matrices in x.
 #'   
 #' @return a `list` of predicted values. 
@@ -129,10 +129,10 @@ fitted <- function(x, beta_coef) {
 #'   each cell and its immediate neighbours.
 #'   It uses an offset approach to compute surrounding cells in each directions.
 #'
-#' @param mat the output matrix of `recycle_borders`
-#' @param nr The number of rows in the original matrix used by `recycle_borders`
-#' @param nc The number of columns in the original matrix used by `recycle_borders`
-#' @param NA_replace A boolean. Should NA delta results be replaced by zeros.
+#' @param mat the output `matrix` of `recycle_borders`
+#' @param nr integer. The number of rows in the original matrix used by `recycle_borders`
+#' @param nc integer. The number of columns in the original matrix used by `recycle_borders`
+#' @param NA_replace logical. Should NA delta results be replaced by zeros.
 #'   Defaults to TRUE.
 #'  
 #' @return a `list` of matrices.  
@@ -164,11 +164,12 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 
 #' Lapse rate computation
 #' 
-#' @param normal Normal rasters to compute lapse rates for. Build with this package functions.
+#' @param normal a `SpatRaster` stack. Normal rasters to compute lapse rates for. Build with this package functions.
 #' @template dem
-#' @param NA_replace A boolean. Should NA lapse rate results be replaced by zeros. Default to TRUE.
-#' @param nthread An integer. Number of parallel threads to use to compute lapse rates.
-#' @param rasterize Return an object of the same class category as normal with the same extend.
+#' @param NA_replace logical. Should NA lapse rate results be replaced by zeros. Default to TRUE.
+#' @param nthread integer. Number of parallel threads to use to compute lapse rates.
+#' @param rasterize logical. Return an object of the same class category as normal with the same extent?
+#'    Default to `TRUE`.
 #'
 #' @details Formulas
 #'   Simple linear regression without the intercept term

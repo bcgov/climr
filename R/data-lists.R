@@ -74,7 +74,7 @@ list_historic <- function() {
 #' @description
 #' `list_variables` lists climate variables
 #' 
-#' @param only_extra A boolean. Should Tmin, Tmax and PPT be excluded? Defaults to FALSE.
+#' @param only_extra logical. Should Tmin, Tmax and PPT be excluded? Defaults to FALSE.
 #' 
 #' @rdname data-option-lists
 #' @export

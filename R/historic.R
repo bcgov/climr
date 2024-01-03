@@ -86,7 +86,7 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 #' @template dbCon
 #' @template bbox
 #' @template cache
-#' @param years Years to retrieve timeseries for, in `1902:2022`. Default `2010:2022`
+#' @param years numeric. Years to retrieve timeseries for, in `1902:2022`. Default `2010:2022`
 #' 
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head tail
