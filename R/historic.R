@@ -41,7 +41,9 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
         message("Retrieving from cache...")
         hist_rast <- rast(paste0(cache_path(), "/historic/", dbcode, "/", oldid, ".tif"))
         attr(hist_rast, "builder") <- "climr"
-        return(list(hist_rast))
+        hist_rast <- list(hist_rast)
+        names(hist_rast) <- period
+        return(hist_rast)
       } else {
         message("Not fully cached :( Will download more")
       }
@@ -71,8 +73,9 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
   }
 
   attr(hist_rast, "builder") <- "climr"
-  browser() ## TODO check list names
-  return(list(hist_rast))
+  hist_rast <- list(hist_rast)
+  names(hist_rast) <- period
+  return(hist_rast)
 }
 
 
@@ -109,7 +112,9 @@ historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRU
         message("Retrieving from cache...")
         hist_rast <- rast(paste0(cache_path(), "/historic_ts/", ts_name, "/", oldid, ".tif"))
         attr(hist_rast, "builder") <- "climr"
-        return(list(hist_rast))
+        hist_rast <- list(hist_rast)
+        names(hist_rast) <- paste(years[1], tail(years, 1), sep = ":")
+        return(hist_rast)
       } else {
         message("Not fully cached :( Will download more")
       }
@@ -139,8 +144,9 @@ historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRU
   }
 
   attr(hist_rast, "builder") <- "climr"
-  browser() ## TODO check list names
-  return(list(hist_rast))
+  hist_rast <- list(hist_rast)
+  names(hist_rast) <- paste(years[1], tail(years, 1), sep = ":")
+  return(hist_rast)
 }
 
 
