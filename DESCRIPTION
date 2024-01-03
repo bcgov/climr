@@ -26,7 +26,6 @@ RoxygenNote: 7.2.3
 Imports: 
     data.table,
     DBI,
-    gh,
     methods,
     pool,
     RPostgres,

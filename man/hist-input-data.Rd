@@ -14,8 +14,8 @@ historic_input_ts(dbCon, bbox = NULL, years = 2010:2022, cache = TRUE)
 
 \item{bbox}{Numeric vector of length 4 giving bounding box of study region, created by \code{get_bb()}.}
 
-\item{period}{A character vector. Label of the period to use.
-Can be obtained from \code{list_gcm_period()}. Default to \code{list_gcm_period()}.}
+\item{period}{character vector. Label of the period to use.
+Can be obtained from list_historic(). Default to "2001_2020".}
 
 \item{cache}{Logical specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 
