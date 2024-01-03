@@ -682,21 +682,3 @@ append_clim_vars <- function(dt, vars) {
   # Reorder to match vars
   setcolorder(dt, c(names(dt)[names(dt) %in% c("ID", "GCM", "SSP", "RUN", "PERIOD")], vars))
 }
-
-#' List climate variables
-#' 
-#' @param only_extra A boolean. Should Tmin, Tmax and PPT be excluded? Defaults to FALSE.
-#' 
-#' @return a character vector
-#' 
-#' @export
-list_variables <- function(only_extra = FALSE) {
-  if (FALSE) {
-    variables <- NULL
-  }
-  res <- variables[["Code"]]
-  if (isTRUE(only_extra)) {
-    res <- res[!grepl("(^PPT|^Tmax|^Tmin)", res)]
-  }
-  return(sort(unique(res)))
-}

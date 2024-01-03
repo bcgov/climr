@@ -65,6 +65,7 @@ expect_true(all(test[, .N, by = ID][, N] == 1))
 
 if (interactive()) {
   ## check plots
+  x11()
   ds_hist_spatial2 <- climr_downscale(xyz = xyz, which_normal = "auto",
                                       historic_period = "2001_2020", return_normal = TRUE,
                                       vars = c("PPT","CMD","CMI","Tave01","Tave07"),
