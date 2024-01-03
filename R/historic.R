@@ -89,7 +89,7 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 #' @param years Years to retrieve timeseries for, in `1902:2022`. Default `2010:2022`
 #' 
 #' @importFrom terra rast writeRaster ext nlyr
-#' @importFrom utils head
+#' @importFrom utils head tail
 #' @importFrom RPostgres dbGetQuery
 #' @importFrom data.table fread setorder data.table fwrite
 #' @importFrom uuid UUIDgenerate

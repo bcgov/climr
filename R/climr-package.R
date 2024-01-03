@@ -6,7 +6,7 @@
   rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
   
   if (!dir.exists(rInfoPath)){
-    message("Downloading and Caching ESM run info :)")
+    packageStartupMessage("Downloading and Caching ESM run info :)")
     dbCon <- data_connect()
     if (is.null(dbCon)){
       warning("Could not connect to server. Only cached normal periods will be available.")
