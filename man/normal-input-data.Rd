@@ -2,7 +2,7 @@
 % Please edit documentation in R/normal.R
 \name{normal_input}
 \alias{normal_input}
-\title{Create normal baseline input for \code{downscale} from PostGIS database.}
+\title{Create normal baseline inputs for \code{downscale} from PostGIS database.}
 \usage{
 normal_input(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE)
 }
@@ -22,5 +22,5 @@ A \code{SpatRaster} containing normals, lapse rates
 and digital elevation model layers, that can be used with \code{downscale}.
 }
 \description{
-Create normal baseline input for \code{downscale} from PostGIS database.
+Create normal baseline inputs for \code{downscale} from PostGIS database.
 }
