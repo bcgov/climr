@@ -8,7 +8,7 @@
 #' 
 #' @template dbCon
 #' @template bbox
-#' @template period character. Vector of labels of the periods to use. 
+#' @param period character. Vector of labels of the periods to use. 
 #'   Can be obtained from `list_historic()`. Default to "2001_2020".
 #' @template cache
 #'
