@@ -179,7 +179,7 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 #'   R² = mss / (mss + rss)
 #'   Lapse rate = beta_coef * R²
 
-#' @return SpatRaster of lapse rate values.
+#' @return `SpatRaster` of lapse rate values.
 #'
 #' @importFrom terra as.list as.matrix ext nlyr compareGeom resample rast crs crs<-
 #' @export

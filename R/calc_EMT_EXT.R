@@ -3,7 +3,7 @@
 #' @template t_min_list
 #' @template td
 #'
-#' @return Extreme Minimum Temperature
+#' @return numeric. Extreme Minimum Temperature
 #'
 calc_EMT <- function(t_min_list, td) {
   tmin1 <- t_min_list[[1]]
@@ -21,7 +21,7 @@ calc_EMT <- function(t_min_list, td) {
 #' @param t_max_list A `list` of monthly maximum temperature for each month in order
 #' @template td
 #'
-#' @return Extreme Maximum Temperature
+#' @return numeric. Extreme Maximum Temperature
 #'
 calc_EXT <- function(t_max_list, td) {
   tmax7 <- t_max_list[[7]]

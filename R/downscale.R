@@ -402,7 +402,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
 #' @inheritParams downscale
 #' @param xyzID same as `xyz`, but with an added "ID" column
 #' 
-#' @return a `data.table`.
+#' @return A `data.table`.
 #' 
 #' @import data.table
 #' @importFrom terra crop ext xres yres extract
@@ -862,7 +862,7 @@ addIDCols <- function(IDCols, results) {
 #'
 #' @param ras a `SpatRaster` or list of `SpatRasters`, or `NULL`
 #'
-#' @return `NULL`, a packed SpatRaster or list of packed SpatRaters
+#' @return `NULL`, a packed `SpatRaster` or list of packed `SpatRasters`
 #'
 #' @importFrom terra wrap
 packRasters <- function(ras) {
@@ -882,7 +882,7 @@ packRasters <- function(ras) {
 #'
 #' @param ras a `SpatRaster` or list of `SpatRasters`, or `NULL`
 #'
-#' @return `NULL`, a packed SpatRaster or list of packed SpatRaters
+#' @return `NULL`, a `PackedSpatRaster` or list of `PackedSpatRasters`
 #'
 #' @importFrom terra unwrap
 unpackRasters <- function(ras) {

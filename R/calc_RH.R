@@ -3,7 +3,7 @@
 #' @param tmin monthly mean minimum air temperature
 #' @param tmax monthly mean maximum air temperature
 #'
-#' @return Relative Humidity
+#' @return numeric. Relative Humidity
 #'
 #' @examples
 #' \dontrun{

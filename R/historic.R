@@ -3,7 +3,7 @@
 #' @description
 #' `historic_input` creates inputs from a given historic **period**.
 #' 
-#' @return A `list` of SpatRasters, each with possibly multiple layers, that can
+#' @return A `list` of `SpatRasters`, each with possibly multiple layers, that can
 #'   be used with `downscale`.
 #' 
 #' @template dbCon
