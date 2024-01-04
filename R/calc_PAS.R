@@ -2,7 +2,7 @@
 #'
 #' @template m
 #' @param tm min temperature for that month
-#' @template PPT
+#' @param ppt numeric. Precipitation in mm.
 #'
 #' @return numeric. Precipitation As Snow
 #'
