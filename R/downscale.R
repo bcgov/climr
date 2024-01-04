@@ -203,7 +203,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' @param normal `SpatRaster`. Reference normal baseline input from `normal_input`.
 #' @param gcm `list` of `SpatRasters`. Global Circulation Models outputs from `gcm_input`. Default to `NULL`.
 #' @param historic `list` of `SpatRasters`. Historic time period outputs from `historic_input`. Default to `NULL`.
-#' @param gcm_ts TODO
+#' @param gcm_ts `list` of `SpatRasters`. TODO
 #' @param gcm_hist `list` of `SpatRasters`. TODO
 #' @param historic_ts `list` of `SpatRasters`. TODO
 #' @template return_normal
@@ -211,7 +211,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #'   can be obtained with `list_variables()`. Definitions can be found in this package
 #'  `variables` dataset. Default to monthly PPT, Tmax, Tmin.
 #' @param ppt_lr logical. Apply lapse rate adjustment to precipitations. Default to FALSE.
-#' @param nthread An integer. Number of parallel threads to use to do computations. Default to 1L.
+#' @param nthread integer. Number of parallel threads to use to do computations. Default to 1L.
 #' @template out_spatial
 #' @template plot
 #' 
