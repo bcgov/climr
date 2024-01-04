@@ -206,7 +206,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' @param gcm_ts TODO
 #' @param gcm_hist `list` of `SpatRasters`. TODO
 #' @param historic_ts `list` of `SpatRasters`. TODO
-#' @param return_normal TODO
+#' @template return_normal
 #' @param vars character. A vector of climate variables to compute. Supported variables
 #'   can be obtained with `list_variables()`. Definitions can be found in this package
 #'  `variables` dataset. Default to monthly PPT, Tmax, Tmin.
