@@ -1,7 +1,7 @@
 #' Calculate Extreme Minimum Temperature (EMT)
 #'
-#' @param t_min_list list of monthly minimum temperature for each month in order
-#' @param td difference between the mean warmest monthly temperature and the mean coldest monthly temperature
+#' @template t_min_list
+#' @template td
 #'
 #' @return Extreme Minimum Temperature
 #'
@@ -19,7 +19,7 @@ calc_EMT <- function(t_min_list, td) {
 #' Calculate Extreme Maximum Temperature
 #'
 #' @param t_max_list A `list` of monthly maximum temperature for each month in order
-#' @param td difference between the mean warmest monthly temperature and the mean coldest monthly temperature
+#' @template td
 #'
 #' @return Extreme Maximum Temperature
 #'
