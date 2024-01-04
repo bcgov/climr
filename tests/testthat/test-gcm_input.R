@@ -35,8 +35,11 @@ test_that("test the whole chain works with all variables", {
       max_run = x$max_runs,
       cache = TRUE
     )
-    
+
     testOut <- sapply(gcm, FUN = function(gcm) {
+      
+      expect_true(is(gcm, "SpatRaster"))
+      
       test <- all(grepl(paste(x$ssps, collapse = "|"), names(gcm)))
       test2 <- all(grepl(paste(x$periods, collapse = "|"), names(gcm)))
       
