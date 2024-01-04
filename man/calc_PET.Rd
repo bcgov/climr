@@ -4,16 +4,16 @@
 \alias{calc_PET}
 \title{Calculate Potential Evapotranspiration}
 \usage{
-calc_PET(tave, tmin, tmax, alt)
+calc_PET(tave, tmmin, tmmax, alt)
 }
 \arguments{
-\item{tave}{monthly average minimum air temperature}
+\item{tave}{numeric. Monthly average minimum air temperature.}
 
-\item{tmin}{monthly mean minimum air temperature}
+\item{tmmin}{numeric. Monthly mean minimum air temperature.}
 
-\item{tmax}{monthly mean maximum air temperature}
+\item{tmmax}{numeric. Monthly mean maximum air temperature.}
 
-\item{alt}{numeric. ?}
+\item{alt}{numeric. Altitude in m.}
 }
 \description{
 Based on simplified Penman - Monteith method from Hogg (1997)

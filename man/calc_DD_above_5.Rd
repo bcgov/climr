@@ -7,14 +7,14 @@
 calc_DD_above_5(m, tm, region)
 }
 \arguments{
-\item{m}{month of the year}
+\item{m}{integer. Month of the year.}
 
-\item{tm}{monthly mean temperature for the \code{m} month}
+\item{tm}{numeric. Monthly mean temperature for the \code{m} month.}
 
-\item{region}{one of either "All", "West", "East"}
+\item{region}{character. One of either "All", "West", "East".}
 }
 \value{
-Degree-Days Above 5
+numeric. Degree-Days Above 5
 }
 \description{
 Calculate Degree-Day Above 5 (DD>5)

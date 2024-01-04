@@ -17,12 +17,12 @@ process_one_gcm3(
 \arguments{
 \item{gcm_nm}{character. Name of GCM to use.}
 
-\item{years}{Numeric vector of desired years. Must be in \code{1851:2015}.
+\item{years}{numeric. Vector of desired years. Must be in \code{1851:2015}.
 Can be obtained from \code{list_gcm_period()}. Default to \code{list_gcm_period()}.}
 
 \item{dbCon}{A db connection object created by \code{data_connect}.}
 
-\item{bbox}{Numeric vector of length 4 giving bounding box of study region, created by \code{get_bb()}.}
+\item{bbox}{numeric. Vector of length 4 giving bounding box of study region, created by \code{get_bb()}.}
 
 \item{max_run}{integer. Maximum number of model runs to include.
 A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
@@ -31,10 +31,10 @@ are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 \item{dbnames}{\code{data.frame} with the list of available GCMs (historical projections)
 and their corresponding names in the PostGIS data base. See climr:::dbnames_hist}
 
-\item{cache}{Logical specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
+\item{cache}{logical. Specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 }
 \value{
-SpatRaster
+\code{SpatRaster}
 }
 \description{
 Process one historic time series at a time

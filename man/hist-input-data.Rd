@@ -12,17 +12,17 @@ historic_input_ts(dbCon, bbox = NULL, years = 2010:2022, cache = TRUE)
 \arguments{
 \item{dbCon}{A db connection object created by \code{data_connect}.}
 
-\item{bbox}{Numeric vector of length 4 giving bounding box of study region, created by \code{get_bb()}.}
+\item{bbox}{numeric. Vector of length 4 giving bounding box of study region, created by \code{get_bb()}.}
 
-\item{period}{character vector. Label of the period to use.
-Can be obtained from list_historic(). Default to "2001_2020".}
+\item{period}{character. Vector of labels of the periods to use.
+Can be obtained from \code{list_historic()}. Default to "2001_2020".}
 
-\item{cache}{Logical specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
+\item{cache}{logical. Specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 
-\item{years}{Years to retrieve timeseries for, in \code{1902:2022}. Default \code{2010:2022}}
+\item{years}{numeric. Years to retrieve timeseries for, in \code{1902:2022}. Default \code{2010:2022}}
 }
 \value{
-A \code{list} of SpatRasters, each with possibly multiple layers, that can
+A \code{list} of \code{SpatRasters}, each with possibly multiple layers, that can
 be used with \code{downscale}.
 }
 \description{
