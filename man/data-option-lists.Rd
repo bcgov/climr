@@ -29,7 +29,7 @@ list_variables(only_extra = FALSE)
 
 \item{gcm}{Character vector to specify requested GCMs}
 
-\item{only_extra}{A boolean. Should Tmin, Tmax and PPT be excluded? Defaults to FALSE.}
+\item{only_extra}{logical. Should Tmin, Tmax and PPT be excluded? Defaults to FALSE.}
 }
 \value{
 a character vector.

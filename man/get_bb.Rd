@@ -10,7 +10,7 @@ get_bb(in_xyz)
 \item{in_xyz}{\code{data.table} (or \code{data.frame}) of points to downscale}
 }
 \value{
-bounding box (e.g. c(51,50,-121,-122))
+integer. A bounding box (e.g. \code{c(51,50,-121,-122)})
 }
 \description{
 Find bounding box of data

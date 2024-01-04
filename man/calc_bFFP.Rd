@@ -7,14 +7,15 @@
 calc_bFFP(td, NFFD, t_min_list)
 }
 \arguments{
-\item{td}{difference between the mean warmest monthly temperature and the mean coldest monthly temperature}
+\item{td}{numeric. Difference between the mean warmest monthly temperature and
+the mean coldest monthly temperature.}
 
-\item{NFFD}{Number of Frost-Free Days}
+\item{NFFD}{numeric. Number of Frost-Free Days.}
 
-\item{t_min_list}{named list of monthly minimum temperature for each month}
+\item{t_min_list}{\code{list} of monthly minimum temperature for each month in order.}
 }
 \value{
-Day of the year on which the Frost-Free Period begins
+numeric. Julian day on which the Frost-Free Period begins
 }
 \description{
 bFFP : Day of the year on which the Frost-Free Period begins

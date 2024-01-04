@@ -7,21 +7,21 @@
 pgGetTerra(conn, name, tile, rast = "rast", bands = 37:73, boundary = NULL)
 }
 \arguments{
-\item{conn}{a DBI or RPostgres connection object}
+\item{conn}{a DBI or RPostgres connection object.}
 
-\item{name}{character. Table name in database}
+\item{name}{character. Table name in database.}
 
 \item{tile}{TODO}
 
 \item{rast}{character. Name of column which stores raster data.
 Defaults to "rast"}
 
-\item{bands}{Which raster bands to return. Default 37:73.}
+\item{bands}{numeric. Which raster bands to return. Default 37:73.}
 
-\item{boundary}{Numeric vector of length 4 (ymax,ymin,xmax,xmin). Defaults to \code{NULL}.}
+\item{boundary}{numeric. Vector of length 4 (ymax,ymin,xmax,xmin). Defaults to \code{NULL}.}
 }
 \value{
-A SpatRaster
+A \code{SpatRaster}
 }
 \description{
 Download raster with bounding box from PostGIS

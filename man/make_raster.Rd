@@ -7,22 +7,22 @@
 make_raster(boundary, conn, rastque, nameque, projID, bands)
 }
 \arguments{
-\item{boundary}{Numeric vector of length 4 (ymax,ymin,xmax,xmin). Defaults to \code{NULL}.}
+\item{boundary}{numeric. Vector of length 4 (ymax,ymin,xmax,xmin). Defaults to \code{NULL}.}
 
-\item{conn}{a DBI or RPostgres connection object}
+\item{conn}{a DBI or RPostgres connection object.}
 
-\item{rastque}{rast query name obtained with e.g. \code{dbQuoteIdentifier(conn, "rast")}}
+\item{rastque}{character. The "rast" query name obtained with e.g. \code{dbQuoteIdentifier(conn, "rast")}}
 
-\item{nameque}{schema.name}
+\item{nameque}{character. The "schema.name"}
 
-\item{projID}{projID in data.base}
+\item{projID}{character. projID in data.base}
 
-\item{bands}{Which raster bands to return. Default 37:73.}
+\item{bands}{numeric. Which raster bands to return. Default 37:73.}
 }
 \value{
-a SpatRaster
+a \code{SpatRaster}
 }
 \description{
 Used internally to access the PostGRS database and
-create a SpatRaster using a given spatial boundary
+create a \code{SpatRaster} using a given spatial boundary
 }
