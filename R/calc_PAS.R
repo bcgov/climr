@@ -4,7 +4,7 @@
 #' @param tm min temperature for that month
 #' @template PPT
 #'
-#' @return Precipitation As Snow
+#' @return numeric. Precipitation As Snow
 #'
 #' @examples
 #' \dontrun{

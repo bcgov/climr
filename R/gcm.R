@@ -1,6 +1,6 @@
 #' Create GCM inputs for `downscale` using data on Postgis database.
 #' 
-#' @return A `list` of SpatRasters, each with possibly multiple layers, that can
+#' @return A `list` of `SpatRasters`, each with possibly multiple layers, that can
 #'   be used with `downscale`.
 #' 
 #' @description
@@ -41,8 +41,8 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
                 bbox = bbox, dbnames = dbnames, dbCon = dbCon, 
                 max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE)
   attr(res, "builder") <- "climr"
-  
-  # Return a list of SpatRaster, one element for each model
+
+  # Return a list of SpatRasters, one element for each model
   return(res)
 }
 
@@ -73,7 +73,7 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
                 max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE)
   attr(res, "builder") <- "climr"
   
-  # Return a list of SpatRaster, one element for each model
+  # Return a list of SpatRasters, one element for each model
   return(res)
 }
 
@@ -110,7 +110,7 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(),
                 max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE)
   attr(res, "builder") <- "climr"
   
-  # Return a list of SpatRaster, one element for each model
+  # Return a list of SpatRasters, one element for each model
   return(res)
 }
 
@@ -156,7 +156,7 @@ list_unique <- function(files, col_num) {
 #' @template dbCon
 #' @template cache
 #'
-#' @return SpatRaster
+#' @return `SpatRaster`
 process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnames, dbCon, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   gcm_nm <- gsub("-", ".", gcm_nm)
@@ -236,7 +236,7 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
 #'   and their corresponding names in the PostGIS data base. See climr:::dbnames_hist
 #' @template cache 
 #'
-#' @return SpatRaster
+#' @return `SpatRaster`
 process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbnames_hist, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   
@@ -308,7 +308,7 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
 #' @template dbCon 
 #' @template cache 
 #'
-#' @return a SpatRaster
+#' @return a `SpatRaster`
 process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   

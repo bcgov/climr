@@ -38,7 +38,7 @@ calc_DD_m_below <- function(tm, k, a, b, t0, beta, c) {
 #' @template m
 #' @template tm
 #'
-#' @return Degree-Days Below 0
+#' @return numeric. Degree-Days Below 0
 #'
 #' @examples
 #' \dontrun{
@@ -66,7 +66,7 @@ calc_DD_below_0 <- function(m, tm) {
 #' @template tm
 #' @param region character. One of either "All", "West", "East".
 #'
-#' @return Degree-Days Above 5
+#' @return numeric. Degree-Days Above 5
 #'
 #' @examples
 #' \dontrun{
@@ -97,7 +97,7 @@ calc_DD_above_5 <- function(m, tm, region) {
 #' @template m
 #' @template tm
 #'
-#' @return Degree-Days Below 18
+#' @return numeric. Degree-Days Below 18
 #'
 #' @examples
 #' \dontrun{
@@ -126,7 +126,7 @@ calc_DD_below_18 <- function(m, tm) {
 #' @template tm
 #' @param region character. One of either "All", "South west", "The rest".
 #'
-#' @return Degree-Days Above 18
+#' @return numeric. Degree-Days Above 18
 #'
 #' @examples
 #' \dontrun{

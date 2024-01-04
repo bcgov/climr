@@ -3,7 +3,7 @@
 #' @template m
 #' @param tm min temperature for that month
 #'
-#' @return Number of Frost Free Days
+#' @return numeric. Number of Frost Free Days
 #'
 #' @examples
 #' \dontrun{

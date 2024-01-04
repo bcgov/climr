@@ -3,7 +3,7 @@
 #' @param tmin monthly mean minimum air temperature
 #' @param tmax monthly mean maximum air temperature
 #' @template latitude
-#' @return Reference evaporation (Eref)
+#' @return numeric. Reference evaporation (Eref)
 calc_Eref <- function(m, tmin, tmax, latitude) {
   Eref <- numeric(length(tmax))
   tmean <- (tmax + tmin) / 2
@@ -26,7 +26,7 @@ calc_Eref <- function(m, tmin, tmax, latitude) {
 #' Calculate climatic moisture deficit (CMD)
 #' @param Eref Reference evaporation
 #' @template PPT
-#' @return Climatic moisture deficit
+#' @return numeric. Climatic moisture deficit
 calc_CMD <- function(Eref, PPT) {
   CMD <- numeric(length(Eref))
   i <- which(Eref > PPT)
@@ -42,7 +42,7 @@ calc_CMD <- function(Eref, PPT) {
 #' @param d numeric. Julian day of the year (January 1 = 1, December 31 = 365).
 #' @param tmean mean temperature for that month
 #' @template latitude
-#' @return Extraterrestrial radiation estimation in mm/day
+#' @return numeric. Extraterrestrial radiation estimation in mm/day
 calc_S0_I <- function(d, tmean, latitude) {
   # BASIC COMPUTER PROGRAM FOR ESTIMATING DAILY RA VALUES
   # D=JULIAN DAY (JANUARY 1=1)
@@ -72,7 +72,7 @@ calc_S0_I <- function(d, tmean, latitude) {
 #' @template m
 #' @param tmean mean temperature for that month
 #' @template latitude
-#' @return Extraterrestrial radiation estimation in mm/day
+#' @return numeric. Extraterrestrial radiation estimation in mm/day
 calc_S0_II <- function(m, tmean, latitude) {
   # BASIC COMPUTER PROGRAM FOR ESTIMATING MONTHLY RA VALUES
   # DEC=DECLINATION OF THE SUN IN RADIANS
