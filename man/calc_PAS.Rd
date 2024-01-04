@@ -11,7 +11,7 @@ calc_PAS(m, tm, ppt)
 
 \item{tm}{min temperature for that month}
 
-\item{PPT}{numeric. Precipitation in mm.}
+\item{ppt}{numeric. Precipitation in mm.}
 }
 \value{
 numeric. Precipitation As Snow
