@@ -4,12 +4,12 @@
 \alias{calc_S0_II}
 \title{PROGRAM II From Hargreaves 1985}
 \usage{
-calc_S0_II(m, tmean, latitude)
+calc_S0_II(m, tm, latitude)
 }
 \arguments{
 \item{m}{integer. Month of the year.}
 
-\item{tmean}{mean temperature for that month}
+\item{tm}{numeric. Monthly mean temperature for the \code{m} month.}
 
 \item{latitude}{numeric. Point latitudes.}
 }
