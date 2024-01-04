@@ -102,6 +102,7 @@ delta_matrix <- function(x, y) {
 #' 
 #' @noRd
 sup <- function(x, exp) {
+  if (length(exp) > 1) stop("'exp' should have a single value")
   lapply(x, `^`, exp)
 }
 
