@@ -4,14 +4,14 @@
 \alias{calc_Eref}
 \title{Calculate Extreme Minimum Temperature (EMT)}
 \usage{
-calc_Eref(m, tmmin, tmmax, latitude)
+calc_Eref(m, tmin, tmax, latitude)
 }
 \arguments{
 \item{m}{integer. Month of the year.}
 
-\item{tmmin}{numeric. Monthly mean minimum air temperature.}
+\item{tmin}{monthly mean minimum air temperature}
 
-\item{tmmax}{numeric. Monthly mean maximum air temperature.}
+\item{tmax}{monthly mean maximum air temperature}
 
 \item{latitude}{numeric. Point latitudes.}
 }
