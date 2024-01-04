@@ -1,12 +1,12 @@
 #' Calculate Extreme Minimum Temperature (EMT)
 #' @template m
-#' @param tmin monthly mean minimum air temperature
-#' @param tmax monthly mean maximum air temperature
+#' @template tmmin
+#' @template tmmax
 #' @template latitude
 #' @return numeric. Reference evaporation (Eref)
-calc_Eref <- function(m, tmin, tmax, latitude) {
-  Eref <- numeric(length(tmax))
-  tmean <- (tmax + tmin) / 2
+calc_Eref <- function(m, tmmin, tmmax, latitude) {
+  Eref <- numeric(length(tmmax))
+  tmean <- (tmmax + tmmin) / 2
   i <- which(tmean >= 0)
   day_month <- c(31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
   day_julian <- c(15, 45, 74, 105, 135, 166, 196, 227, 258, 288, 319, 349)
@@ -15,10 +15,10 @@ calc_Eref <- function(m, tmin, tmax, latitude) {
   # Probably missing
   Eref[i] <- 0.0023 * day_month[m] *
     calc_S0_I(day_julian[m], tmean[i], latitude[i]) *
-    (tmean[i] + 17.8) * sqrt(tmax[i] - tmin[i]) *
+    (tmean[i] + 17.8) * sqrt(tmmax[i] - tmmin[i]) *
     (1.18 - 0.0065 * latitude[i])
 
-  Eref[is.na(tmax)] <- tmax[is.na(tmax)] ## use tmax[is.na(tmax)] to respect NA type
+  Eref[is.na(tmmax)] <- tmmax[is.na(tmmax)] ## use tmmax[is.na(tmmax)] to respect NA type
   
   return(Eref)
 }
