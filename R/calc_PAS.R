@@ -10,10 +10,10 @@
 #' \dontrun{
 #' climr:::calc_PAS(4, 2, 600)
 #' }
-calc_PAS <- function(m, tmin, ppt) {
+calc_PAS <- function(m, tmin, PPT) {
   if (FALSE) {
     T0 <- a <- b <- NULL
   }
 
-  param[["PAS"]][m, ppt * a / (1 + exp(-(tmin - T0) / b))]
+  param[["PAS"]][m, PPT * a / (1 + exp(-(tmin - T0) / b))]
 }
