@@ -40,36 +40,36 @@ downscale(
 )
 }
 \arguments{
-\item{xyz}{A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).}
+\item{xyz}{A 3-column \code{matrix} or \code{data.frame} (x, y, z) or (lon, lat, elev).}
 
-\item{which_normal}{Select which normal layer to use. Default is "auto", which selects the highest resolution normal for each point}
+\item{which_normal}{character. Which normal layer to use. Default is "auto", which selects the highest resolution normal for each point}
 
-\item{historic_period}{Which historic period. Default \code{NULL}}
+\item{historic_period}{character. Which historic period. Default \code{NULL}}
 
-\item{historic_ts}{TODO}
+\item{historic_ts}{\code{list} of \code{SpatRasters}. TODO}
 
-\item{gcm_models}{Vector of GCM names. Options are \code{list_gcm()}. Used for gcm periods, gcm timeseries, and historic timeseries. Default \code{NULL}}
+\item{gcm_models}{character. Vector of GCM names. Options are \code{list_gcm()}. Used for gcm periods, gcm timeseries, and historic timeseries. Default \code{NULL}}
 
-\item{ssp}{A character vector. Label of the shared socioeconomic pathway(s) to use.
+\item{ssp}{character. Vector of labels of the shared socioeconomic pathways to use.
 See available options with \code{list_ssp()}. Defaults to \code{list_ssp()}.}
 
-\item{gcm_period}{Requested future periods. Options are \code{list_gcm_period()}}
+\item{gcm_period}{character. Requested future periods. Options are \code{list_gcm_period()}}
 
-\item{gcm_ts_years}{Requested future timeseries years. Must be in \code{2015:2100}}
+\item{gcm_ts_years}{character. Requested future timeseries years. Must be in \code{2015:2100}}
 
-\item{gcm_hist_years}{Requested historic modelled years. Must be in \code{1851:2010}}
+\item{gcm_hist_years}{character. Requested historic modelled years. Must be in \code{1851:2010}}
 
 \item{max_run}{integer. Maximum number of model runs to include.
 A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
 are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
-\item{return_normal}{TODO}
+\item{return_normal}{logical. Return downscaled normal period (1961-1990)? Default \code{TRUE}.}
 
-\item{vars}{A character vector of climate variables to compute. Supported variables
+\item{vars}{character. A vector of climate variables to compute. Supported variables
 can be obtained with \code{list_variables()}. Definitions can be found in this package
 \code{variables} dataset. Default to monthly PPT, Tmax, Tmin.}
 
-\item{cache}{Logical. Cache data locally? Default \code{TRUE}}
+\item{cache}{logical. Cache data locally? Default \code{TRUE}}
 
 \item{out_spatial}{logical. Should a SpatVector be returned instead of a
 \code{data.frame}.}
@@ -79,19 +79,19 @@ If the variable exists in \code{normal}, then its normal values will also be plo
 Otherwise, normal January total precipitation (PPT01) values will be plotted.
 Defaults to no plotting (NULL).}
 
-\item{normal}{Reference normal baseline input from \code{normal_input}.}
+\item{normal}{\code{SpatRaster}. Reference normal baseline input from \code{normal_input}.}
 
-\item{gcm}{Global Circulation Models input from \code{gcm_input}. Default to NULL.}
+\item{gcm}{\code{list} of \code{SpatRasters}. Global Circulation Models outputs from \code{gcm_input}. Default to \code{NULL}.}
 
-\item{historic}{Historic time period input from \code{historic_input}. Default to NULL}
+\item{historic}{\code{list} of \code{SpatRasters}. Historic time period outputs from \code{historic_input}. Default to \code{NULL}.}
 
-\item{gcm_ts}{TODO}
+\item{gcm_ts}{\code{list} of \code{SpatRasters}. TODO}
 
-\item{gcm_hist}{TODO}
+\item{gcm_hist}{\code{list} of \code{SpatRasters}. TODO}
 
-\item{ppt_lr}{A boolean. Apply lapse rate adjustment to precipitations. Default to FALSE.}
+\item{ppt_lr}{logical. Apply lapse rate adjustment to precipitations. Default to FALSE.}
 
-\item{nthread}{An integer. Number of parallel threads to use to do computations. Default to 1L.}
+\item{nthread}{integer. Number of parallel threads to use to do computations. Default to 1L.}
 }
 \value{
 \code{data.frame} of downscaled climate variables for each location.

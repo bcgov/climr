@@ -1,11 +1,11 @@
 #' Calculate bFFP
 #'
 #' bFFP : Day of the year on which the Frost-Free Period begins
-#' @param td difference between the mean warmest monthly temperature and the mean coldest monthly temperature
-#' @param NFFD Number of Frost-Free Days
-#' @param t_min_list named list of monthly minimum temperature for each month
+#' @template td
+#' @template NFFD
+#' @template t_min_list
 #'
-#' @return Day of the year on which the Frost-Free Period begins
+#' @return numeric. Julian day on which the Frost-Free Period begins
 #'
 #' @examples
 #' \dontrun{
@@ -31,10 +31,10 @@ calc_bFFP <- function(td, NFFD, t_min_list) {
 #'
 #' bFFP : Day of the year on which the Frost-Free Period ends
 #'
-#' @param NFFD Number of Frost-Free Days
-#' @param t_min_list named list of monthly minimum temperature for each month
+#' @template NFFD
+#' @template t_min_list
 #'
-#' @return Day of the year on which the Frost-Free Period ends
+#' @return numeric. Julian day on which the Frost-Free Period ends
 #'
 #' @examples
 #' \dontrun{
@@ -58,10 +58,10 @@ calc_eFFP <- function(NFFD, t_min_list) {
 
 #' Calculate Frost-Free Period
 #'
-#' @param bFFP Day of the year on which the Frost-Free Period begins
-#' @param eFFP Day of the year on which the Frost-Free Period ends
+#' @param bFFP numeric. Day of the year on which the Frost-Free Period begins
+#' @param eFFP numeric. Day of the year on which the Frost-Free Period ends
 #'
-#' @return Frost-Free Period
+#' @return numeric. Frost-Free Period in days
 #'
 #' @examples
 #' \dontrun{

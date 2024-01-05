@@ -1,9 +1,9 @@
 #' Calculate Extreme Minimum Temperature (EMT)
-#' @param m month of the year
+#' @template m
 #' @param tmin monthly mean minimum air temperature
 #' @param tmax monthly mean maximum air temperature
-#' @param latitude point latitudes
-#' @return Reference evaporation (Eref)
+#' @template latitude
+#' @return numeric. Reference evaporation (Eref)
 calc_Eref <- function(m, tmin, tmax, latitude) {
   Eref <- numeric(length(tmax))
   tmean <- (tmax + tmin) / 2
@@ -25,8 +25,8 @@ calc_Eref <- function(m, tmin, tmax, latitude) {
 
 #' Calculate climatic moisture deficit (CMD)
 #' @param Eref Reference evaporation
-#' @param PPT Precipitation mm
-#' @return Climatic moisture deficit
+#' @template PPT
+#' @return numeric. Climatic moisture deficit
 calc_CMD <- function(Eref, PPT) {
   CMD <- numeric(length(Eref))
   i <- which(Eref > PPT)
@@ -39,10 +39,10 @@ calc_CMD <- function(Eref, PPT) {
 }
 
 #' PROGRAM I From Hargreaves 1985
-#' @param d julian day of the year (January 1 = 1, Decembre 31 = 365)
+#' @param d numeric. Julian day of the year (January 1 = 1, December 31 = 365).
 #' @param tmean mean temperature for that month
-#' @param latitude point latitudes
-#' @return Extraterrestrial radiation estimation in mm/day
+#' @template latitude
+#' @return numeric. Extraterrestrial radiation estimation in mm/day
 calc_S0_I <- function(d, tmean, latitude) {
   # BASIC COMPUTER PROGRAM FOR ESTIMATING DAILY RA VALUES
   # D=JULIAN DAY (JANUARY 1=1)
@@ -69,10 +69,10 @@ calc_S0_I <- function(d, tmean, latitude) {
 }
 
 #' PROGRAM II From Hargreaves 1985
-#' @param m month of the year
+#' @template m
 #' @param tmean mean temperature for that month
-#' @param latitude point latitudes
-#' @return Extraterrestrial radiation estimation in mm/day
+#' @template latitude
+#' @return numeric. Extraterrestrial radiation estimation in mm/day
 calc_S0_II <- function(m, tmean, latitude) {
   # BASIC COMPUTER PROGRAM FOR ESTIMATING MONTHLY RA VALUES
   # DEC=DECLINATION OF THE SUN IN RADIANS

@@ -1,2 +1,2 @@
-#' @param dem A digital elevation model SpatRaster. Only needed if normal is a 
-#'   SpatRaster. Defaults to `NULL`. 
+#' @param dem `SpatRaster`. A digital elevation model raster. Only needed if `normal`
+#'   is a `SpatRaster`. Defaults to `NULL`. 

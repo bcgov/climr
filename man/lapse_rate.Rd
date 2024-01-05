@@ -7,19 +7,20 @@
 lapse_rate(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize = TRUE)
 }
 \arguments{
-\item{normal}{Normal rasters to compute lapse rates for. Build with this package functions.}
+\item{normal}{a \code{SpatRaster} stack. Normal rasters to compute lapse rates for. Build with this package functions.}
 
-\item{dem}{A digital elevation model SpatRaster. Only needed if normal is a
-SpatRaster. Defaults to \code{NULL}.}
+\item{dem}{\code{SpatRaster}. A digital elevation model raster. Only needed if \code{normal}
+is a \code{SpatRaster}. Defaults to \code{NULL}.}
 
-\item{NA_replace}{A boolean. Should NA lapse rate results be replaced by zeros. Default to TRUE.}
+\item{NA_replace}{logical. Should NA lapse rate results be replaced by zeros. Default to TRUE.}
 
-\item{nthread}{An integer. Number of parallel threads to use to compute lapse rates.}
+\item{nthread}{integer. Number of parallel threads to use to compute lapse rates.}
 
-\item{rasterize}{Return an object of the same class category as normal with the same extend.}
+\item{rasterize}{logical. Return an object of the same class category as normal with the same extent?
+Default to \code{TRUE}.}
 }
 \value{
-SpatRaster of lapse rate values.
+\code{SpatRaster} of lapse rate values.
 }
 \description{
 Lapse rate computation

@@ -7,12 +7,12 @@
 calc_eFFP(NFFD, t_min_list)
 }
 \arguments{
-\item{NFFD}{Number of Frost-Free Days}
+\item{NFFD}{numeric. Number of Frost-Free Days.}
 
-\item{t_min_list}{named list of monthly minimum temperature for each month}
+\item{t_min_list}{\code{list} of monthly minimum temperature for each month in order.}
 }
 \value{
-Day of the year on which the Frost-Free Period ends
+numeric. Julian day on which the Frost-Free Period ends
 }
 \description{
 bFFP : Day of the year on which the Frost-Free Period ends

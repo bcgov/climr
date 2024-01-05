@@ -7,13 +7,13 @@
 calc_PET(tave, tmin, tmax, alt)
 }
 \arguments{
-\item{tave}{monthly average minimum air temperature}
+\item{tave}{numeric. Monthly average minimum air temperature.}
 
 \item{tmin}{monthly mean minimum air temperature}
 
 \item{tmax}{monthly mean maximum air temperature}
 
-\item{alt}{numeric. ?}
+\item{alt}{numeric. Altitude in m.}
 }
 \description{
 Based on simplified Penman - Monteith method from Hogg (1997)

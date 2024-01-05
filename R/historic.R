@@ -3,13 +3,13 @@
 #' @description
 #' `historic_input` creates inputs from a given historic **period**.
 #' 
-#' @return A `list` of SpatRasters, each with possibly multiple layers, that can
+#' @return A `list` of `SpatRasters`, each with possibly multiple layers, that can
 #'   be used with `downscale`.
 #' 
 #' @template dbCon
 #' @template bbox
-#' @param period  character vector. Label of the period to use. 
-#'   Can be obtained from list_historic(). Default to "2001_2020".
+#' @param period character. Vector of labels of the periods to use. 
+#'   Can be obtained from `list_historic()`. Default to "2001_2020".
 #' @template cache
 #'
 #' @importFrom terra rast writeRaster ext nlyr
@@ -86,7 +86,7 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 #' @template dbCon
 #' @template bbox
 #' @template cache
-#' @param years Years to retrieve timeseries for, in `1902:2022`. Default `2010:2022`
+#' @param years numeric. Years to retrieve timeseries for, in `1902:2022`. Default `2010:2022`
 #' 
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head tail

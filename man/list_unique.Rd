@@ -7,9 +7,9 @@
 list_unique(files, col_num)
 }
 \arguments{
-\item{files}{A character vector. File paths.}
+\item{files}{character. A vector of file paths.}
 
-\item{col_num}{An integer vector. Positions of elements to retrieve in label. Label is split
+\item{col_num}{integer. Vector of indices of elements to retrieve in label. Label is split
 by "_" before processing.}
 }
 \value{

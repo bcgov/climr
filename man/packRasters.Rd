@@ -7,10 +7,10 @@
 packRasters(ras)
 }
 \arguments{
-\item{ras}{a SpatRaster or list of SpatRasters, or \code{NULL}}
+\item{ras}{a \code{SpatRaster} or list of \code{SpatRasters}, or \code{NULL}}
 }
 \value{
-\code{NULL}, a packed SpatRaster or list of packed SpatRaters
+\code{NULL}, a packed \code{SpatRaster} or list of packed \code{SpatRasters}
 }
 \description{
 Pack rasters for parallel computing

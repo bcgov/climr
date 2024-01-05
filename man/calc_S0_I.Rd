@@ -7,14 +7,14 @@
 calc_S0_I(d, tmean, latitude)
 }
 \arguments{
-\item{d}{julian day of the year (January 1 = 1, Decembre 31 = 365)}
+\item{d}{numeric. Julian day of the year (January 1 = 1, December 31 = 365).}
 
 \item{tmean}{mean temperature for that month}
 
-\item{latitude}{point latitudes}
+\item{latitude}{numeric. Point latitudes.}
 }
 \value{
-Extraterrestrial radiation estimation in mm/day
+numeric. Extraterrestrial radiation estimation in mm/day
 }
 \description{
 PROGRAM I From Hargreaves 1985
