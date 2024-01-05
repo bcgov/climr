@@ -1,13 +1,13 @@
 #' Download raster with bounding box from PostGIS
 #' @template conn
-#' @param name character. Table name in database
+#' @param name character. Table name in database.
 #' @param tile TODO
 #' @param rast character. Name of column which stores raster data.
 #'   Defaults to "rast"
 #' @template bands
 #' @template boundary
 
-#' @return A SpatRaster
+#' @return A `SpatRaster`
 #'
 #' @importFrom data.table setDT copy
 #' @importFrom terra rast merge sprc
@@ -171,7 +171,7 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
 #'
 #' @param in_xyz `data.table` (or `data.frame`) of points to downscale
 
-#' @return bounding box (e.g. c(51,50,-121,-122))
+#' @return integer. A bounding box (e.g. `c(51,50,-121,-122)`)
 #' @export
 get_bb <- function(in_xyz) {
   return(c(max(in_xyz[, 2]), min(in_xyz[, 2]), max(in_xyz[, 1]), min(in_xyz[, 1])))
@@ -182,16 +182,16 @@ get_bb <- function(in_xyz) {
 #' Make raster from a boundary
 #'
 #' Used internally to access the PostGRS database and
-#' create a SpatRaster using a given spatial boundary
+#' create a `SpatRaster` using a given spatial boundary
 #'
 #' @template boundary 
 #' @template conn
-#' @param rastque rast query name obtained with e.g. `dbQuoteIdentifier(conn, "rast")`
-#' @param nameque schema.name
-#' @param projID projID in data.base
+#' @param rastque character. The "rast" query name obtained with e.g. `dbQuoteIdentifier(conn, "rast")`
+#' @param nameque character. The "schema.name"
+#' @param projID character. projID in data.base
 #' @template bands 
 #'
-#' @return a SpatRaster
+#' @return a `SpatRaster`
 #'
 #' @importFrom DBI dbGetQuery
 #' @importFrom terra rast

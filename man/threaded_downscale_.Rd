@@ -16,19 +16,19 @@ threaded_downscale_(
 )
 }
 \arguments{
-\item{xyz}{A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).}
+\item{xyz}{A 3-column \code{matrix} or \code{data.frame} (x, y, z) or (lon, lat, elev).}
 
-\item{normal}{Reference normal baseline input from \code{normal_input}.}
+\item{normal}{\code{SpatRaster}. Reference normal baseline input from \code{normal_input}.}
 
-\item{gcm}{Global Circulation Models input from \code{gcm_input}. Default to NULL.}
+\item{gcm}{\code{list} of \code{SpatRasters}. Global Circulation Models outputs from \code{gcm_input}. Default to \code{NULL}.}
 
-\item{gcm_ts}{TODO}
+\item{gcm_ts}{\code{list} of \code{SpatRasters}. TODO}
 
-\item{gcm_hist}{TODO}
+\item{gcm_hist}{\code{list} of \code{SpatRasters}. TODO}
 
-\item{historic}{Historic time period input from \code{historic_input}. Default to NULL}
+\item{historic}{\code{list} of \code{SpatRasters}. Historic time period outputs from \code{historic_input}. Default to \code{NULL}.}
 
-\item{historic_ts}{TODO}
+\item{historic_ts}{\code{list} of \code{SpatRasters}. TODO}
 
 \item{...}{further arguments passed to \code{downscale_}}
 }

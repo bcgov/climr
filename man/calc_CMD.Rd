@@ -9,10 +9,10 @@ calc_CMD(Eref, PPT)
 \arguments{
 \item{Eref}{Reference evaporation}
 
-\item{PPT}{Precipitation mm}
+\item{PPT}{numeric. Precipitation in mm.}
 }
 \value{
-Climatic moisture deficit
+numeric. Climatic moisture deficit
 }
 \description{
 Calculate climatic moisture deficit (CMD)

@@ -1,9 +1,9 @@
 #' Calculate Number of Frost Free Days (NFFD)
 #'
-#' @param m month of the year
+#' @template m
 #' @param tm min temperature for that month
 #'
-#' @return Number of Frost Free Days
+#' @return numeric. Number of Frost Free Days
 #'
 #' @examples
 #' \dontrun{

@@ -6,19 +6,19 @@
 #' @details
 #' Additional details... TODO.
 #' 
-#' @param xyz three or four column data.frame: long, lat, elev, (id)
-#' @param which_normal Select which normal layer to use. Default is "auto", which selects the highest resolution normal for each point
-#' @param historic_period Which historic period. Default `NULL`
-#' @param historic_ts Historic years requested. Must be in `1902:2015`. Default `NULL`
-#' @param gcm_models Vector of GCM names. Options are `list_gcm()`. Used for gcm periods, gcm timeseries, and historic timeseries. Default `NULL`
+#' @param xyz three or four column `data.frame`: long, lat, elev, (id)
+#' @param which_normal character. Which normal layer to use. Default is "auto", which selects the highest resolution normal for each point
+#' @param historic_period character. Which historic period. Default `NULL`
+#' @param historic_ts integer. Vector of historic years requested. Must be in `1902:2015`. Default `NULL`
+#' @param gcm_models character. Vector of GCM names. Options are `list_gcm()`. Used for gcm periods, gcm timeseries, and historic timeseries. Default `NULL`
 #' @template ssp
-#' @param gcm_period Requested future periods. Options are `list_gcm_period()`
-#' @param gcm_ts_years Requested future timeseries years. Must be in `2015:2100`
-#' @param gcm_hist_years Requested historic modelled years. Must be in `1851:2010`
+#' @param gcm_period character. Requested future periods. Options are `list_gcm_period()`
+#' @param gcm_ts_years character. Requested future timeseries years. Must be in `2015:2100`
+#' @param gcm_hist_years character. Requested historic modelled years. Must be in `1851:2010`
 #' @template max_run
-#' @param return_normal Logical. Return downscaled normal period (1961-1990). Default `TRUE`
-#' @param vars Character vector of climate variables. Options are `list_vars()`
-#' @param cache Logical. Cache data locally? Default `TRUE`
+#' @template return_normal
+#' @param vars character. Vector of climate variables. Options are `list_vars()`
+#' @param cache logical. Cache data locally? Default `TRUE`
 #' @template out_spatial
 #' @template plot
 
@@ -199,19 +199,19 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
 #' @details
 #'   Additional details... TODO.
 #' 
-#' @param xyz A 3-column matrix or data.frame (x, y, z) or (lon, lat, elev).
-#' @param normal Reference normal baseline input from `normal_input`.
-#' @param gcm Global Circulation Models input from `gcm_input`. Default to NULL.
-#' @param historic Historic time period input from `historic_input`. Default to NULL
-#' @param gcm_ts TODO
-#' @param gcm_hist TODO
-#' @param historic_ts TODO
-#' @param return_normal TODO
-#' @param vars A character vector of climate variables to compute. Supported variables
+#' @param xyz A 3-column `matrix` or `data.frame` (x, y, z) or (lon, lat, elev).
+#' @param normal `SpatRaster`. Reference normal baseline input from `normal_input`.
+#' @param gcm `list` of `SpatRasters`. Global Circulation Models outputs from `gcm_input`. Default to `NULL`.
+#' @param historic `list` of `SpatRasters`. Historic time period outputs from `historic_input`. Default to `NULL`.
+#' @param gcm_ts `list` of `SpatRasters`. TODO
+#' @param gcm_hist `list` of `SpatRasters`. TODO
+#' @param historic_ts `list` of `SpatRasters`. TODO
+#' @template return_normal
+#' @param vars character. A vector of climate variables to compute. Supported variables
 #'   can be obtained with `list_variables()`. Definitions can be found in this package
 #'  `variables` dataset. Default to monthly PPT, Tmax, Tmin.
-#' @param ppt_lr A boolean. Apply lapse rate adjustment to precipitations. Default to FALSE.
-#' @param nthread An integer. Number of parallel threads to use to do computations. Default to 1L.
+#' @param ppt_lr logical. Apply lapse rate adjustment to precipitations. Default to FALSE.
+#' @param nthread integer. Number of parallel threads to use to do computations. Default to 1L.
 #' @template out_spatial
 #' @template plot
 #' 
@@ -402,7 +402,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
 #' @inheritParams downscale
 #' @param xyzID same as `xyz`, but with an added "ID" column
 #' 
-#' @return a `data.table`.
+#' @return A `data.table`.
 #' 
 #' @import data.table
 #' @importFrom terra crop ext xres yres extract
@@ -860,9 +860,9 @@ addIDCols <- function(IDCols, results) {
 
 #' Pack rasters for parallel computing
 #'
-#' @param ras a SpatRaster or list of SpatRasters, or `NULL`
+#' @param ras a `SpatRaster` or list of `SpatRasters`, or `NULL`
 #'
-#' @return `NULL`, a packed SpatRaster or list of packed SpatRaters
+#' @return `NULL`, a packed `SpatRaster` or list of packed `SpatRasters`
 #'
 #' @importFrom terra wrap
 packRasters <- function(ras) {
@@ -880,9 +880,9 @@ packRasters <- function(ras) {
 
 #' Pack rasters for parallel computing
 #'
-#' @param ras a SpatRaster or list of SpatRasters, or `NULL`
+#' @param ras a `SpatRaster` or list of `SpatRasters`, or `NULL`
 #'
-#' @return `NULL`, a packed SpatRaster or list of packed SpatRaters
+#' @return `NULL`, a `PackedSpatRaster` or list of `PackedSpatRasters`
 #'
 #' @importFrom terra unwrap
 unpackRasters <- function(ras) {

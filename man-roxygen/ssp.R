@@ -1,2 +1,2 @@
-#' @param ssp A character vector. Label of the shared socioeconomic pathway(s) to use.
+#' @param ssp character. Vector of labels of the shared socioeconomic pathways to use.
 #'   See available options with `list_ssp()`. Defaults to `list_ssp()`.

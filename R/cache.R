@@ -16,7 +16,7 @@ cache_path <- function() {
 
 #' Check if package local cache exists
 #' 
-#' @return logical
+#' @return logical.
 cache_exists <- function() {
   file.exists(cache_path())
 }
@@ -24,9 +24,9 @@ cache_exists <- function() {
 #' Ask if user want to use local cache, otherwise use a temporary directory.
 #' 
 #' @noRd
-#' @param ask A boolean. Ask before deleting files. Default to `interactive()`.
+#' @param ask logical. Ask before deleting files. Default to `interactive()`.
 #' 
-#' @return logical
+#' @return logical.
 #' 
 #' @importFrom utils askYesNo
 cache_ask <- function(ask = interactive()) {

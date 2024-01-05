@@ -1,1 +1,1 @@
-#' @param cache Logical specifying whether to cache new data locally or no. Defaults to `TRUE`.
+#' @param cache logical. Specifying whether to cache new data locally or no. Defaults to `TRUE`.

@@ -7,16 +7,16 @@
 calc_Eref(m, tmin, tmax, latitude)
 }
 \arguments{
-\item{m}{month of the year}
+\item{m}{integer. Month of the year.}
 
 \item{tmin}{monthly mean minimum air temperature}
 
 \item{tmax}{monthly mean maximum air temperature}
 
-\item{latitude}{point latitudes}
+\item{latitude}{numeric. Point latitudes.}
 }
 \value{
-Reference evaporation (Eref)
+numeric. Reference evaporation (Eref)
 }
 \description{
 Calculate Extreme Minimum Temperature (EMT)

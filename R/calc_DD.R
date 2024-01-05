@@ -35,10 +35,10 @@ calc_DD_m_below <- function(tm, k, a, b, t0, beta, c) {
 
 #' Calculate Degree-Day Below 0 (DD<0)
 #'
-#' @param m month of the year
-#' @param tm monthly mean temperature for the `m` month
+#' @template m
+#' @template tm
 #'
-#' @return Degree-Days Below 0
+#' @return numeric. Degree-Days Below 0
 #'
 #' @examples
 #' \dontrun{
@@ -62,11 +62,11 @@ calc_DD_below_0 <- function(m, tm) {
 
 #' Calculate Degree-Day Above 5 (DD>5)
 #'
-#' @param m month of the year
-#' @param tm monthly mean temperature for the `m` month
-#' @param region one of either "All", "West", "East"
+#' @template m
+#' @template tm
+#' @param region character. One of either "All", "West", "East".
 #'
-#' @return Degree-Days Above 5
+#' @return numeric. Degree-Days Above 5
 #'
 #' @examples
 #' \dontrun{
@@ -94,10 +94,10 @@ calc_DD_above_5 <- function(m, tm, region) {
 
 #' Calculate Degree-Day Below 18 (DD<18)
 #'
-#' @param m month of the year
-#' @param tm monthly mean temperature for the `m` month
+#' @template m
+#' @template tm
 #'
-#' @return Degree-Days Below 18
+#' @return numeric. Degree-Days Below 18
 #'
 #' @examples
 #' \dontrun{
@@ -122,11 +122,11 @@ calc_DD_below_18 <- function(m, tm) {
 
 #' Calculate Degree-Day Above 18 (DD>18)
 #'
-#' @param m month of the year
-#' @param tm monthly mean temperature for the `m` month
-#' @param region one of either "All", "South west", "The rest"
+#' @template m
+#' @template tm
+#' @param region character. One of either "All", "South west", "The rest".
 #'
-#' @return Degree-Days Above 18
+#' @return numeric. Degree-Days Above 18
 #'
 #' @examples
 #' \dontrun{

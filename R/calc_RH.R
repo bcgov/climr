@@ -3,7 +3,7 @@
 #' @param tmin monthly mean minimum air temperature
 #' @param tmax monthly mean maximum air temperature
 #'
-#' @return Relative Humidity
+#' @return numeric. Relative Humidity
 #'
 #' @examples
 #' \dontrun{
@@ -20,10 +20,10 @@ calc_RH <- function(tmin, tmax) {
 #'
 #' Based on simplified Penman - Monteith method from Hogg (1997)
 #'
-#' @param tave monthly average minimum air temperature
+#' @param tave numeric. Monthly average minimum air temperature.
 #' @param tmin monthly mean minimum air temperature
 #' @param tmax monthly mean maximum air temperature
-#' @param alt numeric. ?
+#' @param alt numeric. Altitude in m.
 #'
 #' @references Hogg, E.H. (1997). Temporal scaling of moisture and the forest-grassland boundary in western Canada. Agricultural and Forest Meteorology, Research on Forest Environmental Influences in a Changing World, 84, 115–122.
 #' @importFrom data.table fifelse

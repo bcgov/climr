@@ -1,10 +1,10 @@
 #' Calculate Precipitation As Snow (PAS)
 #'
-#' @param m month of the year
+#' @template m
 #' @param tm min temperature for that month
-#' @param ppt precipitation mm
+#' @param ppt numeric. Precipitation in mm.
 #'
-#' @return Precipitation As Snow
+#' @return numeric. Precipitation As Snow
 #'
 #' @examples
 #' \dontrun{

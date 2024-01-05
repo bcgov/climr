@@ -7,14 +7,14 @@
 calc_PAS(m, tm, ppt)
 }
 \arguments{
-\item{m}{month of the year}
+\item{m}{integer. Month of the year.}
 
 \item{tm}{min temperature for that month}
 
-\item{ppt}{precipitation mm}
+\item{ppt}{numeric. Precipitation in mm.}
 }
 \value{
-Precipitation As Snow
+numeric. Precipitation As Snow
 }
 \description{
 Calculate Precipitation As Snow (PAS)

@@ -12,7 +12,7 @@ calc_RH(tmin, tmax)
 \item{tmax}{monthly mean maximum air temperature}
 }
 \value{
-Relative Humidity
+numeric. Relative Humidity
 }
 \description{
 Calculate Relative Humidity (RH)
