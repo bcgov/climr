@@ -38,9 +38,9 @@ test_that("calc_* functions work", {
   expect_identical(climr:::calc_PAS(4, NA, 600), NA_real_)
   expect_identical(climr:::calc_PAS(4, 2, NA_real_), NA_real_)
 
-  expect_identical(round(climr:::calc_RH(tmin = 10, tmax = 40), 4), 28.5378)
-  expect_identical(climr:::calc_RH(tmin = NA, tmax = 40), NA_real_)
-  expect_identical(climr:::calc_RH(tmin = 10, tmax = NA), NA_real_)
+  expect_identical(round(climr:::calc_RH(tmmin = 10, tmmax = 40), 4), 28.5378)
+  expect_identical(climr:::calc_RH(tmmin = NA, tmmax = 40), NA_real_)
+  expect_identical(climr:::calc_RH(tmmin = 10, tmmax = NA), NA_real_)
 })
 
 
