@@ -1,4 +1,4 @@
-test_that("test the whole chain works with all variables", {
+test_that("test gcm_input", {
   dbCon <- data_connect()
   
   library(terra)
