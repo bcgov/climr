@@ -1,6 +1,7 @@
 # On load, instantiate either as new or from cache
 #' @importFrom data.table fwrite
 #' @importFrom RPostgres dbGetQuery
+#' @importFrom tools R_user_dir
 #' @noRd
 .onLoad <- function(libname, pkgname) {
   rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
