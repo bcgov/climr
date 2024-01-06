@@ -47,9 +47,9 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
   # historic_period = NULL
   # historic_ts = NULL
   # gcm_models = NULL
-  # ssp = c("ssp245","ssp370")
-  # gcm_period = c("2021_2040", "2041_2060")
-  # gcm_ts_years = 2020:2030
+  # ssp = NULL
+  # gcm_period = NULL
+  # gcm_ts_years = NULL
   # max_run = 0L
   # return_normal = TRUE
   # cache = TRUE
@@ -82,7 +82,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
   } else if (which_normal == "BC") {
     normal <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache)
   } else {
-    message("Normals not specified, extracting normals for BC and keeping points with non-NA climate values")
+    #message("Normals not specified, using highest resolution available for each point")
     bc_outline <- rast(system.file("extdata", "bc_outline.tif", package = "climr"))
     pnts <- extract(bc_outline, xyz[, 1:2], method = "simple")
     bc_ids <- xyz[, 4][!is.na(pnts$PPT01)]
@@ -161,7 +161,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
     results <- addIDCols(IDCols, results)
     return(results)
   } 
-  if ((length(bc_ids) == nrow(xyz_save) | length(bc_ids) < 1)) {
+  if ((length(bc_ids) < 1 || length(bc_ids) == nrow(xyz_save))) {
     if(!is.null(dbCon)) poolClose(dbCon)
     results <- addIDCols(IDCols, results)
     return(results)
