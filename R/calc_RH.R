@@ -1,17 +1,17 @@
 #' Calculate Relative Humidity (RH)
 #'
-#' @param tmin monthly mean minimum air temperature
-#' @param tmax monthly mean maximum air temperature
+#' @template tmmin
+#' @template tmmax
 #'
 #' @return numeric. Relative Humidity
 #'
 #' @examples
 #' \dontrun{
-#' climr:::calc_RH(tmin = 10, tmax = 40)
+#' climr:::calc_RH(tmmin = 10, tmmax = 40)
 #' }
-calc_RH <- function(tmin, tmax) {
-  es_tmin <- calc_SVP(tmin)
-  es_tmax <- calc_SVP(tmax)
+calc_RH <- function(tmmin, tmmax) {
+  es_tmin <- calc_SVP(tmmin)
+  es_tmax <- calc_SVP(tmmax)
   es_avg <- (es_tmin + es_tmax) / 2
   return(100 * es_tmin / es_avg)
 }
@@ -21,14 +21,14 @@ calc_RH <- function(tmin, tmax) {
 #' Based on simplified Penman - Monteith method from Hogg (1997)
 #'
 #' @param tave numeric. Monthly average minimum air temperature.
-#' @param tmin monthly mean minimum air temperature
-#' @param tmax monthly mean maximum air temperature
+#' @template tmmin
+#' @template tmmax
 #' @param alt numeric. Altitude in m.
 #'
 #' @references Hogg, E.H. (1997). Temporal scaling of moisture and the forest-grassland boundary in western Canada. Agricultural and Forest Meteorology, Research on Forest Environmental Influences in a Changing World, 84, 115–122.
 #' @importFrom data.table fifelse
-calc_PET <- function(tave, tmin, tmax, alt) {
-  D <- 0.5 * (.calc_SVP(tmax) - .calc_SVP(tmin)) - .calc_SVP(tmin - 2.5)
+calc_PET <- function(tave, tmmin, tmmax, alt) {
+  D <- 0.5 * (.calc_SVP(tmmax) - .calc_SVP(tmmin)) - .calc_SVP(tmmin - 2.5)
   pet <- fifelse(
     tave > 10, 93 * D * exp(alt / 9300),
     fifelse(tave > -5, (6.2 * tave + 31) * D * exp(alt / 9300), 0)

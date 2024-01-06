@@ -1,8 +1,8 @@
 #' Calculate Precipitation As Snow (PAS)
 #'
 #' @template m
-#' @param tm min temperature for that month
-#' @param ppt numeric. Precipitation in mm.
+#' @template tmin
+#' @template PPT
 #'
 #' @return numeric. Precipitation As Snow
 #'
@@ -10,10 +10,10 @@
 #' \dontrun{
 #' climr:::calc_PAS(4, 2, 600)
 #' }
-calc_PAS <- function(m, tm, ppt) {
+calc_PAS <- function(m, tmin, PPT) {
   if (FALSE) {
     T0 <- a <- b <- NULL
   }
 
-  param[["PAS"]][m, ppt * a / (1 + exp(-(tm - T0) / b))]
+  param[["PAS"]][m, PPT * a / (1 + exp(-(tmin - T0) / b))]
 }

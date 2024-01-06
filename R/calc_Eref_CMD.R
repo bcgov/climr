@@ -1,12 +1,12 @@
 #' Calculate Extreme Minimum Temperature (EMT)
 #' @template m
-#' @param tmin monthly mean minimum air temperature
-#' @param tmax monthly mean maximum air temperature
+#' @template tmmin
+#' @template tmmax
 #' @template latitude
 #' @return numeric. Reference evaporation (Eref)
-calc_Eref <- function(m, tmin, tmax, latitude) {
-  Eref <- numeric(length(tmax))
-  tmean <- (tmax + tmin) / 2
+calc_Eref <- function(m, tmmin, tmmax, latitude) {
+  Eref <- numeric(length(tmmax))
+  tmean <- (tmmax + tmmin) / 2
   i <- which(tmean >= 0)
   day_month <- c(31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
   day_julian <- c(15, 45, 74, 105, 135, 166, 196, 227, 258, 288, 319, 349)
@@ -15,10 +15,10 @@ calc_Eref <- function(m, tmin, tmax, latitude) {
   # Probably missing
   Eref[i] <- 0.0023 * day_month[m] *
     calc_S0_I(day_julian[m], tmean[i], latitude[i]) *
-    (tmean[i] + 17.8) * sqrt(tmax[i] - tmin[i]) *
+    (tmean[i] + 17.8) * sqrt(tmmax[i] - tmmin[i]) *
     (1.18 - 0.0065 * latitude[i])
 
-  Eref[is.na(tmax)] <- tmax[is.na(tmax)] ## use tmax[is.na(tmax)] to respect NA type
+  Eref[is.na(tmmax)] <- tmmax[is.na(tmmax)] ## use tmmax[is.na(tmmax)] to respect NA type
   
   return(Eref)
 }
@@ -40,10 +40,10 @@ calc_CMD <- function(Eref, PPT) {
 
 #' PROGRAM I From Hargreaves 1985
 #' @param d numeric. Julian day of the year (January 1 = 1, December 31 = 365).
-#' @param tmean mean temperature for that month
+#' @param tm numeric. Monthly mean temperature for the corresponding month.
 #' @template latitude
 #' @return numeric. Extraterrestrial radiation estimation in mm/day
-calc_S0_I <- function(d, tmean, latitude) {
+calc_S0_I <- function(d, tm, latitude) {
   # BASIC COMPUTER PROGRAM FOR ESTIMATING DAILY RA VALUES
   # D=JULIAN DAY (JANUARY 1=1)
   # DEC=DECLINATION OF THE SUN IN RADIANS
@@ -63,17 +63,17 @@ calc_S0_I <- function(d, tmean, latitude) {
   DL <- OM / 0.1309
   RAL <- 120 * (DL * sin(XLR) * sin(DEC) + 7.639 * cos(XLR) * cos(DEC) * sin(OM)) / ES
   # CALCULATE THE EXTRATERRESTRIAL RADIATION IN MM/DAY
-  RA <- RAL * 10 / (595.9 - 0.55 * tmean)
+  RA <- RAL * 10 / (595.9 - 0.55 * tm)
 
   return(RA)
 }
 
 #' PROGRAM II From Hargreaves 1985
 #' @template m
-#' @param tmean mean temperature for that month
+#' @template tm
 #' @template latitude
 #' @return numeric. Extraterrestrial radiation estimation in mm/day
-calc_S0_II <- function(m, tmean, latitude) {
+calc_S0_II <- function(m, tm, latitude) {
   # BASIC COMPUTER PROGRAM FOR ESTIMATING MONTHLY RA VALUES
   # DEC=DECLINATION OF THE SUN IN RADIANS
   # ES=MEAN MONTHLY DISTANCE OF THE SUN TO THE EARTH DIVIDED BY THE MEAN ANNUAL DISTANCE
@@ -96,7 +96,7 @@ calc_S0_II <- function(m, tmean, latitude) {
   # CALCULATE THE DAILY EXTRATERRESTRIAL RADIATION IN LANGLEYS/DAY
   RAL <- 916.732 * (OM * sin(XLR) * sin(DEC) + cos(XLR) * cos(DEC) * sin(OM)) / ES
   # CALCULATE THE EXTRATERRESTRIAL RADIATION IN MM/DAY
-  RA <- RAL * 10 / (595.9 - 0.55 * tmean)
+  RA <- RAL * 10 / (595.9 - 0.55 * tm)
 
   return(RA)
 }
