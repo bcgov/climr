@@ -15,9 +15,6 @@ test_that("test the whole chain works with all variables", {
   
   thebb <- get_bb(xyz)
   
-  # Create a normal baseline
-  normal <- normal_input(dbCon, thebb, cache = TRUE)
-  
   # Select GCM
   gcms <- list("BCC-CSM2-MR", c("BCC-CSM2-MR", "INM-CM5-0"))
   ssps <- list("ssp126", c("ssp126", "ssp370"))
