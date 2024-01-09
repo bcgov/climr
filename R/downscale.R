@@ -37,7 +37,7 @@
 #' }
 #' @rdname downscaling
 #' @export
-climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), historic_period = NULL, historic_ts = NULL,
+climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm", "Colin"), historic_period = NULL, historic_ts = NULL,
                             gcm_models = NULL, ssp = c("ssp126", "ssp245", "ssp370", "ssp585"),
                             gcm_period = NULL, gcm_ts_years = NULL, gcm_hist_years = NULL, max_run = 0L, return_normal = TRUE,
                             vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))), cache = TRUE,
@@ -81,6 +81,8 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
     normal <- normal_input(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
   } else if (which_normal == "BC") {
     normal <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache)
+  } else if (which_normal == "Colin") {
+    normal <- normal_input(dbCon = dbCon, normal = "composite_normal", bbox = thebb, cache = cache)
   } else {
     #message("Normals not specified, using highest resolution available for each point")
     bc_outline <- rast(system.file("extdata", "bc_outline.tif", package = "climr"))
@@ -156,7 +158,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm"), histor
     plot = plot
   )
   
-  if (which_normal %in% c("BC", "NorAm")) {
+  if (which_normal != "auto") {
     if(!is.null(dbCon)) poolClose(dbCon)
     results <- addIDCols(IDCols, results)
     return(results)
