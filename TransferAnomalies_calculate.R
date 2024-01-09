@@ -17,7 +17,7 @@ studyarea <- ext(c(-170, -52.25, 13.75, 83.75))
 bdy.na <- vect(countriesHigh[grep("Canada|United States|Mexico", countriesHigh$NAME),])
 bdy.na <- erase(bdy.na, ext(c(-170, -140, 13, 30))) # erase hawaii
 bdy.na <- aggregate(bdy.na) # dissolve
-buff.na <- buffer(bdy.na, width=50000) #transform to latlon projection
+buff.na <- buffer(bdy.na, width=50000) # buffer coastline
 # plot(bdy.na, add=T)
 # plot(buff.na, add=T)
 
@@ -51,8 +51,8 @@ for(e in 1:3){
   # calculate deltas for various averaging periods
   startyear=1961
   duration=30
-  for(startyear in seq(1951, 2011, 10)){
-    for(duration in c(10, 20, 30)){
+  for(duration in c(10, 20, 30)){
+    for(startyear in seq(1951, c(2011, 2001, 1991)[duration/10], 10)){
       endyear <- startyear+duration-1
       
       # loop through months
@@ -82,22 +82,21 @@ for(e in 1:3){
 
         # layer the rasters into a stack for export
         deltaStack <- if(m==1) delta else c(deltaStack, delta)
-        deltaNames <- if(m==1) paste(elements[e], monthcodes[m], sep="") else c(deltaNames, paste(elements[e], monthcodes[m], sep=""))
-        names(deltaStack) <- deltaNames
         
         print(m)
       }
+      names(deltaStack) <- monthcodes
       outfile <- paste("TransferAnomalies/delta.from.", ref.startyear, "_", ref.endyear, ".to.", startyear, "_", endyear, ".", elements[e],  ".tif", sep="")
-      writeRaster(deltaStack, outfile, names=deltaNames, overwrite=TRUE)
+      writeRaster(deltaStack, outfile, overwrite=TRUE)
 
-      print(duration)
-    }
     print(startyear)
+  }
+    print(duration)
   }
   
   print(element)
 }
 
-
-
+test <- rast("TransferAnomalies/delta.from.1981_2010.to.1961_1990.Tmin.tif")
+plot(test[[1]])
 
