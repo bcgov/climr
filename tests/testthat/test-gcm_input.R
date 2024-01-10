@@ -106,7 +106,7 @@ test_that("test gcm_hist_input", {
       
       ## some models may not have all years
       ## add 1 to max runs for ensemble.
-      test2 <- nlyr(gcm_hist) <= baseVars * (x$max_runs + 1) * length(x$years) * length(x$gcms)
+      test2 <- nlyr(gcm_hist) <= baseVars * (x$max_runs + 1) * length(x$years)
       
       ## number or layers should be a product of the number of base climate variables
       test3 <- nlyr(gcm_hist) / baseVars == nlyr(gcm_hist) %/% baseVars
@@ -170,7 +170,7 @@ test_that("test gcm_ts_input", {
       
       ## some models may not have all the years
       ## add 1 to max runs for ensemble.
-      test3 <- nlyr(gcm_ts) <= baseVars * (x$max_runs + 1) * length(x$years) * length(x$gcms)
+      test3 <- nlyr(gcm_ts) <= baseVars * (x$max_runs + 1) * length(x$years) * length(x$ssps)
       
       ## number or layers should be a product of the number of base climate variables
       test4 <- nlyr(gcm_ts) / baseVars == nlyr(gcm_ts) %/% baseVars
