@@ -4,13 +4,15 @@
 #' `historic_input` creates inputs from a given historic **period**.
 #' 
 #' @return A `list` of `SpatRasters`, each with possibly multiple layers, that can
-#'   be used with `downscale`.
+#'   be used with [`downscale()`].
 #' 
 #' @template dbCon
 #' @template bbox
 #' @param period character. Vector of labels of the periods to use. 
-#'   Can be obtained from `list_historic()`. Default to "2001_2020".
+#'   Can be obtained from [`list_historic()`]. Default to "2001_2020".
 #' @template cache
+#' 
+#' @seealso [downscale()], [`list_historic()`]
 #'
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
