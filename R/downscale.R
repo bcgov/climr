@@ -232,6 +232,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", "BC", "NorAm", "Colin"
 #' @examples
 #' \dontrun{
 #' dbCon <- data_connect()
+#' on.exit(try(pool::poolClose(dbCon)))
 #' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
 #' 
 #' ## get bounding box based on input points

@@ -1,5 +1,6 @@
 test_that("test gcm_input", {
   dbCon <- data_connect()
+  on.exit(try(pool::poolClose(dbCon)), add = TRUE)
   
   library(terra)
   
