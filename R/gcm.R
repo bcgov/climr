@@ -30,6 +30,7 @@
 #' 
 #' ## get database connection
 #' dbCon <- data_connect() 
+#' on.exit(try(pool::poolClose(dbCon)))
 #' 
 #' gcm <- gcm_input(dbCon, thebb, list_gcm()[1], list_ssp()[1])
 #' 
@@ -92,7 +93,8 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 #' thebb <- get_bb(xyz)
 #' 
 #' ## get database connection
-#' dbCon <- data_connect() 
+#' dbCon <- data_connect()
+#' on.exit(try(pool::poolClose(dbCon)))
 #' 
 #' gcm_hist <- gcm_hist_input(dbCon, thebb, list_gcm()[1])
 #' 
@@ -148,6 +150,7 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 #' 
 #' ## get database connection
 #' dbCon <- data_connect() 
+#' on.exit(try(pool::poolClose(dbCon)))
 #' 
 #' gcm_ts <- gcm_ts_input(dbCon, thebb, list_gcm()[1], list_ssp()[1])
 #' 

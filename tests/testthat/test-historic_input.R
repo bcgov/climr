@@ -2,6 +2,8 @@ test_that("test historic_input", {
   testInit("terra")
   
   dbCon <- data_connect()
+  on.exit(try(pool::poolClose(dbCon)), add = TRUE)
+  
   ## smaller example in BC
   xyz <- data.frame(Long = c(-127.70521, -127.62279, -127.56235, -127.7162, 
                              -127.18585, -127.1254, -126.94957, -126.95507),
@@ -49,6 +51,8 @@ test_that("test historic_input_ts", {
   testInit("terra")
   
   dbCon <- data_connect()
+  on.exit(try(pool::poolClose(dbCon)), add = TRUE)
+  
   ## smaller example in BC
   xyz <- data.frame(Long = c(-127.70521, -127.62279, -127.56235, -127.7162, 
                              -127.18585, -127.1254, -126.94957, -126.95507),
