@@ -155,6 +155,9 @@ list_unique <- function(files, col_num) {
 #'   corresponding names in the PostGIS data base.  See climr:::dbnames
 #' @template dbCon
 #' @template cache
+#' 
+#' @importFrom tools R_user_dir
+#' @importFrom data.table fread
 #'
 #' @return `SpatRaster`
 process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnames, dbCon, cache) { ## need to update to all GCMs
@@ -235,6 +238,9 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
 #' @param dbnames `data.frame` with the list of available GCMs (historical projections) 
 #'   and their corresponding names in the PostGIS data base. See climr:::dbnames_hist
 #' @template cache 
+#' 
+#' @importFrom tools R_user_dir
+#' @importFrom data.table fread
 #'
 #' @return `SpatRaster`
 process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbnames_hist, cache) { ## need to update to all GCMs
@@ -307,6 +313,9 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
 #' @template bbox 
 #' @template dbCon 
 #' @template cache 
+#' 
+#' @importFrom tools R_user_dir
+#' @importFrom data.table fread
 #'
 #' @return a `SpatRaster`
 process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache) { ## need to update to all GCMs
