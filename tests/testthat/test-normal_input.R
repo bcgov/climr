@@ -36,9 +36,14 @@ test_that("test normal_input", {
     
     if (normal != "normal_bc") {
       normal_bc <- normal_input(dbCon = dbCon, bbox = thebb, normal = "normal_bc", cache = TRUE)
+
       expect_identical(nlyr(normalout), nlyr(normal_bc))
       
-      expect_true(all(res(normalout) > res(normal_bc)))
+      if (normal == "normal_na") {
+        expect_true(all(round(res(normalout), 4) > round(res(normal_bc), 4)))
+      } else {
+        expect_true(all(round(res(normalout), 4) == round(res(normal_bc), 4)))
+      }      
     }
   })
   
