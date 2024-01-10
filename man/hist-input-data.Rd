@@ -15,7 +15,7 @@ historic_input_ts(dbCon, bbox = NULL, years = 2010:2022, cache = TRUE)
 \item{bbox}{numeric. Vector of length 4 giving bounding box of study region, created by \code{get_bb()}.}
 
 \item{period}{character. Vector of labels of the periods to use.
-Can be obtained from \code{list_historic()}. Default to "2001_2020".}
+Can be obtained from \code{\link[=list_historic]{list_historic()}}. Default to "2001_2020".}
 
 \item{cache}{logical. Specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 
@@ -23,10 +23,13 @@ Can be obtained from \code{list_historic()}. Default to "2001_2020".}
 }
 \value{
 A \code{list} of \code{SpatRasters}, each with possibly multiple layers, that can
-be used with \code{downscale}.
+be used with \code{\link[=downscale]{downscale()}}.
 }
 \description{
 \code{historic_input} creates inputs from a given historic \strong{period}.
 
 \code{historic_input} creates inputs from a given historic \strong{time series}.
+}
+\seealso{
+\code{\link[=downscale]{downscale()}}, \code{\link[=list_historic]{list_historic()}}
 }

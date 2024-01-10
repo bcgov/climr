@@ -35,21 +35,27 @@ list_variables(only_extra = FALSE)
 a character vector.
 }
 \description{
-\code{list_gcm} lists available global circulation models
+\code{list_gcm} lists available global circulation models.
 
-\code{list_ssp} lists available shared socioeconomic pathways
+\code{list_ssp} lists available shared socioeconomic pathways.
 
-\code{list_gcm_period} lists available periods
+\code{list_gcm_period} lists available periods.
 
-\code{list_run} lists available runs for a given GCM
+\code{list_run} lists available runs for a given GCM.
 
-\code{list_normal} lists available normals
+\code{list_normal} lists available normals.
 
 \code{list_historic} lists available historic periods
 
 \code{list_variables} lists climate variables
 }
 \details{
-Currently available normals (\code{list_normal()}) span North America ("normal_na") or
-British Columbia ("normal_bc")
+Currently available normals (\code{list_normal()}) are:
+\itemize{
+\item "normal_na" for Climate NA derived normals
+\item "normal_bc" for British Columbia PRISM climatologies derived normals
+\item "normal_composite" for a composite of BC PRISM, adjusted US PRISM and
+DAYMET (Alberta and Saskatchewan), covering western Canada and western
+US.
+}
 }

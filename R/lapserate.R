@@ -130,9 +130,9 @@ fitted <- function(x, beta_coef) {
 #'   each cell and its immediate neighbours.
 #'   It uses an offset approach to compute surrounding cells in each directions.
 #'
-#' @param mat the output `matrix` of `recycle_borders`
-#' @param nr integer. The number of rows in the original matrix used by `recycle_borders`
-#' @param nc integer. The number of columns in the original matrix used by `recycle_borders`
+#' @param mat the output `matrix` of `[recycle_borders()]`
+#' @param nr integer. The number of rows in the original matrix used by `[recycle_borders()]`
+#' @param nc integer. The number of columns in the original matrix used by `[recycle_borders()]`
 #' @param NA_replace logical. Should NA delta results be replaced by zeros.
 #'   Defaults to TRUE.
 #'  

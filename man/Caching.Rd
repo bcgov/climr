@@ -7,7 +7,9 @@
 \usage{
 cache_path()
 
-cache_clear(what = c("gcm", "normal", "historic"))
+cache_clear(
+  what = c("gcm", "gcmts", "gcmhist", "normal", "historic", "historic_ts")
+)
 }
 \arguments{
 \item{what}{character. Which data folders should be cleared?
@@ -31,4 +33,7 @@ set using the \code{climr.cache.path} option with \code{options("climr.cache.pat
 
 It may fail if R has no permission to delete files/folders
 in the \code{cache_path()} directory
+}
+\seealso{
+\code{\link[=cache_path]{cache_path()}}
 }

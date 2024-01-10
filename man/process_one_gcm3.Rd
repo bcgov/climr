@@ -18,7 +18,7 @@ process_one_gcm3(
 \item{gcm_nm}{character. Name of GCM to use.}
 
 \item{years}{numeric. Vector of desired years. Must be in \code{1851:2015}.
-Can be obtained from \code{list_gcm_period()}. Default to \code{list_gcm_period()}.}
+Can be obtained from \code{\link[=list_gcm_period]{list_gcm_period()}}. Default to \code{\link[=list_gcm_period]{list_gcm_period()}}.}
 
 \item{dbCon}{A db connection object created by \code{data_connect}.}
 
