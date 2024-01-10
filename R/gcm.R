@@ -1,7 +1,7 @@
 #' Create GCM inputs for `downscale` using data on Postgis database.
 #' 
 #' @return A `list` of `SpatRasters`, each with possibly multiple layers, that can
-#'   be used with `downscale`.
+#'   be used with [`downscale()`].
 #' 
 #' @description
 #' `gcm_input` creates GCM climate periods inputs, given chosen GCMs, SSPs, 
@@ -14,6 +14,8 @@
 #' @template period
 #' @template max_run
 #' @template cache
+#' 
+#' @seealso [downscale()]
 #' 
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
@@ -55,9 +57,11 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 #' @template bbox
 #' @template gcm
 #' @param years numeric. Vector of desired years. Must be in `1851:2015`.
-#'   Can be obtained from `list_gcm_period()`. Default to `list_gcm_period()`.
+#'   Can be obtained from [`list_gcm_period()`]. Default to [`list_gcm_period()`].
 #' @template max_run
 #' @template cache
+#' 
+#' @seealso [list_gcm_period()], [`list_gcm_period()`]
 #' 
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
@@ -231,7 +235,7 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
 #'
 #' @template gcm_nm 
 #' @param years numeric. Vector of desired years. Must be in `1851:2015`.
-#'   Can be obtained from `list_gcm_period()`. Default to `list_gcm_period()`.
+#'   Can be obtained from [`list_gcm_period()`]. Default to [`list_gcm_period()`].
 #' @template dbCon 
 #' @template bbox 
 #' @template max_run

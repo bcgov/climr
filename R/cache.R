@@ -58,6 +58,7 @@ cache_ask <- function(ask = interactive()) {
 #' @details
 #'   It may fail if R has no permission to delete files/folders
 #'   in the `cache_path()` directory
+#' @seealso [cache_path()]
 #' 
 #' @return TRUE or FALSE depending on whether cache was cleared successfully
 #'   or not.
