@@ -1,4 +1,4 @@
-test_that("test the whole chain works with all variables", {
+test_that("test gcm_input", {
   dbCon <- data_connect()
   
   library(terra)
@@ -14,9 +14,6 @@ test_that("test the whole chain works with all variables", {
                    row.names = c(NA, -8L), class = "data.frame")
   
   thebb <- get_bb(xyz)
-  
-  # Create a normal baseline
-  normal <- normal_input(dbCon, thebb, cache = TRUE)
   
   # Select GCM
   gcms <- list("BCC-CSM2-MR", c("BCC-CSM2-MR", "INM-CM5-0"))
