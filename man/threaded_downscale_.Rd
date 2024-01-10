@@ -20,13 +20,13 @@ threaded_downscale_(
 
 \item{normal}{\code{SpatRaster}. Reference normal baseline input from \code{normal_input}.}
 
-\item{gcm}{\code{list} of \code{SpatRasters}. Global Circulation Models outputs from \code{gcm_input}. Default to \code{NULL}.}
+\item{gcm}{\code{list} of \code{SpatRasters}. Global Circulation Models outputs from \code{\link[=gcm_input]{gcm_input()}}. Default to \code{NULL}.}
 
 \item{gcm_ts}{\code{list} of \code{SpatRasters}. TODO}
 
 \item{gcm_hist}{\code{list} of \code{SpatRasters}. TODO}
 
-\item{historic}{\code{list} of \code{SpatRasters}. Historic time period outputs from \code{historic_input}. Default to \code{NULL}.}
+\item{historic}{\code{list} of \code{SpatRasters}. Historic time period outputs from \code{\link[=historic_input]{historic_input()}}. Default to \code{NULL}.}
 
 \item{historic_ts}{\code{list} of \code{SpatRasters}. TODO}
 

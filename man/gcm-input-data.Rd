@@ -41,13 +41,13 @@ gcm_ts_input(
 \item{bbox}{numeric. Vector of length 4 giving bounding box of study region, created by \code{get_bb()}.}
 
 \item{gcm}{character. Vector of labels of the global circulation models to use.
-Can be obtained from \code{list_gcm()}. Default to \code{list_gcm()}.}
+Can be obtained from \code{\link[=list_gcm]{list_gcm()}}. Default to all GCMs available.}
 
 \item{ssp}{character. Vector of labels of the shared socioeconomic pathways to use.
-See available options with \code{list_ssp()}. Defaults to \code{list_ssp()}.}
+See available options with \code{\link[=list_ssp]{list_ssp()}}. Defaults to all SSPs available.}
 
 \item{period}{character. Vector of labels of the periods to use.
-Can be obtained from \code{list_gcm_period()}. Default to \code{list_gcm_period()}.}
+Can be obtained from \code{\link[=list_gcm_period]{list_gcm_period()}}. Defaults to all periods available.}
 
 \item{max_run}{integer. Maximum number of model runs to include.
 A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
@@ -59,7 +59,7 @@ are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 }
 \value{
 A \code{list} of \code{SpatRasters}, each with possibly multiple layers, that can
-be used with \code{downscale}.
+be used with \code{\link[=downscale]{downscale()}}.
 }
 \description{
 \code{gcm_input} creates GCM climate periods inputs, given chosen GCMs, SSPs,
@@ -70,4 +70,9 @@ years and runs.
 
 \code{gcm_ts_input} creates GCM time series inputs, given chosen GCMs, SSPs,
 years and runs.
+}
+\seealso{
+\code{\link[=downscale]{downscale()}}
+
+\code{\link[=list_gcm_period]{list_gcm_period()}}, \code{\link[=list_gcm_period]{list_gcm_period()}}
 }

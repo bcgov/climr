@@ -3,7 +3,7 @@
 #' @return a character vector.
 #' 
 #' @description
-#' `list_gcm` lists available global circulation models
+#' `list_gcm` lists available global circulation models.
 #' 
 #' @rdname data-option-lists
 #' @export
@@ -16,7 +16,7 @@ list_gcm <- function() {
 }
 
 #' @description
-#' `list_ssp` lists available shared socioeconomic pathways
+#' `list_ssp` lists available shared socioeconomic pathways.
 #' 
 #' @rdname data-option-lists
 #' @export
@@ -26,7 +26,7 @@ list_ssp <- function() {
 }
 
 #' @description
-#' `list_gcm_period` lists available periods
+#' `list_gcm_period` lists available periods.
 #' 
 #' @rdname data-option-lists
 #' @export
@@ -36,7 +36,7 @@ list_gcm_period <- function() {
 }
 
 #' @description
-#' `list_run` lists available runs for a given GCM
+#' `list_run` lists available runs for a given GCM.
 #' 
 #' @template dbCon
 #' @param gcm Character vector to specify requested GCMs
@@ -49,11 +49,15 @@ list_run <- function(dbCon, gcm) {
 }
 
 #' @description 
-#' `list_normal` lists available normals
+#' `list_normal` lists available normals.
 #' 
 #' @details
-#' Currently available normals (`list_normal()`) span North America ("normal_na") or
-#'   British Columbia ("normal_bc")
+#' Currently available normals (`list_normal()`) are:
+#'   * "normal_na" for Climate NA derived normals
+#'   * "normal_bc" for British Columbia PRISM climatologies derived normals
+#'   * "normal_composite" for a composite of BC PRISM, adjusted US PRISM and 
+#'     DAYMET (Alberta and Saskatchewan), covering western Canada and western
+#'     US.
 #' 
 #' @rdname data-option-lists
 #' @export

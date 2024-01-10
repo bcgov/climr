@@ -7,7 +7,7 @@
 \usage{
 climr_downscale(
   xyz,
-  which_normal = c("auto", "BC", "NorAm"),
+  which_normal = c("auto", list_normal()),
   historic_period = NULL,
   historic_ts = NULL,
   gcm_models = NULL,
@@ -42,18 +42,20 @@ downscale(
 \arguments{
 \item{xyz}{A 3-column \code{matrix} or \code{data.frame} (x, y, z) or (lon, lat, elev).}
 
-\item{which_normal}{character. Which normal layer to use. Default is "auto", which selects the highest resolution normal for each point}
+\item{which_normal}{character. Which normal layer to use.
+Default is "auto", which selects the highest resolution normal for each point.
+Other options are one of \code{\link[=list_normal]{list_normal()}}}
 
 \item{historic_period}{character. Which historic period. Default \code{NULL}}
 
 \item{historic_ts}{\code{list} of \code{SpatRasters}. TODO}
 
-\item{gcm_models}{character. Vector of GCM names. Options are \code{list_gcm()}. Used for gcm periods, gcm timeseries, and historic timeseries. Default \code{NULL}}
+\item{gcm_models}{character. Vector of GCM names. Options are \code{\link[=list_gcm]{list_gcm()}}. Used for gcm periods, gcm timeseries, and historic timeseries. Default \code{NULL}}
 
 \item{ssp}{character. Vector of labels of the shared socioeconomic pathways to use.
-See available options with \code{list_ssp()}. Defaults to \code{list_ssp()}.}
+See available options with \code{\link[=list_ssp]{list_ssp()}}. Defaults to all SSPs available.}
 
-\item{gcm_period}{character. Requested future periods. Options are \code{list_gcm_period()}}
+\item{gcm_period}{character. Requested future periods. Options are \code{\link[=list_gcm_period]{list_gcm_period()}}}
 
 \item{gcm_ts_years}{character. Requested future timeseries years. Must be in \code{2015:2100}}
 
@@ -66,7 +68,7 @@ are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 \item{return_normal}{logical. Return downscaled normal period (1961-1990)? Default \code{TRUE}.}
 
 \item{vars}{character. A vector of climate variables to compute. Supported variables
-can be obtained with \code{list_variables()}. Definitions can be found in this package
+can be obtained with \code{\link[=list_variables]{list_variables()}}. Definitions can be found in this package
 \code{variables} dataset. Default to monthly PPT, Tmax, Tmin.}
 
 \item{cache}{logical. Cache data locally? Default \code{TRUE}}
@@ -81,9 +83,9 @@ Defaults to no plotting (NULL).}
 
 \item{normal}{\code{SpatRaster}. Reference normal baseline input from \code{normal_input}.}
 
-\item{gcm}{\code{list} of \code{SpatRasters}. Global Circulation Models outputs from \code{gcm_input}. Default to \code{NULL}.}
+\item{gcm}{\code{list} of \code{SpatRasters}. Global Circulation Models outputs from \code{\link[=gcm_input]{gcm_input()}}. Default to \code{NULL}.}
 
-\item{historic}{\code{list} of \code{SpatRasters}. Historic time period outputs from \code{historic_input}. Default to \code{NULL}.}
+\item{historic}{\code{list} of \code{SpatRasters}. Historic time period outputs from \code{\link[=historic_input]{historic_input()}}. Default to \code{NULL}.}
 
 \item{gcm_ts}{\code{list} of \code{SpatRasters}. TODO}
 
@@ -136,6 +138,9 @@ terra::plot(historic[[1]])
 
 downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)
 }
+}
+\seealso{
+\code{\link[=gcm_input]{gcm_input()}}, \code{\link[=historic_input]{historic_input()}}, \code{\link[=list_variables]{list_variables()}}
 }
 \author{
 Kiri Daust
