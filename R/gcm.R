@@ -99,9 +99,9 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 #' gcm_hist <- gcm_hist_input(dbCon, thebb, list_gcm()[1])
 #' 
 #' ## show ensemble means only
-#' lyrs <- grep("ensemble", names(gcm$`ACCESS-ESM1-5`))
+#' lyrs <- grep("ensemble", names(gcm_hist$`ACCESS-ESM1-5`))
 #' 
-#' plot(gcm$`ACCESS-ESM1-5`[[lyrs]])
+#' plot(gcm_hist$`ACCESS-ESM1-5`[[lyrs]])
 #' }
 #' 
 #' @rdname gcm-input-data
@@ -155,9 +155,9 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 #' gcm_ts <- gcm_ts_input(dbCon, thebb, list_gcm()[1], list_ssp()[1])
 #' 
 #' ## show ensemble means only
-#' lyrs <- grep("ensemble", names(gcm$`ACCESS-ESM1-5`))
+#' lyrs <- grep("ensemble", names(gcm_ts$`ACCESS-ESM1-5`))
 #' 
-#' plot(gcm$`ACCESS-ESM1-5`[[lyrs]])
+#' plot(gcm_ts$`ACCESS-ESM1-5`[[lyrs]])
 #' }
 #' 
 #' @rdname gcm-input-data
