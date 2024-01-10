@@ -1,5 +1,5 @@
 library(terra)
-library(climRdev)
+library(climr)
 library(RPostgres)
 library(data.table)
 library(analogsea)
@@ -19,15 +19,21 @@ writeRaster(bc_outline, filename = "inst/extdata/bc_outline.tif", datatype = "IN
 
 ##process NA normals
 # Load normal files
-dir_normal <- "C:/DataFiles/Normal_1961_1990MP/"
-d <- rast("C:/Program Files/ClimateNA/InputFiles/na4000.asc")
+dir_normal <- "../Common_Files/colin_climatology/"
+files <- list.files(dir_normal, full.names = T)
+fnames <- list.files(dir_normal)
+d <- rast(files)
+names(d) <- c("PPT01", "PPT02", "PPT03", "PPT04", "PPT05", "PPT06", "PPT07", "PPT08", "PPT09", "PPT10", 
+              "PPT11", "PPT12", "Tmax01", "Tmax02", "Tmax03", "Tmax04", "Tmax05", "Tmax06", "Tmax07", 
+              "Tmax08", "Tmax09", "Tmax10", "Tmax11", "Tmax12", "Tmin01", "Tmin02", "Tmin03", "Tmin04",
+              "Tmin05", "Tmin06", "Tmin07", "Tmin08", "Tmin09", "Tmin10", "Tmin11", "Tmin12")
 
-r <- terra::rast(list.files(dir_normal, full.names = TRUE, pattern = "\\.asc"))
-r <- r[[grep("PPT|Tmin|Tmax", names(r))]]
+dem <- rast("../Common_Files/composite_WNA_dem.tif")
+#r <- r[[grep("PPT|Tmin|Tmax", names(r))]]
 
 lr <- lapse_rate(
-  normal = r,
-  dem = d,
+  normal = d,
+  dem = dem,
   NA_replace = TRUE,
   nthread = 2,
   rasterize = TRUE
@@ -36,15 +42,15 @@ names(lr) <- paste0("lr_",names(lr))
 
 # Actual writing
 terra::writeRaster(
-  c(r, lr, d),
-  file.path("C:/DataFiles/ProcessedRasters/", sprintf("%s.wlrdem.tif", "Normal_NA")),
+  c(d, lr, dem),
+  file.path("../Common_Files/composite_wna_wlrdem.tif"),
   overwrite = TRUE,
   gdal="COMPRESS=NONE"
 )
 
 ############# now upload
 session <- ssh_connect("root@146.190.244.244")
-scp_upload(session, "C:/DataFiles/ProcessedRasters/Normal_NA.wlrdem.tif", to = "/share")
+scp_upload(session, "../Common_Files/composite_wna_wlrdem.tif", to = "/share")
 ssh_exec_wait(session, command = c("cd /share",
                                    "ls",
                                    "raster2pgsql -s 4326 -I -C -M Normal_1961_1990MP.wlrdem.tif -t 50x50 normal_wna > normal_wna.sql"))
@@ -62,6 +68,9 @@ curr_per <- rast("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climr/inputs_pkg/h
 plot(curr_per[[35]])
 scp_upload(session, paste0("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climr/inputs_pkg/historic/Historic_2001_2020/2001_2020.tif"), to = "/share")
 pgisfn <- paste0("raster2pgsql -s 4326 -I -C -M 2001_2020.tif -t 6x6 historic_periods > 2001_2020.sql")
+
+"GTIFF_DIRECT_IO=YES raster2pgsql -s 4326 -I -M composite_wna_wlrdem.tif -t 50x50 composite_normal > composite_normal.sql &"
+
 
 metadt <- data.table(period = "2001_2020",fullnm = names(curr_per))
 metadt[,laynum := seq_along(metadt$period)]
