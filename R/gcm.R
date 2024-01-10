@@ -162,7 +162,7 @@ list_unique <- function(files, col_num) {
 #' @return `SpatRaster`
 process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnames, dbCon, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
-  gcm_nm <- gsub("-", ".", gcm_nm)
+  #gcm_nm <- gsub("-", ".", gcm_nm)
   
   rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
   
