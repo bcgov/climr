@@ -33,24 +33,18 @@ test_that("test gcm_input", {
       max_run = x$max_runs,
       cache = TRUE
     )
-
+    
     testOut <- sapply(gcm, FUN = function(gcm) {
       
       expect_true(is(gcm, "SpatRaster"))
       
-      test <- all(grepl(paste(x$ssps, collapse = "|"), names(gcm)))
-      test2 <- all(grepl(paste(x$periods, collapse = "|"), names(gcm)))
+      test <- all(sapply(x$ssps, function(x) anygrepl(x, names(gcm))))
+      test2 <- all(sapply(x$periods, function(x) any(grepl(x, names(gcm)))))
       
       baseVars <- 36 ## number of base variables for run
       
-      if (x$max_runs == 0){
-        test3 <- nlyr(gcm) == baseVars * length(x$ssps) * length(x$periods)
-      }
-      if (x$max_runs > 0) {
-        test3 <- nlyr(gcm) >= baseVars * length(x$ssps) * length(x$periods)
-        ## add 1 to max runs for ensemble.
-        test3 <- test3 & (nlyr(gcm) <= baseVars * (x$max_runs + 1) * length(x$ssps) * length(x$periods))
-      }
+      ## add 1 to max runs for ensemble.
+      test3 <- nlyr(gcm) <= baseVars * (x$max_runs + 1) * length(x$ssps) * length(x$periods)
       
       ## number or layers should be a product of the number of base climate variables
       test4 <- nlyr(gcm) / baseVars == nlyr(gcm) %/% baseVars
