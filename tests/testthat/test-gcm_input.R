@@ -38,7 +38,7 @@ test_that("test gcm_input", {
       
       expect_true(is(gcm, "SpatRaster"))
       
-      test <- all(sapply(x$ssps, function(x) anygrepl(x, names(gcm))))
+      test <- all(sapply(x$ssps, function(x) any(grepl(x, names(gcm)))))
       test2 <- all(sapply(x$periods, function(x) any(grepl(x, names(gcm)))))
       
       baseVars <- 36 ## number of base variables for run
