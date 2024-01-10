@@ -12,15 +12,18 @@ normal_input(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE)
 \item{bbox}{numeric. Vector of length 4 giving bounding box of study region, created by \code{get_bb()}.}
 
 \item{normal}{A \code{character} or a \code{SpatRaster}. For character, label of the normal baseline to use.
-Can be obtained from \code{list_normal()}. For \code{SpatRaster}, 36 layers normal climate variables with
+Can be obtained from \code{\link[=list_normal]{list_normal()}}. For \code{SpatRaster}, 36 layers normal climate variables with
 names PPT01:PPT12, Tmax01:Tmax12 and Tmin01:Tmin12. Defaults to \code{list_normal()[1]}.}
 
 \item{cache}{logical. Specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 }
 \value{
 A \code{SpatRaster} containing normals, lapse rates
-and digital elevation model layers, that can be used with \code{downscale}.
+and digital elevation model layers, that can be used with \code{\link[=downscale]{downscale()}}.
 }
 \description{
 Create normal baseline inputs for \code{downscale} from PostGIS database.
+}
+\seealso{
+\code{\link[=downscale]{downscale()}}
 }
