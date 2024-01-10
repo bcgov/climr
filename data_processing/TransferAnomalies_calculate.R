@@ -28,11 +28,11 @@ counter=0 #counter for total iterations
 for(e in 1:3){
   element <- elements.cru[e]
   if(element!="pre"){
-    dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/cru_ts4.05"
+    dir <- "TimeSeries_gridded_monthly/cru_ts4.05"
     files <- list.files(dir, pattern="\\.nc$")
     r <- rast(paste(dir, files[grep(element, files)], sep="/"))
   } else {
-    dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/GPCC"
+    dir <- "TimeSeries_gridded_monthly/GPCC"
     files <- list.files(dir, pattern="\\.nc$")
     file <- files[13]
     r <- rast(paste(dir, file, sep="/"))
