@@ -44,7 +44,6 @@ test_that("test normal_input", {
       if (normal == "normal_na") {
         expect_true(all(round(res(normalout), 4) > round(res(normal_bc), 4)))
       } else {
-        browser()
         expect_true(all(round(res(normalout), 4) == round(res(normal_bc), 4)))
       }      
     }
