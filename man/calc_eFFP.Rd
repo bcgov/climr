@@ -7,22 +7,24 @@
 calc_eFFP(NFFD, t_min_list)
 }
 \arguments{
-\item{NFFD}{Number of Frost-Free Days}
+\item{NFFD}{numeric. Number of Frost-Free Days.}
 
-\item{t_min_list}{named list of monthly minimum temperature for each month}
+\item{t_min_list}{\code{list} of monthly minimum temperature for each month in order.}
 }
 \value{
-Day of the year on which the Frost-Free Period ends
+numeric. Julian day on which the Frost-Free Period ends
 }
 \description{
 bFFP : Day of the year on which the Frost-Free Period ends
 }
 \examples{
 \dontrun{
-t_min_list <- list("1" = -35, "2" = -32, "3" = -25, "4" = -10, 
-"5" = -5, "6" = 3,  "7" = 15, "8" = 17, "9" = 10, "10" = -5,
-"11" = -20, "12" = -30)
+t_min_list <- list(
+  "1" = -35, "2" = -32, "3" = -25, "4" = -10,
+  "5" = -5, "6" = 3, "7" = 15, "8" = 17, "9" = 10, "10" = -5,
+  "11" = -20, "12" = -30
+)
 
-calc_eFFP(NFFD = 10, t_min_list = t_min_list)
+climr:::calc_eFFP(NFFD = 10, t_min_list = t_min_list)
 }
 }

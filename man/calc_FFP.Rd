@@ -7,18 +7,18 @@
 calc_FFP(bFFP, eFFP)
 }
 \arguments{
-\item{bFFP}{Day of the year on which the Frost-Free Period begins}
+\item{bFFP}{numeric. Day of the year on which the Frost-Free Period begins}
 
-\item{eFFP}{Day of the year on which the Frost-Free Period ends}
+\item{eFFP}{numeric. Day of the year on which the Frost-Free Period ends}
 }
 \value{
-Frost-Free Period
+numeric. Frost-Free Period in days
 }
 \description{
 Calculate Frost-Free Period
 }
 \examples{
 \dontrun{
-calc_FFP(bFFP = 214.5964, eFFP = 265.4581)
+climr:::calc_FFP(bFFP = 214.5964, eFFP = 265.4581)
 }
 }

@@ -4,23 +4,23 @@
 \alias{calc_PAS}
 \title{Calculate Precipitation As Snow (PAS)}
 \usage{
-calc_PAS(m, tm, ppt)
+calc_PAS(m, tmin, PPT)
 }
 \arguments{
-\item{m}{month of the year}
+\item{m}{integer. Month of the year.}
 
-\item{tm}{min temperature for that month}
+\item{tmin}{numeric. Minimum temperature for the \code{m} month.}
 
-\item{ppt}{precipitation mm}
+\item{PPT}{numeric. Precipitation in mm.}
 }
 \value{
-Precipitation As Snow
+numeric. Precipitation As Snow
 }
 \description{
 Calculate Precipitation As Snow (PAS)
 }
 \examples{
 \dontrun{
-calc_PAS(4, 2)
+climr:::calc_PAS(4, 2, 600)
 }
 }

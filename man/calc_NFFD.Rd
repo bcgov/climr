@@ -4,21 +4,21 @@
 \alias{calc_NFFD}
 \title{Calculate Number of Frost Free Days (NFFD)}
 \usage{
-calc_NFFD(m, tm)
+calc_NFFD(m, tmin)
 }
 \arguments{
-\item{m}{month of the year}
+\item{m}{integer. Month of the year.}
 
-\item{tm}{min temperature for that month}
+\item{tmin}{numeric. Minimum temperature for the \code{m} month.}
 }
 \value{
-Number of Frost Free Days
+numeric. Number of Frost Free Days
 }
 \description{
 Calculate Number of Frost Free Days (NFFD)
 }
 \examples{
 \dontrun{
-calc_NFFD(3, 2.05)
+climr:::calc_NFFD(3, 2.05)
 }
 }

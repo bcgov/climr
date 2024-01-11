@@ -1,49 +1,57 @@
 #' Calculate Relative Humidity (RH)
 #'
-#' @param tmin monthly mean minimum air temperature
-#' @param tmax monthly mean maximum air temperature
+#' @template tmmin
+#' @template tmmax
 #'
-#' @return Relative Humidity
+#' @return numeric. Relative Humidity
 #'
 #' @examples
 #' \dontrun{
-#' calc_RH(tmin_mean = 10, tmax_mean = 40)
+#' climr:::calc_RH(tmmin = 10, tmmax = 40)
 #' }
-calc_RH <- function(tmin, tmax) {
-  
-  es_tmin <- calc_es(tmin)
-  es_tmax <- calc_es(tmax)
-  es_avg = (es_tmin + es_tmax)/2
-  return(100 * es_tmin/es_avg)
-  
+calc_RH <- function(tmmin, tmmax) {
+  es_tmin <- calc_SVP(tmmin)
+  es_tmax <- calc_SVP(tmmax)
+  es_avg <- (es_tmin + es_tmax) / 2
+  return(100 * es_tmin / es_avg)
 }
 
-##based on simplified Penman - Monteith method fro Hogg 1997
-calc_PET <- function(tave, tmin, tmax, alt){
-  D <- 0.5*(calc_SVP(tmax) - calc_SVP(tmin)) - calc_SVP(tmin - 2.5)
-  pet <- data.table::fifelse(tave > 10, 93 * D * exp(alt/9300),
-                             data.table::fifelse(tave > -5, (6.2 * tave + 31) * D * exp(alt/9300), 0))
+#' Calculate Potential Evapotranspiration
+#'
+#' Based on simplified Penman - Monteith method from Hogg (1997)
+#'
+#' @param tave numeric. Monthly average minimum air temperature.
+#' @template tmmin
+#' @template tmmax
+#' @param alt numeric. Altitude in m.
+#'
+#' @references Hogg, E.H. (1997). Temporal scaling of moisture and the forest-grassland boundary in western Canada. Agricultural and Forest Meteorology, Research on Forest Environmental Influences in a Changing World, 84, 115–122.
+#' @importFrom data.table fifelse
+calc_PET <- function(tave, tmmin, tmmax, alt) {
+  D <- 0.5 * (.calc_SVP(tmmax) - .calc_SVP(tmmin)) - .calc_SVP(tmmin - 2.5)
+  pet <- fifelse(
+    tave > 10, 93 * D * exp(alt / 9300),
+    fifelse(tave > -5, (6.2 * tave + 31) * D * exp(alt / 9300), 0)
+  )
   return(pet)
 }
 
-# calc_cmi <- function(ppt, pet){
+# calc_cmi <- function(ppt, pet) {
 #   return(ppt - pet)
 # }
 
-# es: saturated vapour pressure at a temperature t
-# t: air temperature
-calc_es <- function(t) {
-  
-  svp <- calc_SVP(t)
+#' Calculate Saturated Vapour Pressure at a temperature t
+#' @template t
+
+calc_SVP <- function(t) {
+  svp <- .calc_SVP(t)
   i <- which(t < 0)
-  svp[i] <- svp[i] * (1 + ( t[i] * 0.01) )
+  svp[i] <- svp[i] * (1 + (t[i] * 0.01))
   return(svp)
-  
 }
 
-# Saturated Vapour Pressure
-calc_SVP <- function(t){
-  
-  return(0.6105 * exp((17.273*t)/(t+237.3)))
-  
+#' internal utility function
+#' @template t
+.calc_SVP <- function(t) {
+  return(0.6105 * exp((17.273 * t) / (t + 237.3)))
 }

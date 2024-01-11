@@ -4,21 +4,21 @@
 \alias{calc_RH}
 \title{Calculate Relative Humidity (RH)}
 \usage{
-calc_RH(tmin, tmax)
+calc_RH(tmmin, tmmax)
 }
 \arguments{
-\item{tmin}{monthly mean minimum air temperature}
+\item{tmmin}{numeric. Monthly mean minimum air temperature.}
 
-\item{tmax}{monthly mean maximum air temperature}
+\item{tmmax}{numeric. Monthly mean maximum air temperature.}
 }
 \value{
-Relative Humidity
+numeric. Relative Humidity
 }
 \description{
 Calculate Relative Humidity (RH)
 }
 \examples{
 \dontrun{
-calc_RH(tmin_mean = 10, tmax_mean = 40)
+climr:::calc_RH(tmmin = 10, tmmax = 40)
 }
 }

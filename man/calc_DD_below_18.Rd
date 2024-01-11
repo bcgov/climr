@@ -7,18 +7,18 @@
 calc_DD_below_18(m, tm)
 }
 \arguments{
-\item{m}{month of the year}
+\item{m}{integer. Month of the year.}
 
-\item{tm}{monthly mean temperature for the \code{m} month}
+\item{tm}{numeric. Monthly mean temperature for the \code{m} month.}
 }
 \value{
-Degree-Day Below 18
+numeric. Degree-Days Below 18
 }
 \description{
 Calculate Degree-Day Below 18 (DD<18)
 }
 \examples{
 \dontrun{
-calc_DD_below_18(2, -14)
+climr:::calc_DD_below_18(2, -14)
 }
 }

@@ -7,20 +7,20 @@
 calc_DD_above_18(m, tm, region)
 }
 \arguments{
-\item{m}{month of the year}
+\item{m}{integer. Month of the year.}
 
-\item{tm}{monthly mean temperature for the \code{m} month}
+\item{tm}{numeric. Monthly mean temperature for the \code{m} month.}
 
-\item{region}{one of either "All", "South west", "The rest"}
+\item{region}{character. One of either "All", "South west", "The rest".}
 }
 \value{
-Degree-Day Above 18
+numeric. Degree-Days Above 18
 }
 \description{
 Calculate Degree-Day Above 18 (DD>18)
 }
 \examples{
 \dontrun{
-calc_DD_above_18(2, -14, "All")
+climr:::calc_DD_above_18(2, -14, "All")
 }
 }
