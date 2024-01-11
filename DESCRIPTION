@@ -1,6 +1,6 @@
 Package: climr
 Title: Downscaling of global climate data
-Version: 0.0.0.9990
+Version: 0.0.1
 Authors@R: c(
     person("Kiri","Daust", email = "kiri.daust@gov.bc.ca", role = "aut"),
     person("Colin", "Mahony", email = "Colin.Mahony@gov.bc.ca", role = c("aut", "cre"),
@@ -24,18 +24,20 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
-    terra,
-    parallel,
     data.table,
-    gh,
-    RPostgres,
+    DBI,
+    methods,
     pool,
-    uuid,
-    methods
+    RPostgres,
+    terra,
+    sf,
+    uuid
+Suggests: 
+    parallel,
+    rmarkdown,
+    testthat (>= 3.0.0),
+    withr
 Depends: 
     R (>= 4.0)
-Suggests: 
-    rmarkdown,
-    testthat (>= 3.0.0)
 Config/testthat/edition: 3
 LazyData: true

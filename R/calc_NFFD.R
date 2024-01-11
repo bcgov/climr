@@ -1,17 +1,17 @@
 #' Calculate Number of Frost Free Days (NFFD)
 #'
-#' @param m month of the year
-#' @param tm min temperature for that month
+#' @template m
+#' @template tmin
 #'
-#' @return Number of Frost Free Days
-#' 
+#' @return numeric. Number of Frost Free Days
+#'
 #' @examples
 #' \dontrun{
-#' calc_NFFD(3, 2.05)
+#' climr:::calc_NFFD(3, 2.05)
 #' }
-calc_NFFD <- function(m, tm) {
-  
-  if (FALSE) { a <- T0 <- b <- NULL }
-  param[["NFFD"]][m, a/(1 + exp(-(tm - T0)/b))]
-  
+calc_NFFD <- function(m, tmin) {
+  if (FALSE) {
+    a <- T0 <- b <- NULL
+  }
+  param[["NFFD"]][m, a / (1 + exp(-(tmin - T0) / b))]
 }

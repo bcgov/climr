@@ -1,30 +1,31 @@
-# Environment to store package files uid database while the package is in use.
+#' Environment to store package files uid database while the package is in use.
 #' @noRd
-.climRpnw <- new.env()
+.climr <- new.env()
 
-# Return path to cached files uid database
+#' Return path to cached files uid database
 #' @noRd
 uid_db <- function() {
   file.path(cache_path(), ".files_uid_db")
 }
 
-# Check if the provided uid is the same as the one stored in the files uid database object.
+#' Check if the provided uid is the same as the one stored in the files uid database object.
 #' @noRd
 uid_check <- function(path, uid) {
-  uid %in% .climRpnw[["files_uid_db"]][path]
+  uid %in% .climr[["files_uid_db"]][path]
 }
 
-# Update the uid value of a file in the files uid database object.
+#' Update the uid value of a file in the files uid database object.
 #' @noRd
 uid_update <- function(path, uid) {
-  .climRpnw[["files_uid_db"]][path] <- uid
+  .climr[["files_uid_db"]][path] <- uid
   if (cache_exists()) {
-    saveRDS(.climRpnw[["files_uid_db"]], uid_db())
+    saveRDS(.climr[["files_uid_db"]], uid_db())
   }
 }
 
-# Reset and delete the current files uid database object.
+#' Reset and delete the current files uid database object.
+#' @noRd
 uid_delete <- function() {
-  .climRpnw[["files_uid_db"]] <- character()
+  .climr[["files_uid_db"]] <- character()
   unlink(uid_db())
 }
