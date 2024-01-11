@@ -350,7 +350,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
     )
     
     # Parallel processing and recombine
-
+    
     ## pack rasters for parallelisation
     normal <- packRasters(normal)
     gcm <- packRasters(gcm)
@@ -364,10 +364,10 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
     parallel::clusterExport(cl, c("unpackRasters"), envir = environment())
     
     res <- rbindlist(
-        parallel::parLapply(
+      parallel::parLapply(
         cl = cl,
         X = xyz,
-      # lapply(xyz,  ## testing
+        # lapply(xyz,  ## testing
         # FUN = threaded_downscale_,
         fun = threaded_downscale_,
         normal = normal, 
@@ -618,7 +618,7 @@ threaded_downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist, historic, hi
   gcm_hist <- unpackRasters(gcm_hist) 
   historic <- unpackRasters(historic)
   historic_ts <- unpackRasters(historic_ts) 
-
+  
   # Set DT threads to 1 in parallel to avoid overloading CPU
   # Not needed for forking, not taking any chances
   dt_nt <- getDTthreads()
@@ -920,7 +920,7 @@ packRasters <- function(ras) {
       ras <- sapply(ras, wrap, USE.NAMES = TRUE, simplify = FALSE)
     }
   }
- return(ras)
+  return(ras)
 }
 
 
