@@ -6,7 +6,9 @@
 #' @template cache
 #'
 #' @return A `SpatRaster` containing normals, lapse rates
-#'   and digital elevation model layers, that can be used with `downscale`. 
+#'   and digital elevation model layers, that can be used with [`downscale()`]. 
+#'
+#' @seealso [downscale()]
 #'
 #' @importFrom terra rast writeRaster ext
 #' @importFrom data.table fread fwrite data.table

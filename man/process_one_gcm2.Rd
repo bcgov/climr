@@ -19,12 +19,12 @@ process_one_gcm2(
 \item{gcm_nm}{character. Name of GCM to use.}
 
 \item{ssp}{character. Vector of labels of the shared socioeconomic pathways to use.
-See available options with \code{list_ssp()}. Defaults to \code{list_ssp()}.}
+See available options with \code{\link[=list_ssp]{list_ssp()}}. Defaults to all SSPs available.}
 
 \item{bbox}{numeric. Vector of length 4 giving bounding box of study region, created by \code{get_bb()}.}
 
 \item{period}{character. Vector of labels of the periods to use.
-Can be obtained from \code{list_gcm_period()}. Default to \code{list_gcm_period()}.}
+Can be obtained from \code{\link[=list_gcm_period]{list_gcm_period()}}. Defaults to all periods available.}
 
 \item{max_run}{integer. Maximum number of model runs to include.
 A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they

@@ -58,12 +58,13 @@ cache_ask <- function(ask = interactive()) {
 #' @details
 #'   It may fail if R has no permission to delete files/folders
 #'   in the `cache_path()` directory
+#' @seealso [cache_path()]
 #' 
 #' @return TRUE or FALSE depending on whether cache was cleared successfully
 #'   or not.
 #' @rdname Caching
 #' @export
-cache_clear <- function(what = c("gcm", "normal", "historic")) {
+cache_clear <- function(what = c("gcm", "gcmts", "gcmhist", "normal", "historic", "historic_ts")) {
   what <- match.arg(what, several.ok = TRUE)
   
   fileList <- list.files(cache_path())
