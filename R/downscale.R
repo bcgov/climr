@@ -57,16 +57,17 @@
 #'                      Subzone = c("vm1","vm2","vs1",rep("mm",3),"dk","dc"))
 #' 
 #' ## historic observational time series
+#' vars <- c("PPT","CMD","Tave07")
 #' climate_norms_hist <- climr_downscale(xyz = in_xyz, which_normal = "auto",
 #'                                       return_normal = TRUE,
 #'                                       historic_period = "2001_2020",
-#'                                       vars = c("PPT","CMD","Tave07"),
+#'                                       vars = vars,
 #'                                       out_spatial = TRUE, plot = "PPT") ##specify desired variables to plot
 #' 
 #' ## as a data.table
 #' climate_norms_hist <- climr_downscale(xyz = in_xyz, which_normal = "auto",
 #'                                       return_normal = TRUE,
-#'                                       vars = cc("PPT","CMD","Tave07"),
+#'                                       vars = vars,
 #'                                       out_spatial = FALSE, plot = "PPT") ##specify desired variables to plot
 #' 
 #' ## future projections
@@ -76,7 +77,7 @@
 #'                                      gcm_period = c("2021_2040"),
 #'                                      #gcm_ts_years = 2020:2060,
 #'                                      max_run = 3, #' we want 3 individual runs for each model
-#'                                      vars = c("PPT","CMD","Tave07"))
+#'                                      vars = vars)
 #' }
 #' @rdname downscaling
 #' @export
