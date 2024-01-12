@@ -39,18 +39,20 @@
 #' library(terra)
 #' set.seed(123)
 #' dbCon <- data_connect()
-#' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
+#' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10),
+#'                   id = 1:10)
 #' 
 #' ## get bounding box based on input points
 #' thebb <- get_bb(xyz)
 #' historic <- historic_input(dbCon, thebb, period = "2001_2020")
 #' plot(historic[[1]][[2]])
 #' 
-#' ## provide or create a long, lat, elev, and optionally id, dataframe - usually read from csv file
-#' in_xyz <- data.frame(Long = c(-127.70521, -127.62279, -127.56235, -127.7162,
+#' ## provide or create a lon, lat, elev, and optionally id, dataframe - usually read from csv file
+#' in_xyz <- data.frame(lon = c(-127.70521, -127.62279, -127.56235, -127.7162,
 #'                               -127.18585, -127.1254, -126.94957, -126.95507),
-#'                      Lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
-#'                      Elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
+#'                      lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
+#'                      elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
+#'                      id = 1:8,
 #'                      Zone = c(rep("CWH",3), rep("CDF",5)),
 #'                      Subzone = c("vm1","vm2","vs1",rep("mm",3),"dk","dc"))
 #' 
@@ -398,8 +400,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
   IDcols <- names(res)[!names(res) %in% vars]
   setkeyv(res, IDcols)
   if (out_spatial) {
-    names(xyz)[4] <- "ID"
-    res <- as.data.table(xyz)[res, on = "ID"]
+    res <- as.data.table(xyz)[res, on = "id"]
     
     res <- vect(res, geom = names(xyz)[1:2], crs = crs(normal, proj = TRUE))
     
@@ -576,7 +577,7 @@ downscale_ <- function(xyzID, normal, gcm, gcm_ts, gcm_hist,
     # Melt gcm_ and set the same key for merging
     normal_ <- melt(
       setDT(normal_),
-      id.vars = c("ID", "Lat", "Elev"),
+      id.vars = c("id", "lat", "elev"),
       variable.factor = FALSE
     )
     setkey(normal_, "variable")
@@ -585,7 +586,7 @@ downscale_ <- function(xyzID, normal, gcm, gcm_ts, gcm_hist,
     normal_ <- dcast(
       # The merge with shared keys is as simple as that
       normal_[ref_dt,],
-      ID + PERIOD + Lat + Elev ~ VAR,
+      id + PERIOD + lat + elev ~ VAR,
       value.var = "value",
       sep = ""
     )
@@ -890,7 +891,7 @@ addIDCols <- function(IDCols, results) {
     nms <- names(IDCols)[-1]
     
     results2 <- as.data.table(results, geom = "XY")
-    results2[IDCols, (nms) := mget(nms), on = "ID"]
+    results2[IDCols, (nms) := mget(nms), on = "id"]
     #setcolorder(results2, c(nm_order,nms))
     if (is(results, "SpatVector")) {
       results2 <- vect(results2, geom = c("x", "y"), crs = crs(results, proj = TRUE))
