@@ -102,22 +102,29 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
   dbCon <- data_connect()
   thebb <- get_bb(xyz) ## get bounding box based on input points
   
-  xyz <- as.data.frame(xyz) ## input needs to be a data.frame, not data.table. This is something we could change in the future
-  IDCols <- NULL
-  if (ncol(xyz) > 3) { ## remove extraneous columns
-    ##check that ids are unique
-    if(length(unique(xyz[,4])) < nrow(xyz)){
-      warning("ID field is not unique. Will reassign ID column. Extra columns will not be returned.")
-      xyz[,4] <- 1:nrow(xyz)
-    }
-    if(ncol(xyz) > 4) { ##save extra variables to join back
-      IDCols <- xyz[, -c(1:3)]
-      colnames(IDCols)[1] <- "ID"
-      setDT(IDCols)
-    }
-  }else{
-    xyz[,4] <- 1:nrow(xyz) ##assign ID column
+  rmCols <- setdiff(names(xyz), expectedCols)
+  if (length(rmCols)) { ## remove extraneous columns
+    warnings("Extra columns will be ignored")
+    xyz <- xyz[, ..expectedCols]
   }
+  
+  ## make an integer id col to use through out
+  if (inherits(xyz$id, c("integer", "numeric"))) {
+    IDint <- as.integer(xyz$id)
+  } else {
+    if (inherits(xyz$id, c("character", "factor"))) {
+      IDint <- as.integer(as.factor(xyz$id))
+    }
+  }
+  setnames(xyz, "id", "id_orig")
+  xyz[, id := IDint]
+  rm(IDint)
+  
+  ## save original ID column to join back
+  origID <- xyz[, .(id, id_orig)]
+  
+  xyz[, id_orig := NULL]
+  
   
   message("Getting normals...")
   if (which_normal == "NorAm") {
@@ -203,12 +210,12 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
   
   if (which_normal != "auto") {
     if(!is.null(dbCon)) poolClose(dbCon)
-    results <- addIDCols(IDCols, results)
+    results <- addIDCols(origID, results)
     return(results)
   } 
   if ((length(bc_ids) < 1 || length(bc_ids) == nrow(xyz_save))) {
     if(!is.null(dbCon)) poolClose(dbCon)
-    results <- addIDCols(IDCols, results)
+    results <- addIDCols(origID, results)
     return(results)
   } else {
     na_xyz <- xyz_save[!xyz_save[, 4] %in% bc_ids,]
@@ -232,7 +239,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
     
     if(!is.null(dbCon)) poolClose(dbCon)
     res_all <- rbind(results, results_na)
-    res_all <- addIDCols(IDCols, res_all)
+    res_all <- addIDCols(origID, res_all)
     
     return(res_all)
   }
@@ -886,12 +893,14 @@ process_one_historic <- function(historic_, res, xyzID, timeseries) {
 #' @importFrom data.table as.data.table
 #' @importFrom methods is
 addIDCols <- function(IDCols, results) {
-  if(!is.null(IDCols)){
+  if (!is.null(IDCols)){
     nm_order <- names(results)
-    nms <- names(IDCols)[-1]
+    nms <- setdiff(names(IDCols), "id")
     
     results2 <- as.data.table(results, geom = "XY")
     results2[IDCols, (nms) := mget(nms), on = "id"]
+    results2[, id := id_orig]
+    results2[, id_orig := NULL]
     #setcolorder(results2, c(nm_order,nms))
     if (is(results, "SpatVector")) {
       results2 <- vect(results2, geom = c("x", "y"), crs = crs(results, proj = TRUE))
