@@ -2,7 +2,7 @@
 % Please edit documentation in R/downscale.R
 \name{addIDCols}
 \alias{addIDCols}
-\title{Add ID columns to \code{downscale} output.}
+\title{Add ID columns back to \code{downscale} output.}
 \usage{
 addIDCols(IDCols, results)
 }
@@ -15,5 +15,9 @@ addIDCols(IDCols, results)
 \code{results} with IDCols
 }
 \description{
-Add ID columns to \code{downscale} output.
+Add ID columns back to \code{downscale} output.
+}
+\details{
+adds back the original ID column and removes temporary
+one
 }
