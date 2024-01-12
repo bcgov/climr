@@ -99,6 +99,11 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
   # vars = c("PPT","CMI","PET07")
   
   message("Welcome to climr!")
+  
+  ## checks
+  expectedCols <- c("lon", "lat", "elev", "id")
+  xyz <- .checkXYZ(xyz, expectedCols)
+  
   dbCon <- data_connect()
   thebb <- get_bb(xyz) ## get bounding box based on input points
   
@@ -306,6 +311,9 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
 downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, gcm_hist = NULL, historic_ts = NULL, return_normal = FALSE,
                       vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))),
                       ppt_lr = FALSE, nthread = 1L, out_spatial = FALSE, plot = NULL) {
+  ## checks
+  xyz <- .checkXYZ(xyz)
+  
   # Make sure normal was built using normal_input
   if (!isTRUE(attr(normal, "builder") == "climr")) {
     stop(
@@ -951,4 +959,35 @@ unpackRasters <- function(ras) {
     }
   }
   return(ras)
+}
+
+
+
+#' Check xyz conforms to standards
+#'
+#' @template xyz
+#' @param expectedCols character. Columns to look for in `xyz`.
+#'
+#' @return NULL
+.checkXYZ <- function(xyz, expectedCols = c("lon", "lat", "elev", "id")) {
+  if (!is(xyz, "data.table")) {
+    xyz <- tryCatch(as.data.table(xyz), error = function(e) e)
+    if (is(xyz, "error")) {
+      stop("Can't coherce xyz to an sf object. Please pass an sf object or another cohercible object class.")
+    }
+  }
+  
+  if (length(setdiff(expectedCols, names(xyz)))) {
+    stop("'xyz' must have the columns ", paste(expectedCols, collapse = ", "))
+  }
+  
+  if (length(unique(xyz$id)) != nrow(xyz)) {
+    stop("'xyz$id' must be a column of unique IDs")
+  }
+  colTypes <- c("integer", "numeric", "character", "factor")
+  if (!inherits(xyz$id, colTypes)) {
+    stop("'xyz$id' must be an column of type ", paste(colTypes, collapse = ", "))
+  }
+  
+  return(xyz)
 }
