@@ -19,6 +19,9 @@ ds_hist <- climr_downscale(xyz = xyz, which_normal = "auto",
                            return_normal = TRUE, ##put this to TRUE if you want the 1961-1990 period
                            vars = c("PPT","CMD","CMI","Tave01","Tave07")) ##specify desired variablesds_hist <- climr_downscale(xyz = xyz, which_normal = "auto",
 
+test <- length(setdiff(ds_hist$id, xyz$id)) + length(setdiff( xyz$id, ds_hist$id))
+expect_true(test == 0)
+
 expect_true(all(ds_hist[, .N, by = ID][, N] == 2))   ## should have 2 periods (historic and normal) per ID
 
 test <- as.data.table(xyz)[ds_hist, on = .(ID, Zone, Subzone), nomatch = NA]
