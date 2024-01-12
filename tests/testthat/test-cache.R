@@ -11,7 +11,8 @@ test_that("test cache in default location", {
   
   expect_identical(cache_path(), R_user_dir("climr", "cache"))
   
-  expecteddirs <- normalizePath(file.path(cache_path(), c("gcm", "normal", "historic")), winslash = "/")
+  expecteddirs <- normalizePath(file.path(cache_path(), c("gcm", "normal", "historic")), 
+                                winslash = "/", mustWork = FALSE)
   
   cache_clear()
   normal <- normal_input(dbCon = dbCon, bbox = thebb, cache = FALSE)
