@@ -86,19 +86,6 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
                             gcm_period = NULL, gcm_ts_years = NULL, gcm_hist_years = NULL, max_run = 0L, return_normal = TRUE,
                             vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))), cache = TRUE,
                             out_spatial = FALSE, plot = NULL) {
-  # xyz <- coords
-  # which_normal = "auto"
-  # historic_period = NULL
-  # historic_ts = NULL
-  # gcm_models = NULL
-  # ssp = NULL
-  # gcm_period = NULL
-  # gcm_ts_years = NULL
-  # max_run = 0L
-  # return_normal = TRUE
-  # cache = TRUE
-  # vars = c("PPT","CMI","PET07")
-  
   message("Welcome to climr!")
   
   ## checks
