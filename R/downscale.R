@@ -524,7 +524,7 @@ downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist,
   if (!is.null(gcm)) {
     # Process each gcm and rbind resulting tables
     res_gcm <- rbindlist(
-      lapply(gcm, process_one_gcm, res = res, xyzID = xyzID, timeseries = FALSE),
+      lapply(gcm, process_one_climaterast, res = res, xyz = xyz, type = "gcm"),
       use.names = TRUE
     )
   } else {
@@ -533,7 +533,7 @@ downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist,
   if (!is.null(gcm_ts)) {
     # Process each gcm and rbind resulting tables
     res_gcmts <- rbindlist(
-      lapply(gcm_ts, process_one_gcm, res = res, xyzID = xyzID, timeseries = TRUE),
+      lapply(gcm_ts, process_one_climaterast, res = res, xyz = xyz, timeseries = TRUE, type = "gcm"),
       use.names = TRUE
     )
   } else {
@@ -542,16 +542,15 @@ downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist,
   if (!is.null(gcm_hist)) {
     # Process each gcm and rbind resulting tables
     res_gcm_hist <- rbindlist(
-      lapply(gcm_hist, process_one_gcm_hist, res = res, xyzID = xyzID),
-      use.names = TRUE
-    )
+      lapply(gcm_hist, process_one_climaterast, res = res, xyz = xyz, type = "gcm_hist"),
+      use.names = TRUE)
   } else {
     res_gcm_hist <- NULL
   }
   if (!is.null(historic)) {
     # print(historic)
     res_hist <- rbindlist(
-      lapply(historic, process_one_historic, res = res, xyzID = xyzID, timeseries = FALSE),
+      lapply(historic, process_one_climaterast, res = res, xyz = xyz, type = "historic"),
       use.names = TRUE
     )
   } else {
@@ -560,7 +559,7 @@ downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist,
   if (!is.null(historic_ts)) {
     # print(historic)
     res_hist_ts <- rbindlist(
-      lapply(historic_ts, process_one_historic, res = res, xyzID = xyzID, timeseries = TRUE),
+      lapply(historic_ts, process_one_climaterast, res = res, xyz = xyz, timeseries = TRUE, type = "historic"),
       use.names = TRUE
     )
   } else {
@@ -644,31 +643,37 @@ threaded_downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist, historic, hi
 
 #' TODO: fill documentation here
 #'
-#' @param gcm_ TODO
-#' @param res TODO
-#' @param xyzID TODO
-#' @param timeseries TODO
+#' @param climaterast 
+#' @param res 
+#' @template xyz 
+#' @param timeseries 
+#' @param type 
 #'
-#' @return `data.table`
-process_one_gcm <- function(gcm_, res, xyzID, timeseries) {
-  ## gcm_ <- gcm[[1]]
+#' @return
+#' @export
+#'
+#' @importFrom stats as.formula
+process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE, 
+                                    type = c("gcm", "gcm_hist", "historic")) {
+  type <- match.arg(type)
+  
   # Store names for later use
-  nm <- names(gcm_)
+  nm <- names(climaterast)
   
   # Define gcm extent. res*2 To make sure we capture surrounding
   # cells for bilinear interpolation.
   ex <- ext(
     c(
-      min(xyzID[, 1L]) - xres(gcm_) * 2,
-      max(xyzID[, 1L]) + xres(gcm_) * 2,
-      min(xyzID[, 2L]) - yres(gcm_) * 2,
-      max(xyzID[, 2L]) + yres(gcm_) * 2
+      min(xyz[["lon"]]) - xres(climaterast) * 2,
+      max(xyz[["lon"]]) + xres(climaterast) * 2,
+      min(xyz[["lat"]]) - yres(climaterast) * 2,
+      max(xyz[["lat"]]) + yres(climaterast) * 2
     )
   )
   # Extract gcm bilinear interpolations
   # Cropping will reduce the size of data to load in memory
-  gcm_ <- crop(gcm_, ex, snap = "out")
-  gcm_ <- extract(x = gcm_, y = xyzID[, 1L:2L], method = "bilinear")
+  climaterast <- crop(climaterast, ex, snap = "out")
+  climaterast <- extract(x = climaterast, y = xyz[, .(lon, lat)], method = "bilinear")
   
   # Create match set to match with res names
   labels <- vapply(
@@ -679,206 +684,83 @@ process_one_gcm <- function(gcm_, res, xyzID, timeseries) {
     character(1)
   )
   
-  # Add matching column to gcm_
+  if (type == "historic") {
+    ## Create match set to match with res names
+    labels <- nm
+    if (timeseries) {
+      labels <- gsub("_.*", "", labels)
+    }
+  }
+  
+  # Add matching column to climaterast
+  res <- as.data.frame(res)
   ppt_ <- grep("PPT", labels)
-  gcm_[, ppt_ + 1L] <- gcm_[, ppt_ + 1L] * res[, match(labels[ppt_], names(res))] ## PPT
-  gcm_[, -c(1L, ppt_ + 1L)] <- gcm_[, -c(1L, ppt_ + 1L)] + res[, match(labels[-ppt_], names(res))] ## Temperature
+  ppt_next <- ppt_ + 1L
+  climaterast[, ppt_next] <- climaterast[, ppt_next] * res[, match(labels[ppt_], names(res))] ## PPT
+  climaterast[, -c(1L, ppt_next)] <- climaterast[, -c(1L, ppt_next)] + res[, match(labels[-ppt_], names(res))] ## Temperature
+  res <- as.data.table(res)
+  climaterast <- as.data.table(climaterast)
   
   # Reshape (melt / dcast) to obtain final form
   ref_dt <- tstrsplit(nm, "_")
+  
   # Recombine PERIOD into one field
-  if (!timeseries) {
+  if (!timeseries & type == "gcm") {
     ref_dt[[6]] <- paste(ref_dt[[6]], ref_dt[[7]], sep = "_")
     ref_dt[7] <- NULL
   }
-  # Transform ref_dt to data.table for remerging
+  
   setDT(ref_dt)
-  setnames(ref_dt, c("GCM", "VAR", "MONTH", "SSP", "RUN", "PERIOD"))
-  set(ref_dt, j = "variable", value = nm)
-  set(ref_dt, j = "GCM", value = gsub(".", "-", ref_dt[["GCM"]], fixed = TRUE))
-  setkey(ref_dt, "variable")
-  
-  # Set Latitude and possibly ID
-  gcm_[["Lat"]] <- xyzID[, 2L]
-  gcm_[["Elev"]] <- xyzID[, 3L]
-  if (ncol(xyzID) >= 4L) {
-    gcm_[["ID"]] <- xyzID[, 4L]
+  if (type == "historic") {
+    if (timeseries) {
+      setnames(ref_dt, c("VAR", "PERIOD"))
+      set(ref_dt, j = "variable", value = nm)
+    } else {
+      setnames(ref_dt, c("VAR"))
+      set(ref_dt, j = "variable", value = nm)
+      set(ref_dt, j = "PERIOD", value = "2001_2020")
+    }
   }
-  
-  # Melt gcm_ and set the same key for merging
-  gcm_ <- melt(
-    setDT(gcm_),
-    id.vars = c("ID", "Lat", "Elev"),
-    variable.factor = FALSE
-  )
-  setkey(gcm_, "variable")
-  
-  # Finally, dcast back to final form to get original 36 columns
-  gcm_ <- dcast(
-    # The merge with shared keys is as simple as that
-    gcm_[ref_dt,],
-    ID + GCM + SSP + RUN + PERIOD + Lat + Elev ~ VAR + MONTH,
-    value.var = "value",
-    sep = ""
-  )
-  
-  return(gcm_)
-}
-
-
-#' TODO: fill documentation here
-#'
-#' @param gcm_ TODO
-#' @param res TODO
-#' @param xyzID TODO
-#'
-#' @return `data.table`
-process_one_gcm_hist <- function(gcm_, res, xyzID) {
-  ## gcm_ <- gcm[[1]]
-  # Store names for later use
-  nm <- names(gcm_)
-  
-  # Define gcm extent. res*2 To make sure we capture surrounding
-  # cells for bilinear interpolation.
-  ex <- ext(
-    c(
-      min(xyzID[, 1L]) - xres(gcm_) * 2,
-      max(xyzID[, 1L]) + xres(gcm_) * 2,
-      min(xyzID[, 2L]) - yres(gcm_) * 2,
-      max(xyzID[, 2L]) + yres(gcm_) * 2
-    )
-  )
-  # Extract gcm bilinear interpolations
-  # Cropping will reduce the size of data to load in memory
-  gcm_ <- crop(gcm_, ex, snap = "out")
-  gcm_ <- extract(x = gcm_, y = xyzID[, 1L:2L], method = "bilinear")
-  
-  # Create match set to match with res names
-  labels <- vapply(
-    strsplit(nm, "_"),
-    function(x) {
-      paste0(x[2:3], collapse = "")
-    },
-    character(1)
-  )
-  
-  # Add matching column to gcm_
-  ppt_ <- grep("PPT", labels)
-  gcm_[, ppt_ + 1L] <- gcm_[, ppt_ + 1L] * res[, match(labels[ppt_], names(res))] ## PPT
-  gcm_[, -c(1L, ppt_ + 1L)] <- gcm_[, -c(1L, ppt_ + 1L)] + res[, match(labels[-ppt_], names(res))] ## Temperature
-  
-  # Reshape (melt / dcast) to obtain final form
-  ref_dt <- tstrsplit(nm, "_")
   
   # Transform ref_dt to data.table for remerging
-  setDT(ref_dt)
-  setnames(ref_dt, c("GCM", "VAR", "MONTH", "RUN", "PERIOD"))
-  set(ref_dt, j = "variable", value = nm)
-  set(ref_dt, j = "GCM", value = gsub(".", "-", ref_dt[["GCM"]], fixed = TRUE))
+  if (type %in% c("gcm", "gcm_hist")) {
+    switch(type,
+           gcm = setnames(ref_dt, c("GCM", "VAR", "MONTH", "SSP", "RUN", "PERIOD")),
+           gcm_hist = setnames(ref_dt, c("GCM", "VAR", "MONTH", "RUN", "PERIOD")))
+    set(ref_dt, j = "variable", value = nm)
+    set(ref_dt, j = "GCM", value = gsub(".", "-", ref_dt[["GCM"]], fixed = TRUE))
+  }
+  
   setkey(ref_dt, "variable")
   
   # Set Latitude and possibly ID
-  gcm_[["Lat"]] <- xyzID[, 2L]
-  gcm_[["Elev"]] <- xyzID[, 3L]
-  if (ncol(xyzID) >= 4L) {
-    gcm_[["ID"]] <- xyzID[, 4L]
-  }
+  climaterast[["lat"]] <- xyz[["lat"]]
+  climaterast[["elev"]] <- xyz[["elev"]]
+  climaterast[["id"]] <- xyz[["id"]]
   
-  # Melt gcm_ and set the same key for merging
-  gcm_ <- melt(
-    setDT(gcm_),
-    id.vars = c("ID", "Lat", "Elev"),
+  # Melt climaterast and set the same key for merging
+  climaterast <- melt(
+    setDT(climaterast),
+    id.vars = c("id", "lat", "elev"),
     variable.factor = FALSE
   )
-  setkey(gcm_, "variable")
-  
-  gcm_ <- dcast(
-    gcm_[ref_dt,],
-    ID + GCM + RUN + PERIOD + Lat + Elev ~ VAR + MONTH,
-    value.var = "value",
-    sep = ""
-  )
-  
-  return(gcm_)
-}
-
-#' TODO: fill documentation here
-#'
-#' @param historic_ TODO
-#' @param res TODO
-#' @param xyzID TODO
-#' @param timeseries TODO
-#'
-#' @return `data.table`
-process_one_historic <- function(historic_, res, xyzID, timeseries) {
-  # print(historic_)
-  # Store names for later use
-  nm <- names(historic_)
-  
-  # Define gcm extent. res*2 To make sure we capture surrounding
-  # cells for bilinear interpolation.
-  ex <- ext(
-    c(
-      min(xyzID[, 1L]) - xres(historic_) * 2,
-      max(xyzID[, 1L]) + xres(historic_) * 2,
-      min(xyzID[, 2L]) - yres(historic_) * 2,
-      max(xyzID[, 2L]) + yres(historic_) * 2
-    )
-  )
-  # Extract gcm bilinear interpolations
-  # Cropping will reduce the size of data to load in memory
-  historic_ <- crop(historic_, ex, snap = "out")
-  historic_ <- extract(x = historic_, y = xyzID[, 1L:2L], method = "bilinear")
-  
-  # Create match set to match with res names
-  labels <- nm
-  if (timeseries) {
-    labels <- gsub("_.*", "", labels)
-  }
-  
-  ppt_ <- grep("PPT", labels)
-  historic_[, ppt_ + 1L] <- historic_[, ppt_ + 1L] * res[, match(labels[ppt_], names(res))] ## PPT
-  historic_[, -c(1L, ppt_ + 1L)] <- historic_[, -c(1L, ppt_ + 1L)] + res[, match(labels[-ppt_], names(res))] ## Temperature
-  
-  
-  # Reshape (melt / dcast) to obtain final form
-  ref_dt <- tstrsplit(nm, "_")
-  setDT(ref_dt)
-  if (timeseries) {
-    setnames(ref_dt, c("VAR", "PERIOD"))
-    set(ref_dt, j = "variable", value = nm)
-  } else {
-    setnames(ref_dt, c("VAR"))
-    set(ref_dt, j = "variable", value = nm)
-    set(ref_dt, j = "PERIOD", value = "2001_2020")
-  }
-  
-  setkey(ref_dt, "variable")
-  # Set Latitude and possibly ID
-  historic_[["Lat"]] <- xyzID[, 2L]
-  historic_[["Elev"]] <- xyzID[, 3L]
-  if (ncol(xyzID) >= 4L) {
-    historic_[["ID"]] <- xyzID[, 4L]
-  }
-  
-  # Melt gcm_ and set the same key for merging
-  historic_ <- melt(
-    setDT(historic_),
-    id.vars = c("ID", "Lat", "Elev"),
-    variable.factor = FALSE
-  )
-  setkey(historic_, "variable")
+  setkey(climaterast, "variable")
   
   # Finally, dcast back to final form to get original 36 columns
-  historic_ <- dcast(
+  form <- switch(type, 
+                 gcm = quote(id + GCM + SSP + RUN + PERIOD + lat + elev ~ VAR + MONTH),
+                 gcm_hist = quote(id + GCM + RUN + PERIOD + lat + elev ~ VAR + MONTH),
+                 historic = quote(id + PERIOD + lat + elev ~ VAR)) 
+  
+  climaterast <- dcast(
     # The merge with shared keys is as simple as that
-    historic_[ref_dt,],
-    ID + PERIOD + Lat + Elev ~ VAR,
+    climaterast[ref_dt,],
+    as.formula(form),
     value.var = "value",
     sep = ""
   )
   
-  return(historic_)
+  return(climaterast)
 }
 
 
