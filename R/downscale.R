@@ -118,6 +118,8 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
   
   xyz[, id_orig := NULL]
   
+  ## input needs to be a data.frame, not data.table. This is something we could change in the future
+  # xyz <- as.data.frame(xyz) 
   
   message("Getting normals...")
   if (which_normal == "NorAm") {
@@ -501,12 +503,14 @@ downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist,
   res[, 38L:74L] <- NULL
   
   # Combine results (ignoring ID column)
+  res <- as.data.frame(res)  ## TODO: convert code below to data.table
   if (isTRUE(ppt_lr)) {
     res[, -1L] <- res[, -1L] + lr
   } else {
     ppt <- grep("^PPT", names(normal)[1L:36L], invert = TRUE)
     res[, ppt + 1L] <- res[, ppt + 1L] + lr[, ppt]
   }
+  res <- as.data.table(res)
   
   # Process one GCM stacked layers
   if (!is.null(gcm)) {
