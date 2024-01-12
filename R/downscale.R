@@ -6,7 +6,7 @@
 #' @details
 #' Additional details... TODO.
 #' 
-#' @param xyz three or four column `data.frame`: long, lat, elev, (id)
+#' @template xyz
 #' @param which_normal character. Which normal layer to use. 
 #'   Default is "auto", which selects the highest resolution normal for each point. 
 #'   Other options are one of [`list_normal()`]
@@ -256,7 +256,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
 #' @details
 #'   Additional details... TODO.
 #' 
-#' @param xyz A 3-column `matrix` or `data.frame` (x, y, z) or (lon, lat, elev).
+#' @template xyz
 #' @param normal `SpatRaster`. Reference normal baseline input from `normal_input`.
 #' @param gcm `list` of `SpatRasters`. Global Circulation Models outputs from [`gcm_input()`]. Default to `NULL`.
 #' @param historic `list` of `SpatRasters`. Historic time period outputs from [`historic_input()`]. Default to `NULL`.
@@ -459,23 +459,23 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
 #' 
 #' @noRd
 #' @inheritParams downscale
-#' @param xyzID same as `xyz`, but with an added "ID" column
+#' @template xyz
 #' 
 #' @return A `data.table`.
 #' 
 #' @import data.table
 #' @importFrom terra crop ext xres yres extract
-downscale_ <- function(xyzID, normal, gcm, gcm_ts, gcm_hist, 
+downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist, 
                        historic, historic_ts, return_normal, 
                        vars, ppt_lr = FALSE) {
-  # print(xyzID)
+  # print(xyz)
   # Define normal extent
   ex <- ext(
     c(
-      min(xyzID[["lon"]]) - xres(normal) * 2,
-      max(xyzID[["lon"]]) + xres(normal) * 2,
-      min(xyzID[["lat"]]) - yres(normal) * 2,
-      max(xyzID[["lat"]]) + yres(normal) * 2
+      min(xyz[["lon"]]) - xres(normal) * 2,
+      max(xyz[["lon"]]) + xres(normal) * 2,
+      min(xyz[["lat"]]) - yres(normal) * 2,
+      max(xyz[["lat"]]) + yres(normal) * 2
     )
   )
   
@@ -493,14 +493,13 @@ downscale_ <- function(xyzID, normal, gcm, gcm_ts, gcm_hist,
   res <-
     extract(
       x = normal,
-      y = xyzID[, .(lon, lat)],
+      y = xyz[, .(lon, lat)],
       method = "bilinear"
     )
   
-  
   # Compute elevation differences between provided points elevation and normal
   # Dem at position 74 (ID column + 36 normal layers + 36 lapse rate layers + 1 dem layer)
-  elev_delta <- xyzID[["elev"]] - res[, 74L]
+  elev_delta <- xyz[["elev"]] - res[, 74L]
   # print(elev_delta)
   # print(res)
   # Compute individual point lapse rate adjustments
@@ -579,10 +578,10 @@ downscale_ <- function(xyzID, normal, gcm, gcm_ts, gcm_hist,
     set(ref_dt, j = "variable", value = nm)
     set(ref_dt, j = "PERIOD", value = "1961_1990")
     setkey(ref_dt, "variable")
-    # Set Latitude and possibly ID
-    normal_[["lat"]] <- xyzID[["lat"]]
-    normal_[["elev"]] <- xyzID[["elev"]]
-    normal_[["id"]] <- xyzID[["id"]]
+    # Set Latitude elevation and ID
+    normal_[["lat"]] <- xyz[["lat"]]
+    normal_[["elev"]] <- xyz[["elev"]]
+    normal_[["id"]] <- xyz[["id"]]
     
     # Melt gcm_ and set the same key for merging
     normal_ <- melt(
@@ -637,7 +636,7 @@ threaded_downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist, historic, hi
   on.exit(setDTthreads(dt_nt))
   
   # Downscale
-  res <- downscale_(xyzID = xyz, normal = normal, gcm = gcm, 
+  res <- downscale_(xyz = xyz, normal = normal, gcm = gcm, 
                     gcm_ts = gcm_ts, gcm_hist = gcm_hist, 
                     historic = historic, historic_ts = historic_ts, ...)
   return(res)
