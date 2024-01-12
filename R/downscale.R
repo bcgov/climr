@@ -764,10 +764,11 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
 }
 
 
-
-
-#' Add ID columns to `downscale` output.
+#' Add ID columns back to `downscale` output.
 #'
+#' @details adds back the original ID column and removes temporary
+#'   one
+#'  
 #' @param IDCols character. ID columns to add, or NULL if none
 #' @param results `data.table` or `SpatVector` output from `downscale`
 #'
