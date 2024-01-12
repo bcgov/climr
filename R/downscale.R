@@ -141,8 +141,8 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
   } else {
     #message("Normals not specified, using highest resolution available for each point")
     bc_outline <- rast(system.file("extdata", "bc_outline.tif", package = "climr"))
-    pnts <- extract(bc_outline, xyz[, 1:2], method = "simple")
-    bc_ids <- xyz[, 4][!is.na(pnts$PPT01)]
+    pnts <- extract(bc_outline, xyz[, .(lon, lat)], method = "simple")
+    bc_ids <- xyz[["id"]][!is.na(pnts$PPT01)]
     if (length(bc_ids) >= 1) {
       xyz_save <- xyz
       xyz <- xyz[!is.na(pnts$PPT01),]
@@ -353,7 +353,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
     
     # Reordering on y axis for smaller cropped area and faster
     # sequential reads
-    xyz <- xyz[order(xyz[, 2L]),]
+    xyz <- xyz[order(lat),]
     
     # Split before parallel processing
     xyz <- lapply(
@@ -414,7 +414,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
   if (out_spatial) {
     res <- as.data.table(xyz)[res, on = "id"]
     
-    res <- vect(res, geom = names(xyz)[1:2], crs = crs(normal, proj = TRUE))
+    res <- vect(res, geom = c("lon", "lat"), crs = crs(normal, proj = TRUE))
     
     if (!is.null(plot)) {
       if (!plot %in% vars) {
@@ -472,10 +472,10 @@ downscale_ <- function(xyzID, normal, gcm, gcm_ts, gcm_hist,
   # Define normal extent
   ex <- ext(
     c(
-      min(xyzID[, 1L]) - xres(normal) * 2,
-      max(xyzID[, 1L]) + xres(normal) * 2,
-      min(xyzID[, 2L]) - yres(normal) * 2,
-      max(xyzID[, 2L]) + yres(normal) * 2
+      min(xyzID[["lon"]]) - xres(normal) * 2,
+      max(xyzID[["lon"]]) + xres(normal) * 2,
+      min(xyzID[["lat"]]) - yres(normal) * 2,
+      max(xyzID[["lat"]]) + yres(normal) * 2
     )
   )
   
@@ -493,14 +493,14 @@ downscale_ <- function(xyzID, normal, gcm, gcm_ts, gcm_hist,
   res <-
     extract(
       x = normal,
-      y = xyzID[, 1L:2L],
+      y = xyzID[, .(lon, lat)],
       method = "bilinear"
     )
   
   
   # Compute elevation differences between provided points elevation and normal
   # Dem at position 74 (ID column + 36 normal layers + 36 lapse rate layers + 1 dem layer)
-  elev_delta <- xyzID[, 3L] - res[, 74L]
+  elev_delta <- xyzID[["elev"]] - res[, 74L]
   # print(elev_delta)
   # print(res)
   # Compute individual point lapse rate adjustments
@@ -580,11 +580,9 @@ downscale_ <- function(xyzID, normal, gcm, gcm_ts, gcm_hist,
     set(ref_dt, j = "PERIOD", value = "1961_1990")
     setkey(ref_dt, "variable")
     # Set Latitude and possibly ID
-    normal_[["Lat"]] <- xyzID[, 2L]
-    normal_[["Elev"]] <- xyzID[, 3L]
-    if (ncol(xyzID) >= 4L) {
-      normal_[["ID"]] <- xyzID[, 4L]
-    }
+    normal_[["lat"]] <- xyzID[["lat"]]
+    normal_[["elev"]] <- xyzID[["elev"]]
+    normal_[["id"]] <- xyzID[["id"]]
     
     # Melt gcm_ and set the same key for merging
     normal_ <- melt(
