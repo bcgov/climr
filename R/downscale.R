@@ -842,7 +842,7 @@ unpackRasters <- function(ras) {
   if (!is(xyz, "data.table")) {
     xyz <- tryCatch(as.data.table(xyz), error = function(e) e)
     if (is(xyz, "error")) {
-      stop("Can't coherce xyz to an sf object. Please pass an sf object or another cohercible object class.")
+      stop("Can't coherce xyz to a data.table object. Please pass a data.table object or another cohercible object class.")
     }
   }
   
