@@ -65,6 +65,13 @@ xyz[, 3] <- extract(dem, xyz[, 1:2], method = "bilinear")[, -1L]
 downscaleout_gcm <- downscale(
   xyz = xyz,
   normal = normal,
+  gcm = gcm,
+  var = list_variables()
+)
+
+downscaleout_gcm_hist <- downscale(
+  xyz = xyz,
+  normal = normal,
   gcm_hist = gcm_hist,
   var = list_variables()
 )
@@ -92,6 +99,7 @@ downscaleout_historic_ts <- downscale(
 
 saveRDS(xyz, "tests/points_downscale_ref.rds")
 saveRDS(downscaleout_gcm, "tests/downscaleout_gcm_ref.rds")
+saveRDS(downscaleout_gcm_hist, "tests/downscaleout_gcm_hist_ref.rds")
 saveRDS(downscaleout_gcm_ts, "tests/downscaleout_gcm_ts_ref.rds")
 saveRDS(downscaleout_historic, "tests/downscaleout_historic_ref.rds")
 saveRDS(downscaleout_historic_ts, "tests/downscaleout_historic_ts_ref.rds")
