@@ -90,7 +90,7 @@ test_that("test downscale", {
 })
 
 ## here, tet with gcm_hist, gcm_ts and historic
-test_that("test downscale gcm_hist", {
+test_that("test downscale with gcm_hist, gcm_ts, historic and historic_ts", {
   testInit("terra")
   
   dbCon <- data_connect()
@@ -186,7 +186,7 @@ test_that("test downscale gcm_hist", {
   testthat::expect_true(all(gcms %in% results$GCM))
   testthat::expect_true(all(gcms %in% results2$GCM))
   testthat::expect_true(all(names(historic) %in% unique(results3$PERIOD)))
-  testthat::expect_true(all(names(historic_ts) %in% unique(results4$PERIOD)))
+  testthat::expect_true(all(eval(parse(text = names(historic_ts))) %in% unique(results4$PERIOD)))
   
   # Test for order
   testthat::expect_equal(tail(names(results), length(list_variables())), list_variables())
