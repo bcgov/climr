@@ -2,7 +2,7 @@
 
 <!-- badges: start -->
 
-[![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](Redirect-URL)
+[![Lifecycle:Stable](https://img.shields.io/badge/Lifecycle-Stable-339999)](Redirect-URL)
 [![Codecov test coverage - main](https://codecov.io/gh/bcgov/climr/branch/main/graph/badge.svg)](https://app.codecov.io/gh/bcgov/climr/?branch=main)
 
 <!-- badges: end -->

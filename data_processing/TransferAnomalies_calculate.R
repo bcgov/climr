@@ -28,11 +28,11 @@ counter=0 #counter for total iterations
 for(e in 1:3){
   element <- elements.cru[e]
   if(element!="pre"){
-    dir <- "TimeSeries_gridded_monthly/cru_ts4.05"
+    dir <- "//objectstore2.nrs.bcgov/ffec/TimeSeries_gridded_monthly/cru_ts4.05"
     files <- list.files(dir, pattern="\\.nc$")
     r <- rast(paste(dir, files[grep(element, files)], sep="/"))
   } else {
-    dir <- "TimeSeries_gridded_monthly/GPCC"
+    dir <- "//objectstore2.nrs.bcgov/ffec/TimeSeries_gridded_monthly/GPCC"
     files <- list.files(dir, pattern="\\.nc$")
     file <- files[13]
     r <- rast(paste(dir, file, sep="/"))
@@ -44,7 +44,7 @@ for(e in 1:3){
   # plot(r[[1]])
   
   # set reference period for anomaly calculation
-  ref.startyear <- 1981
+  ref.startyear <- 1961
   ref.duration <- 30
   ref.endyear <- ref.startyear+ref.duration-1
   
@@ -86,7 +86,7 @@ for(e in 1:3){
         print(m)
       }
       names(deltaStack) <- monthcodes
-      outfile <- paste("TransferAnomalies/delta.from.", ref.startyear, "_", ref.endyear, ".to.", startyear, "_", endyear, ".", elements[e],  ".tif", sep="")
+      outfile <- paste("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.from.", ref.startyear, "_", ref.endyear, ".to.", startyear, "_", endyear, ".", elements[e],  ".tif", sep="")
       writeRaster(deltaStack, outfile, overwrite=TRUE)
 
     print(startyear)

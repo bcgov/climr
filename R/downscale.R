@@ -35,7 +35,46 @@
 #' @importFrom data.table getDTthreads setDTthreads rbindlist setkey
 #'
 #' @examples {
-#'   ## TODO.
+#' library(data.table)
+#' library(terra)
+#' set.seed(123)
+#' dbCon <- data_connect()
+#' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
+#' 
+#' ## get bounding box based on input points
+#' thebb <- get_bb(xyz)
+#' historic <- historic_input(dbCon, thebb, period = "2001_2020")
+#' plot(historic[[1]][[2]])
+#' 
+#' ## provide or create a long, lat, elev, and optionally id, dataframe - usually read from csv file
+#' in_xyz <- data.frame(Long = c(-127.70521, -127.62279, -127.56235, -127.7162,
+#'                               -127.18585, -127.1254, -126.94957, -126.95507),
+#'                      Lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
+#'                      Elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
+#'                      Zone = c(rep("CWH",3), rep("CDF",5)),
+#'                      Subzone = c("vm1","vm2","vs1",rep("mm",3),"dk","dc"))
+#' 
+#' ## historic observational time series
+#' climate_norms_hist <- climr_downscale(xyz = in_xyz, which_normal = "auto",
+#'                                       return_normal = TRUE,
+#'                                       historic_period = "2001_2020",
+#'                                       vars = c("PPT","CMD","Tave07"),
+#'                                       out_spatial = TRUE, plot = "PPT") ##specify desired variables to plot
+#' 
+#' ## as a data.table
+#' climate_norms_hist <- climr_downscale(xyz = in_xyz, which_normal = "auto",
+#'                                       return_normal = TRUE,
+#'                                       vars = cc("PPT","CMD","Tave07"),
+#'                                       out_spatial = FALSE, plot = "PPT") ##specify desired variables to plot
+#' 
+#' ## future projections
+#' climate_norms_fut <- climr_downscale(xyz = in_xyz, which_normal = "auto",
+#'                                      gcm_models = c("ACCESS-ESM1-5"),
+#'                                      ssp = c("ssp370"),
+#'                                      gcm_period = c("2021_2040"),
+#'                                      #gcm_ts_years = 2020:2060,
+#'                                      max_run = 3, #' we want 3 individual runs for each model
+#'                                      vars = c("PPT","CMD","Tave07"))
 #' }
 #' @rdname downscaling
 #' @export
@@ -236,6 +275,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
 #' @examples
 #' \dontrun{
 #' dbCon <- data_connect()
+#' on.exit(try(pool::poolClose(dbCon)))
 #' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
 #' 
 #' ## get bounding box based on input points
@@ -310,7 +350,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
     )
     
     # Parallel processing and recombine
-
+    
     ## pack rasters for parallelisation
     normal <- packRasters(normal)
     gcm <- packRasters(gcm)
@@ -324,10 +364,10 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
     parallel::clusterExport(cl, c("unpackRasters"), envir = environment())
     
     res <- rbindlist(
-        parallel::parLapply(
+      parallel::parLapply(
         cl = cl,
         X = xyz,
-      # lapply(xyz,  ## testing
+        # lapply(xyz,  ## testing
         # FUN = threaded_downscale_,
         fun = threaded_downscale_,
         normal = normal, 
@@ -578,7 +618,7 @@ threaded_downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist, historic, hi
   gcm_hist <- unpackRasters(gcm_hist) 
   historic <- unpackRasters(historic)
   historic_ts <- unpackRasters(historic_ts) 
-
+  
   # Set DT threads to 1 in parallel to avoid overloading CPU
   # Not needed for forking, not taking any chances
   dt_nt <- getDTthreads()
@@ -880,7 +920,7 @@ packRasters <- function(ras) {
       ras <- sapply(ras, wrap, USE.NAMES = TRUE, simplify = FALSE)
     }
   }
- return(ras)
+  return(ras)
 }
 
 

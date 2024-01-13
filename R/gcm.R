@@ -22,6 +22,26 @@
 #' @importFrom RPostgres dbGetQuery
 #' @importFrom uuid UUIDgenerate
 #' @import data.table
+#' 
+#' @example {
+#' library(terra)
+#' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
+#' 
+#' ## get bounding box based on input points
+#' thebb <- get_bb(xyz)
+#' 
+#' ## get database connection
+#' dbCon <- data_connect() 
+#' on.exit(try(pool::poolClose(dbCon)))
+#' 
+#' gcm <- gcm_input(dbCon, thebb, list_gcm()[1], list_ssp()[1])
+#' 
+#' ## show ensemble means only
+#' lyrs <- grep("ensemble", names(gcm$`ACCESS-ESM1-5`))
+#' 
+#' plot(gcm$`ACCESS-ESM1-5`[[lyrs]])
+#' }
+#' 
 #' @rdname gcm-input-data
 #' @export
 gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), period = list_gcm_period(), max_run = 0L, cache = TRUE) {
@@ -68,6 +88,26 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 #' @importFrom RPostgres dbGetQuery
 #' @import uuid
 #' @import data.table
+#' 
+#' @example {
+#' library(terra)
+#' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
+#' 
+#' ## get bounding box based on input points
+#' thebb <- get_bb(xyz)
+#' 
+#' ## get database connection
+#' dbCon <- data_connect()
+#' on.exit(try(pool::poolClose(dbCon)))
+#' 
+#' gcm_hist <- gcm_hist_input(dbCon, thebb, list_gcm()[1])
+#' 
+#' ## show ensemble means only
+#' lyrs <- grep("ensemble", names(gcm_hist$`ACCESS-ESM1-5`))
+#' 
+#' plot(gcm_hist$`ACCESS-ESM1-5`[[lyrs]])
+#' }
+#' 
 #' @rdname gcm-input-data
 #' @export
 gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:1950, max_run = 0L, cache = TRUE) {
@@ -104,6 +144,26 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 #' @importFrom RPostgres dbGetQuery
 #' @import uuid
 #' @import data.table
+#' 
+#' @example {
+#' library(terra)
+#' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
+#' 
+#' ## get bounding box based on input points
+#' thebb <- get_bb(xyz)
+#' 
+#' ## get database connection
+#' dbCon <- data_connect() 
+#' on.exit(try(pool::poolClose(dbCon)))
+#' 
+#' gcm_ts <- gcm_ts_input(dbCon, thebb, list_gcm()[1], list_ssp()[1])
+#' 
+#' ## show ensemble means only
+#' lyrs <- grep("ensemble", names(gcm_ts$`ACCESS-ESM1-5`))
+#' 
+#' plot(gcm_ts$`ACCESS-ESM1-5`[[lyrs]])
+#' }
+#' 
 #' @rdname gcm-input-data
 #' @export
 gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), years = 2020:2030, max_run = 0L, cache = TRUE) {
