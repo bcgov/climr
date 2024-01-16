@@ -110,6 +110,13 @@ test_that("test downscale with gcm_hist, gcm_ts, historic and historic_ts", {
   
   # Select GCM
   gcms <- c("BCC-CSM2-MR", "INM-CM5-0")
+  
+  gcm <- gcm_input(
+    dbCon, 
+    thebb,
+    gcm = gcms,
+  )
+  
   gcm_hist <- gcm_hist_input(
     dbCon, 
     thebb,
