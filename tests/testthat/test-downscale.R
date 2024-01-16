@@ -95,11 +95,10 @@ test_that("test downscale outputs with gcm, gcm_hist, gcm_ts, historic and histo
   dbCon <- data_connect()
   on.exit(try(pool::poolClose(dbCon)), add = TRUE)
   
-  xyz <- data.frame(lon = c(-127.70521, -127.62279, -127.56235, -127.7162, 
-                            -127.18585, -127.1254, -126.94957, -126.95507), 
-                    lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025), 
-                    elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
-                    id = LETTERS[1:8])
+  xyz <- data.frame(lon = c(-127.70), 
+                    lat = c(55.35), 
+                    elev = c(291L),
+                    id = LETTERS[1])
   
   ## get bounding box based on input points
   thebb <- get_bb(xyz)
@@ -138,44 +137,29 @@ test_that("test downscale outputs with gcm, gcm_hist, gcm_ts, historic and histo
     thebb
   )
   
-  # Resample 4000 points from the available data
-  dem <- normal$dem2_WNA
-  set.seed(678)
-  n <- 4000
-  xyz <- data.frame(lon = runif(n, xmin(dem), xmax(dem)), 
-                    lat = runif(n, ymin(dem), ymax(dem)), 
-                    elev = NA,
-                    id = 1:n)
-  xyz[, 3] <- extract(dem, xyz[, 1:2], method = "bilinear")[, -1L]
-  expect_false(any(is.na(xyz)))
+  ## read in the reference points and outputs
+  ref_xyz <- readRDS("tests/points_downscale_ref.rds")
+  list_refs <- list.files("tests", "downscaleout", full.names = TRUE)
   
-  results <- downscale(
-    xyz = xyz,
-    normal = normal,
-    gcm_hist = gcm_hist,
-    var = list_variables()
-  )
+  refs <- lapply(list_refs, readRDS)
+  names(refs) <- sub(".rds", "", basename(list_refs))
   
-  results2 <- downscale(
-    xyz = xyz,
-    normal = normal,
-    gcm_ts = gcm_ts,
-    var = list_variables()
-  )
+  list_args <- list(gcm = gcm, gcm_hist = gcm_hist, gcm_ts = gcm_ts, 
+                    historic = historic, historic_ts = historic_ts)
+  dwnscaleOut <- Map(argname = names(list_args), 
+      argvalue = list_args,
+      f = function(argname, argvalue, normal) {
+        allArgs <- list(xyz = ref_xyz,
+                        normal = normal,
+                        var = list_variables(),
+                        new = argvalue)
+        names(allArgs) <- sub("new", argname, names(allArgs))
+        
+        out <- do.call(downscale, allArgs)
+      }, MoreArgs = list(normal = normal))
   
-  results3 <- downscale(
-    xyz = xyz,
-    normal = normal,
-    historic = historic,
-    var = list_variables()
-  )
   
-  results4 <- downscale(
-    xyz = xyz,
-    normal = normal,
-    historic_ts = historic_ts,
-    var = list_variables()
-  )
+  ### here
   
   
   ## there may be NAs if the points call on areas without data (e.g. ocean and using normal_bc, but points are being BC)
