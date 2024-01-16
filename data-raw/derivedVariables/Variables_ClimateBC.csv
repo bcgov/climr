@@ -1,6 +1,7 @@
 Code,Variable,Time,Category,Scale
 AHM,Annual heat:moisture index (MAT+10)/(MAP/1000)),Annual,Annual,Log
 bFFP,The Julian date on which FFP begins,Annual,Annual,Raw
+CMI,Climate Moisture Index,Annual,Annual,Raw
 CMD,Hargreaves climatic moisture deficit,Annual,Annual,Log
 CMD_at,Autumn Hargreaves climatic moisture deficit,Autumn,Seasonal,Log
 CMD_sm,Summer Hargreaves climatic moisture deficit,Summer,Seasonal,Log
@@ -146,7 +147,7 @@ PAS09,September precipitation as snow,September,Monthly,Log
 PAS10,October precipitation as snow,October,Monthly,Log
 PAS11,November precipitation as snow,November,Monthly,Log
 PAS12,December precipitation as snow,December,Monthly,Log
-PPT,Precipitation,Any,Any,Log
+PPT,Precipitation,Any,Annual,Log
 PPT_at,Autumn precipitation,Autumn,Seasonal,Log
 PPT_sm,Summer precipitation,Summer,Seasonal,Log
 PPT_sp,Spring precipitation,Spring,Seasonal,Log
@@ -164,7 +165,7 @@ PPT10,October precipitation,October,Monthly,Log
 PPT11,November precipitation,November,Monthly,Log
 PPT12,December precipitation,December,Monthly,Log
 SHM,Summer heat:moisture index ((MWMT)/(MSP/1000)),Annual,Annual,Log
-Tave,Mean temperature (deg. C),Any,Any,Raw
+Tave,Mean temperature (deg. C),Any,Annual,Raw
 Tave_at,Autumn mean temperature (deg. C),Autumn,Seasonal,Raw
 Tave_sm,Summer mean temperature (deg. C),Summer,Seasonal,Raw
 Tave_sp,Spring mean temperature (deg. C),Spring,Seasonal,Raw
@@ -182,7 +183,7 @@ Tave10,October mean temperature (deg. C),October,Monthly,Raw
 Tave11,November mean temperature (deg. C),November,Monthly,Raw
 Tave12,December mean temperature (deg. C),December,Monthly,Raw
 TD,"Temperature difference between MWMT and MCMT, or continentality (deg. C)",Annual,Annual,Raw
-Tmax,Mean daily maximum temperature (deg. C),Any,Any,Raw
+Tmax,Mean daily maximum temperature (deg. C),Any,Annual,Raw
 Tmax_at,Autumn mean daily maximum temperature (deg. C),Autumn,Seasonal,Raw
 Tmax_sm,Summer mean daily maximum temperature (deg. C),Summer,Seasonal,Raw
 Tmax_sp,Spring mean daily maximum temperature (deg. C),Spring,Seasonal,Raw
@@ -199,7 +200,7 @@ Tmax09,September mean daily maximum temperature (deg. C),September,Monthly,Raw
 Tmax10,October mean daily maximum temperature (deg. C),October,Monthly,Raw
 Tmax11,November mean daily maximum temperature (deg. C),November,Monthly,Raw
 Tmax12,December mean daily maximum temperature (deg. C),December,Monthly,Raw
-Tmin,Mean daily minimum temperature (deg. C),Any,Any,Raw
+Tmin,Mean daily minimum temperature (deg. C),Any,Annual,Raw
 Tmin_at,Autumn mean daily minimum temperature (deg. C),Autumn,Seasonal,Raw
 Tmin_sm,Summer mean daily minimum temperature (deg. C),Summer,Seasonal,Raw
 Tmin_sp,Spring mean daily minimum temperature (deg. C),Spring,Seasonal,Raw
@@ -216,7 +217,7 @@ Tmin09,September mean daily minimum temperature (deg. C),September,Monthly,Raw
 Tmin10,October mean daily minimum temperature (deg. C),October,Monthly,Raw
 Tmin11,November mean daily minimum temperature (deg. C),November,Monthly,Raw
 Tmin12,December mean daily minimum temperature (deg. C),December,Monthly,Raw
-RH,relative humidity,Any,Any,Raw
+RH,relative humidity,Any,Annual,Raw
 RH_at,Autumn relative humidity,Autumn,Seasonal,Raw
 RH_sm,Summer relative humidity,Summer,Seasonal,Raw
 RH_sp,Spring relative humidity,Spring,Seasonal,Raw

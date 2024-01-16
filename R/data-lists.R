@@ -78,15 +78,21 @@ list_historic <- function() {
 #' @description
 #' `list_variables` lists climate variables
 #' 
+#' @param set character. One of All, Monthly, Seasonal, Annual, or any combination thereof. Defaults to "All".
 #' @param only_extra logical. Should Tmin, Tmax and PPT be excluded? Defaults to FALSE.
 #' 
 #' @rdname data-option-lists
 #' @export
-list_variables <- function(only_extra = FALSE) {
+list_variables <- function(set = c("All", "Monthly", "Seasonal", "Annual"), only_extra = FALSE) {
   if (FALSE) {
     variables <- NULL
   }
-  res <- variables[["Code"]]
+  set <- match.arg(set,several.ok = TRUE)
+  if("All" %in% set){
+    res <- variables[["Code"]]
+  } else {
+    res <- variables[["Code"]][variables[["Category"]] %in% set]
+  }
   if (isTRUE(only_extra)) {
     res <- res[!grepl("(^PPT|^Tmax|^Tmin)", res)]
   }
