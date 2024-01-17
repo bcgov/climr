@@ -93,6 +93,9 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
   thiscall[[1]] <- as.name(".checkClimrDwnsclArgs")
   eval(thiscall, envir = parent.frame())
   
+  expectedCols <- c("lon", "lat", "elev", "id")
+  xyz <- .checkXYZ(xyz, expectedCols)
+  
   dbCon <- data_connect()
   thebb <- get_bb(xyz) ## get bounding box based on input points
   
@@ -306,6 +309,9 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
   thiscall <- match.call()
   thiscall[[1]] <- as.name(".checkDwnsclArgs")
   eval(thiscall, envir = parent.frame())
+  
+  expectedCols <- c("lon", "lat", "elev", "id")
+  xyz <- .checkXYZ(xyz, expectedCols)
   
   if (isTRUE(nthread > 1L)) {
     if (!requireNamespace("parallel")) {
@@ -897,10 +903,6 @@ unpackRasters <- function(ras) {
     stop(msg)
   }
   
-  expectedCols <- c("lon", "lat", "elev", "id")
-  xyz <- .checkXYZ(xyz, expectedCols)
-  
-  
   ## check for "silly" parameter combinations
   if (!is.null(gcm_models) & 
       all(is.null(gcm_hist_years), is.null(gcm_ts_years), is.null(gcm_period), is.null(ssp))) {
@@ -977,9 +979,6 @@ unpackRasters <- function(ras) {
       " See `?historic_input_ts` for details."
     )
   }
-  
-  expectedCols <- c("lon", "lat", "elev", "id")
-  xyz <- .checkXYZ(xyz, expectedCols)
   
   ## check for "silly" parameter combinations
   if (all(is.null(gcm), is.null(gcm_ts), is.null(gcm_hist), 
