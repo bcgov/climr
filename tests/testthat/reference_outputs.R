@@ -5,7 +5,9 @@
 ## this script creates reference outputs for testing using the `main` version of
 ## the package. For now it is run manually and saves outputs to tests/ 
 
-remotes::install_github("bcgov/climr@main")
+library(remotes)
+install_github("bcgov/climr@main")
+
 library(terra)
 library(climr)
 

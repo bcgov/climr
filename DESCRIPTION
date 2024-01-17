@@ -35,6 +35,7 @@ Imports:
 Suggests: 
     parallel,
     rmarkdown,
+    remotes,
     testthat (>= 3.0.0),
     withr
 Depends: 
