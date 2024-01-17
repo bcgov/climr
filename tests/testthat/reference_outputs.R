@@ -58,8 +58,8 @@ historic_ts <- historic_input_ts(
 
 ## make tiny area
 dem <- normal$dem2_WNA
-xyz <- data.frame(lon = c(-128.7300, -127.7957, -127.4695, -128.1778, -127.7719), 
-                  lat = c(55.64114, 54.34666, 54.65660, 54.08937, 54.95381), 
+xyz <- data.frame(lon = c(-127.7300, -127.7957, -127.5695, -127.5778, -127.7719), 
+                  lat = c(55.34114, 55.24666, 55.39660, 55.08937, 55.15381), 
                   elev = NA,
                   id = 1:5)
 xyz[, 3] <- extract(dem, xyz[, 1:2], method = "bilinear")[, -1L]
