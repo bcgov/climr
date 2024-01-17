@@ -112,6 +112,8 @@ test_that("test climr_dowscale with more args", {
              `:=`(gcm_period = NA, gcm_ts_years = NA, gcm_hist_years = NA, ssp = NA)]
   argsCombos[is.na(gcm_period) & is.na(gcm_ts_years) & is.na(gcm_hist_years),
              `:=`(gcm_models = NA, ssp = NA)]
+  argsCombos[is.na(gcm_period) & is.na(gcm_ts_years),
+             `:=`(ssp = NA)]
   argsCombos <- unique(argsCombos)
   
   out <- apply(argsCombos, 1, function(args, xyz) {
