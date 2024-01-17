@@ -82,15 +82,15 @@
 #' @rdname downscaling
 #' @export
 climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), historic_period = NULL, historic_ts = NULL,
-                            gcm_models = NULL, ssp = c("ssp126", "ssp245", "ssp370", "ssp585"),
+                            gcm_models = NULL, ssp = list_ssp(),
                             gcm_period = NULL, gcm_ts_years = NULL, gcm_hist_years = NULL, max_run = 0L, return_normal = TRUE,
                             vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))), cache = TRUE,
                             out_spatial = FALSE, plot = NULL) {
   message("Welcome to climr!")
   
   ## checks
-  expectedCols <- c("lon", "lat", "elev", "id")
-  xyz <- .checkXYZ(xyz, expectedCols)
+  browser()
+  .checkDwnsclArgs()
   
   dbCon <- data_connect()
   thebb <- get_bb(xyz) ## get bounding box based on input points
@@ -860,3 +860,54 @@ unpackRasters <- function(ras) {
   
   return(xyz)
 }
+
+
+
+#' Check arguments of `climr_downscale` and `downscale`
+#'
+#' @inheritParams climr_downscale 
+#' @inheritParams downscale
+#'
+#' @return NULL
+.checkDwnsclArgs <- function(xyz, which_normal = NULL, historic_period = NULL, historic_ts = NULL,
+                            gcm_models = NULL, ssp = list_ssp(), gcm_period = NULL, gcm_ts_years = NULL, 
+                            gcm_hist_years = NULL, max_run = 0L) {
+  which_normal <- match.arg(which_normal, c("auto", list_normal()))
+  ssp <- match.arg(ssp, list_ssp(), several.ok = TRUE)
+  vars <- match.arg(ssp, list_variables(), several.ok = TRUE)
+  
+  if (!is.null(historic_period)) {
+    historic_period <- match.arg(historic_period, list_historic(), several.ok = TRUE)
+  }
+  
+  if (!is.null(historic_ts)) {
+    if (!all(historic_ts %in% 1902:2015)) {
+      stop("'historic_ts' must be in 1902:2015")
+    }
+  }
+  
+  if (!is.null(gcm_models)) {
+    gcm_models <- match.arg(gcm_models, list_gcm(), several.ok = TRUE)
+  }
+  
+  if (!is.null(gcm_period)) {
+    gcm_period <- match.arg(gcm_period, list_gcm_period(), several.ok = TRUE)
+  }
+  
+  if (!is.null(gcm_ts_years)) {
+    if (!all(gcm_ts_years %in% 2015:2100)) {
+      stop("'gcm_ts_years' must be in 2015:2100")
+    }
+  }
+  
+  msg <- "'max_run' must be 0 or larger"
+  if (!inherits(max_run, c("integer", "numeric"))) {
+    stop(msg)
+  } else if (max_run < 0) {
+    stop(msg)
+  }
+  
+  expectedCols <- c("lon", "lat", "elev", "id")
+  xyz <- .checkXYZ(xyz, expectedCols)
+}
+
