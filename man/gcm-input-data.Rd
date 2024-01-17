@@ -74,7 +74,7 @@ years and runs.
 \examples{
 {
 library(terra)
-xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
+xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10), id = 1:10)
 
 ## get bounding box based on input points
 thebb <- get_bb(xyz)
@@ -93,7 +93,7 @@ plot(gcm$`ACCESS-ESM1-5`[[lyrs]])
 
 {
 library(terra)
-xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
+xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10), id = 1:10)
 
 ## get bounding box based on input points
 thebb <- get_bb(xyz)
@@ -112,7 +112,7 @@ plot(gcm_hist$`ACCESS-ESM1-5`[[lyrs]])
 
 {
 library(terra)
-xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
+xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10), id = 1:10)
 
 ## get bounding box based on input points
 thebb <- get_bb(xyz)

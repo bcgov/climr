@@ -121,33 +121,35 @@ library(data.table)
 library(terra)
 set.seed(123)
 dbCon <- data_connect()
-xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
+xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10),
+                  id = 1:10)
 
 ## get bounding box based on input points
 thebb <- get_bb(xyz)
 historic <- historic_input(dbCon, thebb, period = "2001_2020")
 plot(historic[[1]][[2]])
 
-## provide or create a long, lat, elev, and optionally id, dataframe - usually read from csv file
-in_xyz <- data.frame(Long = c(-127.70521, -127.62279, -127.56235, -127.7162,
+## provide or create a lon, lat, elev, and optionally id, dataframe - usually read from csv file
+in_xyz <- data.frame(lon = c(-127.70521, -127.62279, -127.56235, -127.7162,
                               -127.18585, -127.1254, -126.94957, -126.95507),
-                     Lat = c(55.3557, 55.38847, 55.28537, 55.25721, 
-                             54.88135, 54.65636, 54.6913, 54.61025),
-                     Elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
+                     lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
+                     elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
+                     id = 1:8,
                      Zone = c(rep("CWH",3), rep("CDF",5)),
                      Subzone = c("vm1","vm2","vs1",rep("mm",3),"dk","dc"))
 
 ## historic observational time series
+vars <- c("PPT","CMD","Tave07")
 climate_norms_hist <- climr_downscale(xyz = in_xyz, which_normal = "auto",
                                       return_normal = TRUE,
                                       historic_period = "2001_2020",
-                                      vars = c("PPT","CMD","Tave07"),
+                                      vars = vars,
                                       out_spatial = TRUE, plot = "PPT") ##specify desired variables to plot
 
 ## as a data.table
 climate_norms_hist <- climr_downscale(xyz = in_xyz, which_normal = "auto",
                                       return_normal = TRUE,
-                                      vars = c("PPT","CMD","Tave07"),
+                                      vars = vars,
                                       out_spatial = FALSE, plot = "PPT") ##specify desired variables to plot
 
 ## future projections
@@ -157,7 +159,7 @@ climate_norms_fut <- climr_downscale(xyz = in_xyz, which_normal = "auto",
                                      gcm_period = c("2021_2040"),
                                      #gcm_ts_years = 2020:2060,
                                      max_run = 3, #' we want 3 individual runs for each model
-                                     vars = c("PPT","CMD","Tave07"))
+                                     vars = vars)
 }
 \dontrun{
 dbCon <- data_connect()
