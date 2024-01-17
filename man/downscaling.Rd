@@ -11,7 +11,7 @@ climr_downscale(
   historic_period = NULL,
   historic_ts = NULL,
   gcm_models = NULL,
-  ssp = c("ssp126", "ssp245", "ssp370", "ssp585"),
+  ssp = list_ssp(),
   gcm_period = NULL,
   gcm_ts_years = NULL,
   gcm_hist_years = NULL,
