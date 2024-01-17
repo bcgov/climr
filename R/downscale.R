@@ -862,6 +862,7 @@ unpackRasters <- function(ras) {
 #' @param ... ignored
 #'
 #' @return NULL
+#' @noRd
 .checkClimrDwnsclArgs <- function(xyz, which_normal = NULL, normal = NULL, historic_period = NULL, historic_ts = NULL,
                             gcm_models = NULL, ssp = list_ssp(), gcm_period = NULL, gcm_ts_years = NULL, 
                             gcm_hist_years = NULL, max_run = 0L, vars = list_variables(), ...) {
@@ -927,6 +928,7 @@ unpackRasters <- function(ras) {
 #' @param ... ignored
 #'
 #' @return NULL
+#' @noRd
 .checkDwnsclArgs <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, gcm_hist = NULL, 
                              historic_ts = NULL, return_normal = FALSE,
                              vars = list_variables(), ...) {
