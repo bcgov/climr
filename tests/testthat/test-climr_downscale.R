@@ -118,7 +118,7 @@ test_that("test climr_dowscale with more args", {
   
   out <- apply(argsCombos, 1, function(args, xyz) {
     args <- args[!is.na(args)]
-    args$xyz <- xyz # coerces to list.
+    suppressWarnings(args$xyz <- xyz) # coerces to list.
     args$vars <- c("PPT","CMD")  ## for faster results.
     
     if (!is.null(args$historic_ts)) {
@@ -187,6 +187,5 @@ test_that("test climr_dowscale with more args", {
     
     return(c(test, test2, test3, test4))
   }, xyz = xyz)
-  
   expect_true(all(unlist(out)))
 })
