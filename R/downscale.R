@@ -634,8 +634,7 @@ threaded_downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist, historic, hi
 #' @param timeseries 
 #' @param type 
 #'
-#' @return
-#' @export
+#' @return a `data.table`
 #'
 #' @importFrom stats as.formula
 process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE, 
