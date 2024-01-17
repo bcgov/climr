@@ -142,45 +142,46 @@ test_that("test downscale outputs with gcm, gcm_hist, gcm_ts, historic and histo
   list_refs <- list.files("tests", "downscaleout", full.names = TRUE)
   
   refs <- lapply(list_refs, readRDS)
-  names(refs) <- sub(".rds", "", basename(list_refs))
+  names(refs) <- sub("downscaleout_(.*)_ref.rds", "\\1", basename(list_refs))  ## make the same as names(list_args) below
   
   list_args <- list(gcm = gcm, gcm_hist = gcm_hist, gcm_ts = gcm_ts, 
                     historic = historic, historic_ts = historic_ts)
   dwnscaleOut <- Map(argname = names(list_args), 
-      argvalue = list_args,
-      f = function(argname, argvalue, normal) {
-        allArgs <- list(xyz = ref_xyz,
-                        normal = normal,
-                        var = list_variables(),
-                        new = argvalue)
-        names(allArgs) <- sub("new", argname, names(allArgs))
-        
-        out <- do.call(downscale, allArgs)
-      }, MoreArgs = list(normal = normal))
+                     argvalue = list_args,
+                     f = function(argname, argvalue, normal) {
+                       allArgs <- list(xyz = ref_xyz,
+                                       normal = normal,
+                                       var = list_variables(),
+                                       new = argvalue)
+                       names(allArgs) <- sub("new", argname, names(allArgs))
+                       out <- do.call(downscale, allArgs)
+                       return(out)
+                     }, MoreArgs = list(normal = normal))
+
+  testOut <- Map(dwnscaleOut = dwnscaleOut[names(list_args)],
+                 ref = refs[names(list_args)],
+                 f = function(dwnscaleOut, ref) {
+                   dwnscaleOut <- copy(dwnscaleOut)
+                   ref <- copy(ref)
+                   ## put columns in same order and reorder
+                   ## case doesn't matter
+                   setnames(dwnscaleOut, tolower(names(dwnscaleOut)))
+                   setnames(ref, tolower(names(ref)))         
+                   dwnscaleOut <- dwnscaleOut[, .SD, .SDcols = names(ref)]
+                   
+                   cols <- c("id", "gcm", "ssp", "run", "period")
+                   cols <- intersect(cols, names(ref))
+                   setkeyv(dwnscaleOut, cols)
+                   setkeyv(ref, cols)
+                   
+                   ## round to 4 decimals -- differences are sometimes reported at > 6 decimals
+                   cols <- names(which(dwnscaleOut[, sapply(.SD, is.numeric)]))
+                   dwnscaleOut[, (cols) := lapply(.SD, round, digits = 4), .SDcols = cols]
+                   ref[, (cols) := lapply(.SD, round, digits = 4), .SDcols = cols]
+                   
+                   return(identical(dwnscaleOut, ref))
+                 })
   
-  
-  ### here
-  
-  
-  ## there may be NAs if the points call on areas without data (e.g. ocean and using normal_bc, but points are being BC)
-  ## even with NAs some variables may get a 0 (e.g. DD)
-  ## sanity checks: use points in BC that we know are not NA/0
-  ##    the values should be in similar ranges to climateBC's outputs (use Tonlig Wang's downscaling method in app)
-  
-  # Test for variables
-  testthat::expect_true(all(list_variables() %in% names(results)))
-  testthat::expect_true(all(list_variables() %in% names(results2)))
-  testthat::expect_true(all(list_variables() %in% names(results3)))
-  testthat::expect_true(all(list_variables() %in% names(results4)))
-  
-  testthat::expect_true(all(gcms %in% results$GCM))
-  testthat::expect_true(all(gcms %in% results2$GCM))
-  testthat::expect_true(all(names(historic) %in% unique(results3$PERIOD)))
-  testthat::expect_true(all(eval(parse(text = names(historic_ts))) %in% unique(results4$PERIOD)))
-  
-  # Test for order
-  testthat::expect_equal(tail(names(results), length(list_variables())), list_variables())
-  testthat::expect_equal(tail(names(results2), length(list_variables())), list_variables())
-  testthat::expect_equal(tail(names(results3), length(list_variables())), list_variables())
-  testthat::expect_equal(tail(names(results4), length(list_variables())), list_variables())
+  testOut <- unlist(testOut)
+  expect_true(all(testOut))
 })
