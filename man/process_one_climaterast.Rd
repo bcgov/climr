@@ -24,6 +24,9 @@ and a unique "id". Any extra columns will be ignored and not output.}
 
 \item{type}{}
 }
+\value{
+a \code{data.table}
+}
 \description{
 TODO: fill documentation here
 }
