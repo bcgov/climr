@@ -185,8 +185,8 @@ test_that("test climr_dowscale with more args", {
       }
     }
     
-    return(list(test, test2, test3, test4))
+    return(c(test, test2, test3, test4))
   }, xyz = xyz)
   
-  expect_true(all(out))
+  expect_true(all(unlist(out)))
 })
