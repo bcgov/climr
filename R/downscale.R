@@ -89,8 +89,9 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
   message("Welcome to climr!")
   
   ## checks
-  browser()
-  .checkDwnsclArgs()
+  thiscall <- match.call()
+  thiscall[[1]] <- as.name(".checkDwnsclArgs")
+  eval(thiscall, envir = parent.frame())
   
   dbCon <- data_connect()
   thebb <- get_bb(xyz) ## get bounding box based on input points
@@ -302,7 +303,9 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
                       vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))),
                       ppt_lr = FALSE, nthread = 1L, out_spatial = FALSE, plot = NULL) {
   ## checks
-  xyz <- .checkXYZ(xyz)
+  thiscall <- match.call()
+  thiscall[[1]] <- as.name(".checkDwnsclArgs")
+  eval(thiscall, envir = parent.frame())
   
   # Make sure normal was built using normal_input
   if (!isTRUE(attr(normal, "builder") == "climr")) {
@@ -867,14 +870,22 @@ unpackRasters <- function(ras) {
 #'
 #' @inheritParams climr_downscale 
 #' @inheritParams downscale
+#' @param ... ignored
 #'
 #' @return NULL
-.checkDwnsclArgs <- function(xyz, which_normal = NULL, historic_period = NULL, historic_ts = NULL,
+.checkDwnsclArgs <- function(xyz, which_normal = NULL, normal = NULL, historic_period = NULL, historic_ts = NULL,
                             gcm_models = NULL, ssp = list_ssp(), gcm_period = NULL, gcm_ts_years = NULL, 
-                            gcm_hist_years = NULL, max_run = 0L) {
-  which_normal <- match.arg(which_normal, c("auto", list_normal()))
+                            gcm_hist_years = NULL, max_run = 0L, vars = list_variables(), ...) {
   ssp <- match.arg(ssp, list_ssp(), several.ok = TRUE)
-  vars <- match.arg(ssp, list_variables(), several.ok = TRUE)
+  vars <- match.arg(vars, list_variables(), several.ok = TRUE)
+  
+  if (!is.null(which_normal)) {
+    which_normal <- match.arg(which_normal, c("auto", list_normal()))
+  } 
+  
+  if (!is.null(normal)) {
+    normal <- match.arg(normal, c("auto", list_normal()))
+  } 
   
   if (!is.null(historic_period)) {
     historic_period <- match.arg(historic_period, list_historic(), several.ok = TRUE)
@@ -909,5 +920,23 @@ unpackRasters <- function(ras) {
   
   expectedCols <- c("lon", "lat", "elev", "id")
   xyz <- .checkXYZ(xyz, expectedCols)
+  
+  
+  ## check for "silly" parameter combinations
+  if (!is.null(gcm_models) & 
+      all(is.null(gcm_hist_years), is.null(gcm_ts_years), is.null(gcm_period), is.null(ssp))) {
+    message("'gcm_models' will be ignored, since 'gcm_hist_years', 'gcm_ts_years', 'gcm_period' and 'ssp' are missing")
+  }
+  
+  if (is.null(gcm_models) & 
+      any(!is.null(gcm_hist_years), !is.null(gcm_ts_years), !is.null(gcm_period), !is.null(ssp))) {
+    message("'gcm_models' is missing. 'gcm_hist_years', 'gcm_ts_years', 'gcm_period' and 'ssp' will be ignored")
+  }
+  
+  if ((!is.null(max_run) | max_run > 0) & 
+      is.null(gcm_models)) {
+    message("'gcm_models' is missing. 'max_run' will be ignored")
+  }
+  return(invisible(NULL))
 }
 
