@@ -17,6 +17,8 @@ xyz <- data.frame(lon = c(-127.70),
                   elev = c(291L),
                   id = LETTERS[1])
 
+cache_clear()
+
 ## get bounding box based on input points
 thebb <- get_bb(xyz)
 
