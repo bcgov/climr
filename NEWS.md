@@ -1,3 +1,11 @@
+# `climr` 0.0.2
+
+## Enhancements
+* new tests comparing to reference outputs
+* code further streamlined
+* new messages warn user about meaningless `downscale`/`climr_downscale` argument combinations
+
+
 # `climr` 0.0.1
 
 ## Enhancements
