@@ -71,6 +71,65 @@ years and runs.
 \code{gcm_ts_input} creates GCM time series inputs, given chosen GCMs, SSPs,
 years and runs.
 }
+\examples{
+{
+library(terra)
+xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
+
+## get bounding box based on input points
+thebb <- get_bb(xyz)
+
+## get database connection
+dbCon <- data_connect() 
+on.exit(try(pool::poolClose(dbCon)))
+
+gcm <- gcm_input(dbCon, thebb, list_gcm()[1], list_ssp()[1])
+
+## show ensemble means only
+lyrs <- grep("ensemble", names(gcm$`ACCESS-ESM1-5`))
+
+plot(gcm$`ACCESS-ESM1-5`[[lyrs]])
+}
+
+{
+library(terra)
+xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
+
+## get bounding box based on input points
+thebb <- get_bb(xyz)
+
+## get database connection
+dbCon <- data_connect()
+on.exit(try(pool::poolClose(dbCon)))
+
+gcm_hist <- gcm_hist_input(dbCon, thebb, list_gcm()[1])
+
+## show ensemble means only
+lyrs <- grep("ensemble", names(gcm_hist$`ACCESS-ESM1-5`))
+
+plot(gcm_hist$`ACCESS-ESM1-5`[[lyrs]])
+}
+
+{
+library(terra)
+xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
+
+## get bounding box based on input points
+thebb <- get_bb(xyz)
+
+## get database connection
+dbCon <- data_connect() 
+on.exit(try(pool::poolClose(dbCon)))
+
+gcm_ts <- gcm_ts_input(dbCon, thebb, list_gcm()[1], list_ssp()[1])
+
+## show ensemble means only
+lyrs <- grep("ensemble", names(gcm_ts$`ACCESS-ESM1-5`))
+
+plot(gcm_ts$`ACCESS-ESM1-5`[[lyrs]])
+}
+
+}
 \seealso{
 \code{\link[=downscale]{downscale()}}
 

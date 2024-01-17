@@ -5,7 +5,7 @@
 \alias{variables}
 \title{Climate variables definition}
 \format{
-An object of class \code{data.table} (inherits from \code{data.frame}) with 234 rows and 5 columns.
+An object of class \code{data.table} (inherits from \code{data.frame}) with 235 rows and 5 columns.
 
 A \code{data.table} with columns:
 \describe{

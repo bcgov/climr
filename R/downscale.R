@@ -126,11 +126,11 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
   # xyz <- as.data.frame(xyz) 
   
   message("Getting normals...")
-  if (which_normal == "NorAm") {
+  if (which_normal == "normal_na") {
     normal <- normal_input(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
-  } else if (which_normal == "BC") {
+  } else if (which_normal == "normal_bc") {
     normal <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache)
-  } else if (which_normal == "Colin") {
+  } else if (which_normal == "composite_normal") {
     normal <- normal_input(dbCon = dbCon, normal = "composite_normal", bbox = thebb, cache = cache)
   } else {
     #message("Normals not specified, using highest resolution available for each point")
