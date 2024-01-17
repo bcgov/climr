@@ -1,0 +1,19 @@
+---
+title: "climr-with-rasters"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{climr-with-rasters}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(climr)
+```
