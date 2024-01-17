@@ -90,7 +90,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
   
   ## checks
   thiscall <- match.call()
-  thiscall[[1]] <- as.name(".checkDwnsclArgs")
+  thiscall[[1]] <- as.name(".checkClimrDwnsclArgs")
   eval(thiscall, envir = parent.frame())
   
   dbCon <- data_connect()
@@ -306,22 +306,6 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
   thiscall <- match.call()
   thiscall[[1]] <- as.name(".checkDwnsclArgs")
   eval(thiscall, envir = parent.frame())
-  
-  # Make sure normal was built using normal_input
-  if (!isTRUE(attr(normal, "builder") == "climr")) {
-    stop(
-      "Please use this package `normal_input` function to create `normal`.",
-      " See `?normal_input` for details."
-    )
-  }
-  
-  # Make sure gcm was built using gcm_input
-  if (!is.null(gcm) && !isTRUE(attr(gcm, "builder") == "climr")) {
-    stop(
-      "Please use this package `gcm_input` function to create `gcm`.",
-      " See `?gcm_input` for details."
-    )
-  }
   
   if (isTRUE(nthread > 1L)) {
     if (!requireNamespace("parallel")) {
@@ -866,14 +850,13 @@ unpackRasters <- function(ras) {
 
 
 
-#' Check arguments of `climr_downscale` and `downscale`
+#' Check `climr_downscale` arguments
 #'
 #' @inheritParams climr_downscale 
-#' @inheritParams downscale
 #' @param ... ignored
 #'
 #' @return NULL
-.checkDwnsclArgs <- function(xyz, which_normal = NULL, normal = NULL, historic_period = NULL, historic_ts = NULL,
+.checkClimrDwnsclArgs <- function(xyz, which_normal = NULL, normal = NULL, historic_period = NULL, historic_ts = NULL,
                             gcm_models = NULL, ssp = list_ssp(), gcm_period = NULL, gcm_ts_years = NULL, 
                             gcm_hist_years = NULL, max_run = 0L, vars = list_variables(), ...) {
   ssp <- match.arg(ssp, list_ssp(), several.ok = TRUE)
@@ -881,10 +864,6 @@ unpackRasters <- function(ras) {
   
   if (!is.null(which_normal)) {
     which_normal <- match.arg(which_normal, c("auto", list_normal()))
-  } 
-  
-  if (!is.null(normal)) {
-    normal <- match.arg(normal, c("auto", list_normal()))
   } 
   
   if (!is.null(historic_period)) {
@@ -937,6 +916,77 @@ unpackRasters <- function(ras) {
       is.null(gcm_models)) {
     message("'gcm_models' is missing. 'max_run' will be ignored")
   }
+  return(invisible(NULL))
+}
+
+#' Check `downscale` arguments
+#'
+#' @inheritParams downscale
+#' @param ... ignored
+#'
+#' @return NULL
+.checkDwnsclArgs <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, gcm_hist = NULL, 
+                             historic_ts = NULL, return_normal = FALSE,
+                             vars = list_variables(), ...) {
+ 
+  vars <- match.arg(vars, list_variables(), several.ok = TRUE)
+  
+  if (!isTRUE(attr(normal, "builder") == "climr")) {
+    stop(
+      "Please use `normal_input` function to create `normal`.",
+      " See `?normal_input` for details."
+    )
+  }
+  
+  # Make sure gcm was built using gcm_input
+  if (!is.null(gcm) && !isTRUE(attr(gcm, "builder") == "climr")) {
+    stop(
+      "Please use `gcm_input` function to create `gcm`.",
+      " See `?gcm_input` for details."
+    )
+  }
+  
+  # Make sure gcm_ts was built using gcm_ts_input
+  if (!is.null(gcm_ts) && !isTRUE(attr(gcm_ts, "builder") == "climr")) {
+    stop(
+      "Please use `gcm_ts_input` function to create `gcm_ts`.",
+      " See `?gcm_ts_input` for details."
+    )
+  }
+  
+  # Make sure gcm_hist was built using gcm_hist_input
+  if (!is.null(gcm_hist) && !isTRUE(attr(gcm_hist, "builder") == "climr")) {
+    stop(
+      "Please use `gcm_hist_input` function to create `gcm_hist`.",
+      " See `?gcm_hist_input` for details."
+    )
+  }
+  
+  # Make sure historic was built using historic_input
+  if (!is.null(historic) && !isTRUE(attr(historic, "builder") == "climr")) {
+    stop(
+      "Please use `historic_input` function to create `historic`.",
+      " See `?historic_input` for details."
+    )
+  }
+  
+  # Make sure historic_ts was built using historic_input_ts
+  if (!is.null(historic_ts) && !isTRUE(attr(historic_ts, "builder") == "climr")) {
+    stop(
+      "Please use `historic_input_ts` function to create `historic_ts`.",
+      " See `?historic_input_ts` for details."
+    )
+  }
+  
+  expectedCols <- c("lon", "lat", "elev", "id")
+  xyz <- .checkXYZ(xyz, expectedCols)
+  
+  ## check for "silly" parameter combinations
+  if (all(is.null(gcm), is.null(gcm_ts), is.null(gcm_hist), 
+          is.null(historic), is.null(historic_ts))) {
+    warning("'gcm', 'gcm_ts', 'gcm_hist', 'historic' and 'historic_ts' are missing. Nothing to downscale.")
+  }
+  
   return(invisible(NULL))
 }
 
