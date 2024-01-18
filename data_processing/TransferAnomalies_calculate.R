@@ -112,15 +112,19 @@ for(e in 1:3){
   for(m in 1:12){
     X <- anom[[m]]
     # lim <- quantile(abs(values(X)), .99, na.rm=T)
-    lim <- 2
-    breaks <- seq(0-lim, lim, 0.1)
-    colscheme <- colorRampPalette(rev(brewer.pal(11, "RdBu")))(length(breaks)-1)
-    X[X>lim] <- lim
-    X[X < 0-lim] <- 0-lim
-    plot(X, col=colscheme, breaks=breaks, main=paste(month.name[m], elements[e]), legend=F, axes=F)
+    if(e==3) plot(X) else {
+      lim <- 2
+      breaks <- seq(0-lim, lim, 0.1)
+      colscheme <- colorRampPalette(rev(brewer.pal(11, "RdBu")))(length(breaks)-1)
+      X[X>lim] <- lim
+      X[X < 0-lim] <- 0-lim
+      plot(X, col=colscheme, breaks=breaks, main=paste(month.name[m], elements[e]), axes=F, type="continuous")
+    }
     # plot(bdy.na, add=T)
   }
 }
+
+plot(X)
 
 #-----------------------------------------
 # spot check the time series
