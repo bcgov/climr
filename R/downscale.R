@@ -628,14 +628,14 @@ threaded_downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist, historic, hi
 
 #' TODO: fill documentation here
 #'
-#' @param climaterast 
-#' @param res 
-#' @template xyz 
-#' @param timeseries 
-#' @param type 
+#' @param climaterast TODO
+#' @param res TODO
+#' @template xyz
+#' @param timeseries TODO
+#' @param type TODO
 #'
 #' @return a `data.table`
-#'
+#' @noRd
 #' @importFrom stats as.formula
 process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE, 
                                     type = c("gcm", "gcm_hist", "historic")) {
