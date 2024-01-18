@@ -30,7 +30,7 @@ test_that("test cache in default location", {
   cachedirs <- normalizePath(list.dirs(cache_path(), recursive = FALSE), winslash = "/")
   expect_false(any(expecteddirs %in% cachedirs))
   
-  ds_res <- climr_downscale(xyz, which_normal = "BC", historic_period = "2001_2020",
+  ds_res <- climr_downscale(xyz, which_normal = "normal_bc", historic_period = "2001_2020",
                             cache = FALSE)
   cachedirs <- normalizePath(list.dirs(cache_path(), recursive = FALSE), winslash = "/")
   expect_false(any(expecteddirs %in% cachedirs))
@@ -48,7 +48,7 @@ test_that("test cache in default location", {
   )
   expect_true("gcm" %in% list.files(cache_path()))
   
-  ds_res <- climr_downscale(xyz, which_normal = "BC", historic_period = "2001_2020")
+  ds_res <- climr_downscale(xyz, which_normal = "normal_bc", historic_period = "2001_2020")
   expect_true("historic" %in% list.files(cache_path()))
   
   
@@ -73,7 +73,7 @@ test_that("test cache in default location", {
   expect_false("historic" %in% list.files(cache_path()))
   
   cache_clear()
-  ds_res <- climr_downscale(xyz, which_normal = "BC", historic_period = "2001_2020", 
+  ds_res <- climr_downscale(xyz, which_normal = "normal_bc", historic_period = "2001_2020", 
                             gcm_models = list_gcm()[1], gcm_period = "2041_2060")
   cachedirs <- normalizePath(list.dirs(cache_path(), recursive = FALSE), winslash = "/")
   test <- all(expecteddirs %in% cachedirs)
