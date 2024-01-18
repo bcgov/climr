@@ -5,6 +5,8 @@
 * code further streamlined
 * new messages warn user about meaningless `downscale`/`climr_downscale` argument combinations
 
+## Behaviour changes
+* `xyz` (argument to `climr_downscale` and `downscale`) must now be a 4 column `data.table` (or coercible class) with `lon`, `lat`, `elev` and `id` columns. All other columns are ignored and NOT returned.
 
 # `climr` 0.0.1
 
