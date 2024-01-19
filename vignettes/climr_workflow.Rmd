@@ -162,6 +162,10 @@ list_normal()
 We pass our choices to the `climr_downscale`, choosing the "auto" normals option 
 (which defaults to using 'composite_normal') <!--THIS STILL NEEDS TO BE IMPLEMENTED-->.
 
+```{r, include = FALSE}
+options("climr.cache.path" = file.path(tempdir(), "climr.cache"))
+```
+
 ```{r, message = TRUE}
 ds_out <- climr_downscale(xyz = point_data, 
                           which_normal = "auto", 
