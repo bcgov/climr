@@ -1,5 +1,5 @@
 ---
-title: "methods_downscaling"
+title: "`climr` downscaling methods"
 Author: "Colin Mahony"
 vignette: >
   %\VignetteIndexEntry{methods_downscaling}
@@ -22,8 +22,6 @@ library(terra)
 dbCon <- data_connect()
 bdy <- vect("../data-raw/Coast_Vancouver.shp")
 ```
-
-# `climr` downscaling methods
 
 Downscaling is the process of converting low-spatial-resolution climate data to high resolution.
 `climr` adapts a downscaling approach originally implemented in [ClimateNA](https://climatena.ca/) [@wang2016] by Dr. Tongli Wang (University of British Columbia), Dr. Andreas Hamann (University of Alberta), and Dave Spittlehouse (BC Ministry of Forests).
