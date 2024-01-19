@@ -1,0 +1,242 @@
+---
+title: "Downscaling climate variables with `climr`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{climr-workflow}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+bibliography: references.bib
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  cache = 2,
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+# Introduction
+
+`climr` is in essence similar to [ClimateNA](climatena.ca) in that it
+downscales low-resolution (\~100km) global climate model anomalies to
+high-resolution (1-4km) maps of historical climate, with further
+elevation adjustment to user-specified elevation grids/points based on
+empirical lapse rates (local relationship of climate to elevation) of
+the 1-4km climate maps. The elevation-adjusted monthly values of basic
+*climate elements* (temperature and precipitation) are then used to
+estimate *derived variables* (e.g., degree-days, relative humidity)
+based on published equations and parameters from [@wang2016]. See
+`vignette("methods_downscaling.Rmd")` for a detailed explanation of the
+downscaling methodology employed in `climr`.
+
+`climr`'s major advantages, with respect to ClimateNA, are:
+
+1.  improved speed,
+
+2.  the ability of obtaining multiple, individual runs of a (or several)
+General Circulation Model (GCM), as well as the ensemble cross-run
+mean,
+
+3.  cloud-based raw data access and local data caching,
+
+4.  and direct `R` interface to downscaled climate elements and derived
+variables covering western Canada and western US.
+
+In this vignette we cover two basic `climr` workflows to obtain historic
+and future climate projections of a few derived variables. The first,
+less code-heavy, workflow uses `climr_downscale()` to do much of the
+heavy lifting. The second workflow is basically a step-by-step breakdown
+of `climr_downscale()` directly using the functions `climr_downscale()`
+calls internally.
+
+# Main functions
+
+-   `climr_downscale()` takes a `data.table` of point coordinates (in
+lat-long projection), obtains climate normals and historic and/or
+future projections covering the extent of the points, which are then
+downscaled using point elevation data and used to calculate derived
+climate variables at the point locations. It outputs the downscaled
+and derived variables in the form of a `data.table` or `SpatVector`
+of points.
+
+-   `normal_input()` downloads and prepares high-resolution climate
+normals. Called internally by `climr_downscale`.
+
+-   `historic_input()` and `historic_input_ts()` download and prepare
+low-resolution historic climate elements for a given historic period
+or time series, respectively. Called internally by
+`climr_downscale`.
+
+-   `gcm_input()`, `gcm_hist_input()` and `gcm_ts_input` download and
+prepare low-resolution climate element projections for a future
+period, historic period or future time series, respectively. Called
+internally by `climr_downscale`.
+
+-   `downscale()` downscales historic or future climate elements and
+calculates derived climate variables. Called by `climr_downscale`.
+
+# Workflow with `climr_downscale`
+
+In this example workflow we use `climr_downscale` to calculate mean annual 
+temperature (MAT), total annual precipitation (PPT) and relative humidity (RH) 
+for a historic and future period, using two separate
+runs of a GCM and one emissions scenario.
+
+<!--TODO: change coords for a "known" location in BC-->
+
+We begin by loading our `data.table` of point locations, elevation and IDs. Note
+that longitude ('lon') and latitude ('lat') must be in lat-long projection and 
+elevation in m. Point IDs must be unique.
+
+Although we have two other columns in our `data.table` ('zone' and 'subzone')
+these will be ignored by `climr_downscale`. The IDs, however, are preserved and 
+we use them later to join back the extra columns.
+
+```{r}
+library(climr)
+library(data.table)
+library(terra)
+
+## provide or create a long, lat, elev, and optionally id, dataframe - usually read from csv file
+point_data <- data.table(
+  lon = c(
+    -127.70521, -127.62279, -127.56235, -127.7162,
+    -127.18585, -127.1254, -126.94957, -126.95507
+  ),
+  lat = c(
+    55.3557, 55.38847, 55.28537, 55.25721, 54.88135,
+    54.65636, 54.6913, 54.61025
+  ),
+  elev = c(
+    291L, 296L, 626L, 377L, 
+    424L, 591L, 723L, 633L
+  ),
+  id = c(2, 6, 8, 5, 1, 12, 3, 13),
+  zone = c(rep("CWH", 3), rep("CDF", 5)),
+  subzone = c("vm1", "vm2", "vs1", rep("mm", 3), "dk", "dc")
+)
+```
+
+
+The `list_*()` functions below provide a list of available historic and future periods,
+GCMs, emissions scenarios, and derived variables (in this case only the annual ones).
+
+```{r}
+list_historic()
+```
+
+```{r}
+list_gcm_period()
+```
+
+```{r}
+list_gcm()
+```
+
+```{r}
+list_ssp()
+```
+
+```{r}
+list_variables(set = "Annual")
+```
+
+We will chose the only available historic period (2001-2020), 2021-2040 as the future period, the 'CanESM5' GCM and the SSP 2.45 scenario. MAT, PPT and RH will be selected as output variables.
+
+Finally, `list_normal()` returns the list of available high-resolution normals. 
+'normal_na' corresponds to normals for North America obtained from 
+[ClimateNA](climatena.ca). 'composite_normal' corresponds to a composite of 
+British Columbia PRISM, adjusted US PRISM and DAYMET (Alberta and Saskatchewan),
+and covers western Canada and western US. 
+
+```{r}
+list_normal()
+```
+
+We pass our choices to the `climr_downscale`, choosing the "auto" normals option 
+(which defaults to using 'composite_normal') <!--THIS STILL NEEDS TO BE IMPLEMENTED-->.
+
+```{r, message = TRUE}
+ds_out <- climr_downscale(xyz = point_data, 
+                          which_normal = "auto", 
+                          historic_period = "2001_2020",
+                          gcm_period = "2021_2040",
+                          gcm_models = "CanESM5",
+                          ssp = "ssp245",
+                          max_run = 2,
+                          return_normal = TRUE, ## to return the 1961-1990 normals period
+                          vars = c("MAT", "PPT", "RH"))
+```
+
+Note how data from historical periods doesn't have a GCM or SSP value -- this is
+expected of course, as GCMs and SSPs are used to project *future* climate values.
+Also, future projections were obtained for two runs of CanESM5 ('r1i1p1f1' and 
+'r10i1p1f1'), plus the ensemble mean.
+
+```{r}
+ds_out
+```
+
+To add back the extra columns we need only a simple left join.
+
+<!--TODO: this won't be necessary after merge of #107-->
+```{r, include = FALSE}
+setnames(ds_out, "ID", "id")
+ds_out[, `:=`(zone = NULL, subzone = NULL)]
+```
+
+```{r}
+ds_out <- point_data[, .(id, zone, subzone)][ds_out, on = .(id)]
+```
+
+We may also want yearly climate projections. In this case, we want the yearly values
+for the same periods. Notice how some of the data doesn't need to be downloaded again,
+and was retrieved from cache.
+
+```{r, message = TRUE}
+ds_out_ts <- climr_downscale(xyz = point_data, 
+                          which_normal = "auto", 
+                          historic_ts = 2001:2020,
+                          gcm_ts_years = 2021:2040,
+                          gcm_models = "CanESM5",
+                          ssp = "ssp245",
+                          max_run = 2,
+                          return_normal = TRUE, ## to return the 1961-1990 normals period
+                          vars = c("MAT", "PPT", "RH"))
+```
+
+
+```{r, include = FALSE}
+ds_out_ts2 <- melt(ds_out_ts, measure.vars = c("MAT", "PPT", "RH"))
+ds_out_ts2[variable == "PPT", value := value/100]
+ds_out_ts2 <- ds_out_ts2[variable != "RH" & PERIOD != "1961_1990"]
+ds_out_ts2[, PERIOD := as.numeric(PERIOD)]
+
+yrbreaks <- c(min(ds_out_ts2$PERIOD), 
+              seq(min(ds_out_ts2$PERIOD), max(ds_out_ts2$PERIOD), by = 5), 
+              max(ds_out_ts2$PERIOD)) |>
+                unique()
+
+if (require(ggplot2)) {
+  ggplot(ds_out_ts2, 
+         aes(x = PERIOD, y = value, col = variable)) +
+    stat_summary(fun = "mean", geom = "line", linewidth = 1) +
+    scale_y_continuous(sec.axis = sec_axis(~.*100, name = "PPT (mm)")) +
+    scale_x_continuous(breaks = yrbreaks, labels = yrbreaks) +
+    theme_light() +
+    theme(axis.text.x = element_text(angle = 45, vjust = 0.5)) +
+    labs(x = "Year", y = "MAT (degrees C)", col = "")
+}
+```
+
+
+<!--TODO SpatVector output--> 
+
+# Workflow with `*_input` functions and `downscale`
+<!--TODO SpatVector output--> 
