@@ -54,6 +54,7 @@ jobs:
           extra-packages: |
             any::rcmdcheck
             any::Rcpp
+            any::remotes
             any::withr
 
       - uses: r-lib/actions/check-r-package@v2
