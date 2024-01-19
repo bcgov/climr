@@ -187,24 +187,6 @@ plot(Tave.ref-Tave.proj, col=colorRampPalette(rev(brewer.pal(9, "Reds")))(99), m
 plot(bdy, add=T)
 plot(DD_0.proj-DD_0.ref, col=colorRampPalette(rev(brewer.pal(9, "Reds")))(99), main="Change in January degree-days <0C", cex.main=0.8)
 plot(bdy, add=T)
-
-ids1961_1990 <- clim.aoi[PERIOD == "1961_1990", ID]
-ids2041_2060 <- clim.aoi[PERIOD == "2041_2060", ID]
-
-Tmin.ref[ids1961_1990] <- clim.aoi[PERIOD == "1961_1990", Tave01]
-Tmin.proj[ids2041_2060] <- clim.aoi[PERIOD == "2041_2060", Tave01]
-DD_0.ref[ids1961_1990] <- clim.aoi[PERIOD == "1961_1990", DD_0_01]
-DD_0.proj[ids2041_2060] <- clim.aoi[PERIOD == "2041_2060", DD_0_01]
-
-colPal2 <- colorRampPalette(rev(hcl.colors(9, "Reds")))
-
-par(mfrow = c(1, 2))
-plot(Tmin.ref - Tmin.proj, col = colPal2(99), 
-     main = "Change in January mean temperature", cex.main = 0.8)
-plot(bdy, add = TRUE)
-plot(DD_0.proj - DD_0.ref, col = colPal2(99), 
-     main = "Change in January degree-days <0C", cex.main = 0.8)
-plot(bdy, add = TRUE)
 ```
 
 # `climr` data sources
