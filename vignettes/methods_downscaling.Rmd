@@ -17,7 +17,6 @@ knitr::opts_chunk$set(
 ```{r, include = TRUE, echo = FALSE}
 library(climr)
 library(terra)
-library(bcmaps)
 library(RColorBrewer)
 dbCon <- data_connect()
 bdy <- vect("../data-raw/Coast_Vancouver.shp")
