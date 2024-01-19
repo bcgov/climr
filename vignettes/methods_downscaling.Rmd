@@ -6,10 +6,12 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 bibliography: references.bib
+link-citations: true
 ---
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
+  cache = 2, 
   collapse = TRUE,
   comment = "#>",
   include = FALSE,
