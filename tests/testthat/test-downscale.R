@@ -138,8 +138,8 @@ test_that("test downscale outputs with gcm, gcm_hist, gcm_ts, historic and histo
   )
   
   ## read in the reference points and outputs
-  ref_xyz <- readRDS("tests/points_downscale_ref.rds")
-  list_refs <- list.files("tests", "downscaleout", full.names = TRUE)
+  ref_xyz <- readRDS("points_downscale_ref.rds")
+  list_refs <- list.files("downscaleout", full.names = TRUE)
   
   refs <- lapply(list_refs, readRDS)
   names(refs) <- sub("downscaleout_(.*)_ref.rds", "\\1", basename(list_refs))  ## make the same as names(list_args) below
