@@ -103,7 +103,7 @@ plot(bdy, add = TRUE)
 
 This example indicates that the BC PRISM maps for July Tmax have lower lapse rates in maritime influenced mountains (4C/km) than in mountains with less maritime influence (8C/km). The map of lapse rates has artefacts in areas with no relief; these artefacts have no consequence unless users supply elevations for these areas that deviate substantially from realistic ground elevations in areas of flat topography.
 
-We can use the `climr_downscale()` function with a 90m Digital elevation model (DEM) to illustrate the elevation adjustment. First, we import the DEM and convert it into raster input.
+We can use the `climr_downscale()` function with a 90m digital elevation model (DEM) to illustrate the elevation adjustment. First, we import the DEM and convert it into raster input.
 
 ```{r, include = F, echo = FALSE, figures-side, fig.show="hold", out.width="50%"}
 dem_aoi <- rast("../data-raw/example_VanNorthShore.tif") ## get the sample DEM for the North Shore of Vancouver
@@ -190,4 +190,4 @@ The default climate maps for `climr` are a composite for western North America (
 
 ## Historical observational time series and climates
 
-`climr` provides historical observed climates for annual time series from 1901-present and for 10-year, 20-year, and 30-year periods from 1951-2020. These are downscaled in the same way as global climate model data: by adding low-resolution anomalies (change factors) to the high-resolution reference climate map. Temperature anomalies are from the Climatic Research Unit Time Series dataset. Precipitation anomalies are from the Global Precipitation Climatology Centre global dataset, which has a better representation of Canadian precipitation stations than the CRU ts dataset.
+`climr` provides historical observed climates for annual time series from 1901-present and for 10-year, 20-year, and 30-year periods from 1951-2020. These are downscaled in the same way as global climate model data: by adding low-resolution anomalies (change factors) to the high-resolution reference climate map. Temperature anomalies are from the Climatic Research Unit (CRU) Time Series dataset. Precipitation anomalies are from the Global Precipitation Climatology Centre global dataset, which has a better representation of Canadian precipitation stations than the CRU Time Series dataset.
