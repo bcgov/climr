@@ -17,7 +17,6 @@ knitr::opts_chunk$set(
 ```{r, include = TRUE, echo = FALSE}
 library(climr)
 library(terra)
-library(RColorBrewer)
 dbCon <- data_connect()
 bdy <- vect("../data-raw/Coast_Vancouver.shp")
 ```
@@ -38,44 +37,57 @@ The default high-resolution climate maps used by `climr` are 800m gridded maps o
 
 ```{r, include = TRUE, echo = FALSE}
 studyarea <- ext(c(-124, -120, 49, 50.5))
-thebb <- rev(as.vector(studyarea)) #this is a patch until we fix the get_bb() and normal_input() function
-refNormals <- normal_input(dbCon = dbCon, normal = "composite_normal", bbox = thebb, cache = TRUE) 
-breaks=seq(7,33,0.1)
-plot(refNormals$Tmax07, col=colorRampPalette(rev(brewer.pal(11, "RdYlBu")))(length(breaks)-1), breaks=breaks, type="continuous", ext=studyarea)
-plot(bdy, add=T)
+thebb <- rev(as.vector(studyarea)) # this is a patch until we fix the get_bb() and normal_input() function
+refNormals <- normal_input(
+  dbCon = dbCon,
+  normal = "composite_normal",
+  bbox = thebb, cache = TRUE
+)
+breaks <- seq(7, 33, 0.1)
+colPal <- colorRampPalette(rev(hcl.colors(11, "RdYlBu")))
+
+plot(refNormals$Tmax07,
+     col = colPal(length(breaks) - 1),
+     breaks = breaks, type = "continuous", ext = studyarea
+)
+plot(bdy, add = TRUE)
 ```
 
 Global climate model data are at much lower resolution (60-200km grid scale). Here is the change in July Tmax for the EC-Earth3 global climate model for the 2041-2060 time period, relative to the model's 1961-1990 climate. In this case, the warming is greater in areas further (eastward) from the coast.
 
 ```{r, include = TRUE, echo = FALSE}
-gcm <- gcm_input(dbCon, bbox = thebb, 
-                 gcm = c("EC-Earth3"), 
-                 ssp = c("ssp245"), 
+gcm <- gcm_input(dbCon,
+                 bbox = thebb,
+                 gcm = c("EC-Earth3"),
+                 ssp = c("ssp245"),
                  period = "2041_2060",
                  max_run = 0,
-                 cache = TRUE)
-gcm_example <- gcm$`EC-Earth3`[[grep("Tmax_07", names(gcm$`EC-Earth3`))]] # TODO need to figure out how to better call the gcm raster
-plot(gcm_example, col=colorRampPalette(rev(brewer.pal(11, "RdYlBu")))(99), ext=studyarea)
-plot(bdy, add=T)
+                 cache = TRUE
+)
+lyrs <- grep("Tmax_07", names(gcm$`EC-Earth3`))
+gcm_example <- gcm$`EC-Earth3`[[lyrs]] # TODO need to figure out how to better call the gcm raster
+plot(gcm_example, col = colPal(99), ext = studyarea)
+plot(bdy, add = T)
 ```
 
 To downscale the GCM projection, we first interpolate the low-resolution GCM anomaly (in this case, the temperature change from 1961-1990 to 2041-2060) to the resolution of the detailed reference climate map:
 
 ```{r, include = TRUE, echo = FALSE}
-gcm_example_interp <- project(gcm_example, refNormals, method="bilinear")
-plot(gcm_example_interp, col=colorRampPalette(rev(brewer.pal(11, "RdYlBu")))(99), ext=studyarea)
-plot(bdy, add=T)
+gcm_example_interp <- project(gcm_example, refNormals, method = "bilinear")
+plot(gcm_example_interp, col = colPal(99), ext = studyarea)
+plot(bdy, add = T)
 ```
 
 Then we add these smoothed anomalies to the high-resolution 1961-1990 climate map.
 
 ```{r, include = TRUE, echo = FALSE}
 gcm_example_downscaled <- refNormals$Tmax07 + gcm_example_interp
-plot(gcm_example_downscaled, col=colorRampPalette(rev(brewer.pal(11, "RdYlBu")))(length(breaks)-1), breaks=breaks, type="continuous", ext=studyarea) #TODO scale this color ramp the same as the refnormals map above. 
-plot(bdy, add=T)
+plot(gcm_example_downscaled, col = colPal(length(breaks) - 1), 
+     breaks = breaks, type = "continuous", ext = studyarea) # TODO scale this color ramp the same as the refnormals map above.
+plot(bdy, add = T)
 ```
 
-In the case of precipitation we multiply the reference climate by the relative anomaly (e.g., multiply by 1.07 for a 7% increase in precipitation), rather than adding the absolute anomaly.
+In the case of precipitation, we multiply the reference climate by the relative anomaly (e.g., multiply by 1.07 for a 7% increase in precipitation), rather than adding the absolute anomaly.
 
 ### Stage 2: Elevation adjustment
 
@@ -116,14 +128,19 @@ Finally, we convert the output to raster format and plot it in comparison to the
 
 ```{r, include = TRUE, echo = FALSE, fig.show="hold"}
 X <- dem_aoi
- values(X) <- NA
-  X[clim.aoi[PERIOD=="1961_1990", ID]] <- clim.aoi[PERIOD=="1961_1990",  Tmax07]
-par(mfrow=c(1,2))
-breaks=seq(14.5,23.5,0.1)
-plot(refNormals$Tmax07, col=colorRampPalette(rev(brewer.pal(11, "RdYlBu")))(length(breaks)-1), breaks=breaks, type="continuous", ext=ext(dem_aoi), main="climr reference map (800m grid)", cex.main=0.8) 
-plot(bdy, add=T)
-plot(X, col=colorRampPalette(rev(brewer.pal(11, "RdYlBu")))(length(breaks)-1), breaks=breaks, type="continuous", ext=ext(dem_aoi), main="elevation-adjusted map (90m grid)", cex.main=0.8) 
-plot(bdy, add=T)
+values(X) <- NA
+X[clim.aoi[PERIOD == "1961_1990", ID]] <- clim.aoi[PERIOD == "1961_1990", Tmax07]
+par(mfrow = c(1, 2))
+breaks <- seq(14.5, 23.5, 0.1)
+
+plot(refNormals$Tmax07, col = colPal(length(breaks) - 1), breaks = breaks, 
+     type = "continuous", ext = ext(dem_aoi), 
+     main = "climr reference map (800m grid)", cex.main = 0.8)
+plot(bdy, add = TRUE)
+plot(X, col = colPal(length(breaks) - 1), breaks = breaks, 
+     type = "continuous", ext = ext(dem_aoi), 
+     main = "elevation-adjusted map (90m grid)", cex.main = 0.8)
+plot(bdy, add = TRUE)
 ```
 
 ### Stage 3: Derived variables
@@ -137,17 +154,25 @@ The value of delta downscaling isn't just in obtaining the new absolute values o
 Using the `climr` output that we generated in the previous section, we can compare the change in January mean temperature to change in January degree days <0C in the 2041-2060 period relative to the 1961-1990 baseline. January mean temperature is interpolated directly from the GCM, so the only variation in the climate change trend in this variable is the transition from one GCM grid cell to its neighbours. In contrast, January degree-days <0C, while derived directly from January mean temperature, has strong elevation-dependence in its climate change trend. 
 
 ```{r, include = TRUE, echo = FALSE, fig.show="hold"}
- Tmin.ref <- Tmin.proj <- DD_0.ref <- DD_0.proj <- X
-  Tmin.ref[clim.aoi[PERIOD=="1961_1990", ID]] <- clim.aoi[PERIOD=="1961_1990",  Tave01]
-  Tmin.proj[clim.aoi[PERIOD=="2041_2060", ID]] <- clim.aoi[PERIOD=="2041_2060", Tave01]
-  DD_0.ref[clim.aoi[PERIOD=="1961_1990", ID]] <- clim.aoi[PERIOD=="1961_1990",  DD_0_01]
-  DD_0.proj[clim.aoi[PERIOD=="2041_2060", ID]] <- clim.aoi[PERIOD=="2041_2060", DD_0_01]
-par(mfrow=c(1,2))
-plot(Tmin.ref-Tmin.proj, col=colorRampPalette(rev(brewer.pal(9, "Reds")))(99), main="Change in January mean temperature", cex.main=0.8)
-plot(bdy, add=T)
-plot(DD_0.proj-DD_0.ref, col=colorRampPalette(rev(brewer.pal(9, "Reds")))(99), main="Change in January degree-days <0C", cex.main=0.8)
-plot(bdy, add=T)
+Tmin.ref <- Tmin.proj <- DD_0.ref <- DD_0.proj <- X
 
+ids1961_1990 <- clim.aoi[PERIOD == "1961_1990", ID]
+ids2041_2060 <- clim.aoi[PERIOD == "2041_2060", ID]
+
+Tmin.ref[ids1961_1990] <- clim.aoi[PERIOD == "1961_1990", Tave01]
+Tmin.proj[ids2041_2060] <- clim.aoi[PERIOD == "2041_2060", Tave01]
+DD_0.ref[ids1961_1990] <- clim.aoi[PERIOD == "1961_1990", DD_0_01]
+DD_0.proj[ids2041_2060] <- clim.aoi[PERIOD == "2041_2060", DD_0_01]
+
+colPal2 <- colorRampPalette(rev(hcl.colors(9, "Reds")))
+
+par(mfrow = c(1, 2))
+plot(Tmin.ref - Tmin.proj, col = colPal2(99), 
+     main = "Change in January mean temperature", cex.main = 0.8)
+plot(bdy, add = TRUE)
+plot(DD_0.proj - DD_0.ref, col = colPal2(99), 
+     main = "Change in January degree-days <0C", cex.main = 0.8)
+plot(bdy, add = TRUE)
 ```
 
 # `climr` data sources
