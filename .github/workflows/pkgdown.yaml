@@ -35,6 +35,7 @@
 #         with:
 #           extra-packages: |
 #             any::pkgdown
+#             any::ggplot2
 #             local::.
 #           needs: website
 # 
