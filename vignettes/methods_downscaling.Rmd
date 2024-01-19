@@ -177,7 +177,16 @@ January mean temperature is interpolated directly from the GCM, so the only vari
 In contrast, January degree-days \<0C, while derived directly from January mean temperature, has strong elevation-dependence in its climate change trend.
 
 ```{r, fig.show="hold"}
-Tmin.ref <- Tmin.proj <- DD_0.ref <- DD_0.proj <- X
+ Tave.ref <- Tave.proj <- DD_0.ref <- DD_0.proj <- X
+  Tave.ref[clim.aoi[PERIOD=="1961_1990", ID]] <- clim.aoi[PERIOD=="1961_1990",  Tave01]
+  Tave.proj[clim.aoi[PERIOD=="2041_2060", ID]] <- clim.aoi[PERIOD=="2041_2060", Tave01]
+  DD_0.ref[clim.aoi[PERIOD=="1961_1990", ID]] <- clim.aoi[PERIOD=="1961_1990",  DD_0_01]
+  DD_0.proj[clim.aoi[PERIOD=="2041_2060", ID]] <- clim.aoi[PERIOD=="2041_2060", DD_0_01]
+par(mfrow=c(1,2))
+plot(Tave.ref-Tave.proj, col=colorRampPalette(rev(brewer.pal(9, "Reds")))(99), main="Change in January mean temperature", cex.main=0.8)
+plot(bdy, add=T)
+plot(DD_0.proj-DD_0.ref, col=colorRampPalette(rev(brewer.pal(9, "Reds")))(99), main="Change in January degree-days <0C", cex.main=0.8)
+plot(bdy, add=T)
 
 ids1961_1990 <- clim.aoi[PERIOD == "1961_1990", ID]
 ids2041_2060 <- clim.aoi[PERIOD == "2041_2060", ID]
