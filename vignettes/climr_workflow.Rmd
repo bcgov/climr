@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Introduction
+## Introduction
 
 `climr` is in essence similar to [ClimateNA](climatena.ca) in that it
 downscales low-resolution (\~100km) global climate model anomalies to
@@ -55,7 +55,7 @@ heavy lifting. The second workflow is basically a step-by-step breakdown
 of `climr_downscale()` directly using the functions `climr_downscale()`
 calls internally.
 
-# Main functions
+## Main functions
 
 -   `climr_downscale()` takes a `data.table` of point coordinates (in
 lat-long projection), obtains climate normals and historic and/or
@@ -81,7 +81,7 @@ internally by `climr_downscale`.
 -   `downscale()` downscales historic or future climate elements and
 calculates derived climate variables. Called by `climr_downscale`.
 
-# Workflow with `climr_downscale`
+## Workflow with `climr_downscale`
 
 In this example workflow we use `climr_downscale` to calculate mean annual 
 temperature (MAT), total annual precipitation (PPT) and relative humidity (RH) 
@@ -238,5 +238,7 @@ if (require(ggplot2)) {
 
 <!--TODO SpatVector output--> 
 
-# Workflow with `*_input` functions and `downscale`
+## Workflow with `*_input` functions and `downscale`
 <!--TODO SpatVector output--> 
+
+## References
