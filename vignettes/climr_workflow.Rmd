@@ -182,8 +182,12 @@ expected of course, as GCMs and SSPs are used to project *future* climate values
 Also, future projections were obtained for two runs of CanESM5 ('r1i1p1f1' and 
 'r10i1p1f1'), plus the ensemble mean.
 
-```{r}
+```{r, eval = FALSE}
 ds_out
+```
+
+```{r, echo = FALSE, results = "asis"}
+knitr::kable(ds_out, caption = "'ds_out' table - Output from `climr_downscale`")
 ```
 
 To add back the extra columns we need only a simple left join.
