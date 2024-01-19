@@ -22,12 +22,17 @@ list_normal()
 
 list_historic()
 
-list_variables(only_extra = FALSE)
+list_variables(
+  set = c("All", "Monthly", "Seasonal", "Annual"),
+  only_extra = FALSE
+)
 }
 \arguments{
 \item{dbCon}{A db connection object created by \code{data_connect}.}
 
 \item{gcm}{Character vector to specify requested GCMs}
+
+\item{set}{character. One of All, Monthly, Seasonal, Annual, or any combination thereof. Defaults to "All".}
 
 \item{only_extra}{logical. Should Tmin, Tmax and PPT be excluded? Defaults to FALSE.}
 }
@@ -54,7 +59,7 @@ Currently available normals (\code{list_normal()}) are:
 \itemize{
 \item "normal_na" for Climate NA derived normals
 \item "normal_bc" for British Columbia PRISM climatologies derived normals
-\item "normal_composite" for a composite of BC PRISM, adjusted US PRISM and
+\item "composite_normal" for a composite of BC PRISM, adjusted US PRISM and
 DAYMET (Alberta and Saskatchewan), covering western Canada and western
 US.
 }
