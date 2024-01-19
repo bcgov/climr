@@ -35,12 +35,12 @@ Imports:
     uuid
 Suggests: 
     ggplot2,
+    knitr,
     parallel,
     rmarkdown,
     remotes,
     testthat (>= 3.0.0),
-    withr,
-    knitr
+    withr
 Depends: 
     R (>= 4.0)
 Config/testthat/edition: 3
