@@ -2,7 +2,7 @@
 title: "Downscaling climate variables with `climr`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{climr-workflow}
+  %\VignetteIndexEntry{climr_workflow}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
