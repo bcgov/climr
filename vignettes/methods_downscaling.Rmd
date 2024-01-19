@@ -31,7 +31,7 @@ This approach downscales climate data in three stages:
 2.  *Elevation adjustment* of temperature variables to provide scales finer than the high-resolution reference grid; and
 3.  *Calculating derived variables* from the monthly temperature and precipitation variables.
 
-### Stage 1: change-factor (aka "delta") downscaling
+## Stage 1: change-factor (aka "delta") downscaling
 
 `climr` uses a simple method called change-factor downscaling.
 This method is sometimes referred to as the climate imprint method [@hunter2005], the delta method [@wang2016], or simple mean bias correction [@maraun2016].
@@ -98,7 +98,7 @@ plot(bdy, add = T)
 
 In the case of precipitation, we multiply the reference climate by the relative anomaly (e.g., multiply by 1.07 for a 7% increase in precipitation), rather than adding the absolute anomaly.
 
-### Stage 2: Elevation adjustment
+## Stage 2: Elevation adjustment
 
 `climr` uses elevation adjustment to downscale temperature variables at scales finer than the resolution of the reference climate map.
 The local lapse rate is calculated for each grid cell of the reference climate map using a linear regression of temperature to elevation among the focal cell and its 8 neighbours.
@@ -159,7 +159,7 @@ plot(X, col = colPal(length(breaks) - 1), breaks = breaks,
 plot(bdy, add = TRUE)
 ```
 
-### Stage 3: Derived variables
+## Stage 3: Derived variables
 
 The value of delta downscaling isn't just in obtaining the new absolute values of temperature and precipitation.
 It allows us to calculate anomalies in other indices that don't scale linearly with temperature or precipitation, such as degree-days or precipitation as snow.
