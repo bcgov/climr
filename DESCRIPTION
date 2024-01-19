@@ -10,8 +10,8 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-2945-356X")),
     person("Francois", "Bornais", email = "francois@boostao.ca", role = c("aut")),
     person(family = "Province of British Columbia", role = c("cph", "fnd")))
-Description: This package replicate the basic approach of ClimateNA (climatena.ca),
-    but with (1) improved speed, (2) Multiple runs of each GCM, (3) cloud delivery, and (4) 
+Description: This package replicates the basic approach of ClimateNA (climatena.ca),
+    but with (1) improved speed, (2) multiple runs of each GCM, (3) cloud delivery, and (4) 
     programmatic access via R.
     A simple downscaling method is used to bias-correct low-resolution (~100km) global
     climate model anomalies to high-resolution (2km) maps of historical climate, with
@@ -19,7 +19,7 @@ Description: This package replicate the basic approach of ClimateNA (climatena.c
     empirical lapse rates (local relationship of climate to elevation) of the 2km
     climate maps. Elevation-adjusted monthly values of basic climate elements
     (temperature and precipitation) are then used to estimate derived variables
-    (e.g., degree-days) based on published equations and parameters from 2016 Wang et al.
+    (e.g., degree-days) based on published equations and parameters from  Wang et al. 2016.
 License: Apache License (== 2)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
