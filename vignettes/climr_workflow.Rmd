@@ -103,7 +103,6 @@ library(climr)
 library(data.table)
 library(terra)
 
-## provide or create a long, lat, elev, and optionally id, dataframe - usually read from csv file
 point_data <- data.table(
   lon = c(
     -127.70521, -127.62279, -127.56235, -127.7162,
