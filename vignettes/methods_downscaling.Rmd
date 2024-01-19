@@ -8,14 +8,15 @@ vignette: >
 bibliography: references.bib
 ---
 
-```{r, include = TRUE, echo = FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  include = FALSE,
+  message = FALSE,
+  warning = FALSE
 )
-```
 
-```{r, include = TRUE, echo = FALSE}
 library(climr)
 library(terra)
 dbCon <- data_connect()
@@ -43,7 +44,7 @@ The default high-resolution climate maps used by `climr` are 800m gridded maps o
 There is one map for each month of the year, for a total of 36 climate maps.
 Here is what the July T~max~ reference map looks like in the vicinity of Vancouver, BC.
 
-```{r, include = TRUE, echo = FALSE}
+```{r}
 studyarea <- ext(c(-124, -120, 49, 50.5))
 thebb <- rev(as.vector(studyarea)) # this is a patch until we fix the get_bb() and normal_input() function
 refNormals <- normal_input(
@@ -65,7 +66,7 @@ Global climate model data are at much lower resolution (60-200km grid scale).
 Here is the change in July Tmax for the EC-Earth3 global climate model for the 2041-2060 time period, relative to the model's 1961-1990 climate.
 In this case, the warming is greater in areas further (eastward) from the coast.
 
-```{r, include = TRUE, echo = FALSE}
+```{r}
 gcm <- gcm_input(dbCon,
                  bbox = thebb,
                  gcm = c("EC-Earth3"),
@@ -82,7 +83,7 @@ plot(bdy, add = T)
 
 To downscale the GCM projection, we first interpolate the low-resolution GCM anomaly (in this case, the temperature change from 1961-1990 to 2041-2060) to the resolution of the detailed reference climate map:
 
-```{r, include = TRUE, echo = FALSE}
+```{r}
 gcm_example_interp <- project(gcm_example, refNormals, method = "bilinear")
 plot(gcm_example_interp, col = colPal(99), ext = studyarea)
 plot(bdy, add = T)
@@ -90,7 +91,7 @@ plot(bdy, add = T)
 
 Then we add these smoothed anomalies to the high-resolution 1961-1990 climate map.
 
-```{r, include = TRUE, echo = FALSE}
+```{r}
 gcm_example_downscaled <- refNormals$Tmax07 + gcm_example_interp
 plot(gcm_example_downscaled, col = colPal(length(breaks) - 1), 
      breaks = breaks, type = "continuous", ext = studyarea) # TODO scale this color ramp the same as the refnormals map above.
@@ -105,7 +106,7 @@ In the case of precipitation, we multiply the reference climate by the relative 
 The local lapse rate is calculated for each grid cell of the reference climate map using a linear regression of temperature to elevation among the focal cell and its 8 neighbours.
 The lapse rates are included in the `SpatRaster` returned by the `normal_input()` function used above:
 
-```{r, include = TRUE, echo = FALSE}
+```{r}
 lapse <- crop(refNormals$lr_Tmax07, studyarea)
 toChange <- abs(values(lapse)) > quantile(abs(values(lapse)), 0.995, na.rm = TRUE)
 lapse[toChange] <- quantile(abs(values(lapse)), 0.99, na.rm = TRUE)
@@ -119,7 +120,7 @@ The map of lapse rates has artefacts in areas with no relief; these artefacts ha
 We can use the `climr_downscale()` function with a 90m digital elevation model (DEM) to illustrate the elevation adjustment.
 First, we import the DEM and convert it into raster input.
 
-```{r, include = F, echo = FALSE, figures-side, fig.show="hold", out.width="50%"}
+```{r, figures-side, fig.show="hold", out.width="50%"}
 dem_aoi <- rast("../data-raw/example_VanNorthShore.tif") ## get the sample DEM for the North Shore of Vancouver
 points_dat <- as.data.frame(dem_aoi, cells = TRUE, xy = TRUE) # convert dem cells to data frame
 colnames(points_dat) <- c("id", "x", "y", "el") # rename the columns to standard climr format
@@ -129,7 +130,7 @@ points_dat <- points_dat[, c(2, 3, 4, 1)] # restructure for climr input
 Then we use `climr_downscale` to generate July Tmin data for the study area.
 We're including some GCM output and extra variables to use in the next section.
 
-```{r, include = F, echo = FALSE}
+```{r}
 clim.aoi <- climr_downscale(points_dat,
                             which_normal = "composite_normal",
                             gcm_models = list_gcm()[4],
@@ -143,7 +144,7 @@ clim.aoi <- climr_downscale(points_dat,
 
 Finally, we convert the output to raster format and plot it in comparison to the 800m `climr` reference map.
 
-```{r, include = TRUE, echo = FALSE, fig.show="hold"}
+```{r, fig.show="hold"}
 X <- dem_aoi
 values(X) <- NA
 X[clim.aoi[PERIOD == "1961_1990", ID]] <- clim.aoi[PERIOD == "1961_1990", Tmax07]
@@ -175,7 +176,7 @@ Using the `climr` output that we generated in the previous section, we can compa
 January mean temperature is interpolated directly from the GCM, so the only variation in the climate change trend in this variable is the transition from one GCM grid cell to its neighbours.
 In contrast, January degree-days \<0C, while derived directly from January mean temperature, has strong elevation-dependence in its climate change trend.
 
-```{r, include = TRUE, echo = FALSE, fig.show="hold"}
+```{r, fig.show="hold"}
 Tmin.ref <- Tmin.proj <- DD_0.ref <- DD_0.proj <- X
 
 ids1961_1990 <- clim.aoi[PERIOD == "1961_1990", ID]
