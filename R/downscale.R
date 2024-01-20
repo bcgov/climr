@@ -493,18 +493,25 @@ downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist,
   # print(res)
   # Compute individual point lapse rate adjustments
   # Lapse rate position 38:73 (ID column + 36 normal layers + 36 lapse rate layers)
-  lr <- elev_delta * res[, 38L:73L] ## do we need anything other than the lapse rate?
+  lrCols <- grep("lr_", names(res), value = TRUE)
+  lr <- elev_delta * res[, lrCols] ## do we need anything other than the lapse rate?
   
   # Replace any NAs left with 0s
   lr[is.na(lr)] <- 0L
   
   # Remove lapse rates and digital elevation model from res
-  res[, 38L:74L] <- NULL
+  lrDemCols <- grep("lr_|dem", names(res), value = TRUE)
+  if (length(lrCols) == length(lrDemCols)) {
+    stop("Error 01: can't find DEM layer. Please contact developer and supply error code")
+  }
+    
+  res[, lrDemCols] <- NULL
   
   # Combine results (ignoring ID column)
   res <- as.data.frame(res)  ## TODO: convert code below to data.table
   if (isTRUE(ppt_lr)) {
-    res[, -1L] <- res[, -1L] + lr
+    notIDcols <- which(names(res) != "ID")
+    res[, notIDcols] <- res[, notIDcols] + lr
   } else {
     ppt <- grep("^PPT", names(normal)[1L:36L], invert = TRUE)
     res[, ppt + 1L] <- res[, ppt + 1L] + lr[, ppt]
