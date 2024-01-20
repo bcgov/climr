@@ -35,7 +35,7 @@ lr <- lapse_rate(
   normal = d,
   dem = dem,
   NA_replace = TRUE,
-  nthread = 2,
+  nthread = 4,
   rasterize = TRUE
 )
 names(lr) <- paste0("lr_",names(lr))
