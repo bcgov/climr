@@ -152,7 +152,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
   
   if (!is.null(historic_period)) {
     message("Getting historic...")
-    historic <- historic_input(dbCon, bbox = thebb, period = historic_period, cache = cache)
+    historic_period <- historic_input(dbCon, bbox = thebb, period = historic_period, cache = cache)
   }
   if (!is.null(historic_ts)) { 
     historic_ts <- historic_input_ts(dbCon, bbox = thebb, years = historic_ts, cache = cache)
@@ -198,7 +198,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
   results <- downscale(
     xyz = xyz,
     normal = normal,
-    historic = historic,
+    historic = historic_period,
     historic_ts = historic_ts,
     gcm = gcm,
     gcm_ts = gcm_ts,
@@ -227,7 +227,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
     results_na <- downscale(
       xyz = na_xyz,
       normal = normal,
-      historic = historic,
+      historic = historic_period,
       historic_ts = historic_ts,
       gcm = gcm,
       gcm_ts = gcm_ts,
@@ -935,6 +935,7 @@ unpackRasters <- function(ras) {
 .checkDwnsclArgs <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, gcm_hist = NULL, 
                              historic_ts = NULL, return_normal = FALSE,
                              vars = list_variables(), ...) {
+ 
   vars <- match.arg(vars, list_variables(), several.ok = TRUE)
   
   if (!isTRUE(attr(normal, "builder") == "climr")) {
