@@ -22,9 +22,9 @@ test_that("test climr_dowscale basic and spatial", {
   test <- length(setdiff(ds_hist$id, xyz$id)) + length(setdiff( xyz$id, ds_hist$id))
   expect_true(test == 0)
   
-  expect_true(all(ds_hist[, .N, by = ID][, N] == 2))   ## should have 2 periods (historic and normal) per ID
+  expect_true(all(ds_hist[, .N, by = id][, N] == 2))   ## should have 2 periods (historic and normal) per ID
   
-  test <- as.data.table(xyz)[ds_hist, on = .(ID, Zone, Subzone), nomatch = NA]
+  test <- as.data.table(xyz)[ds_hist, on = .(id), nomatch = NA]
   expect_false(any(is.na(test)))
   
   ## ID cols shouldn't be present
@@ -34,8 +34,8 @@ test_that("test climr_dowscale basic and spatial", {
                               historic_period = "2001_2020",
                               return_normal = FALSE, ##put this to TRUE if you want the 1961-1990 period
                               vars = c("PPT","CMD","CMI","Tave01","Tave07")) 
-  expect_true(all(ds_hist2[, .N, by = ID][, N] == 1))   ## should have  only historic period per ID
-  test <- as.data.table(xyz)[ds_hist2, on = .(ID, Zone, Subzone), nomatch = NA]
+  expect_true(all(ds_hist2[, .N, by = id][, N] == 1))   ## should have  only historic period per ID
+  test <- as.data.table(xyz)[ds_hist2, on = .(id), nomatch = NA]
   expect_false(any(is.na(test)))
   
   ds_hist_spatial <- climr_downscale(xyz = xyz, which_normal = "auto",
@@ -45,7 +45,7 @@ test_that("test climr_dowscale basic and spatial", {
                                      out_spatial = TRUE) 
   expect_true(is(ds_hist_spatial, "SpatVector"))
   test <- as.data.table(ds_hist_spatial)
-  expect_true(all(test[, .N, by = ID][, N] == 2))
+  expect_true(all(test[, .N, by = id][, N] == 2))
   
   ds_hist_spatial2 <- climr_downscale(xyz = xyz, which_normal = "auto",
                                       historic_period = "2001_2020",
@@ -54,7 +54,7 @@ test_that("test climr_dowscale basic and spatial", {
                                       out_spatial = TRUE) 
   expect_true(is(ds_hist_spatial2, "SpatVector"))
   test <- as.data.table(ds_hist_spatial2)
-  expect_true(all(test[, .N, by = ID][, N] == 1))
+  expect_true(all(test[, .N, by = id][, N] == 1))
   
   if (interactive()) {
     ## check plots
@@ -143,7 +143,7 @@ test_that("test climr_dowscale with more args", {
     out <- try(do.call(climr_downscale, args))
     
     test <- is(out, "data.table")
-    test2 <- !any(c("ID", "Zone", "Subzone") %in% names(out))
+    test2 <- !any(c("id", "Zone", "Subzone") %in% names(out))
     test3 <- all(args$vars %in% names(out))
     
     ## check outputs of arguments that produce changing output columns
