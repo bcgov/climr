@@ -513,8 +513,8 @@ downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist,
     notIDcols <- which(names(res) != "ID")
     res[, notIDcols] <- res[, notIDcols] + lr
   } else {
-    ppt <- grep("^PPT", names(normal)[1L:36L], invert = TRUE)
-    res[, ppt + 1L] <- res[, ppt + 1L] + lr[, ppt]
+    notppt <- grep("^PPT", names(normal)[1L:36L], invert = TRUE)
+    res[, notppt + 1L] <- res[, notppt + 1L] + lr[, notppt]
   }
   res <- as.data.table(res)
   
