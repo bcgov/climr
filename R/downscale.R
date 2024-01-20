@@ -89,11 +89,12 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
   message("Welcome to climr!")
   
   ## checks
-  thiscall <- match.call()
-  thiscall[[1]] <- as.name(".checkClimrDwnsclArgs")
-  ## we need to evaluate in the parent.frame of climr_downscale not of eval
-  env <- parent.frame()  
-  eval(thiscall, envir = env)
+  args <- formalArgs(.checkClimrDwnsclArgs)
+  env <- environment()
+  args <- sapply(args, function(x, env) {
+    get(x, envir = env)
+    }, env = env, simplify = FALSE)
+  do.call(.checkClimrDwnsclArgs, args)
   
   expectedCols <- c("lon", "lat", "elev", "id")
   xyz <- .checkXYZ(xyz, expectedCols)
@@ -308,11 +309,12 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
                       vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))),
                       ppt_lr = FALSE, nthread = 1L, out_spatial = FALSE, plot = NULL) {
   ## checks
-  thiscall <- match.call()
-  thiscall[[1]] <- as.name(".checkDwnsclArgs")
-  ## we need to evaluate in the parent.frame of downscale not of eval
-  env <- parent.frame()
-  eval(thiscall, envir = env)
+  args <- formalArgs(.checkDwnsclArgs)
+  env <- environment()
+  args <- sapply(args, function(x, env) {
+    get(x, envir = env)
+  }, env = env, simplify = FALSE)
+  do.call(.checkDwnsclArgs, args)
   
   expectedCols <- c("lon", "lat", "elev", "id")
   xyz <- .checkXYZ(xyz, expectedCols)
@@ -862,13 +864,12 @@ unpackRasters <- function(ras) {
 #' Check `climr_downscale` arguments
 #'
 #' @inheritParams climr_downscale 
-#' @param ... ignored
 #'
 #' @return NULL
 #' @noRd
-.checkClimrDwnsclArgs <- function(xyz, which_normal = NULL, normal = NULL, historic_period = NULL, historic_ts = NULL,
+.checkClimrDwnsclArgs <- function(xyz, which_normal = NULL, historic_period = NULL, historic_ts = NULL,
                             gcm_models = NULL, ssp = list_ssp(), gcm_period = NULL, gcm_ts_years = NULL, 
-                            gcm_hist_years = NULL, max_run = 0L, vars = list_variables(), ...) {
+                            gcm_hist_years = NULL, max_run = 0L, vars = list_variables()) {
   ssp <- match.arg(ssp, list_ssp(), several.ok = TRUE)
   vars <- match.arg(vars, list_variables(), several.ok = TRUE)
   
@@ -928,13 +929,12 @@ unpackRasters <- function(ras) {
 #' Check `downscale` arguments
 #'
 #' @inheritParams downscale
-#' @param ... ignored
 #'
 #' @return NULL
 #' @noRd
 .checkDwnsclArgs <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, gcm_hist = NULL, 
                              historic_ts = NULL, return_normal = FALSE,
-                             vars = list_variables(), ...) {
+                             vars = list_variables()) {
  
   vars <- match.arg(vars, list_variables(), several.ok = TRUE)
   
