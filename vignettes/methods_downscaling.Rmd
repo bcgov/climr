@@ -141,7 +141,7 @@ plot(bdy, add = TRUE)
 
 Elevation adjustment provides a visually appealing map and can be useful in improving precision in climate values for points of interest in areas of steep topography. However, it is important to remember that the `climr` output only represents the effects of regional climate and elevation. Microclimatic factors such as aspect, vegetation, water bodies, frost pooling, and soil moisture are not represented in these maps. 
 
-`climr` doesn't apply elevation adjustment to precipitation, because in most cases elevation does not influence precipitation at scales less than 1km; instead, precipitation at scales finer than 800m is simply interpolated from the nearest four grid points in the reference map. Users can choose to apply lapse rates to precipitation by selecting `ppt_lr = FALSE` in the `downscale()` function. 
+By default, `climr` doesn't apply elevation adjustment to precipitation, because in most cases elevation does not influence precipitation at scales less than 1km. Instead, precipitation at scales finer than 800m is simply interpolated from the nearest four grid points in the reference map. Users can choose to apply elevation-adjustment to precipitation by selecting `ppt_lr = TRUE` in the `downscale()` function. 
 
 #### Stage 3: Derived variables
 
