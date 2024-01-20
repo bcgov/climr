@@ -91,7 +91,9 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
   ## checks
   thiscall <- match.call()
   thiscall[[1]] <- as.name(".checkClimrDwnsclArgs")
-  eval(thiscall, envir = environment())
+  ## we need to evaluate in the parent.frame of climr_downscale not of eval
+  env <- parent.frame()  
+  eval(thiscall, envir = env)
   
   expectedCols <- c("lon", "lat", "elev", "id")
   xyz <- .checkXYZ(xyz, expectedCols)
@@ -308,7 +310,9 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
   ## checks
   thiscall <- match.call()
   thiscall[[1]] <- as.name(".checkDwnsclArgs")
-  eval(thiscall, envir = environment())
+  ## we need to evaluate in the parent.frame of downscale not of eval
+  env <- parent.frame()
+  eval(thiscall, envir = env)
   
   expectedCols <- c("lon", "lat", "elev", "id")
   xyz <- .checkXYZ(xyz, expectedCols)
