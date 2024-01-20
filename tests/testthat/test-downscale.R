@@ -183,6 +183,5 @@ test_that("test downscale outputs with gcm, gcm_hist, gcm_ts, historic and histo
                    return(identical(dwnscaleOut, ref))
                  })
   
-  testOut <- unlist(testOut)
-  expect_true(all(testOut))
+  expect_true(all(unlist(testOut)))
 })
