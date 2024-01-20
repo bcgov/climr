@@ -91,6 +91,7 @@ test_that("test downscale", {
 
 test_that("test downscale outputs with gcm, gcm_hist, gcm_ts, historic and historic_ts", {
   testInit("terra")
+  testInit("data.table")
   
   dbCon <- data_connect()
   on.exit(try(pool::poolClose(dbCon)), add = TRUE)
