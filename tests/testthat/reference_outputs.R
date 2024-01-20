@@ -102,9 +102,11 @@ downscaleout_historic_ts <- downscale(
   var = list_variables()
 )
 
-saveRDS(xyz, "tests/points_downscale_ref.rds")
-saveRDS(downscaleout_gcm, "tests/downscaleout_gcm_ref.rds")
-saveRDS(downscaleout_gcm_hist, "tests/downscaleout_gcm_hist_ref.rds")
-saveRDS(downscaleout_gcm_ts, "tests/downscaleout_gcm_ts_ref.rds")
-saveRDS(downscaleout_historic, "tests/downscaleout_historic_ref.rds")
-saveRDS(downscaleout_historic_ts, "tests/downscaleout_historic_ts_ref.rds")
+dPath <- testthat::test_path("data")
+
+saveRDS(xyz, file.path(dPath, "points_downscale_ref.rds"))
+saveRDS(downscaleout_gcm, file.path(dPath, "ownscaleout_gcm_ref.rds"))
+saveRDS(downscaleout_gcm_hist, file.path(dPath, "downscaleout_gcm_hist_ref.rds"))
+saveRDS(downscaleout_gcm_ts, file.path(dPath, "downscaleout_gcm_ts_ref.rds"))
+saveRDS(downscaleout_historic, file.path(dPath, "downscaleout_historic_ref.rds"))
+saveRDS(downscaleout_historic_ts, file.path(dPath, "downscaleout_historic_ts_ref.rds"))
