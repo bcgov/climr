@@ -141,9 +141,9 @@ test_that("test climr_dowscale with more args", {
     }
     
     out <- try(do.call(climr_downscale, args))
-    
+  
     test <- is(out, "data.table")
-    test2 <- !any(c("id", "Zone", "Subzone") %in% names(out))
+    test2 <- all(c("id") %in% names(out))
     test3 <- all(args$vars %in% names(out))
     
     ## check outputs of arguments that produce changing output columns
