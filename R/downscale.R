@@ -134,7 +134,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
   } else if (which_normal == "normal_bc") {
     normal <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache)
   } else if (which_normal == "composite_normal") {
-    normal <- normal_input(dbCon = dbCon, normal = "composite_normal", bbox = thebb, cache = cache)
+    normal <- normal_input(dbCon = dbCon, normal = "normal_composite", bbox = thebb, cache = cache)
   } else {
     #message("Normals not specified, using highest resolution available for each point")
     bc_outline <- rast(system.file("extdata", "bc_outline.tif", package = "climr"))
@@ -145,7 +145,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
       xyz <- xyz[!is.na(pnts$PPT01),]
       thebb_bc <- get_bb(xyz)
       message("for BC...")
-      normal <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb_bc, cache = cache)
+      normal <- normal_input(dbCon = dbCon, normal = "normal_composite", bbox = thebb_bc, cache = cache)
     } else {
       normal <- normal_input(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
     }

@@ -8,10 +8,9 @@
 #' @rdname data-option-lists
 #' @export
 list_gcm <- function() {
-  c(
-    "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5", "EC-Earth3", "GISS-E2-1-G",
-    "INM-CM5-0", "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0"
-  )
+  c("ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5", "CNRM-ESM2-1", "EC-Earth3", 
+    "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0", "IPSL-CM6A-LR", "MIROC6", 
+    "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL")
   # sort(dbGetQuery(dbCon, "SELECT DISTINCT mod FROM esm_layers_ts")[,1])
 }
 
@@ -62,7 +61,7 @@ list_run <- function(dbCon, gcm) {
 #' @rdname data-option-lists
 #' @export
 list_normal <- function() {
-  c("normal_na", "normal_bc","composite_normal")
+  c("normal_na", "normal_bc","normal_composite")
 }
 
 
