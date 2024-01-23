@@ -363,9 +363,9 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
       parallel::parLapply(
         cl = cl,
         X = xyz,
+        fun = threaded_downscale_,
         # lapply(xyz,  ## testing
         # FUN = threaded_downscale_,
-        fun = threaded_downscale_,
         normal = normal, 
         gcm = gcm, 
         gcm_ts = gcm_ts, 
@@ -868,8 +868,8 @@ unpackRasters <- function(ras) {
 #' @return NULL
 #' @noRd
 .checkClimrDwnsclArgs <- function(xyz, which_normal = NULL, historic_period = NULL, historic_ts = NULL,
-                            gcm_models = NULL, ssp = list_ssp(), gcm_period = NULL, gcm_ts_years = NULL, 
-                            gcm_hist_years = NULL, max_run = 0L, vars = list_variables()) {
+                                  gcm_models = NULL, ssp = list_ssp(), gcm_period = NULL, gcm_ts_years = NULL, 
+                                  gcm_hist_years = NULL, max_run = 0L, vars = list_variables()) {
   ssp <- match.arg(ssp, list_ssp(), several.ok = TRUE)
   vars <- match.arg(vars, list_variables(), several.ok = TRUE)
   
