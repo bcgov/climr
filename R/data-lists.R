@@ -54,7 +54,7 @@ list_run <- function(dbCon, gcm) {
 #' Currently available normals (`list_normal()`) are:
 #'   * "normal_na" for Climate NA derived normals
 #'   * "normal_bc" for British Columbia PRISM climatologies derived normals
-#'   * "composite_normal" for a composite of BC PRISM, adjusted US PRISM and 
+#'   * "normal_composite" for a composite of BC PRISM, adjusted US PRISM and 
 #'     DAYMET (Alberta and Saskatchewan), covering western Canada and western
 #'     US.
 #' 

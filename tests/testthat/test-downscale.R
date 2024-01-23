@@ -105,7 +105,7 @@ test_that("test downscale outputs with gcm, gcm_hist, gcm_ts, historic and histo
   thebb <- get_bb(xyz)
   
   # Create a normal baseline
-  normal <- normal_input(dbCon = dbCon, bbox = thebb, normal = "composite_normal", cache = TRUE)
+  normal <- normal_input(dbCon = dbCon, bbox = thebb, normal = "normal_composite", cache = TRUE)
   
   # Select GCM
   gcms <- c("BCC-CSM2-MR", "INM-CM5-0")
