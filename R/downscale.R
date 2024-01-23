@@ -89,12 +89,9 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
   message("Welcome to climr!")
   
   ## checks
-  args <- formalArgs(.checkClimrDwnsclArgs)
-  env <- environment()
-  args <- sapply(args, function(x, env) {
-    get(x, envir = env)
-    }, env = env, simplify = FALSE)
-  do.call(.checkClimrDwnsclArgs, args)
+  .checkClimrDwnsclArgs(xyz, which_normal, historic_period, historic_ts, 
+                        gcm_models, ssp, gcm_period, gcm_ts_years, 
+                        gcm_hist_years, max_run, vars)
   
   expectedCols <- c("lon", "lat", "elev", "id")
   xyz <- .checkXYZ(xyz, expectedCols)
@@ -309,12 +306,8 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
                       vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))),
                       ppt_lr = FALSE, nthread = 1L, out_spatial = FALSE, plot = NULL) {
   ## checks
-  args <- formalArgs(.checkDwnsclArgs)
-  env <- environment()
-  args <- sapply(args, function(x, env) {
-    get(x, envir = env)
-  }, env = env, simplify = FALSE)
-  do.call(.checkDwnsclArgs, args)
+  .checkDwnsclArgs(xyz, normal, gcm, historic, gcm_ts, gcm_hist, 
+                   historic_ts, return_normal, vars)
   
   expectedCols <- c("lon", "lat", "elev", "id")
   xyz <- .checkXYZ(xyz, expectedCols)
