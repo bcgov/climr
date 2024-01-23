@@ -8,6 +8,8 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-6111-5675")),
     person("Bruno", "Tremblay", email = "bruno@boostao.ca", role = c("aut"),
            comment = c(ORCID = "0000-0002-2945-356X")),
+    person("Ceres", "Barros", email = "ceres.barros@gov.bc.ca", role = c("aut"),
+           comment = c(ORCID = "0000-0003-4036-977X")),       
     person("Francois", "Bornais", email = "francois@boostao.ca", role = c("aut")),
     person(family = "Province of British Columbia", role = c("cph", "fnd")))
 Description: This package replicate the basic approach of ClimateNA (climatena.ca),
