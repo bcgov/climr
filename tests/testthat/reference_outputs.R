@@ -6,7 +6,7 @@
 ## the package. For now it is run manually and saves outputs to tests/ 
 
 library(remotes)
-install_github("bcgov/climr@main")
+install_github("bcgov/climr@main", force = TRUE)
 
 library(terra)
 library(climr)
@@ -25,7 +25,7 @@ cache_clear()
 thebb <- get_bb(xyz)
 
 # Create a normal baseline
-normal <- normal_input(dbCon = dbCon, bbox = thebb, normal = "normal_composite",
+normal <- normal_input(dbCon = dbCon, bbox = thebb, normal = "composite_normal",
                        cache = TRUE)
 
 # Select GCM
@@ -105,7 +105,7 @@ downscaleout_historic_ts <- downscale(
 dPath <- testthat::test_path("data")
 
 saveRDS(xyz, file.path(dPath, "points_downscale_ref.rds"))
-saveRDS(downscaleout_gcm, file.path(dPath, "ownscaleout_gcm_ref.rds"))
+saveRDS(downscaleout_gcm, file.path(dPath, "downscaleout_gcm_ref.rds"))
 saveRDS(downscaleout_gcm_hist, file.path(dPath, "downscaleout_gcm_hist_ref.rds"))
 saveRDS(downscaleout_gcm_ts, file.path(dPath, "downscaleout_gcm_ts_ref.rds"))
 saveRDS(downscaleout_historic, file.path(dPath, "downscaleout_historic_ref.rds"))
