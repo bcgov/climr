@@ -481,7 +481,7 @@ downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist,
   
   # Compute elevation differences between provided points elevation and normal
   # Dem at position 74 (ID column + 36 normal layers + 36 lapse rate layers + 1 dem layer)
-  elev_delta <- xyz[["elev"]] - res[, 74L]
+  elev_delta <- xyz[["elev"]] - res[, "dem2_WNA"]
   # print(elev_delta)
   # print(res)
   # Compute individual point lapse rate adjustments
@@ -503,11 +503,24 @@ downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist,
   # Combine results (ignoring ID column)
   res <- as.data.frame(res)  ## TODO: convert code below to data.table
   if (isTRUE(ppt_lr)) {
-    notIDcols <- which(names(res) != "ID")
+    notIDcols <- names(res)[which(tolower(names(res)) != "id")]
+    
+    if (any(paste0("lr_", notIDcols) != names(lr))) {
+      stop("Error 02: lapse rates and downscale output column names do not match.",
+           "\n   Please contact developers.")
+    }
+    
     res[, notIDcols] <- res[, notIDcols] + lr
+    
   } else {
-    notppt <- grep("^PPT", names(normal)[1L:36L], invert = TRUE)
-    res[, notppt + 1L] <- res[, notppt + 1L] + lr[, notppt]
+    notpptLRDEM <- grep("^PPT|ID|^lr_|dem2_WNA", names(res), invert = TRUE, value = TRUE)
+    lr_notpptLRDEM <- grep("^lr_PPT", names(lr), invert = TRUE, value = TRUE)
+    if (any(paste0("lr_", notpptLRDEM) != lr_notpptLRDEM)) {
+      stop("Error 02: lapse rates and downscale output column names do not match.",
+           "\n   Please contact developers.")
+    }
+    res[, notpptLRDEM] <- res[, notpptLRDEM] + lr[, lr_notpptLRDEM]
+    
   }
   res <- as.data.table(res)
   
