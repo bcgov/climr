@@ -104,6 +104,8 @@ test_that("test downscale outputs with gcm, gcm_hist, gcm_ts, historic and histo
   ## get bounding box based on input points
   thebb <- get_bb(xyz)
   
+  cache_clear()
+  
   # Create a normal baseline
   normal <- normal_input(dbCon = dbCon, bbox = thebb, normal = "normal_composite", cache = TRUE)
   
