@@ -12,7 +12,6 @@ library(terra)
 library(climr)
 
 dbCon <- data_connect()
-on.exit(try(pool::poolClose(dbCon)), add = TRUE)
 
 xyz <- data.frame(lon = c(-127.70), 
                   lat = c(55.35), 
@@ -58,6 +57,8 @@ historic_ts <- historic_input_ts(
   dbCon, 
   thebb
 )
+
+pool::poolClose(dbCon)
 
 ## make tiny area
 dem <- normal$dem2_WNA
