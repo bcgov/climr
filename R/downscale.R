@@ -9,7 +9,9 @@
 #' @param xyz three or four column `data.frame`: long, lat, elev, (id)
 #' @param which_normal character. Which normal layer to use. 
 #'   Default is "auto", which selects the highest resolution normal for each point. 
-#'   Other options are one of [`list_normal()`]
+#'   Other options are "BC" for British Columbia, "NorAm" for North America and "composite",
+#'   for a composite of BC, Alberta, Saskatchewan and Western US normals. Depending
+#'   on where points fall, "auto" will select "BC" or "NorAm".
 #' @param historic_period character. Which historic period. Default `NULL`
 #' @param historic_ts integer. Vector of historic years requested. Must be in `1902:2015`. Default `NULL`
 #' @param gcm_models character. Vector of GCM names. Options are [`list_gcm()`]. Used for gcm periods, gcm timeseries, and historic timeseries. Default `NULL`
