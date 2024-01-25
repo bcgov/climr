@@ -1,3 +1,9 @@
+# `climr` 0.0.2
+
+## Bugfixes
+* fixed temperature values of composite anomalies
+* name of composite anomalies changed to "normal_composite" in `normal_input(..., normal)` and to "composite" in `climr_downscale(..., which_normal)`.
+
 # `climr` 0.0.1
 
 ## Enhancements
