@@ -123,7 +123,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
   } else if (which_normal == "BC") {
     normal <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache)
   } else if (which_normal == "Colin") {
-    normal <- normal_input(dbCon = dbCon, normal = "composite_normal", bbox = thebb, cache = cache)
+    normal <- normal_input(dbCon = dbCon, normal = "normal_composite", bbox = thebb, cache = cache)
   } else {
     #message("Normals not specified, using highest resolution available for each point")
     bc_outline <- rast(system.file("extdata", "bc_outline.tif", package = "climr"))

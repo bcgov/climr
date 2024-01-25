@@ -62,7 +62,7 @@ list_run <- function(dbCon, gcm) {
 #' @rdname data-option-lists
 #' @export
 list_normal <- function() {
-  c("normal_na", "normal_bc","composite_normal")
+  c("normal_na", "normal_bc","normal_composite")
 }
 
 
