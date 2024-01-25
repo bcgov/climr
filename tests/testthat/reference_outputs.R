@@ -6,24 +6,26 @@
 ## the package. For now it is run manually and saves outputs to tests/ 
 
 library(remotes)
-install_github("bcgov/climr@main")
+install_github("bcgov/climr@main", force = TRUE)
 
 library(terra)
 library(climr)
 
 dbCon <- data_connect()
-on.exit(try(pool::poolClose(dbCon)), add = TRUE)
 
 xyz <- data.frame(lon = c(-127.70), 
                   lat = c(55.35), 
                   elev = c(291L),
                   id = LETTERS[1])
 
+cache_clear()
+
 ## get bounding box based on input points
 thebb <- get_bb(xyz)
 
 # Create a normal baseline
-normal <- normal_input(dbCon = dbCon, bbox = thebb, cache = TRUE)
+normal <- normal_input(dbCon = dbCon, bbox = thebb, normal = "composite_normal",
+                       cache = TRUE)
 
 # Select GCM
 gcms <- c("BCC-CSM2-MR", "INM-CM5-0")
@@ -55,6 +57,8 @@ historic_ts <- historic_input_ts(
   dbCon, 
   thebb
 )
+
+pool::poolClose(dbCon)
 
 ## make tiny area
 dem <- normal$dem2_WNA
@@ -99,9 +103,11 @@ downscaleout_historic_ts <- downscale(
   var = list_variables()
 )
 
-saveRDS(xyz, test_path("data", "points_downscale_ref.rds"))
-saveRDS(downscaleout_gcm, test_path("data", "downscaleout_gcm_ref.rds"))
-saveRDS(downscaleout_gcm_hist, test_path("data", "downscaleout_gcm_hist_ref.rds"))
-saveRDS(downscaleout_gcm_ts, test_path("data", "downscaleout_gcm_ts_ref.rds"))
-saveRDS(downscaleout_historic, test_path("data", "downscaleout_historic_ref.rds"))
-saveRDS(downscaleout_historic_ts, test_path("data", "downscaleout_historic_ts_ref.rds"))
+dPath <- testthat::test_path("data")
+
+saveRDS(xyz, file.path(dPath, "points_downscale_ref.rds"))
+saveRDS(downscaleout_gcm, file.path(dPath, "downscaleout_gcm_ref.rds"))
+saveRDS(downscaleout_gcm_hist, file.path(dPath, "downscaleout_gcm_hist_ref.rds"))
+saveRDS(downscaleout_gcm_ts, file.path(dPath, "downscaleout_gcm_ts_ref.rds"))
+saveRDS(downscaleout_historic, file.path(dPath, "downscaleout_historic_ref.rds"))
+saveRDS(downscaleout_historic_ts, file.path(dPath, "downscaleout_historic_ts_ref.rds"))
