@@ -122,7 +122,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
     normal <- normal_input(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
   } else if (which_normal == "BC") {
     normal <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache)
-  } else if (which_normal == "Colin") {
+  } else if (which_normal == "composite") {
     normal <- normal_input(dbCon = dbCon, normal = "normal_composite", bbox = thebb, cache = cache)
   } else {
     #message("Normals not specified, using highest resolution available for each point")
