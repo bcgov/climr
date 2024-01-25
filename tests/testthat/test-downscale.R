@@ -160,7 +160,7 @@ test_that("test downscale outputs with gcm, gcm_hist, gcm_ts, historic and histo
                        out <- do.call(downscale, allArgs)
                        return(out)
                      }, MoreArgs = list(normal = normal))
-
+  
   testOut <- Map(dwnscaleOut = dwnscaleOut[names(list_args)],
                  ref = refs[names(list_args)],
                  f = function(dwnscaleOut, ref) {
