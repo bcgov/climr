@@ -1,3 +1,17 @@
+# `climr` 0.0.2
+## Enhancements
+* new tests comparing to reference outputs
+* code further streamlined
+* new messages warn user about meaningless `downscale`/`climr_downscale` argument combinations
+* argument options in `climr_downscale(..., which_normal)` now match the options of `normal_input(..., normal)`
+
+## Behaviour changes
+* `xyz` (argument to `climr_downscale` and `downscale`) must now be a 4 column `data.table` (or coercible class) with `lon`, `lat`, `elev` and `id` columns. All other columns are ignored and NOT returned.
+
+## Bugfixes
+* fixed temperature values of composite anomalies
+* name of composite anomalies changed to "normal_composite" in `normal_input(..., normal)`.
+
 # `climr` 0.0.1
 
 ## Enhancements

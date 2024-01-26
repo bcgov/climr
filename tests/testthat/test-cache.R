@@ -1,19 +1,18 @@
 test_that("test cache in default location", {
   dbCon <- data_connect()
   on.exit(try(pool::poolClose(dbCon)), add = TRUE)
-  xyz <- data.frame(Long = c(-127.70521, -127.62279, -127.56235, -127.7162, 
+  xyz <- data.frame(lon = c(-127.70521, -127.62279, -127.56235, -127.7162, 
                              -127.18585, -127.1254, -126.94957, -126.95507), 
-                    Lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025), 
-                    Elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
-                    ID = LETTERS[1:8],
-                    Zone = c(rep("CWH",3), rep("CDF",5)),
-                    Subzone = c("vm1","vm2","vs1",rep("mm",3),"dk","dc"))
+                    lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025), 
+                    elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
+                    id = LETTERS[1:8])
   
   thebb <- get_bb(xyz)
   
   expect_identical(cache_path(), R_user_dir("climr", "cache"))
   
-  expecteddirs <- normalizePath(file.path(cache_path(), c("gcm", "normal", "historic")), winslash = "/")
+  expecteddirs <- normalizePath(file.path(cache_path(), c("gcm", "normal", "historic")), 
+                                winslash = "/", mustWork = FALSE)
   
   cache_clear()
   normal <- normal_input(dbCon = dbCon, bbox = thebb, cache = FALSE)
@@ -31,7 +30,7 @@ test_that("test cache in default location", {
   cachedirs <- normalizePath(list.dirs(cache_path(), recursive = FALSE), winslash = "/")
   expect_false(any(expecteddirs %in% cachedirs))
   
-  ds_res <- climr_downscale(xyz, which_normal = "BC", historic_period = "2001_2020",
+  ds_res <- climr_downscale(xyz, which_normal = "normal_bc", historic_period = "2001_2020",
                             cache = FALSE)
   cachedirs <- normalizePath(list.dirs(cache_path(), recursive = FALSE), winslash = "/")
   expect_false(any(expecteddirs %in% cachedirs))
@@ -49,7 +48,7 @@ test_that("test cache in default location", {
   )
   expect_true("gcm" %in% list.files(cache_path()))
   
-  ds_res <- climr_downscale(xyz, which_normal = "BC", historic_period = "2001_2020")
+  ds_res <- climr_downscale(xyz, which_normal = "normal_bc", historic_period = "2001_2020")
   expect_true("historic" %in% list.files(cache_path()))
   
   
@@ -74,7 +73,7 @@ test_that("test cache in default location", {
   expect_false("historic" %in% list.files(cache_path()))
   
   cache_clear()
-  ds_res <- climr_downscale(xyz, which_normal = "BC", historic_period = "2001_2020", 
+  ds_res <- climr_downscale(xyz, which_normal = "normal_bc", historic_period = "2001_2020", 
                             gcm_models = list_gcm()[1], gcm_period = "2041_2060")
   cachedirs <- normalizePath(list.dirs(cache_path(), recursive = FALSE), winslash = "/")
   test <- all(expecteddirs %in% cachedirs)
@@ -93,13 +92,11 @@ test_that("test cache in custom location", {
 
   expecteddirs <- suppressWarnings(normalizePath(file.path(cache_path(), c("gcm", "normal", "historic")), winslash = "/"))
   
-  xyz <- data.frame(Long = c(-127.70521, -127.62279, -127.56235, -127.7162, 
-                             -127.18585, -127.1254, -126.94957, -126.95507), 
-                    Lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025), 
-                    Elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
-                    ID = LETTERS[1:8],
-                    Zone = c(rep("CWH",3), rep("CDF",5)),
-                    Subzone = c("vm1","vm2","vs1",rep("mm",3),"dk","dc"))
+  xyz <- data.frame(lon = c(-127.70521, -127.62279, -127.56235, -127.7162, 
+                          -127.18585, -127.1254, -126.94957, -126.95507), 
+                    lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025), 
+                    elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
+                    id = LETTERS[1:8])
   
   cache_clear()
   ds_res <- climr_downscale(xyz, which_normal = "auto", historic_period = "2001_2020", 
@@ -119,13 +116,11 @@ test_that("test cache works within same bbox", {
   dbCon <- data_connect()
   on.exit(try(pool::poolClose(dbCon)), add = TRUE)
 
-  xyz <- data.frame(Long = c(-127.70521, -127.62279, -127.56235, -127.7162, 
-                             -127.18585, -127.1254, -126.94957, -126.95507), 
-                    Lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025), 
-                    Elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
-                    ID = LETTERS[1:8],
-                    Zone = c(rep("CWH",3), rep("CDF",5)),
-                    Subzone = c("vm1","vm2","vs1",rep("mm",3),"dk","dc"))
+  xyz <- data.frame(lon = c(-127.70521, -127.62279, -127.56235, -127.7162, 
+                          -127.18585, -127.1254, -126.94957, -126.95507), 
+                    lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025), 
+                    elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
+                    id = LETTERS[1:8])
   thebb <- get_bb(xyz)
   
   cache_clear()
