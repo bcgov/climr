@@ -51,7 +51,10 @@ test_that("calc_* give sensible outputs", {
   on.exit(try(pool::poolClose(dbCon)), add = TRUE)
   
   ## the following includes NAs for the test and should be small enough
-  xyz <- data.frame(lon = c(-128, -125, -128, -125), lat = c(50, 50, 48, 48), elev = runif(4))
+  xyz <- data.frame(lon = c(-128, -125, -128, -125), 
+                    lat = c(50, 50, 48, 48), 
+                    elev = runif(4),
+                    id = 1:4)
   thebb <- get_bb(xyz)
   
   normalbc <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = TRUE) 
@@ -67,13 +70,14 @@ test_that("calc_* give sensible outputs", {
   n <- 20
   sample_xyz <- data.frame(lon = runif(n, xmin(normalbc$dem2_WNA), xmax(normalbc$dem2_WNA)), 
                            lat = runif(n, ymin(normalbc$dem2_WNA), ymax(normalbc$dem2_WNA)), 
-                           elev = NA)
+                           elev = NA,
+                           id = 1:n)
   sample_xyz[, 3] <- terra::extract(normalbc$dem2_WNA, sample_xyz[, 1:2], method = "bilinear")[, -1L]
   
   ds_res_bc <- downscale(sample_xyz, normal = normalbc, gcm = gcm, var = list_variables())
   
   sample_xyz$ID <- 1:nrow(sample_xyz)
-  ds_res_bc <- as.data.table(sample_xyz)[ds_res_bc, on = .(ID)]
+  ds_res_bc <- as.data.table(sample_xyz)[ds_res_bc, on = .(id)]
   ds_res_bc[, .(lat, lon, elev, Tmax, PPT01, CMD, Eref)]
   
   ## if elevation of inout climate data are NA, downscaled variables should be as well.
