@@ -39,7 +39,7 @@ jobs:
       R_REPRODUCIBLE_RUN_ALL_TESTS: true
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
 
