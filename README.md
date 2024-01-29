@@ -79,10 +79,12 @@ remotes::install_github("bcgov/climr@devl")
 
 ``` r
 ##provide or create a long, lat, elev dataframe
-in_xyz <- structure(list(Long = c(-127.70521, -127.62279, -127.56235, -127.7162, 
+in_xyz <- structure(list(lon = c(-127.70521, -127.62279, -127.56235, -127.7162, 
                                   -127.18585, -127.1254, -126.94957, -126.95507), 
-                         Lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025), 
-                         Elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L)), row.names = c(NA, -8L), class = "data.frame")
+                         lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025), 
+                         elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L)),
+                         id = 1:8,
+                         row.names = c(NA, -8L), class = "data.frame")
 
 ##if you just want to downscale points and not think about what happening behind the scenes, use this function
 
