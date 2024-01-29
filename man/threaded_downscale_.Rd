@@ -16,7 +16,8 @@ threaded_downscale_(
 )
 }
 \arguments{
-\item{xyz}{A 3-column \code{matrix} or \code{data.frame} (x, y, z) or (lon, lat, elev).}
+\item{xyz}{a \code{data.frame} with the following columns "long", "lat", "elev",
+and a unique "id". Any extra columns will be ignored and not output.}
 
 \item{normal}{\code{SpatRaster}. Reference normal baseline input from \code{normal_input}.}
 

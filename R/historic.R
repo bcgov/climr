@@ -43,8 +43,8 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
       if (all(period %in% periods[uid == oldid, period])) {
         message("Retrieving from cache...")
         hist_rast <- rast(paste0(cache_path(), "/historic/", dbcode, "/", oldid, ".tif"))
-        attr(hist_rast, "builder") <- "climr"
         hist_rast <- list(hist_rast)
+        attr(hist_rast, "builder") <- "climr"
         names(hist_rast) <- period
         return(hist_rast)
       } else {
@@ -75,8 +75,8 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
     fwrite(t2, file = paste0(cache_path(), "/historic/", dbcode, "/meta_period.csv"), append = TRUE)
   }
 
-  attr(hist_rast, "builder") <- "climr"
   hist_rast <- list(hist_rast)
+  attr(hist_rast, "builder") <- "climr"
   names(hist_rast) <- period
   return(hist_rast)
 }
@@ -114,8 +114,8 @@ historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRU
       if (all(years %in% periods[uid == oldid, period])) {
         message("Retrieving from cache...")
         hist_rast <- rast(paste0(cache_path(), "/historic_ts/", ts_name, "/", oldid, ".tif"))
-        attr(hist_rast, "builder") <- "climr"
         hist_rast <- list(hist_rast)
+        attr(hist_rast, "builder") <- "climr"
         names(hist_rast) <- paste(years[1], tail(years, 1), sep = ":")
         return(hist_rast)
       } else {
@@ -146,8 +146,8 @@ historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRU
     fwrite(t2, file = paste0(cache_path(), "/historic_ts/", ts_name, "/meta_period.csv"), append = TRUE)
   }
 
-  attr(hist_rast, "builder") <- "climr"
   hist_rast <- list(hist_rast)
+  attr(hist_rast, "builder") <- "climr"
   names(hist_rast) <- paste(years[1], tail(years, 1), sep = ":")
   return(hist_rast)
 }
