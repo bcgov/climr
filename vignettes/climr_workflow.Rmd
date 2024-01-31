@@ -150,7 +150,7 @@ We will chose the only available historic period (2001-2020), 2021-2040 as the f
 
 Finally, `list_normal()` returns the list of available high-resolution normals. 
 'normal_na' corresponds to normals for North America obtained from 
-[ClimateNA](climatena.ca). 'composite_normal' corresponds to a composite of 
+[ClimateNA](climatena.ca). 'normal_composite' corresponds to a composite of 
 British Columbia PRISM, adjusted US PRISM and DAYMET (Alberta and Saskatchewan),
 and covers western Canada and western US. 
 
@@ -159,7 +159,7 @@ list_normal()
 ```
 
 We pass our choices to the `climr_downscale`, choosing the "auto" normals option 
-(which defaults to using 'composite_normal') <!--THIS STILL NEEDS TO BE IMPLEMENTED-->.
+(which defaults to using 'normal_composite') <!--THIS STILL NEEDS TO BE IMPLEMENTED-->.
 
 ```{r, include = FALSE}
 options("climr.cache.path" = file.path(tempdir(), "climr.cache"))
