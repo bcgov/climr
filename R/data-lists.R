@@ -8,10 +8,9 @@
 #' @rdname data-option-lists
 #' @export
 list_gcm <- function() {
-  c(
-    "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5", "EC-Earth3", "GISS-E2-1-G",
-    "INM-CM5-0", "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0"
-  )
+  c("ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5", "CNRM-ESM2-1", "EC-Earth3", 
+    "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0", "IPSL-CM6A-LR", "MIROC6", 
+    "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL")
   # sort(dbGetQuery(dbCon, "SELECT DISTINCT mod FROM esm_layers_ts")[,1])
 }
 
@@ -55,14 +54,14 @@ list_run <- function(dbCon, gcm) {
 #' Currently available normals (`list_normal()`) are:
 #'   * "normal_na" for Climate NA derived normals
 #'   * "normal_bc" for British Columbia PRISM climatologies derived normals
-#'   * "composite_normal" for a composite of BC PRISM, adjusted US PRISM and 
+#'   * "normal_composite" for a composite of BC PRISM, adjusted US PRISM and 
 #'     DAYMET (Alberta and Saskatchewan), covering western Canada and western
 #'     US.
 #' 
 #' @rdname data-option-lists
 #' @export
 list_normal <- function() {
-  c("normal_na", "normal_bc","composite_normal")
+  c("normal_na", "normal_bc", "normal_composite")
 }
 
 

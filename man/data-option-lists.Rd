@@ -59,7 +59,7 @@ Currently available normals (\code{list_normal()}) are:
 \itemize{
 \item "normal_na" for Climate NA derived normals
 \item "normal_bc" for British Columbia PRISM climatologies derived normals
-\item "composite_normal" for a composite of BC PRISM, adjusted US PRISM and
+\item "normal_composite" for a composite of BC PRISM, adjusted US PRISM and
 DAYMET (Alberta and Saskatchewan), covering western Canada and western
 US.
 }
