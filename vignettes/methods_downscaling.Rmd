@@ -42,7 +42,7 @@ studyarea <- ext(c(-124, -120, 49, 50.5))
 thebb <- rev(as.vector(studyarea)) # this is a patch until we fix the get_bb() and normal_input() function
 refNormals <- normal_input(
   dbCon = dbCon,
-  normal = "composite_normal",
+  normal = "normal_composite",
   bbox = thebb, cache = TRUE
 )
 breaks <- seq(7, 33, 0.1)
@@ -115,7 +115,7 @@ points_dat <- as.data.frame(dem_aoi, cells = TRUE, xy = TRUE) ## convert dem cel
 colnames(points_dat) <- c("id", "x", "y", "el") ## rename the columns to standard climr format
 points_dat <- points_dat[, c(2, 3, 4, 1)] ## restructure for climr input
 clim.aoi <- climr_downscale(points_dat,
-                            which_normal = "composite_normal",
+                            which_normal = "normal_composite",
                             gcm_models = list_gcm()[4],
                             ssp = list_ssp()[2],
                             gcm_period = list_gcm_period()[3],
