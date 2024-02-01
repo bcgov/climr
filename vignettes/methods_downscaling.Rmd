@@ -11,7 +11,7 @@ link-citations: true
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
-  cache = 2, 
+  cache = 2,
   collapse = TRUE,
   comment = "#>",
   echo = FALSE,
@@ -23,7 +23,7 @@ library(climr)
 library(terra)
 dbCon <- data_connect()
 on.exit(pool::poolClose(dbCon), add = TRUE)
-bdy <- unwrap(get(data("vancouver", envir = new.env())))   ## new.env() makes sure the original object doesn't clutter .GlobalEnv as we assign it to another obj
+bdy <- unwrap(get(data("vancouver", envir = new.env()))) ## new.env() makes sure the original object doesn't clutter .GlobalEnv as we assign it to another obj
 ```
 
 Downscaling is the process of converting low-spatial-resolution climate data to high resolution. `climr` adapts a downscaling approach originally implemented in [ClimateNA](https://climatena.ca/) [@wang2016] by Dr. Tongli Wang (University of British Columbia), Dr. Andreas Hamann (University of Alberta), and Dave Spittlehouse (BC Ministry of Forests). This approach downscales climate data in three stages:
@@ -50,8 +50,8 @@ breaks <- seq(7, 33, 0.1)
 colPal <- colorRampPalette(rev(hcl.colors(11, "RdYlBu")))
 
 plot(refNormals$Tmax07,
-     col = colPal(length(breaks) - 1),
-     breaks = breaks, type = "continuous", ext = studyarea
+  col = colPal(length(breaks) - 1),
+  breaks = breaks, type = "continuous", ext = studyarea
 )
 plot(bdy, add = TRUE)
 ```
@@ -60,12 +60,12 @@ Global climate model data are at much lower resolution (60-200km grid scale). He
 
 ```{r, fig.cap = "*Low-resolution anomalies (change) in July T~max~ for the EC-Earth3 global climate model for the 2041-2060 time period, relative to the model's 1961-1990 climate*"}
 gcm <- gcm_input(dbCon,
-                 bbox = thebb,
-                 gcm = c("EC-Earth3"),
-                 ssp = c("ssp245"),
-                 period = "2041_2060",
-                 max_run = 0,
-                 cache = TRUE
+  bbox = thebb,
+  gcm = c("EC-Earth3"),
+  ssp = c("ssp245"),
+  period = "2041_2060",
+  max_run = 0,
+  cache = TRUE
 )
 lyrs <- grep("Tmax_07", names(gcm$`EC-Earth3`))
 gcm_example <- gcm$`EC-Earth3`[[lyrs]] # TODO need to figure out how to better call the gcm raster
@@ -85,8 +85,10 @@ Then we add these smoothed anomalies to the high-resolution 1961-1990 climate ma
 
 ```{r, fig.cap = "*Downscaled 2041-2060 July T~max~ for the EC-Earth model, resulting from addition of the interpolated low-resolution model anomalies (change factors) to the high resolution 1961-1990 reference climate.*"}
 gcm_example_downscaled <- refNormals$Tmax07 + gcm_example_interp
-plot(gcm_example_downscaled, col = colPal(length(breaks) - 1), 
-     breaks = breaks, type = "continuous", ext = studyarea) # TODO scale this color ramp the same as the refnormals map above.
+plot(gcm_example_downscaled,
+  col = colPal(length(breaks) - 1),
+  breaks = breaks, type = "continuous", ext = studyarea
+) # TODO scale this color ramp the same as the refnormals map above.
 plot(bdy, add = T)
 ```
 
@@ -115,13 +117,13 @@ dem_aoi <- unwrap(get(data("dem_vancouver", envir = new.env()))) ### get the sam
 points_dat <- as.data.frame(dem_aoi, cells = TRUE, xy = TRUE) ## convert dem cells to data frame
 colnames(points_dat) <- c("id", "lon", "lat", "elev") ## rename the columns to standard climr format
 clim.aoi <- climr_downscale(points_dat,
-                            which_normal = "normal_composite",
-                            gcm_models = list_gcm()[4],
-                            ssp = list_ssp()[2],
-                            gcm_period = list_gcm_period()[3],
-                            max_run = 0,
-                            return_normal = TRUE,
-                            vars = c("Tmax07", "Tave01", "DD_0_01")
+  which_normal = "normal_composite",
+  gcm_models = list_gcm()[4],
+  ssp = list_ssp()[2],
+  gcm_period = list_gcm_period()[3],
+  max_run = 0,
+  return_normal = TRUE,
+  vars = c("Tmax07", "Tave01", "DD_0_01")
 )
 X <- dem_aoi
 values(X) <- NA
@@ -129,13 +131,17 @@ X[clim.aoi[PERIOD == "1961_1990", id]] <- clim.aoi[PERIOD == "1961_1990", Tmax07
 par(mfrow = c(1, 2))
 breaks <- seq(14.5, 23.5, 0.1)
 
-plot(refNormals$Tmax07, col = colPal(length(breaks) - 1), breaks = breaks, 
-     type = "continuous", ext = ext(dem_aoi), 
-     main = "climr reference map (800m grid)", cex.main = 0.8)
+plot(refNormals$Tmax07,
+  col = colPal(length(breaks) - 1), breaks = breaks,
+  type = "continuous", ext = ext(dem_aoi),
+  main = "climr reference map (800m grid)", cex.main = 0.8
+)
 plot(bdy, add = TRUE)
-plot(X, col = colPal(length(breaks) - 1), breaks = breaks, 
-     type = "continuous", ext = ext(dem_aoi), 
-     main = "elevation-adjusted map (90m grid)", cex.main = 0.8)
+plot(X,
+  col = colPal(length(breaks) - 1), breaks = breaks,
+  type = "continuous", ext = ext(dem_aoi),
+  main = "elevation-adjusted map (90m grid)", cex.main = 0.8
+)
 plot(bdy, add = TRUE)
 ```
 
@@ -154,17 +160,17 @@ The value of delta downscaling isn't just in obtaining the new absolute values o
 Using the `climr` output for the EC-Earth3 climate model, we can compare the change in January mean temperature to change in January degree days below 0^o^C in the 2041-2060 period relative to the 1961-1990 baseline. January mean temperature is interpolated directly from the GCM, so the only variation in the climate change trend in this variable is the transition from one GCM grid cell to its neighbours. In contrast, January degree-days below 0^o^C, while derived directly from January mean temperature, has strong elevation-dependence in its climate change trend.
 
 ```{r, fig.cap = "*Downscaled change in January mean temperature (left) and its derived variable January degree days below 0^o^C (right), using the EC-Earth model simulation for 2041-2060.*", fig.show="hold", fig.margin = c(0,0,0,0)}
- Tave.ref <- Tave.proj <- DD_0.ref <- DD_0.proj <- X
-  Tave.ref[clim.aoi[PERIOD=="1961_1990", id]] <- clim.aoi[PERIOD=="1961_1990",  Tave01]
-  Tave.proj[clim.aoi[PERIOD=="2041_2060", id]] <- clim.aoi[PERIOD=="2041_2060", Tave01]
-  DD_0.ref[clim.aoi[PERIOD=="1961_1990", id]] <- clim.aoi[PERIOD=="1961_1990",  DD_0_01]
-  DD_0.proj[clim.aoi[PERIOD=="2041_2060", id]] <- clim.aoi[PERIOD=="2041_2060", DD_0_01]
-par(mfrow=c(1,2))
+Tave.ref <- Tave.proj <- DD_0.ref <- DD_0.proj <- X
+Tave.ref[clim.aoi[PERIOD == "1961_1990", id]] <- clim.aoi[PERIOD == "1961_1990", Tave01]
+Tave.proj[clim.aoi[PERIOD == "2041_2060", id]] <- clim.aoi[PERIOD == "2041_2060", Tave01]
+DD_0.ref[clim.aoi[PERIOD == "1961_1990", id]] <- clim.aoi[PERIOD == "1961_1990", DD_0_01]
+DD_0.proj[clim.aoi[PERIOD == "2041_2060", id]] <- clim.aoi[PERIOD == "2041_2060", DD_0_01]
+par(mfrow = c(1, 2))
 colPal2 <- colorRampPalette(hcl.colors(9, "Reds"))(99)
-plot(Tave.ref-Tave.proj, col=colPal2, main="Change in January mean temperature", cex.main=0.8)
-plot(bdy, add=T)
-plot(DD_0.proj-DD_0.ref, col=colPal2, main="Change in January degree-days <0C", cex.main=0.8)
-plot(bdy, add=T)
+plot(Tave.ref - Tave.proj, col = colPal2, main = "Change in January mean temperature", cex.main = 0.8)
+plot(bdy, add = T)
+plot(DD_0.proj - DD_0.ref, col = colPal2, main = "Change in January degree-days <0C", cex.main = 0.8)
+plot(bdy, add = T)
 ```
 
 ## `climr` data sources

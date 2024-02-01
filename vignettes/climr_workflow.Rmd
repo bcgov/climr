@@ -113,7 +113,7 @@ point_data <- data.table(
     54.65636, 54.6913, 54.61025
   ),
   elev = c(
-    291L, 296L, 626L, 377L, 
+    291L, 296L, 626L, 377L,
     424L, 591L, 723L, 633L
   ),
   id = c(2, 6, 8, 5, 1, 12, 3, 13),
@@ -166,15 +166,17 @@ options("climr.cache.path" = file.path(tempdir(), "climr.cache"))
 ```
 
 ```{r, message = TRUE}
-ds_out <- climr_downscale(xyz = point_data, 
-                          which_normal = "auto", 
-                          historic_period = "2001_2020",
-                          gcm_period = "2021_2040",
-                          gcm_models = "CanESM5",
-                          ssp = "ssp245",
-                          max_run = 2,
-                          return_normal = TRUE, ## to return the 1961-1990 normals period
-                          vars = c("MAT", "PPT", "RH"))
+ds_out <- climr_downscale(
+  xyz = point_data,
+  which_normal = "auto",
+  historic_period = "2001_2020",
+  gcm_period = "2021_2040",
+  gcm_models = "CanESM5",
+  ssp = "ssp245",
+  max_run = 2,
+  return_normal = TRUE, ## to return the 1961-1990 normals period
+  vars = c("MAT", "PPT", "RH")
+)
 ```
 
 Note how data from historical periods doesn't have a GCM or SSP value -- this is
@@ -207,8 +209,9 @@ for the same periods. Notice how some of the data doesn't need to be downloaded 
 and was retrieved from cache.
 
 ```{r, message = TRUE}
-ds_out_ts <- climr_downscale(xyz = point_data, 
-                          which_normal = "auto", 
+ds_out_ts <- climr_downscale(
+  xyz = point_data,
+  which_normal = "auto",
                           historic_ts = 2001:2020,
                           gcm_ts_years = 2021:2040,
                           gcm_models = "CanESM5",
@@ -221,7 +224,7 @@ ds_out_ts <- climr_downscale(xyz = point_data,
 
 ```{r, include = FALSE}
 ds_out_ts2 <- melt(ds_out_ts, measure.vars = c("MAT", "PPT", "RH"))
-ds_out_ts2[variable == "PPT", value := value/100]
+ds_out_ts2[variable == "PPT", value := value / 100]
 ds_out_ts2 <- ds_out_ts2[variable != "RH" & PERIOD != "1961_1990"]
 ds_out_ts2[, PERIOD := as.numeric(PERIOD)]
 
