@@ -263,8 +263,8 @@ if (require(ggplot2)) {
 
 ### Spatial output and plotting options
 
-`climr_downscale` has the option to provide outputs in the form of `SpatVector`
-of points and map the values of a chosen climate variable from the list passed to 
+`climr_downscale` can also provide outputs in the form of a `SpatVector`
+of points and plot the values of a chosen climate variable from the list passed to 
 `climr_downscale(..., vars)`.
 
 
