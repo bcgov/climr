@@ -113,7 +113,7 @@ We can use the `climr_downscale()` function with a 90m digital elevation model (
 ```{r, fig.cap = "*1961-1990 July T~max~ in the 800m reference clmate map (left) and elevation-adjusted to a 90m grid (right).*", figures-side, fig.show="hold", out.width="50%"}
 dem_aoi <- unwrap(get(data("dem_vancouver", envir = new.env()))) ### get the sample DEM for the North Shore of Vancouver
 points_dat <- as.data.frame(dem_aoi, cells = TRUE, xy = TRUE) ## convert dem cells to data frame
-colnames(points_dat) <- c("id", "x", "y", "el") ## rename the columns to standard climr format
+colnames(points_dat) <- c("id", "lon", "lat", "elev") ## rename the columns to standard climr format
 points_dat <- points_dat[, c(2, 3, 4, 1)] ## restructure for climr input
 clim.aoi <- climr_downscale(points_dat,
                             which_normal = "normal_composite",
