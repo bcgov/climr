@@ -110,7 +110,7 @@ This example indicates that the BC PRISM maps for July T~max~ have lower lapse r
 
 We can use the `climr_downscale()` function with a 90m digital elevation model (DEM) to illustrate the elevation adjustment on Vancouver's north shore mountains, shown below.
 
-```{r, fig.cap = "*1961-1990 July T~max~ in the 800m reference clmate map (left) and elevation-adjusted to a 90m grid (right).*", figures-side, fig.show="hold", out.width="50%"}
+```{r figures-side, fig.cap = "*1961-1990 July T~max~ in the 800m reference clmate map (left) and elevation-adjusted to a 90m grid (right).*", fig.show="hold", out.width="50%"}
 dem_aoi <- unwrap(get(data("dem_vancouver", envir = new.env()))) ### get the sample DEM for the North Shore of Vancouver
 points_dat <- as.data.frame(dem_aoi, cells = TRUE, xy = TRUE) ## convert dem cells to data frame
 colnames(points_dat) <- c("id", "lon", "lat", "elev") ## rename the columns to standard climr format
