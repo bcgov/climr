@@ -213,31 +213,47 @@ ds_out_ts <- climr_downscale(
   xyz = point_data,
   which_normal = "auto",
   historic_ts = 2001:2015,
-                          gcm_ts_years = 2021:2040,
-                          gcm_models = "CanESM5",
-                          ssp = "ssp245",
-                          max_run = 2,
-                          return_normal = TRUE, ## to return the 1961-1990 normals period
-                          vars = c("MAT", "PPT", "RH"))
+  gcm_ts_years = 2021:2040,
+  gcm_models = "CanESM5",
+  ssp = "ssp245",
+  max_run = 2,
+  return_normal = TRUE, ## to return the 1961-1990 normals period
+  vars = c("MAT", "PPT", "RH")
+)
 ```
 
-
+<!-- TODO: Colin, please improve the plots as you see fit. I usually avoid showing two variables in different y axes, but wanted to reduce the no. of figures in this case-->
 ```{r, include = FALSE}
 ds_out_ts2 <- melt(ds_out_ts, measure.vars = c("MAT", "PPT", "RH"))
 ds_out_ts2[variable == "PPT", value := value / 100]
 ds_out_ts2 <- ds_out_ts2[variable != "RH" & PERIOD != "1961_1990"]
 ds_out_ts2[, PERIOD := as.numeric(PERIOD)]
 
-yrbreaks <- c(min(ds_out_ts2$PERIOD), 
-              seq(min(ds_out_ts2$PERIOD), max(ds_out_ts2$PERIOD), by = 5), 
-              max(ds_out_ts2$PERIOD)) |>
-                unique()
+## make groups so that mising data is not shown as a "line connection"
+groups <- data.table(PERIOD = unique(ds_out_ts2$PERIOD))
+groups[, idx := c(1, diff(PERIOD))]
+i2 <- c(1, which(groups$idx != 1), nrow(groups) + 1)
+groups[, grp := rep(1:length(diff(i2)), diff(i2))]
+ds_out_ts2 <- groups[, .(PERIOD, grp)][ds_out_ts2, on = "PERIOD"]
+ds_out_ts2
+## HERE: need different groups for each variable.
+yrbreaks <- c(
+  min(ds_out_ts2$PERIOD),
+  seq(min(ds_out_ts2$PERIOD), max(ds_out_ts2$PERIOD), by = 5),
+  max(ds_out_ts2$PERIOD)
+) |>
+  unique()
 
 if (require(ggplot2)) {
-  ggplot(ds_out_ts2, 
-         aes(x = PERIOD, y = value, col = variable)) +
-    stat_summary(fun = "mean", geom = "line", linewidth = 1) +
-    scale_y_continuous(sec.axis = sec_axis(~.*100, name = "PPT (mm)")) +
+  ggplot(
+    ds_out_ts2,
+    aes(x = PERIOD, y = value, col = variable)
+  ) +
+    stat_summary(
+      fun = "mean", geom = "line", linewidth = 1,
+      aes(group = grp)
+    ) +
+    scale_y_continuous(sec.axis = sec_axis(~ . * 100, name = "PPT (mm)")) +
     scale_x_continuous(breaks = yrbreaks, labels = yrbreaks) +
     theme_light() +
     theme(axis.text.x = element_text(angle = 45, vjust = 0.5)) +
