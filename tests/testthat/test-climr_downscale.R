@@ -89,7 +89,7 @@ test_that("test climr_dowscale basic and spatial", {
   }
 })
 
-test_that("test climr_dowscale with more args", {
+test_that("test climr_dowscale with different argument combinations", {
   testInit("data.table")
   
   ## a small no. of points
