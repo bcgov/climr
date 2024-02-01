@@ -196,7 +196,6 @@ To add back the extra columns we need only a simple left join.
 
 <!--TODO: this won't be necessary after merge of #107-->
 ```{r, include = FALSE}
-setnames(ds_out, "ID", "id")
 ds_out[, `:=`(zone = NULL, subzone = NULL)]
 ```
 
