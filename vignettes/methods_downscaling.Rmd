@@ -22,7 +22,8 @@ knitr::opts_chunk$set(
 library(climr)
 library(terra)
 dbCon <- data_connect()
-bdy <- vect("data-raw/Coast_Vancouver.shp")
+on.exit(pool::poolClose(dbCon), add = TRUE)
+bdy <- unwrap(get(data("vancouver", envir = new.env())))   ## new.env() makes sure the original object doesn't clutter .GlobalEnv as we assign it to another obj
 ```
 
 Downscaling is the process of converting low-spatial-resolution climate data to high resolution. `climr` adapts a downscaling approach originally implemented in [ClimateNA](https://climatena.ca/) [@wang2016] by Dr. Tongli Wang (University of British Columbia), Dr. Andreas Hamann (University of Alberta), and Dave Spittlehouse (BC Ministry of Forests). This approach downscales climate data in three stages:
@@ -110,7 +111,7 @@ This example indicates that the BC PRISM maps for July T~max~ have lower lapse r
 We can use the `climr_downscale()` function with a 90m digital elevation model (DEM) to illustrate the elevation adjustment on Vancouver's north shore mountains, shown below.
 
 ```{r, fig.cap = "*1961-1990 July T~max~ in the 800m reference clmate map (left) and elevation-adjusted to a 90m grid (right).*", figures-side, fig.show="hold", out.width="50%"}
-dem_aoi <- rast("data-raw/example_VanNorthShore.tif") ### get the sample DEM for the North Shore of Vancouver
+dem_aoi <- unwrap(get(data("dem_vancouver", envir = new.env()))) ### get the sample DEM for the North Shore of Vancouver
 points_dat <- as.data.frame(dem_aoi, cells = TRUE, xy = TRUE) ## convert dem cells to data frame
 colnames(points_dat) <- c("id", "x", "y", "el") ## rename the columns to standard climr format
 points_dat <- points_dat[, c(2, 3, 4, 1)] ## restructure for climr input

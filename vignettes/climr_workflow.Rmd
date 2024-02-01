@@ -159,7 +159,7 @@ list_normal()
 ```
 
 We pass our choices to the `climr_downscale`, choosing the "auto" normals option 
-(which defaults to using 'normal_composite') <!--THIS STILL NEEDS TO BE IMPLEMENTED-->.
+(which defaults to using the highest resolution data available for the points selected). 
 
 ```{r, include = FALSE}
 options("climr.cache.path" = file.path(tempdir(), "climr.cache"))
@@ -243,7 +243,13 @@ if (require(ggplot2)) {
 ```
 
 
-<!--TODO SpatVector output--> 
+### Spatial output and plotting options
+
+`climr_downscale` has the option to provide outputs in the form of `SpatVector`
+of points and map the values of a chosen climate variable from the list passed to 
+`climr_downscale(..., vars)`.
+
+
 
 ## Workflow with `*_input` functions and `downscale`
 <!--TODO SpatVector output--> 
