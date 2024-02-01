@@ -212,7 +212,7 @@ and was retrieved from cache.
 ds_out_ts <- climr_downscale(
   xyz = point_data,
   which_normal = "auto",
-                          historic_ts = 2001:2020,
+  historic_ts = 2001:2015,
                           gcm_ts_years = 2021:2040,
                           gcm_models = "CanESM5",
                           ssp = "ssp245",
