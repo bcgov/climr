@@ -125,7 +125,7 @@ clim.aoi <- climr_downscale(points_dat,
 )
 X <- dem_aoi
 values(X) <- NA
-X[clim.aoi[PERIOD == "1961_1990", ID]] <- clim.aoi[PERIOD == "1961_1990", Tmax07]
+X[clim.aoi[PERIOD == "1961_1990", id]] <- clim.aoi[PERIOD == "1961_1990", Tmax07]
 par(mfrow = c(1, 2))
 breaks <- seq(14.5, 23.5, 0.1)
 
@@ -155,10 +155,10 @@ Using the `climr` output for the EC-Earth3 climate model, we can compare the cha
 
 ```{r, fig.cap = "*Downscaled change in January mean temperature (left) and its derived variable January degree days below 0^o^C (right), using the EC-Earth model simulation for 2041-2060.*", fig.show="hold", fig.margin = c(0,0,0,0)}
  Tave.ref <- Tave.proj <- DD_0.ref <- DD_0.proj <- X
-  Tave.ref[clim.aoi[PERIOD=="1961_1990", ID]] <- clim.aoi[PERIOD=="1961_1990",  Tave01]
-  Tave.proj[clim.aoi[PERIOD=="2041_2060", ID]] <- clim.aoi[PERIOD=="2041_2060", Tave01]
-  DD_0.ref[clim.aoi[PERIOD=="1961_1990", ID]] <- clim.aoi[PERIOD=="1961_1990",  DD_0_01]
-  DD_0.proj[clim.aoi[PERIOD=="2041_2060", ID]] <- clim.aoi[PERIOD=="2041_2060", DD_0_01]
+  Tave.ref[clim.aoi[PERIOD=="1961_1990", id]] <- clim.aoi[PERIOD=="1961_1990",  Tave01]
+  Tave.proj[clim.aoi[PERIOD=="2041_2060", id]] <- clim.aoi[PERIOD=="2041_2060", Tave01]
+  DD_0.ref[clim.aoi[PERIOD=="1961_1990", id]] <- clim.aoi[PERIOD=="1961_1990",  DD_0_01]
+  DD_0.proj[clim.aoi[PERIOD=="2041_2060", id]] <- clim.aoi[PERIOD=="2041_2060", DD_0_01]
 par(mfrow=c(1,2))
 colPal2 <- colorRampPalette(hcl.colors(9, "Reds"))(99)
 plot(Tave.ref-Tave.proj, col=colPal2, main="Change in January mean temperature", cex.main=0.8)
