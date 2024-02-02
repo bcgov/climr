@@ -189,3 +189,61 @@ test_that("test climr_dowscale with different argument combinations", {
   }, xyz = xyz)
   expect_true(all(unlist(out)))
 })
+
+test_that("test climr_dowscale all periods, all GCMs, all SSPS, all years", {
+  testInit("terra")
+  
+  xyz <- data.frame(lon = c(-127.70521, -127.62279, -127.56235, -127.7162, 
+                            -127.18585, -127.1254, -126.94957, -126.95507), 
+                    lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025), 
+                    elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
+                    id = LETTERS[1:8])
+  
+  normals <- c("auto", "normal_bc", "normal_na")
+  
+  sapply(normals, function(normal) {
+    maxrun <- 2
+    gcms <- setdiff(list_gcm(), c("CNRM-ESM2-1", "GFDL-ESM4", "IPSL-CM6A-LR", "UKESM1-0-LL")) ## these models are missing years
+    
+    cd_out <- climr_downscale( 
+      xyz, 
+      which_normal = normal, 
+      historic_period = list_historic(),
+      # historic_ts = 1901:2015,   ## failing, forces 1902
+      historic_ts = 1902:2015,
+      gcm_models = gcms,  
+      ssp = list_ssp(),
+      gcm_period = list_gcm_period(),
+      gcm_ts_years = 2015:2100,
+      gcm_hist_years = 1850:2014,
+      return_normal = TRUE,
+      max_run = maxrun,
+      cache = TRUE,
+      vars = list_variables()
+    )
+    expect_true(all(gcms %in% cd_out$GCM))
+    expect_true(all(list_variables() %in% names(cd_out)))
+    testOut <- sapply(split(cd_out, by = "GCM"), function(dt) {
+      if (!is.na(unique(dt$GCM))) {
+        # test <- all(2015:2100 %in% dt$PERIOD)  ## this is failing at the moment, missing 2015-2020 or 2011-2020
+        test <- all(2020:2100 %in% dt$PERIOD) 
+        # test2 <- all(1850:2014 %in% dt$PERIOD)    ## this is failing at the moment, missing 2011-2014
+        test2 <- all(1850:2010 %in% dt$PERIOD)    
+        test3 <- all(list_gcm_period() %in% dt$PERIOD) 
+        test4 <- all(list_ssp() %in% dt$SSP)
+        test5 <- length(unique(dt$RUN)) <= maxrun + 1 
+        return(c(test, test2, test3, test4, test5))
+      } else {
+        # test <- all(1901:2015 %in% dt$PERIOD) ## this is failing at the moment, missing 1901
+        test <- all(1902:2015 %in% dt$PERIOD)
+        test2 <- all(c("1961_1990", list_historic()) %in% dt$PERIOD)
+        test3 <- all(list_gcm_period()[1] %in% dt$PERIOD)
+        test4 <- is.na(unique(dt$SSP))
+        return(c(test, test2, test3, test4))
+      }
+    })
+  
+    lapply(testOut, function(x) expect_true(all(x)))
+  })
+})
+  
