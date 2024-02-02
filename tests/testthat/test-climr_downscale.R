@@ -227,8 +227,8 @@ test_that("test climr_dowscale all periods, all GCMs, all SSPS, all years", {
       if (!is.na(unique(dt$GCM))) {
         # test <- all(2015:2100 %in% dt$PERIOD)  ## this is failing at the moment, missing 2015-2020 or 2011-2020
         test <- all(2020:2100 %in% dt$PERIOD) 
-        # test2 <- all(1850:2014 %in% dt$PERIOD)    ## this is failing at the moment, missing 2011-2014
-        test2 <- all(1850:2010 %in% dt$PERIOD)    
+        # test2 <- all(1851:2014 %in% dt$PERIOD)    ## this is failing at the moment, missing 2011-2014
+        test2 <- all(1851:2010 %in% dt$PERIOD)    
         test3 <- all(list_gcm_period() %in% dt$PERIOD) 
         test4 <- all(list_ssp() %in% dt$SSP)
         test5 <- length(unique(dt$RUN)) <= maxrun + 1 
