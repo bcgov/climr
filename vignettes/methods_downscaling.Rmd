@@ -23,7 +23,6 @@ knitr::opts_chunk$set(
 library(climr)
 library(terra)
 dbCon <- data_connect()
-on.exit(pool::poolClose(dbCon), add = TRUE)
 bdy <- unwrap(get(data("vancouver", envir = new.env()))) ## new.env() makes sure the original object doesn't clutter .GlobalEnv as we assign it to another obj
 ```
 
