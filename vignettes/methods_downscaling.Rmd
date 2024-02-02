@@ -15,6 +15,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   echo = FALSE,
+  results = "hide",
   message = FALSE,
   warning = FALSE,
   fig.dim = c(7, 4)
