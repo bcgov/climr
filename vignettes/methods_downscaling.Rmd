@@ -1,6 +1,7 @@
 ---
 title: "`climr` downscaling methods"
 Author: "Colin Mahony"
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{methods_downscaling}
   %\VignetteEngine{knitr::rmarkdown}
