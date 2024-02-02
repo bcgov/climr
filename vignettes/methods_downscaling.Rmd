@@ -11,7 +11,6 @@ link-citations: true
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
-  cache = 2,
   collapse = TRUE,
   comment = "#>",
   echo = FALSE,
