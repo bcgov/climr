@@ -7,4 +7,14 @@ test_that("test get_bb", {
   
   thebb <- get_bb(xyz)
   expect_equal(thebb, c(55.38847, 54.61025, -126.94957, -127.71620))
+  
+  ## different column order
+  xyz2 <- xyz[, c(2,4,1,3)]
+  
+  thebb2 <- get_bb(xyz2)
+  expect_equal(thebb, thebb2)
+  
+  xyz3 <- xyz
+  names(xyz3) <- c("x", "y", "z", "id")
+  expect_error(get_bb(xyz3))
 })
