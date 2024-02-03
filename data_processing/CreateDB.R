@@ -35,7 +35,7 @@ lr <- lapse_rate(
   normal = d,
   dem = dem,
   NA_replace = TRUE,
-  nthread = 2,
+  nthread = 4,
   rasterize = TRUE
 )
 names(lr) <- paste0("lr_",names(lr))
@@ -69,7 +69,7 @@ plot(curr_per[[35]])
 scp_upload(session, paste0("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climr/inputs_pkg/historic/Historic_2001_2020/2001_2020.tif"), to = "/share")
 pgisfn <- paste0("raster2pgsql -s 4326 -I -C -M 2001_2020.tif -t 6x6 historic_periods > 2001_2020.sql")
 
-"GTIFF_DIRECT_IO=YES raster2pgsql -s 4326 -I -M composite_wna_wlrdem.tif -t 50x50 composite_normal > composite_normal.sql &"
+"GTIFF_DIRECT_IO=YES raster2pgsql -s 4326 -I -M composite_wna_wlrdem.tif -t 50x50 normal_composite > normal_composite.sql &"
 
 
 metadt <- data.table(period = "2001_2020",fullnm = names(curr_per))

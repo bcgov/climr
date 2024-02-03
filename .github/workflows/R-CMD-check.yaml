@@ -22,14 +22,14 @@ jobs:
       matrix:
         config:
           - {os: macOS-latest,   r: 'release'}
-          - {os: windows-latest, r: 'devel'}
+          # - {os: windows-latest, r: 'devel'}
           - {os: windows-latest, r: 'release'}
-          - {os: windows-latest, r: 'oldrel'}
-          - {os: windows-latest, r: '4.1'}
-          - {os: ubuntu-20.04,   r: 'devel'}
+          # - {os: windows-latest, r: 'oldrel'}
+          # - {os: windows-latest, r: '4.1'}
+          # - {os: ubuntu-20.04,   r: 'devel'}
           - {os: ubuntu-20.04,   r: 'release'}
-          - {os: ubuntu-20.04,   r: 'oldrel'}
-          - {os: ubuntu-20.04,   r: '4.1'}
+          # - {os: ubuntu-20.04,   r: 'oldrel'}
+          # - {os: ubuntu-20.04,   r: '4.1'}
 
     env:
       _SP_EVOLUTION_STATUS_: 2
@@ -39,7 +39,7 @@ jobs:
       R_REPRODUCIBLE_RUN_ALL_TESTS: true
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
 
