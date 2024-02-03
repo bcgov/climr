@@ -1,5 +1,12 @@
 ---
 title: "Lapse rates"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{methods_downscaling}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+bibliography: references.bib
+link-citations: true
 ---
 
 ```{r, include = TRUE, echo = FALSE}

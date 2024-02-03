@@ -146,7 +146,7 @@ list_ssp()
 list_variables(set = "Annual")
 ```
 
-We will chose the only available historic period (2001-2020), 2021-2040 as the future period, the 'CanESM5' GCM and the SSP 2.45 scenario. MAT, PPT and RH will be selected as output variables.
+We will chose the only available historic period (2001-2020), 2021-2040 as the future period, the 'EC-Earth3' GCM and the SSP 2.45 scenario. MAT, PPT and RH will be selected as output variables.
 
 Finally, `list_normal()` returns the list of available high-resolution normals. 
 'normal_na' corresponds to normals for North America obtained from 
@@ -171,7 +171,7 @@ ds_out <- climr_downscale(
   which_normal = "auto",
   historic_period = "2001_2020",
   gcm_period = "2021_2040",
-  gcm_models = "CanESM5",
+  gcm_models = "EC-Earth3",
   ssp = "ssp245",
   max_run = 2,
   return_normal = TRUE, ## to return the 1961-1990 normals period
@@ -181,7 +181,7 @@ ds_out <- climr_downscale(
 
 Note how data from historical periods doesn't have a GCM or SSP value -- this is
 expected of course, as GCMs and SSPs are used to project *future* climate values.
-Also, future projections were obtained for two runs of CanESM5 ('r1i1p1f1' and 
+Also, future projections were obtained for two runs of EC-Earth3 ('r1i1p1f1' and 
 'r10i1p1f1'), plus the ensemble mean.
 
 ```{r, eval = FALSE}
@@ -203,30 +203,37 @@ ds_out[, `:=`(zone = NULL, subzone = NULL)]
 ds_out <- point_data[, .(id, zone, subzone)][ds_out, on = .(id)]
 ```
 
-We may also want yearly climate projections. In this case, we want the yearly values
-for the same periods. Notice how some of the data doesn't need to be downloaded again,
-and was retrieved from cache.
+We may also want yearly climate projections. In this case, we want the yearly values of MAT and PPT for 2001-2015 and 2021:2040, using the same GCM, SSP and number of model
+runs. Notice how some of the data doesn't need to be downloaded again, and was retrieved from cache.
+
+<!-- missing data for years 2016-2020 -->
+<!-- wclimr does bias correction between observed and modelled historic valeus - link to methods vignette -->
+
+<!-- don't show two vars in 2 yaxes-->
 
 ```{r, message = TRUE}
 ds_out_ts <- climr_downscale(
   xyz = point_data,
   which_normal = "auto",
-  historic_ts = 2001:2015,
-  gcm_ts_years = 2021:2040,
-  gcm_models = "CanESM5",
+  historic_ts = 2001:2015,      ## currently up to 2015
+  gcm_hist_years = 2001:2020,   ## currently up to 2010
+  gcm_ts_years = 2021:2040,     ## currently starting at 2021
+  gcm_models = "EC-Earth3",
   ssp = "ssp245",
-  max_run = 2,
+  max_run = 1,
   return_normal = TRUE, ## to return the 1961-1990 normals period
   vars = c("MAT", "PPT", "RH")
 )
 ```
 
-<!-- TODO: Colin, please improve the plots as you see fit. I usually avoid showing two variables in different y axes, but wanted to reduce the no. of figures in this case-->
-```{r, include = FALSE}
-ds_out_ts2 <- melt(ds_out_ts, measure.vars = c("MAT", "PPT", "RH"))
-ds_out_ts2[variable == "PPT", value := value / 100]
-ds_out_ts2 <- ds_out_ts2[variable != "RH" & PERIOD != "1961_1990"]
-ds_out_ts2[, PERIOD := as.numeric(PERIOD)]
+To plot the time series, we will filter the data to a single model run (i.e. in this
+case discard the ensemble means). Note that we plot both the observed and the projected
+historical climate values.
+
+```{r, fig.cap = "Time series outputs from `climr_downscale`. The lines show mean annual temperature (MAT() and total annual precipitation (PPT) values averaged across model runs."}
+## here -- server went down.
+ds_out_ts[is.na(GCM), GCM := "Historic"]
+ds_out_ts[!grepl("ensemble", RUN)]
 
 ## make groups so that mising data is not shown as a "line connection"
 groups <- data.table(PERIOD = unique(ds_out_ts2$PERIOD))
@@ -234,8 +241,8 @@ groups[, idx := c(1, diff(PERIOD))]
 i2 <- c(1, which(groups$idx != 1), nrow(groups) + 1)
 groups[, grp := rep(1:length(diff(i2)), diff(i2))]
 ds_out_ts2 <- groups[, .(PERIOD, grp)][ds_out_ts2, on = "PERIOD"]
-ds_out_ts2
-## HERE: need different groups for each variable.
+ds_out_ts2[, grp := paste(grp, variable, sep = "_")]
+
 yrbreaks <- c(
   min(ds_out_ts2$PERIOD),
   seq(min(ds_out_ts2$PERIOD), max(ds_out_ts2$PERIOD), by = 5),
@@ -254,9 +261,10 @@ if (require(ggplot2)) {
     ) +
     scale_y_continuous(sec.axis = sec_axis(~ . * 100, name = "PPT (mm)")) +
     scale_x_continuous(breaks = yrbreaks, labels = yrbreaks) +
+    scale_color_manual(values = c("MAT" = "#D6604D", "PPT" = "#4393C3")) +
     theme_light() +
     theme(axis.text.x = element_text(angle = 45, vjust = 0.5)) +
-    labs(x = "Year", y = "MAT (degrees C)", col = "")
+    labs(x = "Year", y = expression("MAT"~~(degree*"C")), col = "")
 }
 ```
 
@@ -267,6 +275,19 @@ if (require(ggplot2)) {
 of points and plot the values of a chosen climate variable from the list passed to 
 `climr_downscale(..., vars)`.
 
+```{r}
+ds_out_spatial <- climr_downscale(
+  xyz = point_data,
+  which_normal = "auto",
+  gcm_models = "EC-Earth3",
+  ssp = "ssp245",
+  max_run = 0,
+  return_normal = FALSE, ## don't return the 1961-1990 normals period
+  out_spatial = TRUE,
+  plot = "MAT",
+  vars = c("MAT", "PPT", "RH")
+)
+```
 
 
 ## Workflow with `*_input` functions and `downscale`
