@@ -146,7 +146,7 @@ list_ssp()
 list_variables(set = "Annual")
 ```
 
-We will chose the only available historic period (2001-2020), 2021-2040 as the future period, the 'CanESM5' GCM and the SSP 2.45 scenario. MAT, PPT and RH will be selected as output variables.
+We will chose the only available historic period (2001-2020), 2021-2040 as the future period, the 'EC-Earth3' GCM and the SSP 2.45 scenario. MAT, PPT and RH will be selected as output variables.
 
 Finally, `list_normal()` returns the list of available high-resolution normals. 
 'normal_na' corresponds to normals for North America obtained from 
@@ -171,7 +171,7 @@ ds_out <- climr_downscale(
   which_normal = "auto",
   historic_period = "2001_2020",
   gcm_period = "2021_2040",
-  gcm_models = "CanESM5",
+  gcm_models = "EC-Earth3",
   ssp = "ssp245",
   max_run = 2,
   return_normal = TRUE, ## to return the 1961-1990 normals period
@@ -181,7 +181,7 @@ ds_out <- climr_downscale(
 
 Note how data from historical periods doesn't have a GCM or SSP value -- this is
 expected of course, as GCMs and SSPs are used to project *future* climate values.
-Also, future projections were obtained for two runs of CanESM5 ('r1i1p1f1' and 
+Also, future projections were obtained for two runs of EC-Earth3 ('r1i1p1f1' and 
 'r10i1p1f1'), plus the ensemble mean.
 
 ```{r, eval = FALSE}
