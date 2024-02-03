@@ -25,7 +25,7 @@
 #' 
 #' @examples {
 #' library(terra)
-#' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
+#' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10), id = 1:10)
 #' 
 #' ## get bounding box based on input points
 #' thebb <- get_bb(xyz)
@@ -91,7 +91,7 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 #' 
 #' @examples {
 #' library(terra)
-#' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
+#' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10), id = 1:10)
 #' 
 #' ## get bounding box based on input points
 #' thebb <- get_bb(xyz)
@@ -147,7 +147,7 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 #' 
 #' @examples {
 #' library(terra)
-#' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
+#' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10), id = 1:10)
 #' 
 #' ## get bounding box based on input points
 #' thebb <- get_bb(xyz)

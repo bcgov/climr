@@ -6,24 +6,26 @@
 ## the package. For now it is run manually and saves outputs to tests/ 
 
 library(remotes)
-install_github("bcgov/climr@main")
+install_github("bcgov/climr@main", force = TRUE)
 
 library(terra)
 library(climr)
 
 dbCon <- data_connect()
-on.exit(try(pool::poolClose(dbCon)), add = TRUE)
 
 xyz <- data.frame(lon = c(-127.70), 
                   lat = c(55.35), 
                   elev = c(291L),
                   id = LETTERS[1])
 
+cache_clear()
+
 ## get bounding box based on input points
 thebb <- get_bb(xyz)
 
 # Create a normal baseline
-normal <- normal_input(dbCon = dbCon, bbox = thebb, cache = TRUE)
+normal <- normal_input(dbCon = dbCon, bbox = thebb, normal = "normal_composite",
+                       cache = TRUE)
 
 # Select GCM
 gcms <- c("BCC-CSM2-MR", "INM-CM5-0")
@@ -56,10 +58,12 @@ historic_ts <- historic_input_ts(
   thebb
 )
 
+pool::poolClose(dbCon)
+
 ## make tiny area
 dem <- normal$dem2_WNA
-xyz <- data.frame(lon = c(-128.7300, -127.7957, -127.4695, -128.1778, -127.7719), 
-                  lat = c(55.64114, 54.34666, 54.65660, 54.08937, 54.95381), 
+xyz <- data.frame(lon = c(-127.7300, -127.7957, -127.5695, -127.5778, -127.7719), 
+                  lat = c(55.34114, 55.24666, 55.39660, 55.08937, 55.15381), 
                   elev = NA,
                   id = 1:5)
 xyz[, 3] <- extract(dem, xyz[, 1:2], method = "bilinear")[, -1L]
@@ -99,9 +103,11 @@ downscaleout_historic_ts <- downscale(
   var = list_variables()
 )
 
-saveRDS(xyz, "tests/points_downscale_ref.rds")
-saveRDS(downscaleout_gcm, "tests/downscaleout_gcm_ref.rds")
-saveRDS(downscaleout_gcm_hist, "tests/downscaleout_gcm_hist_ref.rds")
-saveRDS(downscaleout_gcm_ts, "tests/downscaleout_gcm_ts_ref.rds")
-saveRDS(downscaleout_historic, "tests/downscaleout_historic_ref.rds")
-saveRDS(downscaleout_historic_ts, "tests/downscaleout_historic_ts_ref.rds")
+dPath <- testthat::test_path("data")
+
+saveRDS(xyz, file.path(dPath, "points_downscale_ref.rds"))
+saveRDS(downscaleout_gcm, file.path(dPath, "downscaleout_gcm_ref.rds"))
+saveRDS(downscaleout_gcm_hist, file.path(dPath, "downscaleout_gcm_hist_ref.rds"))
+saveRDS(downscaleout_gcm_ts, file.path(dPath, "downscaleout_gcm_ts_ref.rds"))
+saveRDS(downscaleout_historic, file.path(dPath, "downscaleout_historic_ref.rds"))
+saveRDS(downscaleout_historic_ts, file.path(dPath, "downscaleout_historic_ts_ref.rds"))
