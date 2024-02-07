@@ -13,7 +13,7 @@ data_connect <- function() {
         drv = Postgres(),
         dbname = "climr",
         host = "146.190.244.244",
-        port = 6432,
+        port = 5432,
         user = "climr_client",
         password = "PowerOfBEC2023"
       )
@@ -25,7 +25,7 @@ data_connect <- function() {
             drv = Postgres(),
             dbname = "climr",
             host = "146.190.244.244",
-            port = 6432,
+            port = 5432,
             user = "climr_client",
             password = "PowerOfBEC2023"
           )
