@@ -430,7 +430,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
       plotTitle <- paste0(plot, "\n", plotTitle)
       plot(msk, col = "grey", main = plotTitle, legend = FALSE, mar = c(3.1, 3.1, 3.1, 7.1))
       plot(res2, y = plot, axes = FALSE, ext = ext(msk),
-           col = palette(hcl.colors(100, "viridis")), sort = TRUE,
+           col = hcl.colors(100, "viridis"), sort = TRUE,
            add = TRUE, type = "continuous")
     }
   }
