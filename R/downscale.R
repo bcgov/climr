@@ -1,33 +1,44 @@
-#' Climate variable downscaling
+#' Change-factor downscaling of observed and simulated climate data
 #' 
 #' @description
-#' `climr_downscale` downscales and calculates climate variables for points of interest.
-#' 
+#' `climr_downscale()` and `downscale()` provide downscaled climate variables for user-specified locations. 
+#' `climr` adapts a simple change-factor (aka "delta') downscaling approach originally implemented in \href{https://climatena.ca/}{ClimateNA}. 
+#' This approach downscales climate data in three stages: 
+#' \enumerate{
+#' \item \emph{Change-factor downscaling} of coarse-resolution (50-200km grid) monthly temperature and precipitation data from climate models or observational sources to high-resolution (800m grid);
+#' \item \emph{Elevation adjustment} of temperature variables to provide scales finer than the high-resolution reference grid; and
+#' \item \emph{Calculating derived variables} from the downscaled monthly temperature and precipitation variables.
+#' }
+#' See our vignette \code{\link{methods_downscaling.Rmd}} for a description of the downscaling methodology. 
+#'  
+#' `climr_downscale()` is a user-friendly wrapper for `downscale()`
+#'  
 #' @details
-#' Additional details... TODO.
+#' `downscale()` parameters can be applied in `climr_downscale()`. for example, setting `ppt_lr = TRUE` in `climr_downscale()` will apply elevation adjustment to precipitation values. 
+#' 
+#' Although `which_normal = "auto"` is the default, users are cautioned that this can produce artefacts associated with downscaling to different reference climate maps within and outside the western North American boundary of `normal_composite`. 
+#' We recommend that queries spanning this boundary use `which_normal = "normal_na"`.
 #' 
 #' @template xyz
-#' @param which_normal character. Which normal layer to use. 
-#'   Default is "auto", which selects the highest resolution normal for each point. 
-#'   Other options are one of [`list_normal()`]
-#' @param historic_period character. Which historic period. Default `NULL`
-#' @param historic_ts integer. Vector of historic years requested. Must be in `1902:2015`. Default `NULL`
-#' @param gcm_models character. Vector of GCM names. Options are [`list_gcm()`]. Used for gcm periods, gcm timeseries, and historic timeseries. Default `NULL`
+#' @param which_normal character. Which climatological normals map to use as the high-resolution reference climate map for downscaling. 
+#'   Default is "auto", which selects, for each query point, the best available climatological normals map in declining order of normals_bc, normals_composite, and normals_na. 
+#'   Other options are one of [`list_normal()`], which will provide a consistent reference map for all points. 
+#' @param historic_period character. Which historic period for observed climate data, averaged over this period. Options are [`list_historic()`]. Default `NULL`
+#' @param historic_ts integer. Vector of years to obtain individual years or time series of observed climate data. Must be in `1902:2015`. Default `NULL`
+#' @param gcm_models character. Vector of global climate model names. Options are [`list_gcm()`]. Used for gcm periods, gcm timeseries, and historic timeseries. Default `NULL`
 #' @template ssp
-#' @param gcm_period character. Requested future periods. Options are [`list_gcm_period()`]
-#' @param gcm_ts_years character. Requested future timeseries years. Must be in `2015:2100`
-#' @param gcm_hist_years character. Requested historic modelled years. Must be in `1851:2010`
+#' @param gcm_period character. 20-year normal periods for GCM simulations. Options are [`list_gcm_period()`]
+#' @param gcm_ts_years character. Timeseries years for GCM simulations of future scenarios specified by `ssp`. Must be in `2015:2100`
+#' @param gcm_hist_years character.  Timeseries years for GCM simulations of the historical scenario. Must be in `1851:2014`
 #' @template max_run
 #' @template return_normal
-#' @param vars character. Vector of climate variables. Options are [`list_vars()`]
+#' @template vars
 #' @param cache logical. Cache data locally? Default `TRUE`
 #' @template out_spatial
 #' @template plot
 
 #' @return `data.frame` of downscaled climate variables for each location.
-#'   Historic, normal, and future periods are all returned in one table.
-
-#' @author Kiri Daust
+#'   All outputs are returned in one table.
 
 #' @importFrom sf st_as_sf st_join
 #' @importFrom pool poolClose
@@ -85,7 +96,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
                             gcm_models = NULL, ssp = list_ssp(),
                             gcm_period = NULL, gcm_ts_years = NULL, gcm_hist_years = NULL, max_run = 0L, return_normal = TRUE,
                             vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))), cache = TRUE,
-                            out_spatial = FALSE, plot = NULL) {
+                            out_spatial = FALSE, plot = NULL, ...) {
   message("Welcome to climr!")
   
   ## checks
@@ -204,7 +215,8 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
     return_normal = return_normal,
     vars = vars,
     out_spatial = out_spatial,
-    plot = plot
+    plot = plot, 
+    ...
   )
   
   if (which_normal != "auto") {
@@ -233,7 +245,8 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
       return_normal = return_normal,
       vars = vars,
       out_spatial = out_spatial,
-      plot = plot
+      plot = plot, 
+      ...
     )
     
     if(!is.null(dbCon)) poolClose(dbCon)
@@ -245,23 +258,19 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
 }
 
 
-#' @description `downscale` downscales target rasters to points of interest.
-#' 
-#' @details
-#'   Additional details... TODO.
+#' @description 
+#' `downscale()` takes user-supplied high- and low-resolution rasters as input and downscales to user-specified point locations. 
 #' 
 #' @template xyz
-#' @param normal `SpatRaster`. Reference normal baseline input from `normal_input`.
-#' @param gcm `list` of `SpatRasters`. Global Circulation Models outputs from [`gcm_input()`]. Default to `NULL`.
-#' @param historic `list` of `SpatRasters`. Historic time period outputs from [`historic_input()`]. Default to `NULL`.
-#' @param gcm_ts `list` of `SpatRasters`. TODO
-#' @param gcm_hist `list` of `SpatRasters`. TODO
-#' @param historic_ts `list` of `SpatRasters`. TODO
+#' @param normal `SpatRaster`. Outputs from [`normal_input()`]. The high-resolution climate maps for use as the downscaling baseline. 
+#' @param gcm `list` of `SpatRasters`. Outputs from [`gcm_input()`]. Global climate model data for 20-year normal periods to be downscaled. Default to `NULL`.
+#' @param historic `list` of `SpatRasters`. Outputs from [`historic_input()`]. Observed climate data for 20-year normal periods to be downscaled. Default to `NULL`.
+#' @param gcm_ts `list` of `SpatRasters`. Outputs from [`gcm_ts_input()`]. Global climate model time series for ssp-rcp scenarios to be downscaled. Default to `NULL`.
+#' @param gcm_hist `list` of `SpatRasters`. Outputs from [`gcm_hist_input()`]. Global climate model time series for historical scenario to be downscaled. Default to `NULL`.
+#' @param historic_ts `list` of `SpatRasters`. Outputs from [`historic_input_ts()`]. Observed climate time series to be downscaled. Default to `NULL`.
 #' @template return_normal
-#' @param vars character. A vector of climate variables to compute. Supported variables
-#'   can be obtained with [`list_variables()`]. Definitions can be found in this package
-#'  `variables` dataset. Default to monthly PPT, Tmax, Tmin.
-#' @param ppt_lr logical. Apply lapse rate adjustment to precipitations. Default to FALSE.
+#' @template vars 
+#' @param ppt_lr logical. Apply elevation adjustment to precipitation. Default to FALSE.
 #' @param nthread integer. Number of parallel threads to use to do computations. Default to 1L.
 #' @template out_spatial
 #' @template plot
