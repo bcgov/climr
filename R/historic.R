@@ -1,10 +1,11 @@
-#' Create historic inputs for `downscale` from PostGIS database.
+#' Download historic period anomalies.
 #' 
 #' @description
-#' `historic_input` creates inputs from a given historic **period**.
+#' `historic_input` produces anomalies of historic observed climate for a given **period**.
 #' 
 #' @return A `list` of `SpatRasters`, each with possibly multiple layers, that can
-#'   be used with [`downscale()`].
+#'   be used with [`downscale()`]. Each element of the list corresponds to a particular period, and the
+#'   values of the `SpatRaster` are anomalies of the historic period compare to the normal period.
 #' 
 #' @template dbCon
 #' @template bbox
@@ -13,6 +14,11 @@
 #' @template cache
 #' 
 #' @seealso [downscale()], [`list_historic()`]
+#' @details
+#' Generally, this function should only be used in combination with [`downscale()`] as the values 
+#' returned in the rasters are anomalies compared to the 1961-1990 normal period, 
+#' and are usually not meaningful without the whole downscale process. 
+#' 
 #'
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
@@ -82,13 +88,19 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 }
 
 
+#' Retrieve historic anomalies for specified years
 #' @description
-#' `historic_input` creates inputs from a given historic **time series**.
+#' `historic_input_ts` produces anomalies of historic observed climate for a given **time series**.
 #' 
 #' @template dbCon
 #' @template bbox
 #' @template cache
-#' @param years numeric. Years to retrieve timeseries for, in `1902:2022`. Default `2010:2022`
+#' @param years numeric. Years to retrieve historic anomalies for, in `1902:2022`. Default `2010:2022`
+#' @return List of length 1 containing a `SpatRaster` 
+#' @details
+#' The returned raster contains anomalies for each year specified in `years`. In general this
+#' function should only be used in conjunction with [`downscale()`].
+#' 
 #' 
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head tail
@@ -104,16 +116,25 @@ historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRU
   if (dir.exists(paste0(cache_path(), "/historic_ts/", ts_name))) {
     bnds <- fread(paste0(cache_path(), "/historic_ts/", ts_name, "/meta_area.csv"))
     setorder(bnds, -numlay)
+    spat_match <- list()
     for (i in 1:nrow(bnds)) {
       isin <- is_in_bbox(bbox, matrix(bnds[i, 2:5]))
-      if (isin) break
+      if (isin) spat_match[[i]] <- bnds$uid[i]
     }
-    if (isin) {
-      oldid <- bnds$uid[i]
+    if (length(spat_match) > 0) {
       periods <- fread(paste0(cache_path(), "/historic_ts/", ts_name, "/meta_period.csv"))
-      if (all(years %in% periods[uid == oldid, period])) {
+      isin <- FALSE
+      for(oldid in spat_match){
+        if (all(years %in% periods[uid == oldid, period])) {
+          isin <- TRUE
+          break
+        }
+      }
+      
+      if (isin) {
         message("Retrieving from cache...")
         hist_rast <- rast(paste0(cache_path(), "/historic_ts/", ts_name, "/", oldid, ".tif"))
+        hist_rast <- hist_rast[[grep(paste(years, collapse = "|"), names(hist_rast))]]
         hist_rast <- list(hist_rast)
         attr(hist_rast, "builder") <- "climr"
         names(hist_rast) <- paste(years[1], tail(years, 1), sep = ":")

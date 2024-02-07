@@ -134,7 +134,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
     normal <- normal_input(dbCon = dbCon, normal = "normal_composite", bbox = thebb, cache = cache)
   } else {
     #message("Normals not specified, using highest resolution available for each point")
-    bc_outline <- rast(system.file("extdata", "bc_outline.tif", package = "climr"))
+    bc_outline <- rast(system.file("extdata", "wna_outline.tif", package = "climr"))
     pnts <- extract(bc_outline, xyz[, .(lon, lat)], method = "simple")
     bc_ids <- xyz[["id"]][!is.na(pnts$PPT01)]
     if (length(bc_ids) >= 1) {
