@@ -3,6 +3,52 @@ library(pool)
 library(data.table)
 library(terra)
 
+
+dbCon <- data_connect()
+## smaller example in BC
+xyz <- data.frame(lon = c(-127.70521, -127.62279, -127.56235, -127.7162, 
+                           -127.18585, -127.1254, -126.94957, -126.95507),
+                  lat = c(55.3557, 55.38847, 55.28537, 55.25721, 
+                          54.88135, 54.65636, 54.6913, 54.61025),
+                  elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
+                  id = LETTERS[1:8],
+                  Zone = c(rep("CWH",3), rep("CDF",5)),
+                  Subzone = c("vm1","vm2","vs1",rep("mm",3),"dk","dc"))
+
+thebb <- get_bb(xyz)
+
+histtsout2 <- historic_input_ts(dbCon, thebb, years = 2019:2022, cache = TRUE)
+names(histtsout2[[1]])
+
+gcms <- c("ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5", "CNRM-ESM2-1", "EC-Earth3", "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0", "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL")
+list_gcm()
+gcms[-which(gcms%in%list_gcm())]
+
+in_xyz <- structure(list(lon = c(-127.70521, -127.62279, -127.56235, -127.7162, 
+                                  -127.18585, -127.1254, -126.94957, -126.95507), 
+                         lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025), 
+                         elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
+                         id = 1:8), row.names = c(NA, -8L), class = "data.frame")
+
+
+dbCon <- data_connect()
+test <- historic_input_ts(dbCon, get_bb(in_xyz))
+test <- normal_input(dbCon, get_bb(in_xyz))
+
+clim <- climr_downscale(in_xyz,
+                        which_normal = "auto",
+                        gcm_models = list_gcm(),
+                        ssp = list_ssp()[2],
+                        gcm_period = list_gcm_period()[2],
+                        max_run = 4L,
+                        return_normal = FALSE,
+                        vars = c("CMI","DD5","Tmin01")
+)
+unique(clim$GCM)
+gcms[-which(gcms%in%unique(clim$GCM))]
+
+
+
 set.seed(123)
 dbCon <- data_connect()
 xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10))
@@ -32,7 +78,9 @@ list_historic()
 ##it has to download the data so might take some time. It will then cache the data, so will
 ##be faster for future runs
 ds_hist <- climr_downscale(xyz = in_xyz, which_normal = "auto", 
-                           historic_period = "2001_2020",
+                           gcm_models = "ACCESS-ESM1-5",
+                           gcm_period = "2081_2100",
+                           max_run = 8L,
                            return_normal = TRUE, ##put this to TRUE if you want the 1961-1990 period
                            vars = c("PPT","CMD","CMI","Tave01","Tave07"),
                            out_spatial = FALSE, plot = "PPT") ##specify desired variables
