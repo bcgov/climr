@@ -1,11 +1,11 @@
 ---
-title: "Downscaling climate variables with `climr`"
+title: "`climr` workflow"
 output: 
   rmarkdown::html_vignette:
     toc: true
     toc_depth: 2
 vignette: >
-  %\VignetteIndexEntry{Downscaling climate variables with `climr`}
+  %\VignetteIndexEntry{`climr` workflow}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
