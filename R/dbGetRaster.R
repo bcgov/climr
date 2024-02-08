@@ -1,7 +1,7 @@
 #' Download raster with bounding box from PostGIS
 #' @template conn
 #' @param name character. Table name in database.
-#' @param tile TODO
+#' @param tile Logical. Retrieve data in tiles to avoid overloading the database?
 #' @param rast character. Name of column which stores raster data.
 #'   Defaults to "rast"
 #' @template bands
@@ -15,7 +15,7 @@
 #' @importFrom DBI dbQuoteIdentifier dbGetQuery
 #' @export
 pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
-                       boundary = NULL) {
+                       boundary) {
   ## Check and prepare the schema.name
   name1 <- name
   nameque <- paste(name1, collapse = ".")
