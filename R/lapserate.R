@@ -169,7 +169,7 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 #' This function computes lapse rates (a linear relationship of a climate variable to elevation) across user-provided rasters. 
 #' Lapse rates are calculated using simple linear regression (without the intercept) using the focal cell and its eight neighbors as observations. 
 #' These gridded lapse rates are used in [`downscale()`] and [`climr_downscale()`] for elevation adjustment of climate values during downscaling to user-specified locations. 
-#' The method is illustrated in the vignette 'vignette("lapse_rates")'
+#' The method is illustrated in the vignette \code{vignette("lapse_rates")}
 #' 
 #' @param normal a `SpatRaster` stack. climate rasters to compute lapse rates for. Build with this package functions.
 #' @template dem
