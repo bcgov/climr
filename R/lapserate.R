@@ -163,21 +163,26 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
   return(res)
 }
 
-#' Lapse rate computation
+#' Calculation of gridded lapse rates
 #' 
-#' @param normal a `SpatRaster` stack. Normal rasters to compute lapse rates for. Build with this package functions.
+#' @description
+#' This function computes lapse rates (a linear relationship of a climate variable to elevation) across user-provided rasters. 
+#' Lapse rates are calculated using simple linear regression (without the intercept) using the focal cell and its eight neighbors as observations. 
+#' These gridded lapse rates are used in [`downscale()`] and [`climr_downscale()`] for elevation adjustment of climate values during downscaling to user-specified locations. 
+#' The method is illustrated in the vignette 'vignette("lapse_rates")'
+#' 
+#' @param normal a `SpatRaster` stack. climate rasters to compute lapse rates for. Build with this package functions.
 #' @template dem
 #' @param NA_replace logical. Should NA lapse rate results be replaced by zeros. Default to TRUE.
 #' @param nthread integer. Number of parallel threads to use to compute lapse rates.
 #' @param rasterize logical. Return an object of the same class category as normal with the same extent?
 #'    Default to `TRUE`.
 #'
-#' @details Formulas
-#'   Simple linear regression without the intercept term
-#'   beta_coef = sum(xy) / sum(x²)
-#'   mss = sum(x * beta_coef)², sum of squared fitted values
-#'   rss = sum(ε²), sum of squared (y minus fitted), sum of absolute errors
-#'   R² = mss / (mss + rss)
+#' @details Formulas \cr
+#'   beta_coef = sum(xy) / sum(x²) \cr
+#'   mss = sum(x * beta_coef)², sum of squared fitted values \cr
+#'   rss = sum(ε²), sum of squared (y minus fitted), sum of absolute errors \cr
+#'   R² = mss / (mss + rss) \cr
 #'   Lapse rate = beta_coef * R²
 
 #' @return `SpatRaster` of lapse rate values.
