@@ -3,3 +3,5 @@
 .Rhistory
 .httr-oauth
 inst/doc
+
+climr.cache/
