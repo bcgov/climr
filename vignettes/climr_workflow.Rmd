@@ -4,7 +4,6 @@ output:
   rmarkdown::html_vignette:
     toc: true
     toc_depth: 2
-    toc_depth: 2
 description: >
   Learn the most common `climr` workflows.
 vignette: >
