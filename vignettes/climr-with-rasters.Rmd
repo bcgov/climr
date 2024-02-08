@@ -319,9 +319,13 @@ points(centrds, col = "salmon1")
 The process is similar to what we did in [a) Sampling polygon at regular
 intervals] above.
 
-We begin by extracting all the points of our input raster, adding elevation
-values to each (if not in the raster already) and passing a table of point
-locations to `climr_downscale()`.
+We begin by converting a our raster to a points `SpatVector`, so that each
+raster cell becomes a point. Because we are using a DEM raster, the points
+`SpatVector` will inherits the elevation cell values. Otherwise, we would
+use the points vector to extract elevation values from another source.
+
+We then convert the points `SpatVector` to a `data.table` of point
+locations that is passed to `climr_downscale()`.
 
 ```{r, results = "hide"}
 library(climr)
@@ -352,7 +356,13 @@ dwscl_out <- climr_downscale(xyzDT, which_normal = "auto",
 
 ```
 
-Now we simply need to use our original raster as a template to make rasters of downscaled climate values.
+To convert the outputs back into a raster format, we simply need to use the 
+original raster use to extract the point locations as a template to make 
+rasters of downscaled climate values. 
+
+Since the location `id`s match raster cell IDs, the `dwscl_out$id` column is 
+used to index raster cells climate values when assigning downscaled `MAT` 
+values.
 
 ```{r}
 tempRas <- rast(dem_vancouver)
