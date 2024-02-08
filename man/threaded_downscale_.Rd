@@ -19,17 +19,17 @@ threaded_downscale_(
 \item{xyz}{a \code{data.frame} with the following columns "long", "lat", "elev",
 and a unique "id". Any extra columns will be ignored and not output.}
 
-\item{normal}{\code{SpatRaster}. Reference normal baseline input from \code{normal_input}.}
+\item{normal}{\code{SpatRaster}. Outputs from \code{\link[=normal_input]{normal_input()}}. The high-resolution climate maps for use as the downscaling baseline.}
 
-\item{gcm}{\code{list} of \code{SpatRasters}. Global Circulation Models outputs from \code{\link[=gcm_input]{gcm_input()}}. Default to \code{NULL}.}
+\item{gcm}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=gcm_input]{gcm_input()}}. Global climate model data for 20-year normal periods to be downscaled. Default to \code{NULL}.}
 
-\item{gcm_ts}{\code{list} of \code{SpatRasters}. TODO}
+\item{gcm_ts}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=gcm_ts_input]{gcm_ts_input()}}. Global climate model time series for ssp-rcp scenarios to be downscaled. Default to \code{NULL}.}
 
-\item{gcm_hist}{\code{list} of \code{SpatRasters}. TODO}
+\item{gcm_hist}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=gcm_hist_input]{gcm_hist_input()}}. Global climate model time series for historical scenario to be downscaled. Default to \code{NULL}.}
 
-\item{historic}{\code{list} of \code{SpatRasters}. Historic time period outputs from \code{\link[=historic_input]{historic_input()}}. Default to \code{NULL}.}
+\item{historic}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=historic_input]{historic_input()}}. Observed climate data for 20-year normal periods to be downscaled. Default to \code{NULL}.}
 
-\item{historic_ts}{\code{list} of \code{SpatRasters}. TODO}
+\item{historic_ts}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=historic_input_ts]{historic_input_ts()}}. Observed climate time series to be downscaled. Default to \code{NULL}.}
 
 \item{...}{further arguments passed to \code{downscale_}}
 }

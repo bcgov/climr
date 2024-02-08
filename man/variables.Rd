@@ -25,6 +25,6 @@ variables
 variables
 }
 \description{
-List of available climate variables in ClimateBC.
+List of available climate variables in climr
 }
 \keyword{datasets}

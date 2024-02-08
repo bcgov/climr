@@ -1,6 +1,6 @@
 #' Available climate variables
 #'
-#' List of available climate variables in ClimateBC.
+#' List of available climate variables in climr
 #'
 #' @format A `data.table` with columns:
 #' \describe{
