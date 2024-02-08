@@ -4,7 +4,7 @@
 \alias{normal_input}
 \title{Retrieve climatologies for normal period}
 \usage{
-normal_input(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE)
+normal_input(dbCon, bbox, normal = "normal_na", cache = TRUE)
 }
 \arguments{
 \item{dbCon}{A db connection object created by \code{data_connect}.}
