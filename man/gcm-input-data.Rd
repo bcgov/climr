@@ -4,7 +4,7 @@
 \alias{gcm_input}
 \alias{gcm_hist_input}
 \alias{gcm_ts_input}
-\title{Create GCM inputs for \code{downscale} using data on Postgis database.}
+\title{Retrieve GCM anomalies for \code{downscale}.}
 \usage{
 gcm_input(
   dbCon,
@@ -43,8 +43,8 @@ gcm_ts_input(
 \item{gcm}{character. Vector of labels of the global circulation models to use.
 Can be obtained from \code{\link[=list_gcm]{list_gcm()}}. Default to all GCMs available.}
 
-\item{ssp}{character. Vector of labels of the shared socioeconomic pathways to use.
-See available options with \code{\link[=list_ssp]{list_ssp()}}. Defaults to all SSPs available.}
+\item{ssp}{character. Vector of SSP-RCP scenarios (representative concentration pathways paired with shared socioeconomic pathways).
+Options are \code{\link[=list_ssp]{list_ssp()}}. Defaults to all scenarios available.}
 
 \item{period}{character. Vector of labels of the periods to use.
 Can be obtained from \code{\link[=list_gcm_period]{list_gcm_period()}}. Defaults to all periods available.}
@@ -60,16 +60,33 @@ are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 \value{
 A \code{list} of \code{SpatRasters}, each with possibly multiple layers, that can
 be used with \code{\link[=downscale]{downscale()}}.
+
+A \code{list} of \code{SpatRasters}, each with possibly multiple layers, that can
+be used with \code{\link[=downscale]{downscale()}}.
+
+A \code{list} of \code{SpatRasters}, each with possibly multiple layers, that can
+be used with \code{\link[=downscale]{downscale()}}.
 }
 \description{
-\code{gcm_input} creates GCM climate periods inputs, given chosen GCMs, SSPs,
+\code{gcm_input} retrieves anomalies for GCM data, given chosen GCMs, SSPs,
 periods and runs.
 
-\code{gcm_hist_input} creates GCM \strong{historic} time series inputs, given chosen GCMs, SSPs,
+\code{gcm_hist_input} creates GCM \strong{historic} time series inputs, given chosen GCMs,
 years and runs.
 
-\code{gcm_ts_input} creates GCM time series inputs, given chosen GCMs, SSPs,
+\code{gcm_ts_input} creates future GCM time series inputs, given chosen GCMs, SSPs,
 years and runs.
+}
+\details{
+This function returns a list with one slot for each requested GCM. Rasters inside the list contain anomalies for all requested SSPs, runs, and periods.
+In general this function should only be used in combination with \code{\link[=downscale]{downscale()}}.
+
+This function returns a list with one slot for each requested GCM. Rasters inside the list contain anomalies for all runs and years.
+In general this function should only be used in combination with \code{\link[=downscale]{downscale()}}.
+
+This function returns a list with one slot for each requested GCM. Rasters inside the list contain anomalies for all SSPs, runs and years.
+In general this function should only be used in combination with \code{\link[=downscale]{downscale()}}. Note that if you request multiple runs, multiple SSPs, and a lot of years,
+it will take a while to download the data (there's lot of it).
 }
 \examples{
 {

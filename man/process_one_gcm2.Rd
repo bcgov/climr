@@ -18,8 +18,8 @@ process_one_gcm2(
 \arguments{
 \item{gcm_nm}{character. Name of GCM to use.}
 
-\item{ssp}{character. Vector of labels of the shared socioeconomic pathways to use.
-See available options with \code{\link[=list_ssp]{list_ssp()}}. Defaults to all SSPs available.}
+\item{ssp}{character. Vector of SSP-RCP scenarios (representative concentration pathways paired with shared socioeconomic pathways).
+Options are \code{\link[=list_ssp]{list_ssp()}}. Defaults to all scenarios available.}
 
 \item{bbox}{numeric. Vector of length 4 giving bounding box of study region, created by \code{get_bb()}.}
 

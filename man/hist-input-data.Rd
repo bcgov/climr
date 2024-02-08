@@ -3,7 +3,7 @@
 \name{historic_input}
 \alias{historic_input}
 \alias{historic_input_ts}
-\title{Create historic inputs for \code{downscale} from PostGIS database.}
+\title{Download historic period anomalies.}
 \usage{
 historic_input(dbCon, bbox = NULL, period = list_historic(), cache = TRUE)
 
@@ -19,16 +19,27 @@ Can be obtained from \code{\link[=list_historic]{list_historic()}}. Default to "
 
 \item{cache}{logical. Specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 
-\item{years}{numeric. Years to retrieve timeseries for, in \code{1902:2022}. Default \code{2010:2022}}
+\item{years}{numeric. Years to retrieve historic anomalies for, in \code{1902:2022}. Default \code{2010:2022}}
 }
 \value{
 A \code{list} of \code{SpatRasters}, each with possibly multiple layers, that can
-be used with \code{\link[=downscale]{downscale()}}.
+be used with \code{\link[=downscale]{downscale()}}. Each element of the list corresponds to a particular period, and the
+values of the \code{SpatRaster} are anomalies of the historic period compare to the normal period.
+
+List of length 1 containing a \code{SpatRaster}
 }
 \description{
-\code{historic_input} creates inputs from a given historic \strong{period}.
+\code{historic_input} produces anomalies of historic observed climate for a given \strong{period}.
 
-\code{historic_input} creates inputs from a given historic \strong{time series}.
+\code{historic_input_ts} produces anomalies of historic observed climate for a given \strong{time series}.
+}
+\details{
+Generally, this function should only be used in combination with \code{\link[=downscale]{downscale()}} as the values
+returned in the rasters are anomalies compared to the 1961-1990 normal period,
+and are usually not meaningful without the whole downscale process.
+
+The returned raster contains anomalies for each year specified in \code{years}. In general this
+function should only be used in conjunction with \code{\link[=downscale]{downscale()}}.
 }
 \seealso{
 \code{\link[=downscale]{downscale()}}, \code{\link[=list_historic]{list_historic()}}

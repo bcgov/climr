@@ -2,9 +2,9 @@
 % Please edit documentation in R/normal.R
 \name{normal_input}
 \alias{normal_input}
-\title{Create normal baseline inputs for \code{downscale} from PostGIS database.}
+\title{Retrieve climatologies for normal period}
 \usage{
-normal_input(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE)
+normal_input(dbCon, bbox, normal = "normal_na", cache = TRUE)
 }
 \arguments{
 \item{dbCon}{A db connection object created by \code{data_connect}.}
@@ -22,7 +22,13 @@ A \code{SpatRaster} containing normals, lapse rates
 and digital elevation model layers, that can be used with \code{\link[=downscale]{downscale()}}.
 }
 \description{
-Create normal baseline inputs for \code{downscale} from PostGIS database.
+This function downloads (or retrieves from cache) monthly Tmin, Tmax, and PPT variables
+for the specified climatology and for the specified bounding box. It is intended for use with \code{\link[=downscale]{downscale()}},
+but can also be used as a stand-alone climatology.
+}
+\details{
+The first 36 layers of the output raster correspond with the actual climate variables. The raster also contains
+lapse rates for each variable, and a corresponding digital elevation model.
 }
 \seealso{
 \code{\link[=downscale]{downscale()}}

@@ -2,12 +2,12 @@
 % Please edit documentation in R/lapserate.R
 \name{lapse_rate}
 \alias{lapse_rate}
-\title{Lapse rate computation}
+\title{Calculation of gridded lapse rates}
 \usage{
 lapse_rate(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize = TRUE)
 }
 \arguments{
-\item{normal}{a \code{SpatRaster} stack. Normal rasters to compute lapse rates for. Build with this package functions.}
+\item{normal}{a \code{SpatRaster} stack. climate rasters to compute lapse rates for. Build with this package functions.}
 
 \item{dem}{\code{SpatRaster}. A digital elevation model raster. Only needed if \code{normal}
 is a \code{SpatRaster}. Defaults to \code{NULL}.}
@@ -23,14 +23,16 @@ Default to \code{TRUE}.}
 \code{SpatRaster} of lapse rate values.
 }
 \description{
-Lapse rate computation
+This function computes lapse rates (a linear relationship of a climate variable to elevation) across user-provided rasters.
+Lapse rates are calculated using simple linear regression (without the intercept) using the focal cell and its eight neighbors as observations.
+These gridded lapse rates are used in \code{\link[=downscale]{downscale()}} and \code{\link[=climr_downscale]{climr_downscale()}} for elevation adjustment of climate values during downscaling to user-specified locations.
+The method is illustrated in the vignette \code{vignette("lapse_rates")}
 }
 \details{
-Formulas
-Simple linear regression without the intercept term
-beta_coef = sum(xy) / sum(x²)
-mss = sum(x * beta_coef)², sum of squared fitted values
-rss = sum(ε²), sum of squared (y minus fitted), sum of absolute errors
-R² = mss / (mss + rss)
+Formulas \cr
+beta_coef = sum(xy) / sum(x²) \cr
+mss = sum(x * beta_coef)², sum of squared fitted values \cr
+rss = sum(ε²), sum of squared (y minus fitted), sum of absolute errors \cr
+R² = mss / (mss + rss) \cr
 Lapse rate = beta_coef * R²
 }
