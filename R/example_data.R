@@ -1,8 +1,12 @@
-#' Example vector data
+#' Example line data
 #'
-#' Shapefile of coast of Vancouver, BC, Canada.
+#' Shapefile of coast of Vancouver, BC, Canada. Mostly
+#' used for plotting.
+#' To use this data set, you need to `terra::unwrap`
+#' it first, e.g.:
+#' `vancouver <- terra::unwrap(get(data(vancouver)))`
 #'
-#' @format a `SpatVector`
+#' @format `PackedSpatVector`
 #' @source todo add/describe source
 "vancouver"
 
@@ -10,8 +14,11 @@
 #' Example DEM
 #'
 #' Digital elevation model of North Vancouver, BC, Canada.
+#' To use this data set, you need to `terra::unwrap`
+#' it first, e.g.:
+#' `dem_vancouver <- terra::unwrap(get(data(dem_vancouver)))`
 #'
-#' @format a `SpatRaster`
+#' @format a `PackedSpatRaster`
 #' @source todo add/describe source
 "dem_vancouver"
 
@@ -52,8 +59,11 @@
 #' Example Biogeoclimatic Ecological Classification Zones
 #'
 #' A shapefile with biogeoclimatic zones in the coast of Vancouver, BC, Canada.
+#' To use this data set, you need to `terra::unwrap`
+#' it first, e.g.:
+#' `BECz_vancouver <- terra::unwrap(get(data(BECz_vancouver)))`
 #'
-#' @format a `SpatVector`
+#' @format a `PackedSpatVector`
 #' @source obtained from `bcdata` package, using `bcdc_get_data("bec-map-generalized-1-20k-")`
 "BECz_vancouver"
 
