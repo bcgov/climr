@@ -26,7 +26,7 @@ Default to \code{TRUE}.}
 This function computes lapse rates (a linear relationship of a climate variable to elevation) across user-provided rasters.
 Lapse rates are calculated using simple linear regression (without the intercept) using the focal cell and its eight neighbors as observations.
 These gridded lapse rates are used in \code{\link[=downscale]{downscale()}} and \code{\link[=climr_downscale]{climr_downscale()}} for elevation adjustment of climate values during downscaling to user-specified locations.
-The method is illustrated in the vignette 'vignette("lapse_rates")'
+The method is illustrated in the vignette \code{vignette("lapse_rates")}
 }
 \details{
 Formulas \cr
