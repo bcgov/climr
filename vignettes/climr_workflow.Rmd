@@ -27,6 +27,8 @@ knitr::opts_chunk$set(
 if (!require(ggplot2)) {
   warning("'ggplot2' is not installed. Some visuals won't be available.")
 }
+
+options("climr.cache.path" = file.path(tempdir(), "climr.cache"))
 ```
 
 ## Introduction
@@ -170,10 +172,6 @@ MAT, PPT and RH will be selected as output variables.
 We pass our choices to `climr_downscale()`, choosing the "auto" normals
 option (which defaults to using the highest resolution data available
 for the points selected).
-
-```{r, include = FALSE}
-options("climr.cache.path" = file.path(tempdir(), "climr.cache"))
-```
 
 ```{r, message = TRUE}
 ds_out <- climr_downscale(
