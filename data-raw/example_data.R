@@ -21,11 +21,6 @@ vancouver_points <- vancouver_points[samp,]
 vancouver_points[, 1] <- NULL
 vancouver_points$id <- 1:nrow(vancouver_points)
 
-## a regular grid of points at coarse scale
-point_grid <- as.points(project(dem_vancouver, crs(dem_vancouver), res = 0.01))
-point_grid[, 1] <- NULL
-point_grid$id <- 1:nrow(point_grid)
-
 ## a polygon in North Vancouver
 vancouver_poly <- dem_vancouver
 vancouver_poly[vancouver_poly[] == 0] <- NA
@@ -65,7 +60,6 @@ dem_vancouver <- wrap(dem_vancouver)
 dem_vancouver_lowres <- wrap(dem_vancouver_lowres)
 vancouver_points <- wrap(vancouver_points)
 vancouver_poly <- wrap(vancouver_poly)
-point_grid <- wrap(point_grid)
 ahccd_pstations <- wrap(ahccd_pstations)
 
 
@@ -73,7 +67,6 @@ ahccd_pstations <- wrap(ahccd_pstations)
 usethis::use_data(vancouver, overwrite = TRUE, internal = FALSE)
 usethis::use_data(vancouver_points, overwrite = TRUE, internal = FALSE)
 usethis::use_data(vancouver_poly, overwrite = TRUE, internal = FALSE)
-usethis::use_data(point_grid, overwrite = TRUE, internal = FALSE)
 usethis::use_data(dem_vancouver, overwrite = TRUE, internal = FALSE)
 usethis::use_data(dem_vancouver_lowres, overwrite = TRUE, internal = FALSE)
 usethis::use_data(BECz_vancouver, overwrite = TRUE, internal = FALSE)
