@@ -10,5 +10,4 @@
 #'   \item{Category}{time resolution (e.g., annual, monthly, seasonal, etc.)}
 #'   \item{Scale}{whether the variable has been scaled, or is in raw values}
 #' }
-#' @source todo add/describe source
 "variables"
