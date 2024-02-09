@@ -44,6 +44,7 @@ calc_DD_m_below <- function(tm, k, a, b, t0, beta, c) {
 #' \dontrun{
 #' climr:::calc_DD_below_0(2, -14)
 #' }
+#' @noRd
 calc_DD_below_0 <- function(m, tm) {
   if (FALSE) {
     Month <- k <- a <- b <- T0 <- beta <- c <- NULL
@@ -72,6 +73,7 @@ calc_DD_below_0 <- function(m, tm) {
 #' \dontrun{
 #' climr:::calc_DD_above_5(2, -14, "All")
 #' }
+#' @noRd
 calc_DD_above_5 <- function(m, tm, region) {
   if (FALSE) {
     Month <- Region <- k <- a <- b <- T0 <- beta <- c <- NULL
@@ -103,6 +105,7 @@ calc_DD_above_5 <- function(m, tm, region) {
 #' \dontrun{
 #' climr:::calc_DD_below_18(2, -14)
 #' }
+#' @noRd
 calc_DD_below_18 <- function(m, tm) {
   if (FALSE) {
     Month <- k <- a <- b <- T0 <- beta <- c <- NULL
@@ -132,6 +135,7 @@ calc_DD_below_18 <- function(m, tm) {
 #' \dontrun{
 #' climr:::calc_DD_above_18(2, -14, "All")
 #' }
+#' @noRd
 calc_DD_above_18 <- function(m, tm, region) {
   if (FALSE) {
     Month <- Region <- k <- a <- b <- T0 <- beta <- c <- NULL

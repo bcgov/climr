@@ -297,6 +297,7 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
 #' @param x a vector of values.
 #'
 #' @return `x` with NAs replaced by 0s
+#' @noRd
 NArep <- function(x) {
   x[is.na(x)] <- 0L
   return(x)
@@ -316,6 +317,7 @@ NArep <- function(x) {
 #' @param NA_replace TODO
 #'
 #' @return `data.table`
+#' @noRd
 lapse_rate_redux <- function(y_i, x_i, n_r, n_c, n_sc, sum_xx, NA_replace) {
   # Expand and recycle borders
   y_i <- recycle_borders(y_i, n_r, n_c)

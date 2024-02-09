@@ -206,6 +206,7 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(),
 #' @return A character vector of unique values.
 #' 
 #' @importFrom data.table fread
+#' @noRd
 list_unique <- function(files, col_num) {
   collection <- character()
   for (file in files) {
@@ -242,6 +243,7 @@ list_unique <- function(files, col_num) {
 #' @importFrom data.table fread
 #'
 #' @return `SpatRaster`
+#' @noRd
 process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnames, dbCon, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   #gcm_nm <- gsub("-", ".", gcm_nm)
@@ -325,6 +327,7 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
 #' @importFrom data.table fread
 #'
 #' @return `SpatRaster`
+#' @noRd
 process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbnames_hist, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   
@@ -400,6 +403,7 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
 #' @importFrom data.table fread
 #'
 #' @return a `SpatRaster`
+#' @noRd
 process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   

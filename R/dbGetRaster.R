@@ -196,6 +196,7 @@ get_bb <- function(in_xyz) {
 #'
 #' @importFrom DBI dbGetQuery
 #' @importFrom terra rast
+#' @noRd
 make_raster <- function(boundary, conn, rastque, nameque, projID, bands) {
   cat(".")
   info <- dbGetQuery(conn, paste0(

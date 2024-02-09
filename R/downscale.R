@@ -202,6 +202,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
 #' 
 #' @import data.table
 #' @importFrom terra crop ext xres yres extract
+#' @noRd
 downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist, 
                        historic, historic_ts, return_normal, 
                        vars, ppt_lr = FALSE) {
@@ -378,6 +379,7 @@ downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist,
 #' 
 #' @importFrom data.table getDTthreads setDTthreads
 #' @importFrom terra rast
+#' @noRd
 threaded_downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist, historic, historic_ts, ...) {
   ## unpack rasters
   normal <- unpackRasters(normal)
@@ -535,6 +537,7 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
 #' @importFrom terra vect crs
 #' @importFrom data.table as.data.table
 #' @importFrom methods is
+#' @noRd
 addIDCols <- function(IDCols, results) {
   if (!is.null(IDCols)){
     nm_order <- names(results)
@@ -564,6 +567,7 @@ addIDCols <- function(IDCols, results) {
 #' @return `NULL`, a packed `SpatRaster` or list of packed `SpatRasters`
 #'
 #' @importFrom terra wrap
+#' @noRd
 packRasters <- function(ras) {
   if (!is.null(ras)) {
     if (is(ras, "SpatRaster")) {
@@ -584,6 +588,7 @@ packRasters <- function(ras) {
 #' @return `NULL`, a `PackedSpatRaster` or list of `PackedSpatRasters`
 #'
 #' @importFrom terra unwrap
+#' @noRd
 unpackRasters <- function(ras) {
   if (!is.null(ras)) {
     if (is(ras, "PackedSpatRaster")) {
@@ -604,6 +609,7 @@ unpackRasters <- function(ras) {
 #' @param expectedCols character. Columns to look for in `xyz`.
 #'
 #' @return NULL
+#' @noRd
 .checkXYZ <- function(xyz, expectedCols = c("lon", "lat", "elev", "id")) {
   if (!is(xyz, "data.table")) {
     xyz <- tryCatch(as.data.table(xyz), error = function(e) e)
