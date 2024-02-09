@@ -10,3 +10,6 @@
 ^data-raw$
 ^OPPORTUNITY.md$
 ^vignettes/articles$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
