@@ -17,6 +17,7 @@ cache_path <- function() {
 #' Check if package local cache exists
 #' 
 #' @return logical.
+#' @noRd
 cache_exists <- function() {
   file.exists(cache_path())
 }
