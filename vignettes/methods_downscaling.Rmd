@@ -1,11 +1,20 @@
 ---
 title: "`climr` downscaling methods"
 Author: "Colin Mahony"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
+description: >
+  A brief explanation of the downscaling 
+  methdology used in `climr`
 vignette: >
   %\VignetteIndexEntry{methods_downscaling}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+editor_options: 
+  markdown: 
+    wrap: 72
 bibliography: references.bib
 link-citations: true
 ---
