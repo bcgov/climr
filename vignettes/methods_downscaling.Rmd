@@ -9,7 +9,7 @@ description: >
   A brief explanation of the downscaling 
   methdology used in `climr`
 vignette: >
-  %\VignetteIndexEntry{methods_downscaling}
+  %\VignetteIndexEntry{`climr` downscaling methods}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 editor_options: 
