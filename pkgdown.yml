@@ -1,0 +1,14 @@
+pandoc: 2.19.2
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles:
+  caching: caching.html
+  climr-with-rasters: climr-with-rasters.html
+  climr_workflow: climr_workflow.html
+  lapse_rates: lapse_rates.html
+  methods_downscaling: methods_downscaling.html
+last_built: 2024-02-09T17:49Z
+urls:
+  reference: https://bcgov.github.io/climr/reference
+  article: https://bcgov.github.io/climr/articles
+
