@@ -104,3 +104,12 @@
 #' @format a `PackedSpatVector`
 #' @source [https://www.canada.ca/en/environment-climate-change/services/climate-change/science-research-data/climate-trends-variability/adjusted-homogenized-canadian-data/precipitation.html](https://www.canada.ca/en/environment-climate-change/services/climate-change/science-research-data/climate-trends-variability/adjusted-homogenized-canadian-data/precipitation.html)
 "ahccd_pstations"
+
+#' Example table of point locations
+#' 
+#' A `data.table` of point locations with elevation.
+#' It is a simplified version of the `weather_stations` dataset.
+#'
+#' @format a `data.table`
+#' @source [https://services.pacificclimate.org/met-data-portal-pcds/app/](https://services.pacificclimate.org/met-data-portal-pcds/app/)
+"xyzDT"
