@@ -14,6 +14,7 @@
 
 ## Documentation
 * added vignettes
+* `pkgdown` website for `climr` is live
 
 # `climr` 0.0.1
 
