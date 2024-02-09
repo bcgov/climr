@@ -48,6 +48,11 @@ coltab(BECz_vancouver_ras) <- coltb[, .(value, col)]
 ## adjusted precipitation stations from AHCCD
 ahccd_pstations <- readxl::read_xls("data-raw/Adj_Precipitation_Stations.xls", sheet = "simplified") |>
   as.data.table()
+## a simplified version
+xyzDT <- weather_stations[, .(`Station ID`, Longitude, Latitude, `Elevation (m)`)]  
+setnames(xyzDT, c("id", "lon", "lat", "elev"))
+xyzDT <- unique(xyzDT)
+xyzDT <- xyzDT[!duplicated(id),]  ## still many duplicated stations with slightly different coords/elev
 
 ahccd_pstations <- vect(ahccd_pstations, geom = c("long (deg)", "lat (deg)"),
                             crs = "EPSG:4326")
@@ -73,4 +78,5 @@ usethis::use_data(BECz_vancouver, overwrite = TRUE, internal = FALSE)
 usethis::use_data(BECz_vancouver_ras, overwrite = TRUE, internal = FALSE)
 usethis::use_data(BECcols, overwrite = TRUE, internal = FALSE)
 usethis::use_data(ahccd_pstations, overwrite = TRUE, internal = FALSE)
+usethis::use_data(xyzDT, overwrite = TRUE, internal = FALSE)
 
