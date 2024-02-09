@@ -57,18 +57,6 @@
 #' @source derived from `dem_vancouver`
 "vancouver_poly"
 
-#' Example grid of point locations for sampling
-#'
-#' Shapefile with point locations spaced at regular intervals, in
-#' North Vancouver, BC, Canada.
-#' To use this data set, you need to `terra::unwrap`
-#' it first, e.g.:
-#' `point_grid <- terra::unwrap(get(data(point_grid)))`
-#'
-#' @format `PackedSpatVector`
-#' @source derived from `dem_vancouver` reprojected at 0.01 degrees.
-"point_grid"
-
 #' Example Biogeoclimatic Ecological Classification Zones
 #'
 #' A shapefile with biogeoclimatic zones in the coast of Vancouver, BC, Canada.
