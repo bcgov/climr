@@ -16,11 +16,11 @@ Authors:
   \item Kiri Daust \email{kiri.daust@gov.bc.ca}
   \item Bruno Tremblay \email{bruno@boostao.ca} (\href{https://orcid.org/0000-0002-2945-356X}{ORCID})
   \item Ceres Barros \email{ceres.barros@gov.bc.ca} (\href{https://orcid.org/0000-0003-4036-977X}{ORCID})
-  \item Francois Bornais \email{francois@boostao.ca}
 }
 
 Other contributors:
 \itemize{
+  \item Francois Bornais \email{francois@boostao.ca} [contributor]
   \item  Province of British Columbia [copyright holder, funder]
 }
 
