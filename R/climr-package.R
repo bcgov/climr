@@ -29,6 +29,3 @@
 #     .climr[["files_uid_db"]] <- readRDS(uid_db())
 #   }
 # }
-
-#' Climate variables definition
-"variables"
