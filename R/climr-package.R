@@ -1,3 +1,10 @@
+#' @keywords internal
+"_PACKAGE"
+
+## usethis namespace: start
+## usethis namespace: end
+NULL
+
 # On load, instantiate either as new or from cache
 #' @importFrom data.table fwrite
 #' @importFrom RPostgres dbGetQuery
