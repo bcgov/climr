@@ -5,7 +5,7 @@ output:
     toc: true
     toc_depth: 2
 description: >
-  Learn the most common `climr` workflows.
+  More advanced `climr` workflows.
 vignette: >
   %\VignetteIndexEntry{`climr` workflow - intermediate}
   %\VignetteEncoding{UTF-8}
@@ -131,7 +131,7 @@ library(data.table)
 library(terra)
 
 ## weather station locations
-ahccd_pstations <- get(data("ahccd_pstations")) |>
+weather_stations <- get(data("weather_stations")) |>
   unwrap()
 
 ## study area of interest (North Vancouver)
@@ -139,11 +139,11 @@ vancouver_poly <- get(data("vancouver_poly")) |>
   unwrap()
 
 ## subset to points in study area
-ahccd_pstations <- mask(ahccd_pstations, vancouver_poly)
+weather_stations <- mask(weather_stations, vancouver_poly)
 
 ## convert to data.table and subset/rename columns needed by climr
-xyzDT <- as.data.table(ahccd_pstations, geom = "XY")
-cols <- c("stnid", "x", "y", "elev (m)")
+xyzDT <- as.data.table(weather_stations, geom = "XY")
+cols <- c("Station ID", "x", "y", "Elevation (m)")
 xyzDT <- xyzDT[, ..cols]
 setnames(xyzDT, c("id", "lon", "lat", "elev"))
 
@@ -151,13 +151,30 @@ setnames(xyzDT, c("id", "lon", "lat", "elev"))
 BECz_vancouver <- get(data("BECz_vancouver")) |>
   unwrap()
 
-BECz_points <- extract(BECz_vancouver, ahccd_pstations) |>
+BECz_points <- extract(BECz_vancouver, weather_stations) |>
   as.data.table()
 BECz_points <- BECz_points[, .(ZONE, HEX)]
 
 xyzDT <- cbind(xyzDT, BECz_points)
 
+## remove duplicates
+xyzDT <- unique(xyzDT)
+
+## there are some duplicate stations with slightly different 
+## coordinates. We'll take the first
+xyzDT <- xyzDT[!duplicated(id)]
 ```
+
+```{r, echo = FALSE, fig.show = "hold", fig.cap = "Weather stations in North Vancouver", fig.dim = c(7,5), out.width="70%"}
+cols <- xyzDT$HEX
+names(cols) <- xyzDT$ZONE
+cols <- cols[order(names(cols))]
+cols <- cols[!duplicated(cols)]  
+plot(vancouver_poly, col = hcl.colors(50, palette = "Earth"))
+plot(vect(xyzDT, geom = c("lon", "lat")), y = "ZONE",
+     col = cols, plg = list(title = "BEC zone"), add = TRUE)
+```
+
 
 The `list_*()` functions below provide a list of available historic and
 future periods, GCMs, emissions scenarios, and derived variables (in
@@ -548,7 +565,7 @@ all_downscale <- rbindlist(all_downscale, use.names = TRUE, fill = TRUE)
 ```
 
 ```{r, echo = FALSE}
-knitr::kable(all_downscale[id == head(id, 1)], caption = "'all_downscale' table after binding. Outputs are show for one location ('id')")
+knitr::kable(all_downscale[id == head(id, 1)], caption = "'all_downscale' table after binding. Outputs are shown for one location ('id')")
 ```
 
 ## References
