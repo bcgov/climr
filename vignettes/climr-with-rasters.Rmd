@@ -404,10 +404,10 @@ dwscl_outGrid <- climr_downscale(xyzDT, which_normal = "auto",
                                  vars = "MAT", out_spatial = TRUE)
 ```
 
-```{r, echo = FALSE, fig.show = "hold", fig.cap = "Excluded (grey) and retained (orange) polygon centroids", fig.dim = c(7,5), out.width="70%"}
-plot(vancouver_poly)
+```{r, echo = FALSE, fig.show = "hold", fig.cap = "Excluded (grey) and retained (blue) polygon centroids", fig.dim = c(7,5), out.width="70%"}
+plot(vancouver_poly, col = hcl.colors(50, palette = "Earth"))
 points(centroids(vancouver_poly), col = "grey")
-points(centrds, col = "salmon1")
+points(centrds, col = "navy")
 ```
 
 ## References
