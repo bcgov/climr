@@ -5,7 +5,7 @@
 \alias{BECz_vancouver}
 \title{Example Biogeoclimatic Ecological Classification Zones}
 \format{
-a \code{SpatVector}
+a \code{PackedSpatVector}
 }
 \source{
 obtained from \code{bcdata} package, using \code{bcdc_get_data("bec-map-generalized-1-20k-")}
@@ -15,5 +15,8 @@ BECz_vancouver
 }
 \description{
 A shapefile with biogeoclimatic zones in the coast of Vancouver, BC, Canada.
+To use this data set, you need to \code{terra::unwrap}
+it first, e.g.:
+\code{BECz_vancouver <- terra::unwrap(get(data(BECz_vancouver)))}
 }
 \keyword{datasets}

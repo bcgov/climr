@@ -22,6 +22,19 @@
 #' @source todo add/describe source
 "dem_vancouver"
 
+#' Example low resolution DEM
+#'
+#' A lower resolution version of `dem_vancouver`, 
+#' re-projected at 0.005 degrees.
+#' To use this data set, you need to `terra::unwrap`
+#' it first, e.g.:
+#' `dem_vancouver_lowres <- terra::unwrap(get(data(dem_vancouver_lowres)))`
+#'
+#' @format a `PackedSpatRaster`
+#' @source todo add/describe source
+"dem_vancouver_lowres"
+
+
 #' Example point locations
 #'
 #' Shapefile with point locations North Vancouver, BC, Canada.
@@ -68,6 +81,20 @@
 "BECz_vancouver"
 
 
+#' Example Biogeoclimatic Ecological Classification Zones in raster format
+#'
+#' A categorical raster of biogeoclimatic zones in the coast of Vancouver, BC, Canada.
+#' Derived from `BECz_vancouver` using `dem_vancouver` as the template for extent, 
+#' resolution and projection information.
+#' To use this data set, you need to `terra::unwrap`
+#' it first, e.g.:
+#' `BECz_vancouver_ras <- terra::unwrap(get(data(BECz_vancouver_ras)))`
+#'
+#' @format a `PackedSpatRaster`
+#' @source derived from `BECz_vancouver`
+"BECz_vancouver_ras"
+
+
 #' Colour sscheme for Biogeoclimatic Ecological Classification Zones
 #'
 #' A `data.table` with RGB and HEX colours for biogeoclimatic zones in BC.
@@ -75,3 +102,17 @@
 #' @format a `data.table`
 #' @source colour scheme commonly used by the BC provincial government.
 "BECcols"
+
+
+#' Adjusted Precipitation for Canada
+#'
+#' A points shapefile of the Adjusted Precipitation for Canada 
+#' (APC2) dataset for over 462 locations.
+#' 
+#' To use this data set, you need to `terra::unwrap`
+#' it first, e.g.:
+#' `ahccd_pstations <- terra::unwrap(get(data(ahccd_pstations)))`
+#'
+#' @format a `PackedSpatVector`
+#' @source [https://www.canada.ca/en/environment-climate-change/services/climate-change/science-research-data/climate-trends-variability/adjusted-homogenized-canadian-data/precipitation.html](https://www.canada.ca/en/environment-climate-change/services/climate-change/science-research-data/climate-trends-variability/adjusted-homogenized-canadian-data/precipitation.html)
+"ahccd_pstations"
