@@ -74,7 +74,7 @@ vancouver_poly <- get(data("vancouver_poly")) |>
 dem_vancouver <- crop(dem_vancouver, vancouver_poly)
 ```
 
-```{r, echo = FALSE, results = "hide", fig.cap = "Digital Elevation Model of North Vancouver w/ and w/o values outside polygon area", fig.show = "hold", out.width = "100%"}
+```{r, echo = FALSE, results = "hide", fig.cap = "Digital Elevation Model of North Vancouver w/ and w/o values outside polygon area", fig.show = "hold", fig.dim = c(7,3), out.width = "100%"}
 library(climr)
 library(terra)
 library(data.table)
@@ -199,7 +199,7 @@ dem_vancouver_lowres <- get(data(dem_vancouver_lowres)) |>
 xyzDT$elev <- extract(dem_vancouver_lowres, xyzDT[, .(lon, lat)])[names(dem_vancouver_lowres)]
 ```
 
-```{r, fig.cap = "Rasters used to derive point locations (left) and elevation values (right)."}
+```{r, fig.cap = "Rasters used to derive point locations (left) and elevation values (right).", fig.dim = c(7,3)}
 par(mfrow = c(1,2))
 plot(BECz_vancouver_ras, main = "BGC zones N Vancouver")
 plot(dem_vancouver_lowres, main = "Low res. DEM",
@@ -262,7 +262,7 @@ xyzDT <- xyzDT[complete.cases(xyzDT)]
 lowRes_points <- lowRes_points[lowRes_points$id %in% xyzDT$id,]
 ```
 
-```{r, echo = FALSE, results = "hide", fig.cap = "Points extracted from raster", fig.show = "hold", out.width = "100%"}
+```{r, echo = FALSE, results = "hide", fig.cap = "Points extracted from raster", fig.show = "hold", out.width = "70%"}
 plot(dem_vancouver, col = cols)
 points(lowRes_points, alpha = 0.7)
 ```
@@ -404,7 +404,7 @@ dwscl_outGrid <- climr_downscale(xyzDT, which_normal = "auto",
                                  vars = "MAT", out_spatial = TRUE)
 ```
 
-```{r, echo = FALSE, fig.show = "hold", fig.cap = "Excluded (grey) and retained (orange) polygon centroids", fig.dim = c(5,3)}
+```{r, echo = FALSE, fig.show = "hold", fig.cap = "Excluded (grey) and retained (orange) polygon centroids", fig.dim = c(7,5), out.width="70%"}
 plot(vancouver_poly)
 points(centroids(vancouver_poly), col = "grey")
 points(centrds, col = "salmon1")
