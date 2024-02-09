@@ -1,5 +1,5 @@
 ---
-title: "`climr` workflow"
+title: "`climr` workflow - intermediate"
 output: 
   rmarkdown::html_vignette:
     toc: true
@@ -7,13 +7,15 @@ output:
 description: >
   Learn the most common `climr` workflows.
 vignette: >
-  %\VignetteIndexEntry{`climr` workflow}
+  %\VignetteIndexEntry{`climr` workflow - intermediate}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   markdown: 
     wrap: 72
 bibliography: references.bib
+link-citations: true
+code_folding: show
 ---
 
 ```{r, include = FALSE}
@@ -42,7 +44,7 @@ adjustment to user-specified elevation grids/points based on empirical
 lapse rates (local relationship of climate to elevation) of the 1-4km
 climate maps. The elevation-adjusted monthly values of basic climate
 elements (temperature and precipitation) are then used to estimate
-derived variables (e.g., degree-days, relative humidity) based on
+derived variables (e.g., degree-days, precipitation as snow) based on
 published equations and parameters from [@wang2016].
 
 See `vignette("methods_downscaling.Rmd")` for a detailed explanation of
@@ -51,19 +53,21 @@ the downscaling methodology employed in `climr`.
 `climr`'s strenghts are:
 
 1.  its ability to obtain multiple, individual runs of a (or several)
-General Circulation Model(s) (GCM), as well as the ensemble
-cross-run mean,
+    General Circulation Model(s) (GCM), as well as the ensemble
+    cross-run mean,
+
+<!-- benchmark Speed and add it here -->
 
 2.  cloud-based raw data access and local data caching,
 
 3.  and direct `R` interface to downscaled climate elements and derived
-variables covering western Canada and western US.
+    variables covering western Canada and western US.
 
-In this vignette we cover two basic `climr` workflows to obtain
-historic and future climate projections of a few derived variables.
+In this vignette we cover two basic `climr` workflows to obtain historic
+and future climate projections of a few derived variables.
 
-The first, less code-heavy, workflow uses `climr_downscale()` to do
-much of the heavy lifting -- [Workflow with climr_downscale]. The second
+The first, less code-heavy, workflow uses `climr_downscale()` to do much
+of the heavy lifting -- [Workflow with climr_downscale]. The second
 workflow is a step-by-step breakdown of `climr_downscale()` using the
 functions `climr_downscale()` calls internally -- [Workflow with
 \*\_input functions and downscale].
@@ -73,74 +77,86 @@ functions `climr_downscale()` calls internally -- [Workflow with
 Below is a list of the main functions used in the two workflows.
 
 -   `climr_downscale()` takes a `data.table` of point coordinates (in
-lat-long projection), obtains climate normals and historic and/or
-future projections covering the extent of the points, which are then
-downscaled using point elevation data and used to calculate derived
-climate variables at the point locations. It outputs the downscaled
-and derived variables in the form of a `data.table` or `SpatVector`
-of points.
+    lat-long projection), obtains climate normals and historic and/or
+    future projections covering the extent of the points, which are then
+    downscaled using point elevation data and used to calculate derived
+    climate variables at the point locations. It outputs the downscaled
+    and derived variables in the form of a `data.table` or `SpatVector`
+    of points.
 
 -   `normal_input()` downloads and prepares high-resolution climate
-normals. Called internally by `climr_downscale()`.
+    normals. Called internally by `climr_downscale()`.
 
 -   `historic_input()` and `historic_input_ts()` download and prepare
-low-resolution historic climate elements for a given historic period
-or time series, respectively. Called internally by
-`climr_downscale()`.
+    low-resolution historic climate elements for a given historic period
+    or time series, respectively. Called internally by
+    `climr_downscale()`.
 
 -   `gcm_input()`, `gcm_hist_input()` and `gcm_ts_input()` download and
-prepare low-resolution climate element projections for a future
-period, historic period or future time series, respectively. Called
-internally by `climr_downscale()`.
+    prepare low-resolution climate element projections for a future
+    period, historic period or future time series, respectively. Called
+    internally by `climr_downscale()`.
 
 -   `downscale()` downscales historic or future climate elements and
-calculates derived climate variables. Called by
-`climr_downscale()`.
+    calculates derived climate variables. Called by `climr_downscale()`.
 
 ## Workflow with `climr_downscale`
 
 In this example workflow we use `climr_downscale()` to calculate mean
-annual temperature (MAT), total annual precipitation (PPT) and relative
-humidity (RH) for a historic and future period, using two separate runs
-of a GCM and one emissions scenario.
+annual temperature (MAT), total annual precipitation (PPT) and
+precipitation as snow (PAS) at weather stations associated with the
+[Adjusted and homogenized Canadian climate
+data](https://www.canada.ca/en/environment-climate-change/services/climate-change/science-research-data/climate-trends-variability/adjusted-homogenized-canadian-data.html).
 
-We begin by loading our `data.table` of point locations, elevation and
-IDs. Note that longitude ('lon') and latitude ('lat') must be in
-lat-long projection and elevation in m. Point IDs must be unique.
+We will downscale MAT, PPT and MAS at these locations for a historic and
+a future period, using two separate runs of a GCM and one emissions
+scenario.
 
-Although we will add two other columns in our `data.table` ('ZONE' and
-'HEZ') these are ignored by `climr_downscale`. The IDs, however, are
-preserved and we use them later to join back the extra columns used for
-plotting later on.
+We begin by loading the Adjusted Precipitation for Canada (APC2) dataset
+and clipping it to the North Vancouver area. This dataset already
+contains elevation information.
+
+Note that longitude ('lon') and latitude ('lat') must be in lat-long
+projection (EPSG:4326) and elevation in m. Point IDs must be unique --
+we will use the weather station IDs.
+
+We will also add two other columns in our `data.table` ('ZONE' and
+'HEZ') these are ignored by `climr_downscale()`. `climr_downscale()`
+preserves the IDs and we use them to join back the extra columns used
+for plotting later on.
 
 ```{r}
 library(climr)
 library(data.table)
 library(terra)
 
-## we'll use a DEM of Northern Vancouver to draw our point locations from
-dem_vancouver <- get(data("dem_vancouver")) |>
+## weather station locations
+ahccd_pstations <- get(data("ahccd_pstations")) |>
   unwrap()
 
-point_locations <- as.data.table(dem_vancouver, cell = TRUE, xy = TRUE)
-setnames(point_locations, c("id", "lon", "lat", "elev"))  ## change to climr-accepted column names
+## study area of interest (North Vancouver)
+vancouver_poly <- get(data("vancouver_poly")) |>
+  unwrap()
 
-## sample a few points with elev > 0m
-point_locations <- point_locations[elev > 0]
-set.seed(123)
-point_sample <- sample(1:nrow(point_locations), 
-                       100, replace = FALSE)
-point_locations <- point_locations[point_sample]
+## subset to points in study area
+ahccd_pstations <- mask(ahccd_pstations, vancouver_poly)
+
+## convert to data.table and subset/rename columns needed by climr
+xyzDT <- as.data.table(ahccd_pstations, geom = "XY")
+cols <- c("stnid", "x", "y", "elev (m)")
+xyzDT <- xyzDT[, ..cols]
+setnames(xyzDT, c("id", "lon", "lat", "elev"))
 
 ## join BEC zones and colours
-data("BECz_vancouver")
-BECz_vancouver <- unwrap(BECz_vancouver)
+BECz_vancouver <- get(data("BECz_vancouver")) |>
+  unwrap()
 
-BECz_points <- extract(BECz_vancouver, point_locations[, .(lon, lat)]) |>
+BECz_points <- extract(BECz_vancouver, ahccd_pstations) |>
   as.data.table()
 BECz_points <- BECz_points[, .(ZONE, HEX)]
 
-point_locations <- cbind(point_locations, BECz_points)
+xyzDT <- cbind(xyzDT, BECz_points)
+
 ```
 
 The `list_*()` functions below provide a list of available historic and
@@ -169,7 +185,7 @@ list_variables(set = "Annual")
 
 We will chose the only available historic period (2001-2020), the
 2021-2040 future period, the 'EC-Earth3' GCM and the SSP 2.45 scenario.
-MAT, PPT and RH will be selected as output variables.
+MAT, PPT and PAS will be selected as output variables.
 
 We pass our choices to `climr_downscale()`, choosing the "auto" normals
 option (which defaults to using the highest resolution data available
@@ -177,7 +193,7 @@ for the points selected).
 
 ```{r, message = TRUE}
 ds_out <- climr_downscale(
-  xyz = point_locations,
+  xyz = xyzDT,
   which_normal = "auto",
   historic_period = "2001_2020",
   gcm_period = "2021_2040",
@@ -185,14 +201,14 @@ ds_out <- climr_downscale(
   ssp = "ssp245",
   max_run = 2,
   return_normal = TRUE, ## to return the 1961-1990 normals period
-  vars = c("MAT", "PPT", "RH")
+  vars = c("MAT", "PPT", "PAS")
 )
 ```
 
-Note how data from historical periods doesn't have a GCM or SSP value
--- this is expected , as GCMs and SSPs are used to project future
-climate values. Also, future projections were obtained for two runs of
-EC-Earth3 ('r1i1p1f1' and 'r10i1p1f1'), plus the ensemble mean.
+Note how data from historical periods doesn't have a GCM or SSP value --
+this is expected , as GCMs and SSPs are used to project future climate
+values. Also, future projections were obtained for two runs of EC-Earth3
+('r1i1p1f1' and 'r10i1p1f1'), plus the ensemble mean.
 
 ```{r, echo = FALSE, results = "asis"}
 knitr::kable(ds_out[id == head(id, 1)], caption = "'ds_out' table - Output from `climr_downscale`. Outputs are show for one location ('id')")
@@ -201,14 +217,14 @@ knitr::kable(ds_out[id == head(id, 1)], caption = "'ds_out' table - Output from 
 To add back the extra columns we need only a simple left join.
 
 ```{r}
-ds_out <- point_locations[, .(id, ZONE, HEX)][ds_out, on = .(id)]
+ds_out <- xyzDT[, .(id, ZONE, HEX)][ds_out, on = .(id)]
 ```
 
 We can now do a simple visualisation of climate variation by
 biogeoclimatic zone ('ZONE'), in the normals period of 1961-1990:
 
-```{r, out.width = "80%", fig.dim = c(8,5), eval = require(ggplot2), echo = TRUE}
-plotdata <- melt(ds_out, measure.vars = c("MAT", "PPT", "RH"))
+```{r, echo = TRUE, class.source = 'fold-hide', out.width = "80%", fig.dim = c(8,5), eval = require(ggplot2)}
+plotdata <- melt(ds_out, measure.vars = c("MAT", "PPT", "PAS"))
 cols <- plotdata$HEX
 names(cols) <- plotdata$ZONE
 cols <- cols[!duplicated(cols)]
@@ -233,7 +249,7 @@ values so that they align with their observed counterpart. See
 
 ```{r, message = TRUE}
 ds_out_ts <- climr_downscale(
-  xyz = point_locations,
+  xyz = xyzDT,
   which_normal = "auto",
   historic_ts = 2001:2015,      ## currently up to 2015
   gcm_hist_years = 2001:2020,   ## currently up to 2010
@@ -242,7 +258,7 @@ ds_out_ts <- climr_downscale(
   ssp = "ssp245",
   max_run = 1,
   return_normal = TRUE, ## to return the 1961-1990 normals period
-  vars = c("MAT", "PPT", "RH")
+  vars = c("MAT", "PPT", "PAS")
 )
 ```
 
@@ -252,13 +268,13 @@ location. Note that we plot both the observed (`obs_hist`) and the
 projected historical (`proj_hist`) climate values along with future
 climate projections (`proj_fut`).
 
-```{r, fig.cap = "Time series outputs from `climr_downscale`. Pannels show mean annual temperature (MAT), total annual precipitation (PPT) and relative humidity (RH). Line colours refer to observed historic values (grey), projected historic values (gren) and future projected values (blue) for a single location, GCM, emissions scenario and model run.", out.width = "80%", eval = require(ggplot2), fig.dim = c(7,8),echo = TRUE}
+```{r, echo = TRUE, class.source = 'fold-hide', fig.cap = "Time series outputs from `climr_downscale`. Pannels show mean annual temperature (MAT), total annual precipitation (PPT) and precipitation as snow (PAS). Line colours refer to observed historic values (grey), projected historic values (gren) and future projected values (blue) for a single location, GCM, emissions scenario and model run.", out.width = "80%", eval = require(ggplot2), fig.dim = c(7,8)}
 
 ds_out_ts[is.na(GCM), GCM := "Historic"]
 ds_out_ts <- ds_out_ts[!grepl("ensemble", RUN)]
 ds_out_ts <- ds_out_ts[!grepl("1961_1990", PERIOD)]
 
-plotdata <- melt(ds_out_ts, measure.vars = c("MAT", "PPT", "RH"))
+plotdata <- melt(ds_out_ts, measure.vars = c("MAT", "PPT", "PAS"))
 plotdata[, PERIOD := as.numeric(PERIOD)]
 plotdata <- plotdata[id == head(id,1)]
 
@@ -301,13 +317,13 @@ ggplot(plotdata, aes(x = PERIOD, y = value, col = pgrp, group = grp)) +
 
 ### Spatial output and plotting options
 
-`climr_downscale` can also provide outputs in the form of a
-`SpatVector` of points and plot the values of a chosen climate variable
-from the list passed to `climr_downscale(..., vars)`, in this case MAT.
+`climr_downscale` can also provide outputs in the form of a `SpatVector`
+of points and plot the values of a chosen climate variable from the list
+passed to `climr_downscale(..., vars)`, in this case MAT.
 
 ```{r, fig.dim = c(8, 6), out.width = "80%"}
 ds_out_spatial <- climr_downscale(
-  xyz = point_locations,
+  xyz = xyzDT,
   which_normal = "auto",
   gcm_models = "EC-Earth3", 
   gcm_period = "2021_2040",
@@ -316,7 +332,7 @@ ds_out_spatial <- climr_downscale(
   return_normal = FALSE, ## don't return the 1961-1990 normals period
   out_spatial = TRUE,
   plot = "MAT",
-  vars = c("MAT", "PPT", "RH")
+  vars = c("MAT", "PPT", "PAS")
 )
 ```
 
@@ -328,7 +344,7 @@ vancouver <- get(data("vancouver")) |>
   unwrap()
 
 par(mfrow = c(1,2))
-plot(dem_vancouver, col = hcl.colors(50, palette = "Earth"),
+plot(vancouver_poly, col = hcl.colors(50, palette = "Earth"),
      plg = list(x = "bottom", title = "Elevation"), 
      mar = c(4, 1, 1, 4))
 plot(vancouver, add = TRUE, col = "black")
@@ -336,7 +352,7 @@ plot(ds_out_spatial, "MAT", col = hcl.colors(50, palette = "Reds"),
      add = TRUE, type = "continuous",
      plg = list(x = "right", title = "MAT"))
 
-plot(dem_vancouver, col = hcl.colors(50, palette = "Earth"),
+plot(vancouver_poly, col = hcl.colors(50, palette = "Earth"),
      plg = list(x = "bottom", title = "Elevation"), 
      mar = c(4, 1, 1, 4))
 plot(vancouver, add = TRUE, col = "black")
@@ -351,8 +367,8 @@ par(mfrow = c(1,1))
 
 ## Workflow with `*_input` functions and `downscale`
 
-Alternatively, a user may choose to run the climate data preparation
-and downscaling functions separately.
+Alternatively, a user may choose to run the climate data preparation and
+downscaling functions separately.
 
 We suggest doing this at least once or twice to have a full
 understanding of the steps that `climr_downscale` executes internally.
@@ -360,7 +376,7 @@ understanding of the steps that `climr_downscale` executes internally.
 Steps 1 and 2 bellow download and prepare the climate data used in the
 downscaling step (Step 3).
 
-We will use the same point locations as above.
+We will use the same point locations as above for downscaling.
 
 ### 1) Get climate normals - `normal_input()`
 
@@ -368,27 +384,51 @@ When using `normal_input()`, we establish a connection to the PostGIS
 server and pass the bounding box containing the point locations of
 interest.
 
-Also, note that there is no "auto" option for to select the source of
-climate normals. `list_normal` provides a list of available options.
-'normal_na' corresponds to normals for North America obtained from
-[ClimateNA](climatena.ca)[@wang2016]. 'normal_composite' corresponds to
-a composite of British Columbia PRISM, adjusted US PRISM and DAYMET
-(Alberta and Saskatchewan), and covers western Canada and western US. We
-will use 'normal_composite'.
+There is no "auto" option for to select the source of climate normals.
+`list_normal()` provides a list of available options:
+
+-   'normal_na' corresponds to normals for North America obtained from
+[ClimateNA](climatena.ca) [@wang2016];
+
+-   'normal_bc' corresponds to the British Columbia PRISM normals;
+
+-   'normal_composite' corresponds to a composite of British Columbia
+    PRISM, adjusted US PRISM and DAYMET (Alberta and Saskatchewan), and
+    covers western Canada and western US.
+
+We will use 'normal_composite' has it is the highest resolution product
+for the area of interest.
+
 
 ```{r}
 list_normal()
 ```
 
-```{r, out.width = "80%"}
+The extent of the downloaded climate anomalies will often be larger
+than the extent of the bounding box, and vary depending on the spatial 
+resolution of the data. To demonstrate this we will define a bounding 
+box with a set of coordinates.
+
+Alternatively, `get_bb` could be used to extract bounding box around the
+point locations in `xyzDT`. 
+
+```{r}
 dbCon <- data_connect()
-the_bb <- get_bb(point_locations)
+the_bb <- c(50, 49, -122, -124)
+
+## alternatively:
+# the_bb <- get_bb(xyzDT)
 
 normals <- normal_input(dbCon, bbox = the_bb, 
                         normal = "normal_composite")
+```
+
+```{r, echo = FALSE, out.width = "80%", fig.cap = "Downloaded normals shown with North Vancouver area and the requested bounding box."}
+plotVect <- vect(ext(the_bb[c(4, 3, 2, 1)]), crs = "EPSG:4326")
+
 plot(normals[["Tmax07"]], col = hcl.colors(50, "Reds", rev = 1), 
      range = c(0, 30), main = "Max temp. July - 1961-1990 normals",
-     fun = function() lines(vancouver, col = "grey"))
+     fun = function() {polys(vancouver_poly); polys(plotVect, lty = 2)})
 ```
 
 ### 2) Get climate projections and/or historical observations
@@ -402,7 +442,7 @@ period or individual years (i.e. time series).
 Historical observations for a given period or for individual years can
 be obtained with `historic_input` and `historic_input_ts`, respectively.
 
-```{r, fig.show = 'hold', fig.dim = c(12, 5), out.width = "100%"}
+```{r}
 hist_proj <- gcm_hist_input(dbCon, bbox = the_bb, 
                             gcm = "EC-Earth3",
                             years = 2001:2020,
@@ -424,47 +464,51 @@ hist_obs <- historic_input(dbCon, bbox = the_bb,
                            period = "2001_2020")
 hist_obs_ts <- historic_input_ts(dbCon, bbox = the_bb,
                                  years = 2001:2020)
-par(mfrow = c(1,4))
-plot(crop(hist_proj[[1]][["EC-Earth3_Tmax_07_ensembleMean_2001"]], vancouver), 
-     col = hcl.colors(50, "Reds", rev = 1), type = "continuous",
-     main = "Max temp. July\nhistorical anomaly, 2001",
-     mar = c(1, 2, 1, 4),
-     fun = function() lines(vancouver))
-
-plot(crop(hist_obs[[1]][["Tmax07"]], vancouver), 
-     col = hcl.colors(50, "Reds", rev = 1), type = "continuous",
-     mar = c(1, 2, 1, 4),
-     ext = ext(vancouver), main = "Max temp. July\nobserved anomaly 2001-2020",
-     fun = function() lines(vancouver))
-plot(crop(hist_obs_ts[[1]][["Tmax07_2001"]], vancouver),
-     col = hcl.colors(50, "Reds", rev = 1), type = "continuous",
-     mar = c(2, 2, 1, 4),
-     ext = ext(vancouver), main = "Max temp. July\nobserved anomaly 2001",
-     fun = function() lines(vancouver))
-plot(crop(fut_proj[[1]][["EC-Earth3_Tmax_07_ssp245_ensembleMean_2021_2040"]], vancouver),
-     col = hcl.colors(50, "Reds", rev = 1), type = "continuous",
-     mar = c(1, 2, 1, 4),
-     ext = ext(vancouver), main = "Max temp. July\nfuture anomaly, 2021-2040",
-     fun = function() lines(vancouver))
 ```
 
-```{r, include = FALSE}
+```{r, echo = FALSE, fig.show = 'hold', fig.cap = "Downloaded historical and future anomalies shown with North Vancouver area and the requested bounding box.", fig.dim = c(12, 5), out.width = "100%"}
+
+minmax <- range(minmax(hist_obs_ts[[1]][["Tmax07_2001"]]), 
+                minmax(hist_obs[[1]][["Tmax07"]]),
+                minmax(hist_proj[[1]][["EC-Earth3_Tmax_07_ensembleMean_2001"]]),
+                minmax(fut_proj[[1]][["EC-Earth3_Tmax_07_ssp245_ensembleMean_2021_2040"]]))
+
+par(mfrow = c(1,4))
+plot(hist_obs_ts[[1]][["Tmax07_2001"]],
+     col = hcl.colors(50, "Reds", rev = 1), type = "continuous",
+     mar = c(2, 2, 1, 4), range = minmax,
+     main = "Max temp. July\nobserved anomaly 2001",
+     fun = function() {polys(vancouver_poly); polys(plotVect, lty = 2)})
+plot(hist_obs[[1]][["Tmax07"]], 
+     col = hcl.colors(50, "Reds", rev = 1), type = "continuous",
+     mar = c(1, 2, 1, 4), range = minmax,
+     main = "Max temp. July\nobserved anomaly 2001-2020",
+     fun = function() {polys(vancouver_poly); polys(plotVect, lty = 2)})
+plot(hist_proj[[1]][["EC-Earth3_Tmax_07_ensembleMean_2001"]], 
+     col = hcl.colors(50, "Reds", rev = 1), type = "continuous",
+     main = "Max temp. July\n projected historical anomaly, 2001",
+     mar = c(1, 2, 1, 4), range = minmax,
+     fun = function() {polys(vancouver_poly); polys(plotVect, lty = 2)})
+plot(fut_proj[[1]][["EC-Earth3_Tmax_07_ssp245_ensembleMean_2021_2040"]],
+     col = hcl.colors(50, "Reds", rev = 1), type = "continuous",
+     mar = c(1, 2, 1, 4), range = minmax, 
+     main = "Max temp. July\n projected future anomaly, 2021-2040",
+     fun = function() {polys(vancouver_poly); polys(plotVect, lty = 2)})
 par(mfrow = c(1,1))
 ```
-
 
 ### 3) Downscale and calculate actual values (i.e., not anomalies)
 
 Now that we have all necessary inputs, we can downscale the climate
 data. To avoid repeating the same lines of code for each input, we'll
-use `lapply` and `do.call` to iterate over the several climate inputs to
+use `lapply()` and `do.call()` to iterate over the several climate inputs to
 downscale.
 
-Note that for `do.call` to work our list of climate inputs must be
-named according to `downscale`'s argument names (you can list them with
+Note that for `do.call()` to work, our list of climate inputs (`inputs`) must be
+named according to `downscale()`'s argument names (you can list them with
 `formalArgs(downscale)`).
 
-```{r, results = 'hide'}
+```{r, results = "hide"}
 inputs <- list("gcm" = fut_proj,
                "historic" = hist_obs,
                "gcm_ts" = fut_proj_ts,
@@ -472,20 +516,20 @@ inputs <- list("gcm" = fut_proj,
                "historic_ts" = hist_obs_ts)
 
 all_downscale <- sapply(names(inputs), 
-                        function(input_arg, point_locations, normals, inputs) {
+                        function(input_arg, xyzDT, normals, inputs) {
                           args <- list(inputs[[input_arg]])
                           names(args) <- input_arg
                           
                           ## add a few more arguments
                           args <- append(args, 
-                                         list("xyz" = point_locations,
+                                         list("xyz" = xyzDT,
                                               "normal" = normals,
                                               "return_normal" = FALSE, 
                                               "vars" = "MAT", 
                                               "out_spatial" = FALSE))
                           
                           return(do.call(downscale, args))
-                        }, normals = normals, inputs = inputs, point_locations)
+                        }, normals = normals, inputs = inputs, xyzDT)
 
 all_downscale
 ```
@@ -499,7 +543,7 @@ all_downscale
 Binding the tables results in a similar table to the one we would have
 achieved had we used `climr_downscale()`.
 
-```{r, results = 'hide'}
+```{r, results = "hide"}
 all_downscale <- rbindlist(all_downscale, use.names = TRUE, fill = TRUE)
 ```
 
