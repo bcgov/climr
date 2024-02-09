@@ -45,17 +45,18 @@ coltb <- coltb[levs, on = "ZONE"]
 setnames(coltb, "ID", "value")
 coltab(BECz_vancouver_ras) <- coltb[, .(value, col)]
 
-## adjusted precipitation stations from AHCCD
-ahccd_pstations <- readxl::read_xls("data-raw/Adj_Precipitation_Stations.xls", sheet = "simplified") |>
-  as.data.table()
+## adjusted precipitation stations from PCIC (https://services.pacificclimate.org/met-data-portal-pcds/app/)
+weather_stations <- fread("data-raw/station-metadata-by-history_BC.csv")
+weather_stations$`Elevation (m)` <- as.numeric(weather_stations$`Elevation (m)`) 
+
 ## a simplified version
 xyzDT <- weather_stations[, .(`Station ID`, Longitude, Latitude, `Elevation (m)`)]  
 setnames(xyzDT, c("id", "lon", "lat", "elev"))
 xyzDT <- unique(xyzDT)
 xyzDT <- xyzDT[!duplicated(id),]  ## still many duplicated stations with slightly different coords/elev
 
-ahccd_pstations <- vect(ahccd_pstations, geom = c("long (deg)", "lat (deg)"),
-                            crs = "EPSG:4326")
+weather_stations <- weather_stations[!is.na(`Elevation (m)`)]
+weather_stations <- vect(weather_stations, geom = c("Longitude", "Latitude"), crs = "EPSG:4326")
 
 ## wrap terra objects before saving
 vancouver <- wrap(vancouver)
@@ -65,8 +66,7 @@ dem_vancouver <- wrap(dem_vancouver)
 dem_vancouver_lowres <- wrap(dem_vancouver_lowres)
 vancouver_points <- wrap(vancouver_points)
 vancouver_poly <- wrap(vancouver_poly)
-ahccd_pstations <- wrap(ahccd_pstations)
-
+weather_stations <- wrap(weather_stations)
 
 
 usethis::use_data(vancouver, overwrite = TRUE, internal = FALSE)
@@ -77,6 +77,6 @@ usethis::use_data(dem_vancouver_lowres, overwrite = TRUE, internal = FALSE)
 usethis::use_data(BECz_vancouver, overwrite = TRUE, internal = FALSE)
 usethis::use_data(BECz_vancouver_ras, overwrite = TRUE, internal = FALSE)
 usethis::use_data(BECcols, overwrite = TRUE, internal = FALSE)
-usethis::use_data(ahccd_pstations, overwrite = TRUE, internal = FALSE)
+usethis::use_data(weather_stations, overwrite = TRUE, internal = FALSE)
 usethis::use_data(xyzDT, overwrite = TRUE, internal = FALSE)
 

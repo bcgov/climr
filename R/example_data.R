@@ -92,18 +92,19 @@
 "BECcols"
 
 
-#' Adjusted Precipitation for Canada
+#' BC Weather Station Data - PCDS
 #'
-#' A points shapefile of the Adjusted Precipitation for Canada 
-#' (APC2) dataset for over 462 locations.
+#' A points shapefile of weather stations in BC from the
+#' Pacific Climate Impacts Consortium. Stations without elevation
+#' data were excluded.
 #' 
 #' To use this data set, you need to `terra::unwrap`
 #' it first, e.g.:
-#' `ahccd_pstations <- terra::unwrap(get(data(ahccd_pstations)))`
+#' `weather_stations <- terra::unwrap(get(data(weather_stations)))`
 #'
 #' @format a `PackedSpatVector`
-#' @source [https://www.canada.ca/en/environment-climate-change/services/climate-change/science-research-data/climate-trends-variability/adjusted-homogenized-canadian-data/precipitation.html](https://www.canada.ca/en/environment-climate-change/services/climate-change/science-research-data/climate-trends-variability/adjusted-homogenized-canadian-data/precipitation.html)
-"ahccd_pstations"
+#' @source [https://services.pacificclimate.org/met-data-portal-pcds/app/](https://services.pacificclimate.org/met-data-portal-pcds/app/)
+"weather_stations"
 
 #' Example table of point locations
 #' 
