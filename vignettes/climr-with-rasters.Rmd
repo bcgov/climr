@@ -1,20 +1,22 @@
 ---
-title: "Working with rasters"
+title: "Working with rasters and other spatial objects"
 output: 
   rmarkdown::html_vignette:
     toc: true
-    toc_depth: 2
+    toc_depth: 4
 description: >
   Learn how to use `climr` when working with spatial 
   input and output objects.
 vignette: >
-  %\VignetteIndexEntry{Working with rasters}
+  %\VignetteIndexEntry{Working with rasters and other spatial objects}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   markdown: 
     wrap: 72
 bibliography: references.bib
+link-citations: true
+code_folding: show
 ---
 
 ```{r, include = FALSE}
@@ -32,34 +34,222 @@ options("climr.cache.path" = file.path("climr.cache"))
 
 ## Spatial inputs and `climr_downscale()`
 
-We often start with spatial inputs of a study area (in vector or raster
-format) or point locations for which we want to obtain downscaled
+We often start with a spatial object of a study area (in raster or vector format) or point locations for which we want to obtain downscaled
 climate variables.
 
-Bellow we show some common input formats and how they can be used with
-`climr_downscale()`.
+Bellow we show how to work with these spatial objects and `climr_downscale()`.
 
-### Starting and ending with point vector data
+### Raster inputs
 
-This is perhaps the most straight forward input object. If your points
-had elevation information you simply need to convert it to a
-`data.table` (or coercible object, like a `data.frame`) using something
-like `as.data.frame(<yourpointsobbject>)`. Make sure that table column
-names are `lon`, `lat`, `elev`, `id`.
+Often we have a raster of interest of the study area for which we want full
+coverage of downscaled climate variables.
 
-If they don't have elevation information, then you need to obtain it. In
-the example below we start with a set of points in North Vancouver, BC,
-Canada, for which we get elevation values from a Digital Elevation Model
-(DEM) raster.
+Since `climr_downscale()` accepts a table of point locations, we need to
+convert the raster to a table of cell coordinates, with elevation ('elev') 
+information and unique point IDs.
 
-To get point-type outputs simply set
-`climr_downscale(..., out_spatial = TRUE)`.
+#### Raster with elevation values (a DEM)
 
-```{r, results = "hide"}
+If the raster is a DEM, the points `SpatVector` inherits the 
+elevation cell values. 
+
+The DEM we use below has 0 elevation values in ocean areas. Since `climr` is meant
+to be used to downscale climate variables in land, we will "clip" (set values outside
+the polygon to NAs) the raster using a land-only polygon.
+
+```{r, eval = FALSE, results = "hide"}
 library(climr)
 library(terra)
 library(data.table)
 
+dem_vancouver <- get(data("dem_vancouver")) |>
+  unwrap()
+
+vancouver_poly <- get(data("vancouver_poly")) |>
+  unwrap()
+
+dem_vancouver <- crop(dem_vancouver, vancouver_poly)
+```
+
+```{r, echo = FALSE, results = "hide", fig.cap = "Digital Elevation Model of North Vancouver w/ and w/o values outside polygon area", fig.show = "hold", out.width = "100%"}
+library(climr)
+library(terra)
+library(data.table)
+
+dem_vancouver <- get(data("dem_vancouver")) |>
+  unwrap()
+
+vancouver_poly <- get(data("vancouver_poly")) |>
+  unwrap()
+
+par(mfrow = c(1,2))
+
+cols <- hcl.colors(100, "Earth")
+plot(dem_vancouver, main = "Original DEM", col = cols)
+
+## exclude areas outside the polygons
+dem_vancouver <- mask(dem_vancouver, vancouver_poly)
+plot(dem_vancouver, main = "Masked DEM", col = cols)
+
+par(mfrow = c(1,1))
+```
+
+When making a table of raster cell (centroid) coordinates we must preserve the
+cell IDs (with `as.data.frame(..., cell = TRUE)`) so that we can later convert 
+`clirm_downscale()` outputs back into raster format.
+
+```{r, results = "hide"}
+## xy = TRUE ensures we get cell (centroid) coordinates
+## cell = TRUE ensures we get cell ID numbers, which will be the point location IDs.
+xyzDT <- dem_vancouver |>
+  as.data.frame(., xy = TRUE, cell = TRUE) |>  
+  as.data.table()
+
+## rename colums to climr standard
+setnames(xyzDT, c("id", "lon", "lat", "elev"))
+```
+
+Note that cells with NA's were automagically excluded.
+
+```{r}
+xyzDT
+```
+
+We can now pass our table of cell locations to `climr_downscale()`:
+
+```{r, results = "hide"}
+## in this case there's really no need for a spatial output format
+dwscl_out <- climr_downscale(xyzDT, which_normal = "auto",
+                             gcm_models = list_gcm()[1:3],
+                             ssp = list_ssp()[1],
+                             gcm_period = list_gcm_period(),
+                             max_run = 0L, return_normal = FALSE,
+                             vars = "MAT", out_spatial = FALSE)
+```
+
+
+To convert the outputs back into raster format, we simply need to use the 
+original raster use to extract the point locations as a template to make 
+rasters of downscaled climate values. 
+
+Since the location `id`s match raster cell IDs, the `dwscl_out$id` column is 
+used to index raster cells climate values when assigning downscaled `MAT` 
+values.
+
+```{r}
+tempRas <- rast(dem_vancouver)
+
+dwscl_Ras <- sapply(split(dwscl_out, by = c("GCM", "PERIOD")) , function(DT, tempRas) {
+  tempRas[DT$id] <- DT$MAT
+  return(tempRas)
+}, tempRas = tempRas)
+
+## make a stack
+dwscl_Ras <- rast(dwscl_Ras)
+
+dwscl_Ras
+```
+
+```{r, echo = FALSE, results = "hide", fig.show = "hold", fig.cap = "`climr_downscale()` outputs converted to raster layers", fig.dim = c(15,9), out.width = "100%"}
+minmax <- range(dwscl_out$MAT)
+
+gcmstr <- paste(list_gcm()[1:3], collapse = "|")
+titles <- sub(paste0("(", gcmstr, ")\\.([[:digit:]]{4})_([[:digit:]]{4})"), "\\1\\\n\\2-\\3", names(dwscl_Ras)) 
+plot(dwscl_Ras, main = titles, nc = 5, nr = 3,
+     type = "continuous", col = hcl.colors(100, "Reds", rev = 1), 
+     range = minmax, plg = list(title = "MAT"), mar = c(0.1, 1, 1, 3))
+```
+
+
+#### Raster without elevation values
+
+If the raster is not a DEM, we need to obtain elevation for each of the points
+extracted from the raster cells. This can be done by extracting elevation values 
+from a DEM raster at the first raster's cell centroid coordinates.
+
+The DEM's resolution doesn't need to match the first raster's resolution.
+
+Here we start with a raster of biogeoclimatc zones for North Vancouver and use a 
+lower resolution DEM to obtain elevation values.
+
+Again, we clip it to land areas.
+
+```{r, results = "hide"}
+## get point locations from raster of interest
+BECz_vancouver_ras <- get(data("BECz_vancouver_ras")) |>
+  unwrap()
+
+BECz_vancouver_ras <- mask(BECz_vancouver_ras, vancouver_poly)
+
+## raster to data.table and rename columns to climr standard
+xyzDT <- BECz_vancouver_ras |>
+  as.data.frame(., xy = TRUE, cell = TRUE) |>  
+  as.data.table()
+setnames(xyzDT, c("id", "lon", "lat", "ZONE"))
+
+## now extract elevation values at each cell centroid coordinate
+## from a DEM raster
+dem_vancouver_lowres <- get(data(dem_vancouver_lowres)) |>
+  unwrap()
+
+xyzDT$elev <- extract(dem_vancouver_lowres, xyzDT[, .(lon, lat)])[names(dem_vancouver_lowres)]
+```
+
+
+```{r, fig.cap = "Rasters used to derive point locations (left) and elevation values (right)."}
+par(mfrow = c(1,2))
+plot(BECz_vancouver_ras, main = "BGC zones N Vancouver")
+plot(dem_vancouver_lowres, main = "Low res. DEM",
+     col = hcl.colors(100, "Earth"))
+par(mfrow = c(1,1))
+```
+
+
+The process to convert the downscaled data to raster format is the same as before, 
+because we again used the raster cell IDs as point location IDs (`xyzDT$id`): 
+
+```{r}
+dwscl_out <- climr_downscale(xyzDT, which_normal = "auto",
+                             gcm_models = list_gcm()[1:3],
+                             ssp = list_ssp()[1],
+                             gcm_period = list_gcm_period(),
+                             max_run = 0L, return_normal = FALSE,
+                             vars = "MAT", out_spatial = FALSE)
+
+tempRas <- rast(BECz_vancouver_ras)
+
+dwscl_Ras <- sapply(split(dwscl_out, by = c("GCM", "PERIOD")) , function(DT, tempRas) {
+  tempRas[DT$id] <- DT$MAT
+  return(tempRas)
+}, tempRas = tempRas)
+
+## make a stack
+dwscl_Ras <- rast(dwscl_Ras)
+```
+
+
+### Vector inputs/outputs
+
+#### Point vector data
+
+The process is again similar to the above.
+
+If the points have elevation information we simply need to convert them to a
+`data.table`. In this case, point IDs need to be added to the `data.table` 
+afterwards.
+
+If they don't have elevation information, then we need to obtain it. In
+the example below we start with a set of points in North Vancouver, BC,
+Canada, for which we get elevation values from a Digital Elevation Model
+(DEM) raster. 
+
+The `terra::extract()` function outputs a `data.frame` with point IDs, the extracted
+values and, optionally x/y coordinates. So we need simply to use this output to
+create our `xyzDT` table for `climr_downscale()`.
+
+To get point-type outputs simply set `climr_downscale(..., out_spatial = TRUE)`.
+
+```{r, results = "hide"}
 vancouver_points <- get(data("vancouver_points")) |>
   unwrap()
 dem_vancouver <- get(data("dem_vancouver")) |>
@@ -102,15 +292,16 @@ plot(dwscl_outLong, lyrs, main = titles, nc = 5, nr = 3,
      range = minmax, plg = list(title = "MAT"), mar = c(0.1, 1, 1, 3))
 ```
 
-### Starting with polygon vector data
+### Polygon vector data
 
 We assume here that your polygon data refers to an area (or several) for
 which you want downscaled climate variables for.
 
 Because each polygon is associated with a single value per attribute or
-field, you will need to decide for which locations within that polygon
-you want to downscale data for. There are many ways to do this. We show
-two here:
+field, the polygons will need to be sampled/combined with the points where 
+downscaling will happen. 
+
+There are many ways to do this. We show three here:
 
 a)  sampling the polygon at regular intervals,
 
@@ -121,83 +312,54 @@ c)  using the polygon centroids -- we only advise doing this when when
 the polygons are sufficiently small, otherwise the centroid will not
 reflect overall polygon climate conditions
 
-#### a) Sampling polygon at regular intervals
+In all cases we need to sample the polygons using points.
 
-We can use a raster (in this case the DEM) to define the points.
+#### a) sampling polygon at regular intervals
+
+We can use a raster (in this case the DEM) to define the sampling grid.
 
 ```{r, results = "hide"}
-library(climr)
-library(terra)
-library(data.table)
-
 vancouver_poly <- get(data("vancouver_poly")) |>
   unwrap()
 dem_vancouver <- get(data("dem_vancouver")) |>
   unwrap()
-```
 
-```{r, echo = FALSE, results = "hide", fig.cap = "Digital Elevation Model of North Vancouver w/ and w/o values outside polygon area", fig.show = "hold", fig.dim = c(6,3), out.width = "100%"}
-par(mfrow = c(1,2))
-
-cols <- hcl.colors(100, "Earth")
-plot(dem_vancouver, main = "Original DEM", col = cols)
-
-## exclude areas outside the polygons
 dem_vancouver <- mask(dem_vancouver, vancouver_poly)
-plot(dem_vancouver, main = "Masked DEM", col = cols)
-
-par(mfrow = c(1,1))
 ```
+
+Here we use sampling grid with a larger spacing than the DEM raster resolution, 
+but extract elevation values from at the original (and higher) DEM resolutions.
 
 ```{r, results = "hide"}
-## extract a point per cell, obtaining elevation values
-hiRes_points <- as.points(dem_vancouver)
-xyz_hiRes <- hiRes_points |>
-  as.data.frame(., geom = "XY") |>
-  as.data.table()
-setnames(xyz_hiRes, c("elev", "lon", "lat"))
-xyz_hiRes$id <- 1:nrow(xyz_hiRes)
-
 ## extract points at a coarser scale, but elevation at original scale
 lowRes_ras <- rast(dem_vancouver) 
 lowRes_ras <- project(lowRes_ras, crs(lowRes_ras), res = 0.01) 
 
 lowRes_ras[] <- 1
-lowRes_ras <- mask(lowRes_ras, vancouver_poly)
+lowRes_ras <- mask(lowRes_ras, vancouver_poly) ## set water back to NA
 
 lowRes_points <- as.points(lowRes_ras)
 lowRes_points$id <- 1:nrow(lowRes_points)
-xyz_lowRes <- extract(dem_vancouver, lowRes_points, xy = TRUE) |>
+
+xyzDT <- extract(dem_vancouver, lowRes_points, xy = TRUE) |>
   as.data.table()
-setnames(xyz_lowRes, c("id", "elev", "lon", "lat"))
+setnames(xyzDT, c("id", "elev", "lon", "lat"))
 
 ## exclude NAs
-xyz_lowRes <- xyz_lowRes[complete.cases(xyz_lowRes)]
-lowRes_points <- lowRes_points[lowRes_points$id %in% xyz_lowRes$id,]
+xyzDT <- xyzDT[complete.cases(xyzDT)]
+lowRes_points <- lowRes_points[lowRes_points$id %in% xyzDT$id,]
 ```
 
-```{r, echo = FALSE, results = "hide", fig.cap = "Points extracted from raster", fig.show = "hold", fig.dim = c(6,3), out.width = "100%"}
-par(mfrow = c(1,2))
-plot(dem_vancouver, col = cols, main = "Points at DEM resolution")
-points(hiRes_points, alpha = 0.1)
-
-plot(dem_vancouver, col = cols, main = "Points at coarser resolution")
+```{r, echo = FALSE, results = "hide", fig.cap = "Points extracted from raster", fig.show = "hold", out.width = "100%"}
+plot(dem_vancouver, col = cols)
 points(lowRes_points, alpha = 0.7)
-par(mfrow = c(1,1))
 ```
 
 As before, pass your `data.table` of point locations to
 `climr_downscale`:
 
 ```{r, results = "hide"}
-dwscl_outHiRes <- climr_downscale(xyz_hiRes, which_normal = "auto",
-                                  gcm_models = list_gcm()[1:3],
-                                  ssp = list_ssp()[1],
-                                  gcm_period = list_gcm_period(),
-                                  max_run = 0L, return_normal = FALSE,
-                                  vars = "MAT", out_spatial = TRUE)
-
-dwscl_outLowRes <- climr_downscale(xyz_lowRes, which_normal = "auto",
+dwscl_out <- climr_downscale(xyzDT, which_normal = "auto",
                                    gcm_models = list_gcm()[1:3],
                                    ssp = list_ssp()[1],
                                    gcm_period = list_gcm_period(),
@@ -205,32 +367,17 @@ dwscl_outLowRes <- climr_downscale(xyz_lowRes, which_normal = "auto",
                                    vars = "MAT", out_spatial = TRUE)
 ```
 
-```{r, echo = FALSE, results = "hide", fig.show = "hold", fig.cap = "Plot of spatial outputs from `climr_downscale()` using 'high resolution' point locations", fig.dim = c(15,9), out.width = "100%"}
-minmax <- range(dwscl_outHiRes$MAT)
-
-dwscl_outHiResLong <- as.data.table(dwscl_outHiRes, geom = "XY") |>
-  dcast(formula = ... ~ GCM + PERIOD, value.var = "MAT") |>
-  vect(geom = c("x", "y"), crs = crs(dem_vancouver))
-
-lyrs <- setdiff(names(dwscl_outHiResLong), c("elev", "id", "SSP", "RUN"))
-gcmstr <- paste(list_gcm()[1:3], collapse = "|")
-titles <- sub(paste0("(", gcmstr, ")_([[:digit:]]{4})_([[:digit:]]{4})"), "\\1\\\n\\2-\\3", lyrs) 
-plot(dwscl_outHiResLong, lyrs, main = titles, nc = 5, nr = 3,
-     type = "continuous", col = hcl.colors(100, "Reds", rev = 1), 
-     range = minmax, plg = list(title = "MAT"), mar = c(0.1, 1, 1, 3))
-```
-
 ```{r, echo = FALSE, results = "hide", fig.show = "hold", fig.cap = "Plot of spatial outputs from `climr_downscale()` using more spaced point locations", fig.dim = c(15,9), out.width = "100%"}
-minmax <- range(dwscl_outLowRes$MAT)
+minmax <- range(dwscl_out$MAT)
 
-dwscl_outLowResLong <- as.data.table(dwscl_outLowRes, geom = "XY") |>
+dwscl_outLong <- as.data.table(dwscl_out, geom = "XY") |>
   dcast(formula = ... ~ GCM + PERIOD, value.var = "MAT") |>
   vect(geom = c("x", "y"), crs = crs(dem_vancouver))
 
-lyrs <- setdiff(names(dwscl_outLowResLong), c("elev", "id", "SSP", "RUN"))
+lyrs <- setdiff(names(dwscl_outLong), c("elev", "id", "SSP", "RUN"))
 gcmstr <- paste(list_gcm()[1:3], collapse = "|")
 titles <- sub(paste0("(", gcmstr, ")_([[:digit:]]{4})_([[:digit:]]{4})"), "\\1\\\n\\2-\\3", lyrs) 
-plot(dwscl_outLowResLong, lyrs, main = titles, nc = 5, nr = 3,
+plot(dwscl_outLong, lyrs, main = titles, nc = 5, nr = 3,
      type = "continuous", col = hcl.colors(100, "Reds", rev = 1), 
      range = minmax, plg = list(title = "MAT"), mar = c(0.1, 1, 1, 3))
 ```
@@ -240,32 +387,26 @@ plot(dwscl_outLowResLong, lyrs, main = titles, nc = 5, nr = 3,
 Alternatively, we may want to combine a study area polygon with a set of
 point locations, for which we have/extract elevation values.
 
-In this case, the points are spaced at regular 0.01 degree intervals and
-are then used to extract elevation values from the DEM.
+In this case, the points are weather stations from the [Adjusted and homogenized Canadian climate data](https://www.canada.ca/en/environment-climate-change/services/climate-change/science-research-data/climate-trends-variability/adjusted-homogenized-canadian-data.html).
 
-```{r, include = FALSE, fig.show = "hold", fig.cap = "Points in polygon."}
-library(climr)
-library(terra)
-library(data.table)
-
+```{r, fig.show = "hold", fig.cap = "Points in polygon."}
 vancouver_poly <- get(data("vancouver_poly")) |>
   unwrap()
 dem_vancouver <- get(data("dem_vancouver")) |>
   unwrap()
-point_grid <- get(data("point_grid")) |>
+ahccd_pstations <- get(data("ahccd_pstations")) |>
   unwrap()
 
+xyzPoints <- mask(ahccd_pstations, vancouver_poly)
+
 plot(vancouver_poly)
-points(point_grid, alpha = 0.5)
+points(xyzPoints, col = "salmon1")
 
-points_in <- mask(point_grid, vancouver_poly)
-points(points_in, col = "salmon1")
-
-xyzDT <- extract(dem_vancouver, points_in, xy = TRUE) |>
+xyzDT <- extract(dem_vancouver, xyzPoints, xy = TRUE) |>
   as.data.table()
 setnames(xyzDT, c("id", "elev", "lon", "lat"))
 
-dwscl_outGrid <- climr_downscale(xyz_lowRes, which_normal = "auto",
+dwscl_outGrid <- climr_downscale(xyzDT, which_normal = "auto",
                                  gcm_models = list_gcm()[1:3],
                                  ssp = list_ssp()[1],
                                  gcm_period = list_gcm_period(),
@@ -279,10 +420,6 @@ We advise *against* doing this unless your polygons are so small that
 the centroid reflects the overall polygon's climate conditions.
 
 ```{r, results = "hide"}
-library(climr)
-library(terra)
-library(data.table)
-
 vancouver_poly <- get(data("vancouver_poly")) |>
   unwrap()
 dem_vancouver <- get(data("dem_vancouver")) |>
@@ -300,7 +437,7 @@ xyzDT <- extract(dem_vancouver, centrds, xy = TRUE) |>
   as.data.table()
 setnames(xyzDT, c("id", "elev", "lon", "lat"))
 
-dwscl_outGrid <- climr_downscale(xyz_lowRes, which_normal = "auto",
+dwscl_outGrid <- climr_downscale(xyzDT, which_normal = "auto",
                                  gcm_models = list_gcm()[1:3],
                                  ssp = list_ssp()[1],
                                  gcm_period = list_gcm_period(),
@@ -308,84 +445,10 @@ dwscl_outGrid <- climr_downscale(xyz_lowRes, which_normal = "auto",
                                  vars = "MAT", out_spatial = TRUE)
 ```
 
-```{r, echo = FALSE, fig.show = "hold", fig.cap = "Retained polygon centroids shown in orange", fig.dim = c(5,3)}
+```{r, echo = FALSE, fig.show = "hold", fig.cap = "Excluded (grey) and retained (orange) polygon centroids", fig.dim = c(5,3)}
 plot(vancouver_poly)
 points(centroids(vancouver_poly), col = "grey")
 points(centrds, col = "salmon1")
-```
-
-### Starting with raster data and converting back to raster
-
-The process is similar to what we did in [a) Sampling polygon at regular
-intervals] above.
-
-We begin by converting a our raster to a points `SpatVector`, so that each
-raster cell becomes a point. Because we are using a DEM raster, the points
-`SpatVector` will inherits the elevation cell values. Otherwise, we would
-use the points vector to extract elevation values from another source.
-
-We then convert the points `SpatVector` to a `data.table` of point
-locations that is passed to `climr_downscale()`.
-
-```{r, results = "hide"}
-library(climr)
-library(terra)
-library(data.table)
-
-dem_vancouver <- get(data("dem_vancouver")) |>
-  unwrap()
-
-points_vancouver <- as.points(dem_vancouver)
-xyzDT <- points_vancouver |>
-  as.data.frame(., geom = "XY") |>
-  as.data.table()
-setnames(xyzDT, c("elev", "lon", "lat"))
-xyzDT$id <- 1:nrow(xyzDT)
-
-## check that no. cells matches number of unique IDS
-if (nrow(points_vancouver) != max(xyzDT$id))
-  stop("IDs do not match raster cells")
-
-## in this case there's really no need for a spatial output format
-dwscl_out <- climr_downscale(xyzDT, which_normal = "auto",
-                             gcm_models = list_gcm()[1:3],
-                             ssp = list_ssp()[1],
-                             gcm_period = list_gcm_period(),
-                             max_run = 0L, return_normal = FALSE,
-                             vars = "MAT", out_spatial = FALSE)
-
-```
-
-To convert the outputs back into a raster format, we simply need to use the 
-original raster use to extract the point locations as a template to make 
-rasters of downscaled climate values. 
-
-Since the location `id`s match raster cell IDs, the `dwscl_out$id` column is 
-used to index raster cells climate values when assigning downscaled `MAT` 
-values.
-
-```{r}
-tempRas <- rast(dem_vancouver)
-
-dwscl_Ras <- sapply(split(dwscl_out, by = c("GCM", "PERIOD")) , function(DT, tempRas) {
-  tempRas[DT$id] <- DT$MAT
-  return(tempRas)
-}, tempRas = tempRas)
-
-## make a stack
-dwscl_Ras <- rast(dwscl_Ras)
-
-dwscl_Ras
-```
-
-```{r, echo = FALSE, results = "hide", fig.show = "hold", fig.cap = "`climr_downscale()` outputs after converting to raster layers", fig.dim = c(15,9), out.width = "100%"}
-minmax <- range(dwscl_out$MAT)
-
-gcmstr <- paste(list_gcm()[1:3], collapse = "|")
-titles <- sub(paste0("(", gcmstr, ")\\.([[:digit:]]{4})_([[:digit:]]{4})"), "\\1\\\n\\2-\\3", names(dwscl_Ras)) 
-plot(dwscl_Ras, main = titles, nc = 5, nr = 3,
-     type = "continuous", col = hcl.colors(100, "Reds", rev = 1), 
-     range = minmax, plg = list(title = "MAT"), mar = c(0.1, 1, 1, 3))
 ```
 
 
