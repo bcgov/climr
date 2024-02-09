@@ -257,15 +257,24 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
   if (dir.exists(paste0(cache_path(), "/gcm/", gcmcode))) {
     bnds <- fread(paste0(cache_path(), "/gcm/", gcmcode, "/meta_area.csv"))
     setorder(bnds, -numlay)
-    for (i in 1:nrow(bnds)) {
-      isin <- is_in_bbox(bbox, matrix(bnds[i, 2:5]))
-      if (isin) break
-    }
-    if (isin) {
-      oldid <- bnds$uid[i]
+    
+    spat_match <- lapply(1:nrow(bnds), FUN = \(x){if(is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]})
+    spat_match <- spat_match[!sapply(spat_match,is.null)]
+
+    if (length(spat_match) > 0) {
       periods <- fread(paste0(cache_path(), "/gcm/", gcmcode, "/meta_period.csv"))
       ssps <- fread(paste0(cache_path(), "/gcm/", gcmcode, "/meta_ssp.csv"))
-      if (all(period %in% periods[uid == oldid, period]) & all(ssp %in% ssps[uid == oldid, ssp]) & max_run <= bnds[uid == oldid, max_run]) {
+      isin <- FALSE
+      for(oldid in spat_match){
+        if (all(period %in% periods[uid == oldid, period]) & 
+            all(ssp %in% ssps[uid == oldid, ssp]) & 
+            max_run <= bnds[uid == oldid, max_run]) {
+          isin <- TRUE
+          break
+        }
+      }
+      
+    if (isin) {
         message("Retrieving from cache...")
         gcm_rast <- rast(paste0(cache_path(), "/gcm/", gcmcode, "/", oldid, ".tif"))
         layinfo <- data.table(fullnm = names(gcm_rast))
@@ -340,14 +349,22 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
   if (dir.exists(paste0(cache_path(), "/gcmhist/", gcmcode))) {
     bnds <- fread(paste0(cache_path(), "/gcmhist/", gcmcode, "/meta_area.csv"))
     setorder(bnds, -numlay)
-    for (i in 1:nrow(bnds)) {
-      isin <- is_in_bbox(bbox, matrix(bnds[i, 2:5]))
-      if (isin) break
-    }
-    if (isin) {
-      oldid <- bnds$uid[i]
+    
+    spat_match <- lapply(1:nrow(bnds), FUN = \(x){if(is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]})
+    spat_match <- spat_match[!sapply(spat_match,is.null)]
+    
+    if (length(spat_match) > 0) {
       yeardat <- fread(paste0(cache_path(), "/gcmhist/", gcmcode, "/meta_years.csv"))
-      if (all(years %in% yeardat[uid == oldid, years]) & max_run <= bnds[uid == oldid, max_run]) {
+      isin <- FALSE
+      for(oldid in spat_match){ ##see if any have all required variables
+        if (all(years %in% yeardat[uid == oldid, years]) 
+            & max_run <= bnds[uid == oldid, max_run]) {
+          isin <- TRUE
+          break
+        }
+      }
+      
+    if (isin) {
         message("Retrieving from cache...")
         gcm_rast <- rast(paste0(cache_path(), "/gcmhist/", gcmcode, "/", oldid, ".tif"))
         layinfo <- data.table(fullnm = names(gcm_rast))
@@ -417,15 +434,24 @@ process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts,
   if (dir.exists(paste0(cache_path(), "/gcmts/", gcmcode))) {
     bnds <- fread(paste0(cache_path(), "/gcmts/", gcmcode, "/meta_area.csv"))
     setorder(bnds, -numlay)
-    for (i in 1:nrow(bnds)) {
-      isin <- is_in_bbox(bbox, matrix(bnds[i, 2:5]))
-      if (isin) break
-    }
-    if (isin) {
-      oldid <- bnds$uid[i]
+    
+    spat_match <- lapply(1:nrow(bnds), FUN = \(x){if(is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]})
+    spat_match <- spat_match[!sapply(spat_match,is.null)]
+    
+    if (length(spat_match) > 0) {
       periods <- fread(paste0(cache_path(), "/gcmts/", gcmcode, "/meta_period.csv"))
       ssps <- fread(paste0(cache_path(), "/gcmts/", gcmcode, "/meta_ssp.csv"))
-      if (all(period %in% periods[uid == oldid, period]) & all(ssp %in% ssps[uid == oldid, ssp]) & max_run <= bnds[uid == oldid, max_run]) {
+      isin <- FALSE
+      for(oldid in spat_match){ ##see if any have all required variables
+        if (all(period %in% periods[uid == oldid, period]) & 
+            all(ssp %in% ssps[uid == oldid, ssp]) & 
+            max_run <= bnds[uid == oldid, max_run]) {
+          isin <- TRUE
+          break
+        }
+      }
+    
+    if (isin) {
         message("Retrieving from cache...")
         gcm_rast <- rast(paste0(cache_path(), "/gcmts/", gcmcode, "/", oldid, ".tif"))
         layinfo <- data.table(fullnm = names(gcm_rast))
