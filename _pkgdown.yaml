@@ -39,7 +39,6 @@ reference:
     available climate variables and functions listing 
     available data.
   contents:
-  - ahccd_pstations
   - BECz_vancouver
   - BECz_vancouver_ras
   - BECcols
@@ -48,6 +47,7 @@ reference:
   - vancouver
   - vancouver_points
   - vancouver_poly
+  - weather_stations
   - variables
   - list_normal
   - list_historic
