@@ -15,6 +15,7 @@ xyzDT
 }
 \description{
 A \code{data.table} of point locations with elevation.
-It is a simplified version of the \code{weather_stations} dataset.
+It is a simplified and cleaned-up version of the \code{weather_stations} dataset,
+where incomplete cases were removed.
 }
 \keyword{datasets}

@@ -38,7 +38,7 @@ gcm_ts_input(
 \arguments{
 \item{dbCon}{A db connection object created by \code{data_connect}.}
 
-\item{bbox}{numeric. Vector of length 4 giving bounding box of study region, created by \code{get_bb()}.}
+\item{bbox}{numeric. Vector of length 4 giving bounding box of study region, in the order ymax,ymin,xmax,xmin. In general this is created by \code{get_bb()}, but can also be user-defined.}
 
 \item{gcm}{character. Vector of labels of the global circulation models to use.
 Can be obtained from \code{\link[=list_gcm]{list_gcm()}}. Default to all GCMs available.}
