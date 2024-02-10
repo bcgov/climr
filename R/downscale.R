@@ -94,7 +94,7 @@ climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), histor
                         gcm_hist_years, max_run, vars)
   
   expectedCols <- c("lon", "lat", "elev", "id")
-  xyz <- .checkXYZ(xyz, expectedCols)
+  xyz <- .checkXYZ(copy(xyz), expectedCols)
   
   dbCon <- data_connect()
   thebb <- get_bb(xyz) ## get bounding box based on input points
@@ -310,7 +310,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
                    historic_ts, return_normal, vars)
   
   expectedCols <- c("lon", "lat", "elev", "id")
-  xyz <- .checkXYZ(xyz, expectedCols)
+  xyz <- .checkXYZ(copy(xyz), expectedCols)
   
   if (isTRUE(nthread > 1L)) {
     if (!requireNamespace("parallel")) {
