@@ -54,6 +54,7 @@ xyzDT <- weather_stations[, .(`Station ID`, Longitude, Latitude, `Elevation (m)`
 setnames(xyzDT, c("id", "lon", "lat", "elev"))
 xyzDT <- unique(xyzDT)
 xyzDT <- xyzDT[!duplicated(id),]  ## still many duplicated stations with slightly different coords/elev
+xyzDT <- xyzDT[complete.cases(xyzDT)]
 
 weather_stations <- weather_stations[!is.na(`Elevation (m)`)]
 weather_stations <- vect(weather_stations, geom = c("Longitude", "Latitude"), crs = "EPSG:4326")

@@ -109,7 +109,8 @@
 #' Example table of point locations
 #' 
 #' A `data.table` of point locations with elevation.
-#' It is a simplified version of the `weather_stations` dataset.
+#' It is a simplified and cleaned-up version of the `weather_stations` dataset,
+#' where incomplete cases were removed.
 #'
 #' @format a `data.table`
 #' @source [https://services.pacificclimate.org/met-data-portal-pcds/app/](https://services.pacificclimate.org/met-data-portal-pcds/app/)
