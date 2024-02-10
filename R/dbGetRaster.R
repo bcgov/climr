@@ -175,7 +175,12 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
 #' @export
 get_bb <- function(in_xyz) {
   .checkXYZ(in_xyz)
-  return(c(max(in_xyz[, "lat"]), min(in_xyz[, "lat"]), max(in_xyz[, "lon"]), min(in_xyz[, "lon"])))
+  thebb <- c(max(in_xyz[, "lat"]), min(in_xyz[, "lat"]), max(in_xyz[, "lon"]), min(in_xyz[, "lon"]))
+  
+  if (any(is.na(thebb))) {
+    stop("Couldn't guess bounding box. Are there NA's in 'xyz'?")
+  }
+  return(thebb)
 }
 
 
