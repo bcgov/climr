@@ -116,11 +116,9 @@ historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRU
   if (dir.exists(paste0(cache_path(), "/historic_ts/", ts_name))) {
     bnds <- fread(paste0(cache_path(), "/historic_ts/", ts_name, "/meta_area.csv"))
     setorder(bnds, -numlay)
-    spat_match <- list()
-    for (i in 1:nrow(bnds)) {
-      isin <- is_in_bbox(bbox, matrix(bnds[i, 2:5]))
-      if (isin) spat_match[[i]] <- bnds$uid[i]
-    }
+    
+    spat_match <- lapply(1:nrow(bnds), FUN = \(x){if(is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]})
+    spat_match <- spat_match[!sapply(spat_match,is.null)]
     if (length(spat_match) > 0) {
       periods <- fread(paste0(cache_path(), "/historic_ts/", ts_name, "/meta_period.csv"))
       isin <- FALSE
