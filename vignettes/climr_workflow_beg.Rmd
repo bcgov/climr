@@ -43,7 +43,6 @@ two emissions scenarios and two General Circulation Models. We also specify we w
 3 indivual runs of each model/scenario combination, in addition to the ensemble mean
 (returned by default).
 
-
 ```{r}
 library(climr)
 
@@ -61,6 +60,7 @@ ds_out <- climr_downscale(xyz = xyzDT, which_normal = "auto",
 ```
 
 These functions are useful to list available options:
+
 ```{r, eval = FALSE}
 list_gcm()
 list_gcm_period()
