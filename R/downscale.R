@@ -65,7 +65,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, g
                    historic_ts, return_normal, vars)
   
   expectedCols <- c("lon", "lat", "elev", "id")
-  xyz <- .checkXYZ(xyz, expectedCols)
+  xyz <- .checkXYZ(copy(xyz), expectedCols)
   
   if (isTRUE(nthread > 1L)) {
     if (!requireNamespace("parallel")) {
