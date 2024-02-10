@@ -12,7 +12,7 @@ historic_input_ts(dbCon, bbox = NULL, years = 2010:2022, cache = TRUE)
 \arguments{
 \item{dbCon}{A db connection object created by \code{data_connect}.}
 
-\item{bbox}{numeric. Vector of length 4 giving bounding box of study region, created by \code{get_bb()}.}
+\item{bbox}{numeric. Vector of length 4 giving bounding box of study region, in the order ymax,ymin,xmax,xmin. In general this is created by \code{get_bb()}, but can also be user-defined.}
 
 \item{period}{character. Vector of labels of the periods to use.
 Can be obtained from \code{\link[=list_historic]{list_historic()}}. Default to "2001_2020".}

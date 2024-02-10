@@ -9,7 +9,7 @@ normal_input(dbCon, bbox, normal = "normal_na", cache = TRUE)
 \arguments{
 \item{dbCon}{A db connection object created by \code{data_connect}.}
 
-\item{bbox}{numeric. Vector of length 4 giving bounding box of study region, created by \code{get_bb()}.}
+\item{bbox}{numeric. Vector of length 4 giving bounding box of study region, in the order ymax,ymin,xmax,xmin. In general this is created by \code{get_bb()}, but can also be user-defined.}
 
 \item{normal}{A \code{character} or a \code{SpatRaster}. For character, label of the normal baseline to use.
 Can be obtained from \code{\link[=list_normal]{list_normal()}}. For \code{SpatRaster}, 36 layers normal climate variables with
