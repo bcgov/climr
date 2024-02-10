@@ -171,7 +171,7 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
 #'
 #' @param in_xyz `data.table` (or `data.frame`) of points to downscale
 #'  with columns "lon", "lat", "elev" and "id"
-#' @return integer. A bounding box (e.g. `c(51, 50, -121, -122)`)
+#' @return numeric vector. Bounding box coordinates with order ymax,ymin,xmax,xmin (e.g. `c(51, 50, -121, -122)`).
 #' @export
 get_bb <- function(in_xyz) {
   .checkXYZ(in_xyz)
