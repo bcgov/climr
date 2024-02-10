@@ -32,7 +32,7 @@ if (!require(ggplot2)) {
   warning("'ggplot2' is not installed. Some visuals won't be available.")
 }
 
-options("climr.cache.path" = file.path(tempdir(), "climr.cache"))
+options("climr.cache.path" = "climr.cache")
 ```
 
 ## Introduction
