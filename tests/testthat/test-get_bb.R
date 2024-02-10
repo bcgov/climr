@@ -6,15 +6,25 @@ test_that("test get_bb", {
                     id = LETTERS[1:8])
   
   thebb <- get_bb(xyz)
-  expect_equal(thebb, c(55.38847, 54.61025, -126.94957, -127.71620))
+  expect_equal(get_bb(xyz), c(55.38847, 54.61025, -126.94957, -127.71620))
   
   ## different column order
   xyz2 <- xyz[, c(2,4,1,3)]
-  
-  thebb2 <- get_bb(xyz2)
-  expect_equal(thebb, thebb2)
+  expect_equal(get_bb(xyz2), thebb2)
   
   xyz3 <- xyz
   names(xyz3) <- c("x", "y", "z", "id")
   expect_error(get_bb(xyz3))
+  
+  xyz4 <- xyz
+  xyz4[1, 2] <- NA
+  expect_error(get_bb(xyz4))
+  
+  xyz4 <- xyz
+  xyz4[1, ] <- NA
+  expect_error(get_bb(xyz4))
+  
+  xyz4 <- xyz
+  xyz4[1, 3] <- NA
+  expect_equal(get_bb(xyz4), c(55.38847, 54.61025, -126.94957, -127.71620))
 })
