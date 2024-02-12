@@ -9,7 +9,7 @@
 #' @template xyz
 #' @param which_normal character. Which normal layer to use. 
 #'   Default is "auto", which selects the highest resolution normal for each point. 
-#'   Other options are one of [`list_normal()`]
+#'   Other options are one of [`list_normal()`].
 #' @param historic_period character. Which historic period. Default `NULL`
 #' @param historic_ts integer. Vector of historic years requested. Must be in `1902:2015`. Default `NULL`
 #' @param gcm_models character. Vector of GCM names. Options are [`list_gcm()`]. Used for gcm periods, gcm timeseries, and historic timeseries. Default `NULL`
@@ -81,7 +81,7 @@
 #' }
 #' @rdname downscaling
 #' @export
-climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), historic_period = NULL, historic_ts = NULL,
+climr_downscale <- function(xyz, which_normal = "auto", historic_period = NULL, historic_ts = NULL,
                             gcm_models = NULL, ssp = list_ssp(),
                             gcm_period = NULL, gcm_ts_years = NULL, gcm_hist_years = NULL, max_run = 0L, return_normal = TRUE,
                             vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))), cache = TRUE,
