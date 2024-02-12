@@ -91,7 +91,7 @@
 #'                                      vars = vars)
 #' }
 #' @export
-climr_downscale <- function(xyz, which_normal = c("auto", list_normal()), historic_period = NULL, historic_ts = NULL,
+climr_downscale <- function(xyz, which_normal = "auto", historic_period = NULL, historic_ts = NULL,
                             gcm_models = NULL, ssp = list_ssp(),
                             gcm_period = NULL, gcm_ts_years = NULL, gcm_hist_years = NULL, max_run = 0L, return_normal = TRUE,
                             vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))), cache = TRUE,
