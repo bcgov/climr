@@ -6,7 +6,7 @@
 #' @details
 #' The input table `xyz` can be a single location or multiple locations. If multiple locations, the plot provides the mean of the anomalies for these locations. 
 #' 
-#' The climate change trajectories provided by `show_trajectories` are connected with an interpolation spline when the x variable is monotonic; otherwise the trajectory points are connected by straight lines. 
+#' The climate change trajectories provided by `show_trajectories` are points for each of the five 20-year periods specified by `list_gcm_period()`. These points are connected with an interpolation spline when the x variable is monotonic; otherwise the trajectory points are connected by straight lines. 
 #' 
 #' This plot is designed to be used with a single SSP scenario. If multiple scenarios are passed to the plot, the GCM means and ensemble mean are averaged across the scenarios, but the individual runs for all scenarios are plotted separately. 
 #' 
@@ -19,22 +19,22 @@
 #' @param show_ensMean logical. If TRUE, the multi-model ensemble mean is plotted (for `period_focal` only). 
 #' @param show_observed logical. If TRUE, the 2001-2020 observed climate is plotted. 
 #' @param show_trajectories logical. If TRUE, the values of the single-model ensemble mean are plotted for all 20-year periods in `list_gcm_period()`, connected by an interpolation spline. 
-#' @param interactive logical. If TRUE, an interactive plot is generated using plotly(). If FALSE, a plot is generated using base graphics. 
+#' @param interactive logical. If TRUE, an interactive plot is generated using `{plotly}`. If FALSE, a plot is generated using base graphics. 
 #' 
 #' @return TODO 
 #'
 #' @importFrom data.table TODO: find out what i need to do to get this command right. 
-#' @importFrom stinepack stinterp TODO: add this package to dependencies
+#' @importFrom stinepack stinterp TODO: add this package to dependencies (as a suggest)
 #'
 #' @examples {
 #' library(data.table) # TODO: what do i need to do with library(plotly) and library(stinepack)?
 #' 
 #' # data frame of arbitrary points on vancouver island
-#' my_points <- data.frame(lon = c(-123.4404, -123.5064, -124.2317),
-#'                         lat = c(48.52631, 48.46807, 49.21999),
-#'                         elev = c(52, 103, 357),
-#'                      id = LETTERS[1:3]
-#' )
+# my_points <- data.frame(lon = c(-123.4404, -123.5064, -124.2317),
+#                         lat = c(48.52631, 48.46807, 49.21999),
+#                         elev = c(52, 103, 357),
+#                         id = LETTERS[1:3]
+# )
 #' 
 #' # plot without export
 #' plot_bivariate(my_points)
@@ -46,6 +46,7 @@
 #' }
 #' @export
 
+## TODO: structure the climr_downscale calls so that a user can't break the plot. 
 plot_bivariate <- function(
     xyz, 
     xvar = "Tave_sm", 
@@ -60,7 +61,7 @@ plot_bivariate <- function(
     show_ensMean = T,
     show_observed = T,
     show_trajectories = T,
-    interactive = F, ## TODO: add a plotly version of the plot
+    interactive = F, 
     ...
 ) {
   
@@ -78,8 +79,8 @@ plot_bivariate <- function(
   data <- climr_downscale(xyz, 
                           which_normal = "auto",
                           historic_period = list_historic()[1],
-                          gcm_models = list_gcm()[c(1,4,5,6,7,10,11,12)], ## TODO: this is wrong. need to recieve this as passed from plot_bivariate()
-                          ssp = list_ssp()[2], ## TODO: this is wrong. need to receive this as passed from plot_bivariate()
+                          gcm_models = gcm_models, ## TODO: this is wrong. need to recieve this as passed from plot_bivariate()
+                          ssp = ssp, ## TODO: this is wrong. need to receive this as passed from plot_bivariate()
                           gcm_period = list_gcm_period(), 
                           max_run = 10, 
                           vars = c(xvar, yvar)
@@ -97,10 +98,11 @@ plot_bivariate <- function(
   obs <- data[is.na(GCM) & PERIOD == period_focal]
   
   if(interactive == F){
+    
     # BASE PLOT
     # initiate the plot
     par(mar=c(3,4,0,1), mgp=c(1.25, 0.25,0), cex=1.5)
-    plot(data_mean$xanom,data_mean$yanom,col="white", tck=0, xaxt="n", yaxt="n", ylab="",
+    plot(data$xanom,data$yanom,col="white", tck=0, xaxt="n", yaxt="n", ylab="",
          xlab=paste("Change in", variables$Variable[which(variables$Code==xvar)]) 
     )
     par(mgp=c(2.5,0.25, 0))
@@ -142,8 +144,8 @@ plot_bivariate <- function(
     }
     
     # axis labels
-    axis(1, at=pretty(data_mean$xanom), labels=if(xvar_type=="Log") paste(pretty(data_mean$xanom)*100, "%", sep="") else pretty(data_mean$xanom), tck=0)
-    axis(2, at=pretty(data_mean$yanom), labels=if(yvar_type=="Log") paste(pretty(data_mean$yanom)*100, "%", sep="") else pretty(data_mean$yanom), las=2, tck=0)
+    axis(1, at=pretty(data$xanom), labels=if(xvar_type=="Log") paste(pretty(data$xanom)*100, "%", sep="") else pretty(data$xanom), tck=0)
+    axis(2, at=pretty(data$yanom), labels=if(yvar_type=="Log") paste(pretty(data$yanom)*100, "%", sep="") else pretty(data$yanom), las=2, tck=0)
     
     # Legend 
     s <- c(show_observed, show_runs, T, show_trajectories, show_ensMean)
@@ -157,11 +159,77 @@ plot_bivariate <- function(
            lwd = c(NA, NA, NA, 2, NA)[s],
            bty = "n", cex=0.8
     )
+    
   } else {
+    
     # PLOTLY PLOT
+    library(plotly) # TODO: figure out how to manage dependencies
+    # TODO: the colors aren't plotting correctly. need to fix this. 
+    
+    #initiate the plot
+    fig <- plot_ly(x=data$xanom,y=data$yanom, type = 'scatter', mode = 'markers', marker = list(color ="lightgray", size=5), hoverinfo="none", color="All models/scenarios/runs/periods")
+    
+    # axis titles
+    fig <- fig %>% layout(xaxis = list(title=paste("Change in", variables$Variable[which(variables$Code==xvar)]), range=range(data$xanom)), 
+                          yaxis = list(title=paste("Change in", variables$Variable[which(variables$Code==yvar)]), range=range(data$yanom))
+    )
+    
+    # observed climate
+    fig <- fig %>% add_markers(obs$xanom ,obs$yanom, name="Observed Climate (2001-2020)", text="observed\n(2001-2020)", hoverinfo="text",
+                               marker = list(size = 25, color = "grey"), symbol = 43)
+    
+    # ensemble mean
+    fig <- fig %>% add_markers(ensMean$xanom,ensMean$yanom, name="Ensemble mean", text="Ensemble mean", hoverinfo="text",
+                               marker = list(size = 20, color = "grey", symbol = 3))
+    
+    # plot individual runs
+    if(show_runs){
+      for(gcm in gcm_models){
+        i=which(gcm_models==gcm)
+        x.runs <- data[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, xanom]
+        y.runs <- data[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, yanom]
+        runs <- data[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, RUN]
+        fig <- fig %>% add_markers(x=x.runs,y=y.runs, color = ColScheme[i], name="Individual GCM runs", text=paste(gcm_models[i], runs), hoverinfo="text", showlegend = F,
+                                   marker = list(size = 7, color = ColScheme[i], line = list(color = "black", width = 1)), legendgroup=paste("group", i, sep=""))
+      }
+    }
+    
+    # GCM mean trajectories
+    # plot model means and trajectories
+    gcm = gcm_models[2]
+    for(gcm in gcm_models){
+      i=which(gcm_models==gcm)
+      x2 <- c(0, data[GCM==gcm & RUN == "ensembleMean", xanom])
+      y2 <- c(0, data[GCM==gcm & RUN == "ensembleMean", yanom])
+      if(show_trajectories){
+        if(length(unique(sign(diff(x2))))==1){
+          x3 <- if(unique(sign(diff(x2)))==-1) rev(x2) else x2
+          y3 <- if(unique(sign(diff(x2)))==-1) rev(y2) else y2
+          s <- stinterp(x3,y3, seq(min(x3),max(x3), diff(range(data$xanom))/500)) # way better than interpSpline, not prone to oscillations
+          fig <- fig %>% add_trace(x=s$x, y=s$y, color = ColScheme[i], type = 'scatter', mode = 'lines', line = list(color=ColScheme[i], width = 2), marker=NULL, legendgroup=paste("group", i, sep=""), showlegend = FALSE)
+        } else {
+          fig <- fig %>% add_trace(x=x2, y=y2, color = ColScheme[i], type = 'scatter', mode = 'lines', line = list(color=ColScheme[i], width = 2), marker=NULL, legendgroup=paste("group", i, sep=""), showlegend = FALSE)
+        }
+        fig <- fig %>% add_markers(x=x2,y=y2, color = ColScheme[i], text=gcm_models[i], hoverinfo="text",
+                                   marker = list(size = 8, color = ColScheme[i]), legendgroup=paste("group", i, sep=""), showlegend = FALSE)
+      }
+      j=which(list_gcm_period()==period_focal)+1
+      fig <- fig %>% add_markers(x2[j],y2[j], color = gcm_models[i], colors=ColScheme[i], text=gcm_models[i],
+                                 marker = list(size = 20, color = ColScheme[i], line = list(color = "black", width = 1)),
+                                 legendgroup=paste("group", i, sep=""))
+      
+      fig <- fig %>% add_annotations(x=x2[j],y=y2[j], text = sprintf("<b>%s</b>", substr(gcm_models, 1, 2)[i]), xanchor = 'center', yanchor = 'center', showarrow = F,
+                                     legendgroup=paste("group", i, sep=""))
+    }
+    
+    if(xvar_type=="Log") fig <- fig %>% layout(xaxis = list(tickformat = "%"))
+    if(yvar_type=="Log") fig <- fig %>% layout(yaxis = list(tickformat = "%"))
+    
+    fig
+    
   }
 }
 
-
+plot_bivariate(my_points, xvar = "PPT_sm", yvar = "Tave_sm")
 
 
