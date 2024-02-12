@@ -37,8 +37,10 @@ Imports:
     uuid
 Suggests: 
     parallel,
+    plotly,
     rmarkdown,
     remotes,
+    stinepack,
     testthat (>= 3.0.0),
     withr
 Depends: 
