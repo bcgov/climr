@@ -8,6 +8,8 @@
 #' 
 #' The climate change trajectories provided by `show_trajectories` are connected with an interpolation spline when the x variable is monotonic; otherwise the trajectory points are connected by straight lines. 
 #' 
+#' This plot is designed to be used with a single SSP scenario. If multiple scenarios are passed to the plot, the GCM means and ensemble mean are averaged across the scenarios, but the individual runs for all scenarios are plotted separately. 
+#' 
 #' @template xyz
 #' @param xvar character. x-axis variable. options are `list_variables()`.
 #' @param yvar character. y-axis variable. options are `list_variables()`.
@@ -25,14 +27,25 @@
 #' @importFrom stinepack stinterp TODO: add this package to dependencies
 #'
 #' @examples {
-#' library(data.table)
-#' TODO: add example usage
+#' library(data.table) # TODO: what do i need to do with library(plotly) and library(stinepack)?
+#' 
+#' # data frame of arbitrary points on vancouver island
+#' my_points <- data.frame(lon = c(-123.4404, -123.5064, -124.2317),
+#'                         lat = c(48.52631, 48.46807, 49.21999),
+#'                         elev = c(52, 103, 357),
+#'                      id = LETTERS[1:3]
+#' )
+#' 
+#' # plot without export
+#' plot_bivariate(my_points)
+#' 
+#' # export plot to the working directory
+#' png(filename="plot_test.png", type="cairo", units="in", width=6, height=5, pointsize=10, res=300)
+#' plot_bivariate(my_points)
+#' dev.off()
 #' }
 #' @export
 
-# Test_Locations_VanIsl <- read.csv("data-raw/Test_Locations_VanIsl.csv")
-# xyz <- data.frame(Test_Locations_VanIsl, id=1:dim(Test_Locations_VanIsl)[1])
-# names(xyz) <- c("lat", "lon", "elev", "id")
 plot_bivariate <- function(
     xyz, 
     xvar = "Tave_sm", 
@@ -42,7 +55,7 @@ plot_bivariate <- function(
     period_focal = list_gcm_period()[1], 
     gcm_models = list_gcm()[c(1,4,5,6,7,10,11,12)], ## TODO: check that i am passing this to climr_downscale properly
     ssp = list_ssp()[2], ## TODO: check that i am passing this to climr_downscale properly
-    legend_pos = "topright", 
+    legend_pos = "bottomleft", 
     show_runs = T, 
     show_ensMean = T,
     show_observed = T,
@@ -51,11 +64,11 @@ plot_bivariate <- function(
     ...
 ) {
   
-  variables_lookup <- read.csv("data-raw/variables_lookup.csv")
+  data("variables")
   
   # variable types for default scaling (percent or absolute)
-  xvar_type <- variables_lookup$Type[which(variables_lookup$Code==xvar)]
-  yvar_type <- variables_lookup$Type[which(variables_lookup$Code==yvar)]
+  xvar_type <- variables$Scale[which(variables$Code==xvar)]
+  yvar_type <- variables$Scale[which(variables$Code==yvar)]
   
   colors = grDevices::colors()[grep('gr(a|e)y', grDevices::colors(), invert = T)][-1]
   set.seed(2)
@@ -73,11 +86,11 @@ plot_bivariate <- function(
                           )
   
   # convert absolute values to anomalies
-  data[, xanom := if(xvar_type=="ratio") (get(xvar)/get(xvar)[1]-1) else (get(xvar) - get(xvar)[1]), by = id]
-  data[, yanom := if(yvar_type=="ratio") (get(yvar)/get(yvar)[1]-1) else (get(yvar) - get(yvar)[1]), by = id]
+  data[, xanom := if(xvar_type=="Log") (get(xvar)/get(xvar)[1]-1) else (get(xvar) - get(xvar)[1]), by = id]
+  data[, yanom := if(yvar_type=="Log") (get(yvar)/get(yvar)[1]-1) else (get(yvar) - get(yvar)[1]), by = id]
   
   # collapse the points down to a mean anomaly
-  data <- data[, .(xanom = mean(xanom), yanom = mean(yanom)), by = .(GCM, SSP, RUN, PERIOD)]
+  data <- data[, .(xanom = mean(xanom), yanom = mean(yanom)), by = .(GCM, SSP, RUN, PERIOD)] # TODO: need to give special treatment to SSPs; perhaps by averaging the ensemble mean but retaining the individual runs
   # ensemble mean for the selected period
   ensMean <- data[!is.na(GCM) & RUN == "ensembleMean" & PERIOD == period_focal, .(xanom = mean(xanom), yanom = mean(yanom)), ]
   # observed climate
@@ -88,10 +101,10 @@ plot_bivariate <- function(
     # initiate the plot
     par(mar=c(3,4,0,1), mgp=c(1.25, 0.25,0), cex=1.5)
     plot(data_mean$xanom,data_mean$yanom,col="white", tck=0, xaxt="n", yaxt="n", ylab="",
-         xlab=paste("Change in", variables_lookup$Variable[which(variables_lookup$Code==xvar)]) 
+         xlab=paste("Change in", variables$Variable[which(variables$Code==xvar)]) 
     )
     par(mgp=c(2.5,0.25, 0))
-    title(ylab=paste("Change in", variables_lookup$Variable[which(variables_lookup$Code==yvar)]))
+    title(ylab=paste("Change in", variables$Variable[which(variables$Code==yvar)]))
     lines(c(0,0), c(-99,99), lty=2, col="gray")
     lines(c(-99,99), c(0,0), lty=2, col="gray")
     
@@ -99,14 +112,21 @@ plot_bivariate <- function(
     if(show_observed) points(obs$xanom ,obs$yanom, pch=22, bg="gray", cex=2.5)
     # text(x1,y1, "2001-2020", cex=1.15, font=2, pos=4, col="gray", offset=0.9)  
     
-    # GCM projections
-    gcm=list_gcm()[1]
+    # plot individual runs
+    if(show_runs){
+      for(gcm in gcm_models){
+        i=which(gcm_models==gcm)
+        x.runs <- data[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, xanom]
+        y.runs <- data[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, yanom]
+        points(x.runs,y.runs, pch=21, bg=ColScheme[i], cex=1)
+      }
+    }
+    
+    # plot model means and trajectories
     for(gcm in gcm_models){
       i=which(gcm_models==gcm)
       x2 <- c(0, data[GCM==gcm & RUN == "ensembleMean", xanom])
       y2 <- c(0, data[GCM==gcm & RUN == "ensembleMean", yanom])
-      x.runs <- data[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, xanom]
-      y.runs <- data[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, yanom]
       if(show_trajectories){
         if(length(unique(sign(diff(x2))))==1){
           x3 <- if(unique(sign(diff(x2)))==-1) rev(x2) else x2
@@ -118,20 +138,19 @@ plot_bivariate <- function(
       }
       j=which(list_gcm_period()==period_focal)+1
       points(x2[j],y2[j], pch=21, bg=ColScheme[i], cex=2.5)
-      if(show_runs) points(x.runs,y.runs, pch=21, bg=ColScheme[i], cex=1)
       text(x2[j],y2[j], substr(gcm_models, 1, 2)[i], cex=0.5, font=2)
     }
     
     # axis labels
-    axis(1, at=pretty(data_mean$xanom), labels=if(xvar_type=="ratio") paste(pretty(data_mean$xanom)*100, "%", sep="") else pretty(data_mean$xanom), tck=0)
-    axis(2, at=pretty(data_mean$yanom), labels=if(yvar_type=="ratio") paste(pretty(data_mean$yanom)*100, "%", sep="") else pretty(data_mean$yanom), las=2, tck=0)
+    axis(1, at=pretty(data_mean$xanom), labels=if(xvar_type=="Log") paste(pretty(data_mean$xanom)*100, "%", sep="") else pretty(data_mean$xanom), tck=0)
+    axis(2, at=pretty(data_mean$yanom), labels=if(yvar_type=="Log") paste(pretty(data_mean$yanom)*100, "%", sep="") else pretty(data_mean$yanom), las=2, tck=0)
     
     # Legend 
     s <- c(show_observed, show_runs, T, show_trajectories, show_ensMean)
     legend(legend_pos, 
            legend = c("Observed climate (2001-2020)", "individual GCM simulation", "GCM mean", "GCM mean trajectory", "Ensemble mean")[s], 
            pch = c(22, 21, 21, 16, 43)[s], 
-           pt.cex = c(2.5, 1, 2.5, 0.5, 3)[s], 
+           pt.cex = c(2, .8, 2, 0.5, 2.2)[s], 
            pt.bg = c("gray", "gray", "gray", NA, NA)[s],
            col = c(1,1,1,"gray","gray")[s], 
            lty = c(NA, NA, NA, 1, NA)[s],
@@ -142,4 +161,7 @@ plot_bivariate <- function(
     # PLOTLY PLOT
   }
 }
+
+
+
 
