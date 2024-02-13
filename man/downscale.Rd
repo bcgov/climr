@@ -70,7 +70,6 @@ While less user-friendly than \code{\link[=climr_downscale]{climr_downscale()}},
 We recommend \code{\link[=climr_downscale]{climr_downscale()}} for most purposes.
 }
 \examples{
-\dontrun{
 dbCon <- data_connect()
 on.exit(try(pool::poolClose(dbCon)))
 xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10), id = 1:10)
@@ -90,7 +89,6 @@ historic <- historic_input(dbCon, thebb)
 terra::plot(historic[[1]])
 
 downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)
-}
 }
 \seealso{
 \code{\link[=gcm_input]{gcm_input()}}, \code{\link[=historic_input]{historic_input()}}, \code{\link[=list_variables]{list_variables()}}
