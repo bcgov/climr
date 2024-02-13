@@ -45,7 +45,7 @@
 #' @importFrom terra rast extract sources ext xres yres crop
 #' @importFrom data.table getDTthreads setDTthreads rbindlist setkey
 #'
-#' @examples {
+#' @examples
 #' library(data.table)
 #' library(terra)
 #' set.seed(123)
@@ -89,7 +89,7 @@
 #'                                      #gcm_ts_years = 2020:2060,
 #'                                      max_run = 3, #' we want 3 individual runs for each model
 #'                                      vars = vars)
-#' }
+#' 
 #' @export
 climr_downscale <- function(xyz, which_normal = "auto", historic_period = NULL, historic_ts = NULL,
                             gcm_models = NULL, ssp = list_ssp(),

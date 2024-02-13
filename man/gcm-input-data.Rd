@@ -89,7 +89,6 @@ In general this function should only be used in combination with \code{\link[=do
 it will take a while to download the data (there's lot of it).
 }
 \examples{
-{
 library(terra)
 xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10), id = 1:10)
 
@@ -106,7 +105,6 @@ gcm <- gcm_input(dbCon, thebb, list_gcm()[1], list_ssp()[1])
 lyrs <- grep("ensemble", names(gcm$`ACCESS-ESM1-5`))
 
 plot(gcm$`ACCESS-ESM1-5`[[lyrs]])
-}
 
 {
 library(terra)
@@ -127,7 +125,6 @@ lyrs <- grep("ensemble", names(gcm_hist$`ACCESS-ESM1-5`))
 plot(gcm_hist$`ACCESS-ESM1-5`[[lyrs]])
 }
 
-{
 library(terra)
 xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10), id = 1:10)
 
@@ -144,7 +141,6 @@ gcm_ts <- gcm_ts_input(dbCon, thebb, list_gcm()[1], list_ssp()[1])
 lyrs <- grep("ensemble", names(gcm_ts$`ACCESS-ESM1-5`))
 
 plot(gcm_ts$`ACCESS-ESM1-5`[[lyrs]])
-}
 
 }
 \seealso{
