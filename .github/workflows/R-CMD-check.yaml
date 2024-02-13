@@ -39,9 +39,15 @@ jobs:
       R_REPRODUCIBLE_RUN_ALL_TESTS: true
 
     steps:
+      - name: Install X11 dependencies on MacOS
+        if: runner.os == 'macOS'
+        run: |
+          brew install --cask xquartz
+          
       - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
+      
 
       - uses: r-lib/actions/setup-r@v2
         with:
