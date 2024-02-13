@@ -1,6 +1,6 @@
 Package: climr
 Title: Downscaling of global climate data
-Version: 0.0.1.9009
+Version: 0.0.2.9009
 Date: 12-02-2024
 Authors@R: c(
     person("Kiri","Daust", email = "kiri.daust@gov.bc.ca", role = "aut"),
