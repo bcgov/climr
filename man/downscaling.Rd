@@ -7,7 +7,7 @@
 \usage{
 climr_downscale(
   xyz,
-  which_normal = c("auto", list_normal()),
+  which_normal = "auto",
   historic_period = NULL,
   historic_ts = NULL,
   gcm_models = NULL,
@@ -45,7 +45,7 @@ and a unique "id". Any extra columns will be ignored and not output.}
 
 \item{which_normal}{character. Which normal layer to use.
 Default is "auto", which selects the highest resolution normal for each point.
-Other options are one of \code{\link[=list_normal]{list_normal()}}}
+Other options are one of \code{\link[=list_normal]{list_normal()}}.}
 
 \item{historic_period}{character. Which historic period. Default \code{NULL}}
 
