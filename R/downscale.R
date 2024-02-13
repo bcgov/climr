@@ -36,7 +36,6 @@
 #' 
 #' @export
 #' @examples
-#' \dontrun{
 #' dbCon <- data_connect()
 #' on.exit(try(pool::poolClose(dbCon)))
 #' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10), id = 1:10)
@@ -56,7 +55,6 @@
 #' terra::plot(historic[[1]])
 #' 
 #' downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)
-#' }
 downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, gcm_hist = NULL, historic_ts = NULL, return_normal = FALSE,
                       vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))),
                       ppt_lr = FALSE, nthread = 1L, out_spatial = FALSE, plot = NULL) {
