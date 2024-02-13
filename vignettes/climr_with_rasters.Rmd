@@ -29,7 +29,12 @@ knitr::opts_chunk$set(
   fig.align = "center"
 )
 
-options("climr.cache.path" = file.path("climr.cache"))
+cpath <- if (interactive()) {
+  normalizePath("climr.cache", winslash = "/")
+} else {
+  normalizePath(file.path(tempdir(), "climr.cache"), winslash = "/")
+}
+options("climr.cache.path" = cpath)
 ```
 
 ## Spatial inputs and `climr_downscale()`
