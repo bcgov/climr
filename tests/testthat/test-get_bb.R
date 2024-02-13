@@ -10,7 +10,7 @@ test_that("test get_bb", {
   
   ## different column order
   xyz2 <- xyz[, c(2,4,1,3)]
-  expect_equal(get_bb(xyz2), thebb2)
+  expect_equal(get_bb(thebb), get_bb(xyz2))
   
   xyz3 <- xyz
   names(xyz3) <- c("x", "y", "z", "id")
