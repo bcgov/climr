@@ -1,7 +1,14 @@
 #' Bivariate climate change plots
 #' 
 #' @description
-#' Bivariate plots of 21st century climate change for user-selected locations and climate variables.
+#' Bivariate plots of 21st century climate change for user-selected locations and climate variables. 
+#' The purposes of the plot are to 
+#' \enumerate{
+#'   \item show differences in climate change trends among global climate models (GCMs), 
+#'   \item show the differences between multiple simulations of each model, and 
+#'   \item compare simulated climate change to observed climate change in the 2001-2020 period. 
+#' }
+#' All climate changes are relative to the 1961-1990 reference period normals. 
 #'  
 #' @details
 #' The input table `xyz` can be a single location or multiple locations. If multiple locations, the plot provides the mean of the anomalies for these locations. 
@@ -23,7 +30,7 @@
 #' @return NULL. Draws a plot in the active graphics device. 
 #'
 #' @examples 
-#' # data frame of arbitrary points on vancouver island
+#' # data frame of arbitrary points on Vancouver Island
 #' my_points <- data.frame(lon = c(-123.4404, -123.5064, -124.2317),
 #'                         lat = c(48.52631, 48.46807, 49.21999),
 #'                         elev = c(52, 103, 357),
@@ -46,7 +53,6 @@ plot_bivariate <- function(
     yvar = "PPT_sm", 
     # percent_x = NULL, TODO: set up an override for ratio variables being expressed as percent anomalies
     # percent_y = NULL, TODO: set up an override for ratio variables being expressed as percent anomalies
-    which_normal = "auto", # TODO: remove once the bug is fixed. 
     period_focal = list_gcm_period()[1], 
     gcm_models = list_gcm()[c(1,4,5,6,7,10,11,12)], 
     ssp = list_ssp()[2], 
@@ -72,13 +78,11 @@ plot_bivariate <- function(
     xvar_type <- variables$Scale[which(variables$Code==xvar)]
     yvar_type <- variables$Scale[which(variables$Code==yvar)]
     
-    colors = grDevices::colors()[grep('gr(a|e)y', grDevices::colors(), invert = TRUE)][-1]
-    set.seed(2)
-    ColScheme <- sample(colors,length(gcm_models)) # TODO select better colors
+    colors <- c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C", "#FB9A99", "#E31A1C", "#FDBF6F", "#FF7F00", "#CAB2D6", "#6A3D9A", "#1e90ff", "#B15928", "#FFFF99")
+    ColScheme <- colors[1:length(gcm_models)] 
     
     # generate the climate data
     data <- climr_downscale(xyz, 
-                            which_normal = which_normal, # TODO: remove once the bug is fixed. 
                             historic_period = historic_period,
                             gcm_models = gcm_models, 
                             ssp = ssp, 
@@ -93,7 +97,9 @@ plot_bivariate <- function(
     data[, yanom := if(yvar_type=="Log") (get(yvar)/get(yvar)[1]-1) else (get(yvar) - get(yvar)[1]), by = id]
     
     # collapse the points down to a mean anomaly
-    data <- data[, .(xanom = mean(xanom), yanom = mean(yanom)), by = .(GCM, SSP, RUN, PERIOD)] # TODO: need to give special treatment to SSPs; perhaps by averaging the ensemble mean but retaining the individual runs
+    data.all <- copy(data[, .(xanom = mean(xanom), yanom = mean(yanom)), by = .(GCM, SSP, RUN, PERIOD)]) 
+    # collapse the SSP field to calculate a single-model ensemble mean
+    data <- copy(data.all[, .(xanom = mean(xanom), yanom = mean(yanom)), by = .(GCM, RUN, PERIOD)]) 
     # ensemble mean for the selected period
     ensMean <- data[!is.na(GCM) & RUN == "ensembleMean" & PERIOD == period_focal, .(xanom = mean(xanom), yanom = mean(yanom)), ]
     # observed climate
@@ -104,7 +110,7 @@ plot_bivariate <- function(
       # BASE PLOT
       # initiate the plot
       par(mar=c(3,4,0,1), mgp=c(1.25, 0.25,0), cex=1.5)
-      plot(data$xanom,data$yanom,col="white", tck=0, xaxt="n", yaxt="n", ylab="",
+      plot(data.all$xanom,data.all$yanom,col="white", tck=0, xaxt="n", yaxt="n", ylab="",
            xlab=paste("Change in", variables$Variable[which(variables$Code==xvar)]) 
       )
       par(mgp=c(2.5,0.25, 0))
@@ -120,8 +126,8 @@ plot_bivariate <- function(
       if(show_runs){
         for(gcm in gcm_models){
           i=which(gcm_models==gcm)
-          x.runs <- data[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, xanom]
-          y.runs <- data[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, yanom]
+          x.runs <- data.all[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, xanom]
+          y.runs <- data.all[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, yanom]
           points(x.runs,y.runs, pch=21, bg=ColScheme[i], cex=1)
         }
       }
@@ -135,7 +141,7 @@ plot_bivariate <- function(
           if(length(unique(sign(diff(x2))))==1){
             x3 <- if(unique(sign(diff(x2)))==-1) rev(x2) else x2
             y3 <- if(unique(sign(diff(x2)))==-1) rev(y2) else y2
-            s <- stinepack::stinterp(x3,y3, seq(min(x3),max(x3), diff(range(data$xanom))/500)) 
+            s <- stinepack::stinterp(x3,y3, seq(min(x3),max(x3), diff(range(data.all$xanom))/500)) 
             lines(s, col=ColScheme[i], lwd=2)
           } else lines(x2, y2, col=ColScheme[i], lwd=2)
           points(x2,y2, pch=16, col=ColScheme[i], cex=0.5)
@@ -146,8 +152,8 @@ plot_bivariate <- function(
       }
       
       # axis labels
-      axis(1, at=pretty(data$xanom), labels=if(xvar_type=="Log") paste(pretty(data$xanom)*100, "%", sep="") else pretty(data$xanom), tck=0)
-      axis(2, at=pretty(data$yanom), labels=if(yvar_type=="Log") paste(pretty(data$yanom)*100, "%", sep="") else pretty(data$yanom), las=2, tck=0)
+      axis(1, at=pretty(data.all$xanom), labels=if(xvar_type=="Log") paste(pretty(data.all$xanom)*100, "%", sep="") else pretty(data.all$xanom), tck=0)
+      axis(2, at=pretty(data.all$yanom), labels=if(yvar_type=="Log") paste(pretty(data.all$yanom)*100, "%", sep="") else pretty(data.all$yanom), las=2, tck=0)
       
       # Legend 
       s <- c(show_observed, show_runs, TRUE, show_trajectories, show_ensMean)
@@ -169,19 +175,18 @@ plot_bivariate <- function(
       } else {
         
         # PLOTLY PLOT
-        # TODO: the colors aren't plotting correctly. need to fix this. 
-        
+
         #initiate the plot
-        fig <- plot_ly(x=data$xanom,y=data$yanom, type = 'scatter', mode = 'markers', marker = list(color ="lightgray", size=5), hoverinfo="none", color="All models/scenarios/runs/periods")
+        fig <- plot_ly(x=data.all$xanom,y=data.all$yanom, type = 'scatter', mode = 'markers', marker = list(color ="lightgray", size=5), hoverinfo="none", color="All models/scenarios/runs/periods")
         
         # axis titles
-        fig <- fig %>% layout(xaxis = list(title=paste("Change in", variables$Variable[which(variables$Code==xvar)]), range=range(data$xanom)), 
-                              yaxis = list(title=paste("Change in", variables$Variable[which(variables$Code==yvar)]), range=range(data$yanom))
+        fig <- fig %>% layout(xaxis = list(title=paste("Change in", variables$Variable[which(variables$Code==xvar)]), range=range(data.all$xanom)), 
+                              yaxis = list(title=paste("Change in", variables$Variable[which(variables$Code==yvar)]), range=range(data.all$yanom))
         )
         
         # observed climate
         fig <- fig %>% add_markers(obs$xanom ,obs$yanom, name="Observed Climate (2001-2020)", text="observed\n(2001-2020)", hoverinfo="text",
-                                   marker = list(size = 25, color = "grey"), symbol = 43)
+                                   marker = list(size = 25, color = "grey", symbol = 1))
         
         # ensemble mean
         fig <- fig %>% add_markers(ensMean$xanom,ensMean$yanom, name="Ensemble mean", text="Ensemble mean", hoverinfo="text",
@@ -191,10 +196,11 @@ plot_bivariate <- function(
         if(show_runs){
           for(gcm in gcm_models){
             i=which(gcm_models==gcm)
-            x.runs <- data[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, xanom]
-            y.runs <- data[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, yanom]
-            runs <- data[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, RUN]
-            fig <- fig %>% add_markers(x=x.runs,y=y.runs, color = ColScheme[i], name="Individual GCM runs", text=paste(gcm_models[i], runs), hoverinfo="text", showlegend = FALSE,
+            x.runs <- data.all[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, xanom]
+            y.runs <- data.all[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, yanom]
+            runs <- data.all[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, RUN]
+            ssps <- data.all[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, SSP]
+            fig <- fig %>% add_markers(x=x.runs,y=y.runs, color = ColScheme[i], name="Individual GCM runs", text=paste(gcm_models[i], ssps, runs), hoverinfo="text", showlegend = if(i==1) TRUE else FALSE,
                                        marker = list(size = 7, color = ColScheme[i], line = list(color = "black", width = 1)), legendgroup=paste("group", i, sep=""))
           }
         }
@@ -210,7 +216,7 @@ plot_bivariate <- function(
             if(length(unique(sign(diff(x2))))==1){
               x3 <- if(unique(sign(diff(x2)))==-1) rev(x2) else x2
               y3 <- if(unique(sign(diff(x2)))==-1) rev(y2) else y2
-              s <- stinepack::stinterp(x3,y3, seq(min(x3),max(x3), diff(range(data$xanom))/500)) # way better than interpSpline, not prone to oscillations
+              s <- stinepack::stinterp(x3,y3, seq(min(x3),max(x3), diff(range(data.all$xanom))/500)) # way better than interpSpline, not prone to oscillations
               fig <- fig %>% add_trace(x=s$x, y=s$y, color = ColScheme[i], type = 'scatter', mode = 'lines', line = list(color=ColScheme[i], width = 2), marker=NULL, legendgroup=paste("group", i, sep=""), showlegend = FALSE)
             } else {
               fig <- fig %>% add_trace(x=x2, y=y2, color = ColScheme[i], type = 'scatter', mode = 'lines', line = list(color=ColScheme[i], width = 2), marker=NULL, legendgroup=paste("group", i, sep=""), showlegend = FALSE)
@@ -219,7 +225,7 @@ plot_bivariate <- function(
                                        marker = list(size = 8, color = ColScheme[i]), legendgroup=paste("group", i, sep=""), showlegend = FALSE)
           }
           j=which(list_gcm_period()==period_focal)+1
-          fig <- fig %>% add_markers(x2[j],y2[j], color = gcm_models[i], colors=ColScheme[i], text=gcm_models[i],
+          fig <- fig %>% add_markers(x2[j],y2[j], color = gcm_models[i], colors=ColScheme[i],
                                      marker = list(size = 20, color = ColScheme[i], line = list(color = "black", width = 1)),
                                      legendgroup=paste("group", i, sep=""))
           
@@ -235,5 +241,3 @@ plot_bivariate <- function(
     }
   }
 }
-
-

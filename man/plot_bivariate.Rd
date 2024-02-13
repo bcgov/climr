@@ -8,7 +8,6 @@ plot_bivariate(
   xyz,
   xvar = "Tave_sm",
   yvar = "PPT_sm",
-  which_normal = "auto",
   period_focal = list_gcm_period()[1],
   gcm_models = list_gcm()[c(1, 4, 5, 6, 7, 10, 11, 12)],
   ssp = list_ssp()[2],
@@ -31,10 +30,6 @@ and a unique "id". Any extra columns will be ignored and not output.}
 \item{xvar}{character. x-axis variable. options are \code{list_variables()}.}
 
 \item{yvar}{character. y-axis variable. options are \code{list_variables()}.}
-
-\item{which_normal}{character. Which normal layer to use.
-Default is "auto", which selects the highest resolution normal for each point.
-Other options are one of \code{\link[=list_normal]{list_normal()}}}
 
 \item{period_focal}{character. The 20-year period for which to plot the ensemble detail. options are \code{list_gcm_period()}.}
 
@@ -70,6 +65,13 @@ NULL. Draws a plot in the active graphics device.
 }
 \description{
 Bivariate plots of 21st century climate change for user-selected locations and climate variables.
+The purposes of the plot are to
+\enumerate{
+\item show differences in climate change trends among global climate models (GCMs),
+\item show the differences between multiple simulations of each model, and
+\item compare simulated climate change to observed climate change in the 2001-2020 period.
+}
+All climate changes are relative to the 1961-1990 reference period normals.
 }
 \details{
 The input table \code{xyz} can be a single location or multiple locations. If multiple locations, the plot provides the mean of the anomalies for these locations.
@@ -77,7 +79,7 @@ The climate change trajectories provided by \code{show_trajectories} are points 
 This plot is designed to be used with a single SSP scenario. If multiple scenarios are passed to the plot, the GCM means and ensemble mean are averaged across the scenarios, but the individual runs for all scenarios are plotted separately.
 }
 \examples{
-# data frame of arbitrary points on vancouver island
+# data frame of arbitrary points on Vancouver Island
 my_points <- data.frame(lon = c(-123.4404, -123.5064, -124.2317),
                         lat = c(48.52631, 48.46807, 49.21999),
                         elev = c(52, 103, 357),
