@@ -32,7 +32,12 @@ if (!require(ggplot2)) {
   warning("'ggplot2' is not installed. Some visuals won't be available.")
 }
 
-options("climr.cache.path" = "climr.cache")
+cpath <- if (interactive()) {
+  normalizePath("climr.cache", winslash = "/")
+} else {
+  normalizePath(file.path(tempdir(), "climr.cache"), winslash = "/")
+}
+options("climr.cache.path" = cpath)
 ```
 
 
