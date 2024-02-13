@@ -6,7 +6,7 @@
 \usage{
 climr_downscale(
   xyz,
-  which_normal = c("auto", list_normal()),
+  which_normal = "auto",
   historic_period = NULL,
   historic_ts = NULL,
   gcm_models = NULL,
@@ -91,7 +91,6 @@ Although \code{which_normal = "auto"} is the default, users are cautioned that t
 We recommend that queries spanning this boundary use \code{which_normal = "normal_na"}.
 }
 \examples{
-{
 library(data.table)
 library(terra)
 set.seed(123)
@@ -135,5 +134,5 @@ climate_norms_fut <- climr_downscale(xyz = in_xyz, which_normal = "auto",
                                      #gcm_ts_years = 2020:2060,
                                      max_run = 3, #' we want 3 individual runs for each model
                                      vars = vars)
-}
+
 }

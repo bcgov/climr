@@ -28,7 +28,7 @@
 #' @importFrom uuid UUIDgenerate
 #' @import data.table
 #' 
-#' @examples {
+#' @examples
 #' library(terra)
 #' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10), id = 1:10)
 #' 
@@ -45,7 +45,6 @@
 #' lyrs <- grep("ensemble", names(gcm$`ACCESS-ESM1-5`))
 #' 
 #' plot(gcm$`ACCESS-ESM1-5`[[lyrs]])
-#' }
 #' 
 #' @rdname gcm-input-data
 #' @export
@@ -163,7 +162,7 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 #' @import uuid
 #' @import data.table
 #' 
-#' @examples {
+#' @examples
 #' library(terra)
 #' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10), id = 1:10)
 #' 
@@ -180,7 +179,6 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 #' lyrs <- grep("ensemble", names(gcm_ts$`ACCESS-ESM1-5`))
 #' 
 #' plot(gcm_ts$`ACCESS-ESM1-5`[[lyrs]])
-#' }
 #' 
 #' @rdname gcm-input-data
 #' @export
