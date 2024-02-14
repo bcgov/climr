@@ -20,7 +20,7 @@ years and runs."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
     
     <a class="navbar-brand me-2" href="../index.html">climr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2.9006</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,8 +35,9 @@ years and runs."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/caching.html">caching</a>
-    <a class="dropdown-item" href="../articles/climr-with-rasters.html">Working with rasters and other spatial objects</a>
-    <a class="dropdown-item" href="../articles/climr_workflow.html">`climr` workflow - intermediate</a>
+    <a class="dropdown-item" href="../articles/climr_with_rasters.html">Working with rasters and other spatial objects</a>
+    <a class="dropdown-item" href="../articles/climr_workflow_beg.html">`climr` workflow - beginner</a>
+    <a class="dropdown-item" href="../articles/climr_workflow_int.html">`climr` workflow - intermediate</a>
     <a class="dropdown-item" href="../articles/lapse_rates.html">Lapse rates</a>
     <a class="dropdown-item" href="../articles/methods_downscaling.html">`climr` downscaling methods</a>
   </div>
@@ -107,7 +108,7 @@ years and runs.</p>
 
 
 <dt>bbox</dt>
-<dd><p>numeric. Vector of length 4 giving bounding box of study region, created by <code><a href="get_bb.html">get_bb()</a></code>.</p></dd>
+<dd><p>numeric. Vector of length 4 giving bounding box of study region, in the order ymax,ymin,xmax,xmin. In general this is created by <code><a href="get_bb.html">get_bb()</a></code>, but can also be user-defined.</p></dd>
 
 
 <dt>gcm</dt>
@@ -172,8 +173,7 @@ it will take a while to download the data (there's lot of it).</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="op">{</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">xyz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>lon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, <span class="op">-</span><span class="fl">140</span>, <span class="op">-</span><span class="fl">106</span><span class="op">)</span>, lat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">37</span>, <span class="fl">61</span><span class="op">)</span>, elev <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>, id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## get bounding box based on input points</span></span></span>
@@ -184,16 +184,15 @@ it will take a while to download the data (there's lot of it).</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu">pool</span><span class="fu">::</span><span class="fu"><a href="http://rstudio.github.io/pool/reference/Pool-class.html" class="external-link">poolClose</a></span><span class="op">(</span><span class="va">dbCon</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">gcm</span> <span class="op">&lt;-</span> <span class="fu">gcm_input</span><span class="op">(</span><span class="va">dbCon</span>, <span class="va">thebb</span>, <span class="fu"><a href="data-option-lists.html">list_gcm</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="fu"><a href="data-option-lists.html">list_ssp</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Not fully cached :( Will download more</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in poolCheckout(pool):</span> The pool has been closed.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## show ensemble means only</span></span></span>
 <span class="r-in"><span><span class="va">lyrs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"ensemble"</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">gcm</span><span class="op">$</span><span class="va">`ACCESS-ESM1-5`</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'gcm' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">gcm</span><span class="op">$</span><span class="va">`ACCESS-ESM1-5`</span><span class="op">[[</span><span class="va">lyrs</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Downloading GCM anomalies</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> .</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Caching data...</span>
-<span class="r-plt img"><img src="gcm-input-data-1.png" alt="" width="700" height="433"></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'gcm' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="op">{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span></span>
@@ -215,9 +214,8 @@ it will take a while to download the data (there's lot of it).</p>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Downloading GCM anomalies</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Caching data...</span>
-<span class="r-plt img"><img src="gcm-input-data-2.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="gcm-input-data-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="op">{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">xyz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>lon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, <span class="op">-</span><span class="fl">140</span>, <span class="op">-</span><span class="fl">106</span><span class="op">)</span>, lat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">37</span>, <span class="fl">61</span><span class="op">)</span>, elev <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>, id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -229,21 +227,14 @@ it will take a while to download the data (there's lot of it).</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu">pool</span><span class="fu">::</span><span class="fu"><a href="http://rstudio.github.io/pool/reference/Pool-class.html" class="external-link">poolClose</a></span><span class="op">(</span><span class="va">dbCon</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">gcm_ts</span> <span class="op">&lt;-</span> <span class="fu">gcm_ts_input</span><span class="op">(</span><span class="va">dbCon</span>, <span class="va">thebb</span>, <span class="fu"><a href="data-option-lists.html">list_gcm</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="fu"><a href="data-option-lists.html">list_ssp</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in poolCheckout(pool):</span> The pool has been closed.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## show ensemble means only</span></span></span>
 <span class="r-in"><span><span class="va">lyrs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"ensemble"</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">gcm_ts</span><span class="op">$</span><span class="va">`ACCESS-ESM1-5`</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in eval(expr, envir, enclos):</span> object 'gcm_ts' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">gcm_ts</span><span class="op">$</span><span class="va">`ACCESS-ESM1-5`</span><span class="op">[[</span><span class="va">lyrs</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Downloading GCM anomalies</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Precip...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> .</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Tmax...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> .</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Tmin...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> .</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Caching data...</span>
-<span class="r-plt img"><img src="gcm-input-data-3.png" alt="" width="700" height="433"></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'gcm_ts' not found</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -252,7 +243,7 @@ it will take a while to download the data (there's lot of it).</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Kiri Daust, Colin Mahony, Bruno Tremblay, Ceres Barros, Francois Bornais, Province of British Columbia.</p>
+  <p></p><p>Developed by Kiri Daust, Colin Mahony, Bruno Tremblay, Ceres Barros, Province of British Columbia.</p>
 </div>
 
 <div class="pkgdown-footer-right">

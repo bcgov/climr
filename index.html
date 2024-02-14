@@ -44,7 +44,7 @@
     
     <a class="navbar-brand me-2" href="index.html">climr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2.9006</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,8 +60,9 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="articles/caching.html">caching</a>
-    <a class="dropdown-item" href="articles/climr-with-rasters.html">Working with rasters and other spatial objects</a>
-    <a class="dropdown-item" href="articles/climr_workflow.html">`climr` workflow - intermediate</a>
+    <a class="dropdown-item" href="articles/climr_with_rasters.html">Working with rasters and other spatial objects</a>
+    <a class="dropdown-item" href="articles/climr_workflow_beg.html">`climr` workflow - beginner</a>
+    <a class="dropdown-item" href="articles/climr_workflow_int.html">`climr` workflow - intermediate</a>
     <a class="dropdown-item" href="articles/lapse_rates.html">Lapse rates</a>
     <a class="dropdown-item" href="articles/methods_downscaling.html">`climr` downscaling methods</a>
   </div>
@@ -88,18 +89,14 @@
 <!-- badges: start -->
 
 <!-- badges: end -->
-<p>Copyright 2023 Province of British Columbia</p>
-<p>Licensed under the Apache License, Version 2.0 (the “License”); you may not use this file except in compliance with the License. You may obtain a copy of the License at</p>
-<p><a href="http://www.apache.org/licenses/LICENSE-2.0" class="external-link uri">http://www.apache.org/licenses/LICENSE-2.0</a></p>
-<p>Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an “AS IS” BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.</p>
 <div class="section level2">
 <h2 id="about-climr">About <code>climr</code>
 <a class="anchor" aria-label="anchor" href="#about-climr"></a>
 </h2>
 <p><code>climr</code> is an experimental R package that builds on the downscaling concepts operationalized in the <a href="https://climatena.ca/" target="_blank" class="external-link">ClimateNA</a> tool (Wang et al. 2016). It provides downscaling of observational and simulated climate data using change-factor (a.k.a. climate imprint) downscaling, a simple method that adds low-spatial-resolution climate anomalies to a high-spatial-resolution reference climatological map, with additional elevation adjustment for “scale-free” downscaling. <code>climr</code> is designed to be fast and to minimize local data storage requirements. To do so, it uses a remote PostGIS database, and optionally caches data locally.</p>
-<div class="section level4">
-<h4 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
-</h4>
+<div class="section level3">
+<h3 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
+</h3>
 <p><code>climr</code> provides the following data:</p>
 <ul>
 <li><p>Historical observational time series (1902-2022), currently limited to the ClimateNA time series (Wang et al., 2016)</p></li>
@@ -107,23 +104,19 @@
 <li><p>User selection of single or multiple climate variables, with derived variables following the ClimateNA methodology of Wang et al. (2016).</p></li>
 </ul>
 </div>
-<div class="section level4">
-<h4 id="data-sources">Data Sources<a class="anchor" aria-label="anchor" href="#data-sources"></a>
-</h4>
-<p>The reference climatologies for British Columbia are the <a href="https://www.pacificclimate.org/data/prism-climatology-and-monthly-timeseries" target="_blank" class="external-link">BC PRISM maps</a> provided by Pacific Climate Impacts Consortium. Reference climatologies for North America are the ClimateNA (Wang et al. 2016) mosaics of PRISM (BC, US) and WorldClim (rest of North America). The ClimateNA mosaics are accessed from <a href="https://adaptwest.databasin.org/pages/adaptwest-climatena/" target="_blank" class="external-link">AdaptWest</a>.</p>
-<p>Historical observational time series are derived using <a href="https://climatena.ca/" target="_blank" class="external-link">ClimateNA</a> (Wang et al. 2016).</p>
-<p>The CMIP6 global climate model data were downloaded and subsetted to North America by Tongli Wang, Associate Professor at the UBC Department of Forest and Conservation Sciences. The 13 global climate models selected for <code>climr</code>, and best practices for ensemble analysis, are described in Mahony et al. (2022).</p>
-</div>
-<div class="section level4">
-<h4 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
-</h4>
-<p>Mahony, C.R., T. Wang, A. Hamann, and A.J. Cannon. 2022. <a href="https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.7566" target="_blank" class="external-link">A global climate model ensemble for downscaled monthly climate normals over North America</a>. International Journal of Climatology. 42:5871-5891. <a href="https://doi.org/10.1002/joc.7566" target="_blank" class="external-link">doi.org/10.1002/joc.7566</a></p>
-<p>Wang T., A. Hamann, D. Spittlehouse, and C. Carroll. 2016. <a href="https://doi.org/10.1371/journal.pone.0156720" target="_blank" class="external-link">Locally Downscaled and Spatially Customizable Climate Data for Historical and Future Periods for North America</a>. PLoS ONE. e0156720. <a href="https://doi.org/10.1371/journal.pone.0156720" target="_blank" class="external-link">doi.org/10.1371/journal.pone.0156720</a></p>
+<div class="section level3">
+<h3 id="data-sources">Data Sources<a class="anchor" aria-label="anchor" href="#data-sources"></a>
+</h3>
+<p>The reference climatologies for British Columbia are the <a href="https://www.pacificclimate.org/data/prism-climatology-and-monthly-timeseries" class="external-link">BC PRISM maps</a> provided by Pacific Climate Impacts Consortium. Reference climatologies for North America are the ClimateNA [@wang2016] mosaics of PRISM (BC, US) and WorldClim (rest of North America). The ClimateNA mosaics are accessed from <a href="https://adaptwest.databasin.org/pages/adaptwest-climatena/" class="external-link">AdaptWest</a>.</p>
+<p>A high resolution composite climatology of BC PRISM, adjusted US PRISM and DAYMET (Alberta and Saskatchewan), is also available for Western Canada and Western US.</p>
+<p>Historical observational time series are derived using <a href="https://climatena.ca/" class="external-link">ClimateNA</a> [@wang2016].</p>
+<p>The CMIP6 global climate model data were downloaded and subsetted to North America by Tongli Wang, Associate Professor at the UBC Department of Forest and Conservation Sciences. The 13 global climate models selected for <code>climr</code>, and best practices for ensemble analysis, are described in @mahony2022 .</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
+<p><code>climr</code> is only available on GitHub. To install please use:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"bcgov/climr"</span><span class="op">)</span></span></code></pre></div>
 <p>If you want to install the development version:</p>
@@ -131,80 +124,30 @@
 <code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"bcgov/climr@devl"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="example-usage">Example Usage<a class="anchor" aria-label="anchor" href="#example-usage"></a>
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">##provide or create a long, lat, elev dataframe</span></span>
-<span><span class="va">in_xyz</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/structure.html" class="external-link">structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">127.70521</span>, <span class="op">-</span><span class="fl">127.62279</span>, <span class="op">-</span><span class="fl">127.56235</span>, <span class="op">-</span><span class="fl">127.7162</span>, </span>
-<span>                                  <span class="op">-</span><span class="fl">127.18585</span>, <span class="op">-</span><span class="fl">127.1254</span>, <span class="op">-</span><span class="fl">126.94957</span>, <span class="op">-</span><span class="fl">126.95507</span><span class="op">)</span>, </span>
-<span>                         lat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">55.3557</span>, <span class="fl">55.38847</span>, <span class="fl">55.28537</span>, <span class="fl">55.25721</span>, <span class="fl">54.88135</span>, <span class="fl">54.65636</span>, <span class="fl">54.6913</span>, <span class="fl">54.61025</span><span class="op">)</span>, </span>
-<span>                         elev <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">291L</span>, <span class="fl">296L</span>, <span class="fl">626L</span>, <span class="fl">377L</span>, <span class="fl">424L</span>, <span class="fl">591L</span>, <span class="fl">723L</span>, <span class="fl">633L</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                         id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">8</span>,</span>
-<span>                         row.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="op">-</span><span class="fl">8L</span><span class="op">)</span>, class <span class="op">=</span> <span class="st">"data.frame"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">##if you just want to downscale points and not think about what happening behind the scenes, use this function</span></span>
-<span></span>
-<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/climr_downscale.html">climr_downscale</a></span><span class="op">(</span>xyz <span class="op">=</span> <span class="va">in_xyz</span>, which_normal <span class="op">=</span> <span class="st">"auto"</span>, </span>
-<span>                       gcm_models <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ACCESS-ESM1-5"</span>, <span class="st">"EC-Earth3"</span><span class="op">)</span>, </span>
-<span>                       ssp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ssp370"</span>,<span class="st">"ssp245"</span><span class="op">)</span>, </span>
-<span>                       gcm_period <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2021_2040"</span>, <span class="st">"2041_2060"</span>,<span class="st">"2061_2080"</span><span class="op">)</span>,</span>
-<span>                       <span class="co">#gcm_ts_years = 2020:2060,</span></span>
-<span>                       max_run <span class="op">=</span> <span class="fl">3</span>, <span class="co"># we want 3 individual runs for each model</span></span>
-<span>                       vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PPT"</span>,<span class="st">"CMD"</span>,<span class="st">"CMI"</span><span class="op">)</span><span class="op">)</span></span>
-<span>                       </span>
-<span><span class="co">##Functions to show what data are available:</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/data-option-lists.html">list_gcm</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/data-option-lists.html">list_gcm_period</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/data-option-lists.html">list_ssp</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/data-option-lists.html">list_variables</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span>                       </span>
-<span><span class="co">## Otherwise, you can download and investigate the normals and annomalies#####################</span></span>
-<span><span class="va">dbCon</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/data_connect.html">data_connect</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">thebb</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_bb.html">get_bb</a></span><span class="op">(</span><span class="va">in_xyz</span><span class="op">)</span> <span class="co">##get bounding box based on input points</span></span>
-<span><span class="va">normal</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/normal-input-data.html">normal_input</a></span><span class="op">(</span>dbCon <span class="op">=</span> <span class="va">dbCon</span>, bbox <span class="op">=</span> <span class="va">thebb</span>, cache <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co">##get normal data and lapse rates</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">normal</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">##get GCM anomolies (20 yr periods)</span></span>
-<span><span class="va">gcm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/gcm-input-data.html">gcm_input</a></span><span class="op">(</span><span class="va">dbCon</span>, bbox <span class="op">=</span> <span class="va">thebb</span>, gcm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ACCESS-ESM1-5"</span>, <span class="st">"EC-Earth3"</span><span class="op">)</span>, </span>
-<span>                         ssp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ssp370"</span><span class="op">)</span>, </span>
-<span>                         period <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2021_2040"</span>,<span class="st">"2041_2060"</span>,<span class="st">"2061_2080"</span><span class="op">)</span>,</span>
-<span>                         max_run <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>                         cache <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">gcm</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">##get GCM anomolies (time series) - note that for multiple runs, this can take a bit to download the data</span></span>
-<span><span class="va">gcm_ts</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/gcm-input-data.html">gcm_ts_input</a></span><span class="op">(</span><span class="va">dbCon</span>, bbox <span class="op">=</span> <span class="va">thebb</span>, gcm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ACCESS-ESM1-5"</span>, <span class="st">"EC-Earth3"</span><span class="op">)</span>, </span>
-<span>                         ssp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ssp370"</span><span class="op">)</span>, </span>
-<span>                         years <span class="op">=</span> <span class="fl">2020</span><span class="op">:</span><span class="fl">2080</span>,</span>
-<span>                         max_run <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>                         cache <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">gcm_ts</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Downscale!</span></span>
-<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/downscale.html">downscale</a></span><span class="op">(</span></span>
-<span>  xyz <span class="op">=</span> <span class="va">in_xyz</span>,</span>
-<span>  normal <span class="op">=</span> <span class="va">normal</span>,</span>
-<span>  gcm <span class="op">=</span> <span class="va">gcm</span>,</span>
-<span>  gcm_ts <span class="op">=</span> <span class="va">gcm_ts</span>,</span>
-<span>  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Tmax%02d"</span><span class="op">)</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<div class="section level4">
-<h4 id="adding--modifying-climate-variables">Adding / Modifying climate variables<a class="anchor" aria-label="anchor" href="#adding--modifying-climate-variables"></a>
-</h4>
-<p>All climate variables are computed via <a href="./R/append_clim_vars.R">R/append_clim_vars.R</a>. Add or modify entries in the variables list as needed. Use function <code>v</code> to handle dependencies (i.e. <code>v("Tmin")</code> instead of <code>dt$Tmin</code> / <code>dt[["Tmin"]]</code>).</p>
+<p>See:</p>
+<ul>
+<li><p><code>vignette("vignettes/climr_workflow_beg.Rmd")</code> for a simple <code>climr</code> workflow;</p></li>
+<li><p><code>vignette("vignettes/climr_workflow_int.Rmd")</code> provides a deeper dive into <code>climr</code> and more advanced examples of how it can be used;</p></li>
+<li><p><code>vignette("vignettes/climr_with_rasters.Rmd")</code> covers several examples of how to work with <code>climr</code> using spatial inputs and outputs, such as raster and vector data.</p></li>
+</ul>
 </div>
-<div class="section level4">
-<h4 id="lapse-rates-details">Lapse rates details<a class="anchor" aria-label="anchor" href="#lapse-rates-details"></a>
-</h4>
-<p>See lapse rates article in the vignettes folder for details.</p>
+<div class="section level2">
+<h2 id="methods">Methods<a class="anchor" aria-label="anchor" href="#methods"></a>
+</h2>
+<p>For an overview of dowscaling methods used in <code>climr</code> see <code>vignette("vignettes/lapse_rates.Rmd")</code> and <code>vignette("vignettes/methods_downscaling.Rmd")</code></p>
+<div class="section level3">
+<h3 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
+</h3>
+<p>Copyright 2024 Province of British Columbia</p>
+<p>Licensed under the Apache License, Version 2.0 (the “License”); you may not use this file except in compliance with the License. You may obtain a copy of the License at</p>
+<p><a href="http://www.apache.org/licenses/LICENSE-2.0" class="external-link uri">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+<p>Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an “AS IS” BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.</p>
 </div>
-<div class="section level4">
-<h4 id="use-of-terra-package">Use of terra package<a class="anchor" aria-label="anchor" href="#use-of-terra-package"></a>
-</h4>
-<p>Instead of implementing custom algorithms for bilinear interpolation and raster manipulation, this package use <code>terra</code>. Long term, it will benefit from any performance improvement in <code>terra</code>. <code>terra</code> is a replacement for the <code>raster</code> package.</p>
-<p>Data pivot using <code>data.table</code> dcast is the most resource expensive operation of the <code>downscale</code> function according to profiling using <code>profvis</code>.</p>
+<div class="section level3">
+<h3 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h3>
 </div>
 </div>
 </div>
@@ -230,8 +173,8 @@
 <li>Colin Mahony <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-6111-5675" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Bruno Tremblay <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-2945-356X" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Ceres Barros <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0003-4036-977X" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>Francois Bornais <br><small class="roles"> Author </small>  </li>
 <li> Province of British Columbia <br><small class="roles"> Copyright holder, funder </small>  </li>
+<li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
 
@@ -249,7 +192,7 @@
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Kiri Daust, Colin Mahony, Bruno Tremblay, Ceres Barros, Francois Bornais, Province of British Columbia.</p>
+<p>Developed by Kiri Daust, Colin Mahony, Bruno Tremblay, Ceres Barros, Province of British Columbia.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -28,7 +28,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">climr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2.9006</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,8 +44,9 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/caching.html">caching</a>
-    <a class="dropdown-item" href="../articles/climr-with-rasters.html">Working with rasters and other spatial objects</a>
-    <a class="dropdown-item" href="../articles/climr_workflow.html">`climr` workflow - intermediate</a>
+    <a class="dropdown-item" href="../articles/climr_with_rasters.html">Working with rasters and other spatial objects</a>
+    <a class="dropdown-item" href="../articles/climr_workflow_beg.html">`climr` workflow - beginner</a>
+    <a class="dropdown-item" href="../articles/climr_workflow_int.html">`climr` workflow - intermediate</a>
     <a class="dropdown-item" href="../articles/lapse_rates.html">Lapse rates</a>
     <a class="dropdown-item" href="../articles/methods_downscaling.html">`climr` downscaling methods</a>
   </div>
@@ -157,98 +158,98 @@ the R² adjustment applied.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">dem</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">1000</span>, <span class="fl">25</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5]</span></span>
-<span><span class="co">#&gt; [1,]   84  507  882  255  579</span></span>
-<span><span class="co">#&gt; [2,]  983  505  609  150  445</span></span>
-<span><span class="co">#&gt; [3,]  521  701  748  162  447</span></span>
-<span><span class="co">#&gt; [4,]  764  614  114   76  858</span></span>
-<span><span class="co">#&gt; [5,]  381  467  934  115  665</span></span>
+<span><span class="co">#&gt; [1,]  298   90  717  932  320</span></span>
+<span><span class="co">#&gt; [2,]  314  995  955  844   31</span></span>
+<span><span class="co">#&gt; [3,]  455  565  331  510  899</span></span>
+<span><span class="co">#&gt; [4,]  705  795  443  609  810</span></span>
+<span><span class="co">#&gt; [5,]  587  389  908  788  400</span></span>
 <span><span class="op">(</span><span class="va">tmax</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">30</span> <span class="op">-</span> <span class="op">(</span><span class="va">dem</span> <span class="op">/</span> <span class="fl">50</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%/%</a></span> <span class="fl">1</span>, nrow <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5]</span></span>
-<span><span class="co">#&gt; [1,]   29   20   13   25   19</span></span>
-<span><span class="co">#&gt; [2,]   11   20   18   27   22</span></span>
-<span><span class="co">#&gt; [3,]   20   16   16   27   22</span></span>
-<span><span class="co">#&gt; [4,]   15   18   28   29   13</span></span>
-<span><span class="co">#&gt; [5,]   23   21   12   28   17</span></span></code></pre></div>
+<span><span class="co">#&gt; [1,]   25   29   16   12   24</span></span>
+<span><span class="co">#&gt; [2,]   24   11   11   14   30</span></span>
+<span><span class="co">#&gt; [3,]   21   19   24   20   13</span></span>
+<span><span class="co">#&gt; [4,]   16   15   22   18   14</span></span>
+<span><span class="co">#&gt; [5,]   19   23   12   15   22</span></span></code></pre></div>
 <p>Start by extending matrices</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dem_ext</span> <span class="op">&lt;-</span> <span class="fu">climr</span><span class="fu">:::</span><span class="fu">recycle_borders</span><span class="op">(</span><span class="va">dem</span>, <span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Downloading and Caching ESM run info :)</span></span>
 <span><span class="op">(</span><span class="va">tmax_ext</span> <span class="op">&lt;-</span> <span class="fu">climr</span><span class="fu">:::</span><span class="fu">recycle_borders</span><span class="op">(</span><span class="va">tmax</span>, <span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5] [,6] [,7]</span></span>
-<span><span class="co">#&gt; [1,]   29   29   20   13   25   19   19</span></span>
-<span><span class="co">#&gt; [2,]   29   29   20   13   25   19   19</span></span>
-<span><span class="co">#&gt; [3,]   11   11   20   18   27   22   22</span></span>
-<span><span class="co">#&gt; [4,]   20   20   16   16   27   22   22</span></span>
-<span><span class="co">#&gt; [5,]   15   15   18   28   29   13   13</span></span>
-<span><span class="co">#&gt; [6,]   23   23   21   12   28   17   17</span></span>
-<span><span class="co">#&gt; [7,]   23   23   21   12   28   17   17</span></span></code></pre></div>
+<span><span class="co">#&gt; [1,]   25   25   29   16   12   24   24</span></span>
+<span><span class="co">#&gt; [2,]   25   25   29   16   12   24   24</span></span>
+<span><span class="co">#&gt; [3,]   24   24   11   11   14   30   30</span></span>
+<span><span class="co">#&gt; [4,]   21   21   19   24   20   13   13</span></span>
+<span><span class="co">#&gt; [5,]   16   16   15   22   18   14   14</span></span>
+<span><span class="co">#&gt; [6,]   19   19   23   12   15   22   22</span></span>
+<span><span class="co">#&gt; [7,]   19   19   23   12   15   22   22</span></span></code></pre></div>
 <p>Sample 8 times</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dem_d</span> <span class="op">&lt;-</span> <span class="fu">climr</span><span class="fu">:::</span><span class="fu">deltas</span><span class="op">(</span><span class="va">dem_ext</span>, <span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="op">(</span><span class="va">tmax_d</span> <span class="op">&lt;-</span> <span class="fu">climr</span><span class="fu">:::</span><span class="fu">deltas</span><span class="op">(</span><span class="va">tmax_ext</span>, <span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $northwest</span></span>
 <span><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5]</span></span>
-<span><span class="co">#&gt; [1,]    0    9    7  -12    6</span></span>
-<span><span class="co">#&gt; [2,]   18    9    2  -14    3</span></span>
-<span><span class="co">#&gt; [3,]   -9   -5    4   -9    5</span></span>
-<span><span class="co">#&gt; [4,]    5    2  -12  -13   14</span></span>
-<span><span class="co">#&gt; [5,]   -8   -6    6    0   12</span></span>
+<span><span class="co">#&gt; [1,]    0   -4   13    4  -12</span></span>
+<span><span class="co">#&gt; [2,]    1   14   18    2  -18</span></span>
+<span><span class="co">#&gt; [3,]    3    5  -13   -9    1</span></span>
+<span><span class="co">#&gt; [4,]    5    6   -3    6    6</span></span>
+<span><span class="co">#&gt; [5,]   -3   -7    3    7   -4</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $north</span></span>
 <span><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5]</span></span>
 <span><span class="co">#&gt; [1,]    0    0    0    0    0</span></span>
-<span><span class="co">#&gt; [2,]   18    0   -5   -2   -3</span></span>
-<span><span class="co">#&gt; [3,]   -9    4    2    0    0</span></span>
-<span><span class="co">#&gt; [4,]    5   -2  -12   -2    9</span></span>
-<span><span class="co">#&gt; [5,]   -8   -3   16    1   -4</span></span>
+<span><span class="co">#&gt; [2,]    1   18    5   -2   -6</span></span>
+<span><span class="co">#&gt; [3,]    3   -8  -13   -6   17</span></span>
+<span><span class="co">#&gt; [4,]    5    4    2    2   -1</span></span>
+<span><span class="co">#&gt; [5,]   -3   -8   10    3   -8</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $northeast</span></span>
 <span><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5]</span></span>
-<span><span class="co">#&gt; [1,]   -9   -7   12   -6    0</span></span>
-<span><span class="co">#&gt; [2,]    9   -7    7   -8   -3</span></span>
-<span><span class="co">#&gt; [3,]    0    2   11   -5    0</span></span>
-<span><span class="co">#&gt; [4,]    1   -2   -1   -7    9</span></span>
-<span><span class="co">#&gt; [5,]   -5    7   17  -15   -4</span></span>
+<span><span class="co">#&gt; [1,]    4  -13   -4   12    0</span></span>
+<span><span class="co">#&gt; [2,]    5    5    1   10   -6</span></span>
+<span><span class="co">#&gt; [3,]  -10   -8  -10   10   17</span></span>
+<span><span class="co">#&gt; [4,]    3    9   -2   -5   -1</span></span>
+<span><span class="co">#&gt; [5,]   -4   -1    6   -1   -8</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $east</span></span>
 <span><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5]</span></span>
-<span><span class="co">#&gt; [1,]   -9   -7   12   -6    0</span></span>
-<span><span class="co">#&gt; [2,]    9   -2    9   -5    0</span></span>
-<span><span class="co">#&gt; [3,]   -4    0   11   -5    0</span></span>
-<span><span class="co">#&gt; [4,]    3   10    1  -16    0</span></span>
-<span><span class="co">#&gt; [5,]   -2   -9   16  -11    0</span></span>
+<span><span class="co">#&gt; [1,]    4  -13   -4   12    0</span></span>
+<span><span class="co">#&gt; [2,]  -13    0    3   16    0</span></span>
+<span><span class="co">#&gt; [3,]   -2    5   -4   -7    0</span></span>
+<span><span class="co">#&gt; [4,]   -1    7   -4   -4    0</span></span>
+<span><span class="co">#&gt; [5,]    4  -11    3    7    0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $southeast</span></span>
 <span><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5]</span></span>
-<span><span class="co">#&gt; [1,]   -9   -2   14   -3    3</span></span>
-<span><span class="co">#&gt; [2,]    5   -4    9   -5    0</span></span>
-<span><span class="co">#&gt; [3,]   -2   12   13  -14   -9</span></span>
-<span><span class="co">#&gt; [4,]    6   -6    0  -12    4</span></span>
-<span><span class="co">#&gt; [5,]   -2   -9   16  -11    0</span></span>
+<span><span class="co">#&gt; [1,]  -14  -18   -2   18    6</span></span>
+<span><span class="co">#&gt; [2,]   -5   13    9   -1  -17</span></span>
+<span><span class="co">#&gt; [3,]   -6    3   -6   -6    1</span></span>
+<span><span class="co">#&gt; [4,]    7   -3   -7    4    8</span></span>
+<span><span class="co">#&gt; [5,]    4  -11    3    7    0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $south</span></span>
 <span><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5]</span></span>
-<span><span class="co">#&gt; [1,]  -18    0    5    2    3</span></span>
-<span><span class="co">#&gt; [2,]    9   -4   -2    0    0</span></span>
-<span><span class="co">#&gt; [3,]   -5    2   12    2   -9</span></span>
-<span><span class="co">#&gt; [4,]    8    3  -16   -1    4</span></span>
+<span><span class="co">#&gt; [1,]   -1  -18   -5    2    6</span></span>
+<span><span class="co">#&gt; [2,]   -3    8   13    6  -17</span></span>
+<span><span class="co">#&gt; [3,]   -5   -4   -2   -2    1</span></span>
+<span><span class="co">#&gt; [4,]    3    8  -10   -3    8</span></span>
 <span><span class="co">#&gt; [5,]    0    0    0    0    0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $southwest</span></span>
 <span><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5]</span></span>
-<span><span class="co">#&gt; [1,]  -18   -9    7   -7    8</span></span>
-<span><span class="co">#&gt; [2,]    9    0   -2  -11    5</span></span>
-<span><span class="co">#&gt; [3,]   -5   -1    2    1    7</span></span>
-<span><span class="co">#&gt; [4,]    8    5   -7  -17   15</span></span>
-<span><span class="co">#&gt; [5,]    0    2    9  -16   11</span></span>
+<span><span class="co">#&gt; [1,]   -1   -5   -5   -1  -10</span></span>
+<span><span class="co">#&gt; [2,]   -3   10    8   10  -10</span></span>
+<span><span class="co">#&gt; [3,]   -5   -3   -9    2    5</span></span>
+<span><span class="co">#&gt; [4,]    3    4    1   -6    1</span></span>
+<span><span class="co">#&gt; [5,]    0   -4   11   -3   -7</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $west</span></span>
 <span><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5]</span></span>
-<span><span class="co">#&gt; [1,]    0    9    7  -12    6</span></span>
-<span><span class="co">#&gt; [2,]    0   -9    2   -9    5</span></span>
-<span><span class="co">#&gt; [3,]    0    4    0  -11    5</span></span>
-<span><span class="co">#&gt; [4,]    0   -3  -10   -1   16</span></span>
-<span><span class="co">#&gt; [5,]    0    2    9  -16   11</span></span></code></pre></div>
+<span><span class="co">#&gt; [1,]    0   -4   13    4  -12</span></span>
+<span><span class="co">#&gt; [2,]    0   13    0   -3  -16</span></span>
+<span><span class="co">#&gt; [3,]    0    2   -5    4    7</span></span>
+<span><span class="co">#&gt; [4,]    0    1   -7    4    4</span></span>
+<span><span class="co">#&gt; [5,]    0   -4   11   -3   -7</span></span></code></pre></div>
 <p>Now compute relevant coefficients</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Number of surrounding cells</span></span>
@@ -278,11 +279,11 @@ the R² adjustment applied.</p>
 <span><span class="co"># coefficient of determination and multiply by beta coficient</span></span>
 <span><span class="op">(</span><span class="va">lapse_rate</span> <span class="op">&lt;-</span> <span class="va">beta_coef</span> <span class="op">*</span> <span class="va">mss</span> <span class="op">/</span> <span class="op">(</span><span class="va">mss</span> <span class="op">+</span> <span class="va">rss</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;             [,1]        [,2]        [,3]        [,4]        [,5]</span></span>
-<span><span class="co">#&gt; [1,] -0.02032729 -0.01973014 -0.01898027 -0.01896813 -0.01883840</span></span>
-<span><span class="co">#&gt; [2,] -0.01964212 -0.01922065 -0.01946335 -0.01865606 -0.01760671</span></span>
-<span><span class="co">#&gt; [3,] -0.01983750 -0.01990969 -0.01862179 -0.01936336 -0.01979772</span></span>
-<span><span class="co">#&gt; [4,] -0.02061463 -0.01971922 -0.01964157 -0.01992438 -0.02053305</span></span>
-<span><span class="co">#&gt; [5,] -0.02105837 -0.01959283 -0.01953142 -0.01979095 -0.02017625</span></span></code></pre></div>
+<span><span class="co">#&gt; [1,] -0.01990964 -0.02044435 -0.02021598 -0.01973832 -0.01963622</span></span>
+<span><span class="co">#&gt; [2,] -0.01948657 -0.01941569 -0.02070793 -0.01936400 -0.01983646</span></span>
+<span><span class="co">#&gt; [3,] -0.01878916 -0.01957684 -0.02004733 -0.01969064 -0.01920718</span></span>
+<span><span class="co">#&gt; [4,] -0.02088295 -0.01902721 -0.02092524 -0.01946596 -0.01923845</span></span>
+<span><span class="co">#&gt; [5,] -0.02066287 -0.02090164 -0.02131038 -0.01873797 -0.01881078</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
@@ -292,7 +293,7 @@ the R² adjustment applied.</p>
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Kiri Daust, Colin Mahony, Bruno Tremblay, Ceres Barros, Francois Bornais, Province of British Columbia.</p>
+<p>Developed by Kiri Daust, Colin Mahony, Bruno Tremblay, Ceres Barros, Province of British Columbia.</p>
 </div>
 
 <div class="pkgdown-footer-right">

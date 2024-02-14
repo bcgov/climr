@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">climr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2.9006</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -25,8 +25,9 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/caching.html">caching</a>
-    <a class="dropdown-item" href="../articles/climr-with-rasters.html">Working with rasters and other spatial objects</a>
-    <a class="dropdown-item" href="../articles/climr_workflow.html">`climr` workflow - intermediate</a>
+    <a class="dropdown-item" href="../articles/climr_with_rasters.html">Working with rasters and other spatial objects</a>
+    <a class="dropdown-item" href="../articles/climr_workflow_beg.html">`climr` workflow - beginner</a>
+    <a class="dropdown-item" href="../articles/climr_workflow_int.html">`climr` workflow - intermediate</a>
     <a class="dropdown-item" href="../articles/lapse_rates.html">Lapse rates</a>
     <a class="dropdown-item" href="../articles/methods_downscaling.html">`climr` downscaling methods</a>
   </div>
@@ -49,21 +50,34 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.0.2" id="climr-002">
-<code>climr</code> 0.0.2<a class="anchor" aria-label="anchor" href="#climr-002"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.0.3" id="climr-003">
+<code>climr</code> 0.0.3<a class="anchor" aria-label="anchor" href="#climr-003"></a></h2>
 <div class="section level3">
-<h3 id="enhancements-0-0-2">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-0-0-2"></a></h3>
+<h3 id="enhancements-0-0-3">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-0-0-3"></a></h3>
 <ul><li>new tests comparing to reference outputs</li>
 <li>code further streamlined</li>
 <li>new messages warn user about meaningless <code>downscale</code>/<code>climr_downscale</code> argument combinations</li>
 <li>argument options in <code>climr_downscale(..., which_normal)</code> now match the options of <code>normal_input(..., normal)</code>
 </li>
+<li>add <code><a href="../reference/plot_bivariate.html">plot_bivariate()</a></code> function to generate plots showing climate model ensemble variation in recent and future climate change.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="behaviour-changes-0-0-2">Behaviour changes<a class="anchor" aria-label="anchor" href="#behaviour-changes-0-0-2"></a></h3>
+<h3 id="behaviour-changes-0-0-3">Behaviour changes<a class="anchor" aria-label="anchor" href="#behaviour-changes-0-0-3"></a></h3>
 <ul><li>
 <code>xyz</code> (argument to <code>climr_downscale</code> and <code>downscale</code>) and <code>in_xyz</code> (argument to <code>get_bb</code>), must now be a 4 column <code>data.table</code> (or coercible class) with <code>lon</code>, <code>lat</code>, <code>elev</code> and <code>id</code> columns. All other columns are ignored and NOT returned. Column order no longer matters.</li>
 </ul></div>
+<div class="section level3">
+<h3 id="bugfixes-0-0-3">Bugfixes<a class="anchor" aria-label="anchor" href="#bugfixes-0-0-3"></a></h3>
+<ul><li>cache fixes</li>
+<li>fixing geographical checks to get highest resolution beyond BC, Canada</li>
+<li>fixing <code>historic_input_ts</code> to get only queried years</li>
+<li>
+<code>get_bb</code> follows column names</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.0.2" id="climr-002">
+<code>climr</code> 0.0.2<a class="anchor" aria-label="anchor" href="#climr-002"></a></h2>
 <div class="section level3">
 <h3 id="bugfixes-0-0-2">Bugfixes<a class="anchor" aria-label="anchor" href="#bugfixes-0-0-2"></a></h3>
 <ul><li>fixed temperature values of composite anomalies</li>
@@ -72,6 +86,8 @@
 <div class="section level3">
 <h3 id="documentation-0-0-2">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-0-2"></a></h3>
 <ul><li>added vignettes</li>
+<li>
+<code>pkgdown</code> website for <code>climr</code> is live</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -118,7 +134,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Kiri Daust, Colin Mahony, Bruno Tremblay, Ceres Barros, Francois Bornais, Province of British Columbia.</p>
+  <p></p><p>Developed by Kiri Daust, Colin Mahony, Bruno Tremblay, Ceres Barros, Province of British Columbia.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -7,10 +7,13 @@
     <loc>https://bcgov.github.io/climr/articles/caching.html</loc>
   </url>
   <url>
-    <loc>https://bcgov.github.io/climr/articles/climr-with-rasters.html</loc>
+    <loc>https://bcgov.github.io/climr/articles/climr_with_rasters.html</loc>
   </url>
   <url>
-    <loc>https://bcgov.github.io/climr/articles/climr_workflow.html</loc>
+    <loc>https://bcgov.github.io/climr/articles/climr_workflow_beg.html</loc>
+  </url>
+  <url>
+    <loc>https://bcgov.github.io/climr/articles/climr_workflow_int.html</loc>
   </url>
   <url>
     <loc>https://bcgov.github.io/climr/articles/index.html</loc>
@@ -41,9 +44,6 @@
   </url>
   <url>
     <loc>https://bcgov.github.io/climr/reference/Caching.html</loc>
-  </url>
-  <url>
-    <loc>https://bcgov.github.io/climr/reference/ahccd_pstations.html</loc>
   </url>
   <url>
     <loc>https://bcgov.github.io/climr/reference/climr-package.html</loc>
@@ -88,6 +88,9 @@
     <loc>https://bcgov.github.io/climr/reference/pgGetTerra.html</loc>
   </url>
   <url>
+    <loc>https://bcgov.github.io/climr/reference/plot_bivariate.html</loc>
+  </url>
+  <url>
     <loc>https://bcgov.github.io/climr/reference/vancouver.html</loc>
   </url>
   <url>
@@ -98,5 +101,11 @@
   </url>
   <url>
     <loc>https://bcgov.github.io/climr/reference/variables.html</loc>
+  </url>
+  <url>
+    <loc>https://bcgov.github.io/climr/reference/weather_stations.html</loc>
+  </url>
+  <url>
+    <loc>https://bcgov.github.io/climr/reference/xyzDT.html</loc>
   </url>
 </urlset>
