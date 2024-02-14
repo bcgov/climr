@@ -1,7 +1,7 @@
 Package: climr
 Title: Downscaling of global climate data
-Version: 0.0.2.9009
-Date: 12-02-2024
+Version: 0.0.2.9006
+Date: 14-02-2024
 Authors@R: c(
     person("Kiri","Daust", email = "kiri.daust@gov.bc.ca", role = "aut"),
     person("Colin", "Mahony", email = "Colin.Mahony@gov.bc.ca", role = c("aut", "cre"),
@@ -39,9 +39,12 @@ Suggests:
     ggplot2,
     knitr,
     parallel,
+    plotly,
     rmarkdown,
     remotes,
+    stinepack,
     testthat (>= 3.0.0),
+    utils,
     withr
 Depends: 
     R (>= 4.0)

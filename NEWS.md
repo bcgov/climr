@@ -4,6 +4,7 @@
 * code further streamlined
 * new messages warn user about meaningless `downscale`/`climr_downscale` argument combinations
 * argument options in `climr_downscale(..., which_normal)` now match the options of `normal_input(..., normal)`
+* add `plot_bivariate()` function to generate plots showing climate model ensemble variation in recent and future climate change. 
 
 ## Behaviour changes
 * `xyz` (argument to `climr_downscale` and `downscale`) and `in_xyz` (argument to `get_bb`), must now be a 4 column `data.table` (or coercible class) with `lon`, `lat`, `elev` and `id` columns. All other columns are ignored and NOT returned. Column order no longer matters.
