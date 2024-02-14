@@ -45,7 +45,7 @@ The most basic use of `climr` is to pass a `data.table` of point coordinates, ID
 and elevation to `climr_downscale()` and select the type of climate projection or 
 values wanted - e.g. below we ask for future projections in three periods, using
 two emissions scenarios and two General Circulation Models. We also specify we want
-3 indivual runs of each model/scenario combination, in addition to the ensemble mean
+3 individual runs of each model/scenario combination, in addition to the ensemble mean
 (returned by default).
 
 ```{r}
