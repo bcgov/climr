@@ -5,4 +5,6 @@
 inst/doc
 
 climr.cache/
-docs/
+/doc/
+/Meta/
+docs
