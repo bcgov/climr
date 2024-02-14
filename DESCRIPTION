@@ -42,8 +42,10 @@ Suggests:
     remotes,
     stinepack,
     testthat (>= 3.0.0),
+    utils,
     withr
 Depends: 
     R (>= 4.0)
 Config/testthat/edition: 3
 LazyData: true
+VignetteBuilder: utils
