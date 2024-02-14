@@ -74,7 +74,7 @@ plot_bivariate <- function(
     stop("package stinepack must be installed to use this function")
   } else {
     
-    data("variables")
+    data("variables", envir = environment())
     
     # variable types for default scaling (percent or absolute)
     xvar_type <- variables$Scale[which(variables$Code==xvar)]
