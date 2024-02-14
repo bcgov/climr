@@ -5,12 +5,11 @@ test_that("test get_bb", {
                     elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
                     id = LETTERS[1:8])
   
-  thebb <- get_bb(xyz)
   expect_equal(get_bb(xyz), c(55.38847, 54.61025, -126.94957, -127.71620))
   
   ## different column order
   xyz2 <- xyz[, c(2,4,1,3)]
-  expect_equal(get_bb(thebb), get_bb(xyz2))
+  expect_equal(get_bb(xyz), get_bb(xyz2))
   
   xyz3 <- xyz
   names(xyz3) <- c("x", "y", "z", "id")
