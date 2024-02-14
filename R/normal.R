@@ -44,7 +44,7 @@ normal_input <- function(dbCon, bbox, normal = "normal_na", cache = TRUE) {
   ## check cached
   needDownload <- TRUE
   
-  cPath <- file.path(cache_path(), "/normal/", normal)
+  cPath <- file.path(cache_path(), "normal", normal)
   
   if (dir.exists(cPath)) {
     bnds <- try(fread(file.path(cPath, "meta_data.csv")), silent = TRUE)
@@ -97,11 +97,11 @@ normal_input <- function(dbCon, bbox, normal = "normal_na", cache = TRUE) {
     if (cache) {
       message("Caching data...")
       uid <- UUIDgenerate()
-      if (!dir.exists(paste0(cache_path(), "/normal/", normal))) dir.create(paste0(cache_path(), "/normal/", normal), recursive = TRUE)
-      writeRaster(res, paste0(cache_path(), "/normal/", normal, "/", uid, ".tif"))
+      dir.create(cPath, recursive = TRUE, showWarnings = FALSE)
+      writeRaster(res, file.path(cPath, paste0(uid, ".tif")))
       rastext <- ext(res)
       temp <- data.table(uid = uid, ymax = rastext[4] + 0.1, ymin = rastext[3] - 0.1, xmax = rastext[2] + 0.1, xmin = rastext[1] - 0.1)
-      fwrite(temp, file = paste0(cache_path(), "/normal/", normal, "/meta_data.csv"), append = TRUE)
+      fwrite(temp, file = file.path(cPath, "meta_data.csv"), append = TRUE)
     }  
   }
   
