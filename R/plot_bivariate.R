@@ -172,27 +172,27 @@ plot_bivariate <- function(
       
     } else {
       
-      if(!require(plotly)){
+      if(!requireNamespace("plotly")){
         stop("package 'plotly' must be installed when 'interactive==TRUE'")
       } else {
         
         # PLOTLY PLOT
-
+        
         #initiate the plot
-        fig <- plot_ly(x=data.all$xanom,y=data.all$yanom, type = 'scatter', mode = 'markers', marker = list(color ="lightgray", size=5), hoverinfo="none", color="All models/scenarios/runs/periods")
+        fig <- plotly::plot_ly(x=data.all$xanom,y=data.all$yanom, type = 'scatter', mode = 'markers', marker = list(color ="lightgray", size=5), hoverinfo="none", color="All models/scenarios/runs/periods")
         
         # axis titles
-        fig <- fig %>% layout(xaxis = list(title=paste("Change in", variables$Variable[which(variables$Code==xvar)]), range=range(data.all$xanom)), 
-                              yaxis = list(title=paste("Change in", variables$Variable[which(variables$Code==yvar)]), range=range(data.all$yanom))
+        fig <- fig %>% plotly::layout(xaxis = list(title=paste("Change in", variables$Variable[which(variables$Code==xvar)]), range=range(data.all$xanom)), 
+                                      yaxis = list(title=paste("Change in", variables$Variable[which(variables$Code==yvar)]), range=range(data.all$yanom))
         )
         
         # observed climate
-        fig <- fig %>% add_markers(obs$xanom ,obs$yanom, name="Observed Climate (2001-2020)", text="observed\n(2001-2020)", hoverinfo="text",
-                                   marker = list(size = 25, color = "grey", symbol = 1))
+        fig <- fig %>% plotly::add_markers(obs$xanom ,obs$yanom, name="Observed Climate (2001-2020)", text="observed\n(2001-2020)", hoverinfo="text",
+                                           marker = list(size = 25, color = "grey", symbol = 1))
         
         # ensemble mean
-        fig <- fig %>% add_markers(ensMean$xanom,ensMean$yanom, name="Ensemble mean", text="Ensemble mean", hoverinfo="text",
-                                   marker = list(size = 20, color = "grey", symbol = 3))
+        fig <- fig %>% plotly::add_markers(ensMean$xanom,ensMean$yanom, name="Ensemble mean", text="Ensemble mean", hoverinfo="text",
+                                           marker = list(size = 20, color = "grey", symbol = 3))
         
         # plot individual runs
         if(show_runs){
@@ -202,8 +202,8 @@ plot_bivariate <- function(
             y.runs <- data.all[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, yanom]
             runs <- data.all[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, RUN]
             ssps <- data.all[GCM==gcm & RUN != "ensembleMean" & PERIOD == period_focal, SSP]
-            fig <- fig %>% add_markers(x=x.runs,y=y.runs, color = ColScheme[i], name="Individual GCM runs", text=paste(gcm_models[i], ssps, runs), hoverinfo="text", showlegend = if(i==1) TRUE else FALSE,
-                                       marker = list(size = 7, color = ColScheme[i], line = list(color = "black", width = 1)), legendgroup=paste("group", i, sep=""))
+            fig <- fig %>% plotly::add_markers(x=x.runs,y=y.runs, color = ColScheme[i], name="Individual GCM runs", text=paste(gcm_models[i], ssps, runs), hoverinfo="text", showlegend = if(i==1) TRUE else FALSE,
+                                               marker = list(size = 7, color = ColScheme[i], line = list(color = "black", width = 1)), legendgroup=paste("group", i, sep=""))
           }
         }
         
@@ -219,24 +219,24 @@ plot_bivariate <- function(
               x3 <- if(unique(sign(diff(x2)))==-1) rev(x2) else x2
               y3 <- if(unique(sign(diff(x2)))==-1) rev(y2) else y2
               s <- stinepack::stinterp(x3,y3, seq(min(x3),max(x3), diff(range(data.all$xanom))/500)) # way better than interpSpline, not prone to oscillations
-              fig <- fig %>% add_trace(x=s$x, y=s$y, color = ColScheme[i], type = 'scatter', mode = 'lines', line = list(color=ColScheme[i], width = 2), marker=NULL, legendgroup=paste("group", i, sep=""), showlegend = FALSE)
+              fig <- fig %>% plotly::add_trace(x=s$x, y=s$y, color = ColScheme[i], type = 'scatter', mode = 'lines', line = list(color=ColScheme[i], width = 2), marker=NULL, legendgroup=paste("group", i, sep=""), showlegend = FALSE)
             } else {
-              fig <- fig %>% add_trace(x=x2, y=y2, color = ColScheme[i], type = 'scatter', mode = 'lines', line = list(color=ColScheme[i], width = 2), marker=NULL, legendgroup=paste("group", i, sep=""), showlegend = FALSE)
+              fig <- fig %>% plotly::add_trace(x=x2, y=y2, color = ColScheme[i], type = 'scatter', mode = 'lines', line = list(color=ColScheme[i], width = 2), marker=NULL, legendgroup=paste("group", i, sep=""), showlegend = FALSE)
             }
-            fig <- fig %>% add_markers(x=x2,y=y2, color = ColScheme[i], text=gcm_models[i], hoverinfo="text",
-                                       marker = list(size = 8, color = ColScheme[i]), legendgroup=paste("group", i, sep=""), showlegend = FALSE)
+            fig <- fig %>% plotly::add_markers(x=x2,y=y2, color = ColScheme[i], text=gcm_models[i], hoverinfo="text",
+                                               marker = list(size = 8, color = ColScheme[i]), legendgroup=paste("group", i, sep=""), showlegend = FALSE)
           }
           j=which(list_gcm_period()==period_focal)+1
-          fig <- fig %>% add_markers(x2[j],y2[j], color = gcm_models[i], colors=ColScheme[i],
-                                     marker = list(size = 20, color = ColScheme[i], line = list(color = "black", width = 1)),
-                                     legendgroup=paste("group", i, sep=""))
+          fig <- fig %>% plotly::add_markers(x2[j],y2[j], color = gcm_models[i], colors=ColScheme[i],
+                                             marker = list(size = 20, color = ColScheme[i], line = list(color = "black", width = 1)),
+                                             legendgroup=paste("group", i, sep=""))
           
-          fig <- fig %>% add_annotations(x=x2[j],y=y2[j], text = sprintf("<b>%s</b>", substr(gcm_models, 1, 2)[i]), xanchor = 'center', yanchor = 'center', showarrow = FALSE,
-                                         legendgroup=paste("group", i, sep=""))
+          fig <- fig %>% plotly::add_annotations(x=x2[j],y=y2[j], text = sprintf("<b>%s</b>", substr(gcm_models, 1, 2)[i]), xanchor = 'center', yanchor = 'center', showarrow = FALSE,
+                                                 legendgroup=paste("group", i, sep=""))
         }
         
-        if(xvar_type=="Log") fig <- fig %>% layout(xaxis = list(tickformat = "%"))
-        if(yvar_type=="Log") fig <- fig %>% layout(yaxis = list(tickformat = "%"))
+        if(xvar_type=="Log") fig <- fig %>% plotly::layout(xaxis = list(tickformat = "%"))
+        if(yvar_type=="Log") fig <- fig %>% plotly::layout(yaxis = list(tickformat = "%"))
         
         fig
       }
