@@ -63,7 +63,7 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
                 bbox = bbox, dbnames = dbnames, dbCon = dbCon, 
                 max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE)
   attr(res, "builder") <- "climr"
-
+  
   # Return a list of SpatRasters, one element for each model
   return(res)
 }
@@ -234,8 +234,24 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
   runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssp, run]))
   sel_runs <- runs[1:(max_run + 1L)]
   
-  if (dir.exists(paste0(cache_path(), "/gcm/", gcmcode))) {
-    bnds <- fread(paste0(cache_path(), "/gcm/", gcmcode, "/meta_area.csv"))
+  ## check cached
+  needDownload <- TRUE
+  
+  cPath <- file.path(cache_path(), "gcm", gcmcode)
+  
+  if (dir.exists(cPath)) {
+    bnds <- try(fread(file.path(cPath, "meta_data.csv")), silent = TRUE)
+    
+    if (is(bnds, "try-error")) {
+      ## try to get the data again
+      message("Meta-data file no longer exists of is unreadable.",
+              " Downloading the data again")
+    } else {
+      needDownload <- FALSE
+    }
+  }
+  
+  if (!needDownload) {
     setorder(bnds, -numlay)
     for (i in 1:nrow(bnds)) {
       isin <- is_in_bbox(bbox, matrix(bnds[i, 2:5]))
@@ -243,50 +259,52 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
     }
     if (isin) {
       oldid <- bnds$uid[i]
-      periods <- fread(paste0(cache_path(), "/gcm/", gcmcode, "/meta_period.csv"))
-      ssps <- fread(paste0(cache_path(), "/gcm/", gcmcode, "/meta_ssp.csv"))
+      periods <- fread(file.path(cPath, "meta_period.csv"))
+      ssps <- fread(file.path(cPath, "meta_ssp.csv"))
       if (all(period %in% periods[uid == oldid, period]) & all(ssp %in% ssps[uid == oldid, ssp]) & max_run <= bnds[uid == oldid, max_run]) {
         message("Retrieving from cache...")
-        gcm_rast <- rast(paste0(cache_path(), "/gcm/", gcmcode, "/", oldid, ".tif"))
+        gcm_rast <- rast(file.path(cPath, paste0(oldid, ".tif")))
         layinfo <- data.table(fullnm = names(gcm_rast))
         layinfo[, c("Mod", "Var", "Month", "Scenario", "Run", "Period1", "Period2") := tstrsplit(fullnm, "_")]
         layinfo[, Period := paste(Period1, Period2, sep = "_")]
         layinfo[, laynum := seq_along(fullnm)]
         sel <- layinfo[Scenario %in% ssp & Period %in% period & Run %in% sel_runs, laynum]
-        return(gcm_rast[[sel]])
+        gcm_rast <- gcm_rast[[sel]]
       } else {
         message("Not fully cached :( Will download more")
+        needDownload <- TRUE
       }
     }
   }
   
-  
-  q <- paste0(
-    "select fullnm, laynum from esm_layers where mod = '", gcm_nm, "' and scenario in ('", paste(ssp, collapse = "','"),
-    "') and period in ('", paste(period, collapse = "','"), "') and run in ('", paste(sel_runs, collapse = "','"), "')"
-  )
-  # print(q)
-  layerinfo <- dbGetQuery(dbCon, q)
-  message("Downloading GCM anomalies")
-  gcm_rast <- pgGetTerra(dbCon, gcmcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
-  names(gcm_rast) <- layerinfo$fullnm
-  
-  if (cache) {
-    message("Caching data...")
-    uid <- UUIDgenerate()
-    if (!dir.exists(paste0(cache_path(), "/gcm/", gcmcode))) dir.create(paste0(cache_path(), "/gcm/", gcmcode), recursive = TRUE)
-    writeRaster(gcm_rast, paste0(cache_path(), "/gcm/", gcmcode, "/", uid, ".tif"))
-    rastext <- ext(gcm_rast)
-    t1 <- data.table(
-      uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1],
-      numlay = nlyr(gcm_rast), max_run = max_run
+  if (needDownload) {
+    q <- paste0(
+      "select fullnm, laynum from esm_layers where mod = '", gcm_nm, "' and scenario in ('", paste(ssp, collapse = "','"),
+      "') and period in ('", paste(period, collapse = "','"), "') and run in ('", paste(sel_runs, collapse = "','"), "')"
     )
-    t2 <- data.table(uid = rep(uid, length(period)), period = period)
-    t3 <- data.table(uid = rep(uid, length(ssp)), ssp = ssp)
-    fwrite(t1, file = paste0(cache_path(), "/gcm/", gcmcode, "/meta_area.csv"), append = TRUE)
-    fwrite(t2, file = paste0(cache_path(), "/gcm/", gcmcode, "/meta_period.csv"), append = TRUE)
-    fwrite(t3, file = paste0(cache_path(), "/gcm/", gcmcode, "/meta_ssp.csv"), append = TRUE)
-  }
+    # print(q)
+    layerinfo <- dbGetQuery(dbCon, q)
+    message("Downloading GCM anomalies")
+    gcm_rast <- pgGetTerra(dbCon, gcmcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
+    names(gcm_rast) <- layerinfo$fullnm
+    
+    if (cache) {
+      message("Caching data...")
+      uid <- UUIDgenerate()
+      if (!dir.exists(cPath) dir.create(cPath, recursive = TRUE)
+          writeRaster(gcm_rast, file.path(cPath, paste0(uid, ".tif")))
+          rastext <- ext(gcm_rast)
+          t1 <- data.table(
+            uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1],
+            numlay = nlyr(gcm_rast), max_run = max_run
+          )
+          t2 <- data.table(uid = rep(uid, length(period)), period = period)
+          t3 <- data.table(uid = rep(uid, length(ssp)), ssp = ssp)
+          fwrite(t1, file = file.path(cPath, "meta_area.csv"), append = TRUE)
+          fwrite(t2, file = file.path(cPath, "meta_period.csv"), append = TRUE)
+          fwrite(t3, file = file.path(cPath, "meta_ssp.csv"), append = TRUE)
+    }
+  } 
   
   return(gcm_rast)
 }
