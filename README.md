@@ -1,10 +1,3 @@
----
-editor_options: 
-  markdown: 
-    wrap: sentence
-bibliography: references.bib
----
-
 # `climr` <img src="logo.svg" align="right" alt="" width="120"/>
 
 <!-- badges: start -->
@@ -89,3 +82,7 @@ See the License for the specific language governing permissions and limitations 
 `climr` logo uses icon designed by Freepik, Flaticon.com, available [here](https://www.flaticon.com/free-icon/pin_6093139).
 
 ### References
+
+Mahony, Colin. 2022. “Rationale for the ClimateBC/NA 8-Model Ensemble Mean.” [http://climatena.ca/downloads/ClimateNA_8ModelRationale_Mahony_07May2022.pdf](http://climatena.ca/downloads/ClimateNA_8ModelRationale_Mahony_07May2022.pdf).
+
+Wang, Tongli, Andreas Hamann, Dave Spittlehouse, and Carlos Carroll. 2016. “Locally Downscaled and Spatially Customizable Climate Data for Historical and Future Periods for North America.” Edited by Inés Álvarez. PLOS ONE 11 (6): [e0156720](https://doi.org/10.1371/journal.pone.0156720).
