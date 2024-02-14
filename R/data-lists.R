@@ -97,3 +97,13 @@ list_variables <- function(set = c("All", "Monthly", "Seasonal", "Annual"), only
   }
   return(sort(unique(res)))
 }
+
+
+#' @description
+#' `list_historic_ts` lists available years for historic time series
+#' 
+#' @rdname data-option-lists
+#' @export
+list_historic_ts <- function() {
+  1902:2022
+}
