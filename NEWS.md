@@ -4,6 +4,7 @@
 * code further streamlined
 * new messages warn user about meaningless `downscale`/`climr_downscale` argument combinations
 * argument options in `climr_downscale(..., which_normal)` now match the options of `normal_input(..., normal)`
+* new functions `list_historic_ts` and `list_gcm_ts` to get available years for historic/future time series
 
 ## Behaviour changes
 * `xyz` (argument to `climr_downscale` and `downscale`) and `in_xyz` (argument to `get_bb`), must now be a 4 column `data.table` (or coercible class) with `lon`, `lat`, `elev` and `id` columns. All other columns are ignored and NOT returned. Column order no longer matters.
