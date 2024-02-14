@@ -66,6 +66,9 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
         message("Not fully cached :( Will download more")
         needDownload <- TRUE
       }
+    } else {
+      message("Not fully cached :( Will download more")
+      needDownload <- TRUE
     }
   }
 
@@ -158,6 +161,9 @@ historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRU
         message("Not fully cached :( Will download more")
         needDownload <- TRUE
       }
+    } else {
+      message("Not fully cached :( Will download more")
+      needDownload <- TRUE
     }
   }
 

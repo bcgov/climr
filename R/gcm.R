@@ -274,6 +274,9 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
         message("Not fully cached :( Will download more")
         needDownload <- TRUE
       }
+    } else {
+      message("Not fully cached :( Will download more")
+      needDownload <- TRUE
     }
   }
   
@@ -373,6 +376,9 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
         message("Not fully cached :( Will download more")
         needDownload <- TRUE
       }
+    }  else {
+      message("Not fully cached :( Will download more")
+      needDownload <- TRUE
     }
   }
   
@@ -471,6 +477,9 @@ process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts,
         message("Not fully cached :( Will download more")
         needDownload <- TRUE
       }
+    } else {
+      message("Not fully cached :( Will download more")
+      needDownload <- TRUE
     }
   }
   
