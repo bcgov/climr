@@ -28,6 +28,8 @@
 #' @param interactive logical. If TRUE, an interactive plot is generated using `{plotly}`. If FALSE, a plot is generated using base graphics. 
 #' 
 #' @return NULL. Draws a plot in the active graphics device. 
+#' 
+#' @importFrom graphics axis legend lines par points text title
 #'
 #' @examples 
 #' # data frame of arbitrary points on Vancouver Island
