@@ -107,3 +107,12 @@ list_variables <- function(set = c("All", "Monthly", "Seasonal", "Annual"), only
 list_historic_ts <- function() {
   1902:2022
 }
+
+#' @description
+#' `list_gcm_ts` lists available years for future projections' time series
+#' 
+#' @rdname data-option-lists
+#' @export
+list_gcm_ts <- function() {
+  2015:2100
+}
