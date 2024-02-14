@@ -39,6 +39,7 @@ reference:
     available climate variables and functions listing 
     available data.
   contents:
+  - xyzDT
   - BECz_vancouver
   - BECz_vancouver_ras
   - BECcols
@@ -61,3 +62,4 @@ reference:
     Other useful functions
   contents:
   - get_bb
+  - plot_bivariate
