@@ -26,15 +26,15 @@ To do so, it uses a remote PostGIS database, and optionally caches data locally.
 ### Data Sources
 
 The reference climatologies for British Columbia are the [BC PRISM maps](https://www.pacificclimate.org/data/prism-climatology-and-monthly-timeseries) provided by Pacific Climate Impacts Consortium.
-Reference climatologies for North America are the ClimateNA [@wang2016] mosaics of PRISM (BC, US) and WorldClim (rest of North America).
+Reference climatologies for North America are the ClimateNA (Wang et al. 2016) mosaics of PRISM (BC, US) and WorldClim (rest of North America).
 The ClimateNA mosaics are accessed from [AdaptWest](https://adaptwest.databasin.org/pages/adaptwest-climatena/).
 
 A high resolution composite climatology of BC PRISM, adjusted US PRISM and DAYMET (Alberta and Saskatchewan), is also available for Western Canada and Western US.
 
-Historical observational time series are derived using [ClimateNA](https://climatena.ca/) [@wang2016].
+Historical observational time series are derived using [ClimateNA](https://climatena.ca/) (Wang et al. 2016).
 
 The CMIP6 global climate model data were downloaded and subsetted to North America by Tongli Wang, Associate Professor at the UBC Department of Forest and Conservation Sciences.
-The 13 global climate models selected for `climr`, and best practices for ensemble analysis, are described in @mahony2022 .
+The 13 global climate models selected for `climr`, and best practices for ensemble analysis, are described in Mahony (2022).
 
 ## Installation
 
