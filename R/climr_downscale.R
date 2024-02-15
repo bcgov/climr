@@ -214,8 +214,7 @@ climr_downscale <- function(xyz, which_normal = "auto", historic_period = NULL, 
     return_normal = return_normal,
     vars = vars,
     out_spatial = out_spatial,
-    plot = plot, 
-    ...
+    plot = plot
   )
   
   if (which_normal != "auto") {
@@ -244,8 +243,7 @@ climr_downscale <- function(xyz, which_normal = "auto", historic_period = NULL, 
       return_normal = return_normal,
       vars = vars,
       out_spatial = out_spatial,
-      plot = plot, 
-      ...
+      plot = plot
     )
     
     if(!is.null(dbCon)) poolClose(dbCon)
