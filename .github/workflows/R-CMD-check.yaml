@@ -65,7 +65,13 @@ jobs:
             any::stinepack
             any::withr
 
-      - uses: r-lib/actions/check-r-package@v2
+      - uses: r-lib/actions/check-r-package@v2    
+        if: "contains(github.event.commits[0].message, '[skip-tests]')"
+        with:
+          args: 'c("--no-manual", "--as-cran", "--no-tests", "--no-examples")'
+      
+      - uses: r-lib/actions/check-r-package@v2    
+        if: "!contains(github.event.commits[0].message, '[skip-tests]')"
         with:
           args: 'c("--no-manual", "--as-cran", "--run-dontrun", "--run-donttest")'
 
