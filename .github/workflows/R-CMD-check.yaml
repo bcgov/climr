@@ -37,6 +37,7 @@ jobs:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       R_REPRODUCIBLE_RUN_ALL_EXAMPLES: true
       R_REPRODUCIBLE_RUN_ALL_TESTS: true
+      ARGS: ${{ contains(github.event.commits[0].message, '[skip-tests]') && 'c("--no-manual", "--as-cran", "--no-tests", "--no-examples")' || 'c("--no-manual", "--as-cran", "--run-dontrun", "--run-donttest")' }}
 
     steps:
       - name: Install X11 dependencies on MacOS
@@ -66,14 +67,8 @@ jobs:
             any::withr
 
       - uses: r-lib/actions/check-r-package@v2    
-        if: "contains(github.event.commits[0].message, '[skip-tests]')"
         with:
-          args: 'c("--no-manual", "--as-cran", "--no-tests", "--no-examples")'
-      
-      - uses: r-lib/actions/check-r-package@v2    
-        if: "!contains(github.event.commits[0].message, '[skip-tests]')"
-        with:
-          args: 'c("--no-manual", "--as-cran", "--run-dontrun", "--run-donttest")'
+          args: ${{ env.ARGS }}
 
       - name: Show testthat output
         if: always()
