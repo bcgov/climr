@@ -11,8 +11,22 @@ on:
 name: R-CMD-check
 
 jobs:
+  check_skip_flags:
+    name: Check skip flags
+    runs-on: ubuntu-latest
+    outputs:
+      head-commit-message: ${{ steps.get_head_commit_message.outputs.headCommitMsg }}
+    steps:
+      - name: Get repo
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ env.GITHUB_SHA }}
+      - name: Print head git commit message
+        id: get_head_commit_message
+        run: echo "HEAD_COMMIT_MESSAGE=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
+
   R-CMD-check:
-    if: "!contains(github.event.head_commit.message, '[skip-ci]')"
+    if: "!contains(needs.check_skip_flags.outputs.head-commit-message, '[skip-ci]')"
     runs-on: ${{ matrix.config.os }}
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
@@ -66,13 +80,13 @@ jobs:
             any::withr
 
       - name: Package checks
-        if: "contains(github.event.head_commit.message, '[skip-tests]')"
+        if: "contains(needs.check_skip_flags.outputs.head-commit-message, '[skip-tests]')"
         uses: r-lib/actions/check-r-package@v2    
         with:
           args: 'c("--no-manual", "--as-cran", "--no-tests", "--no-examples")'
           
       - name: Package checks
-        if: "!contains(github.event.head_commit.message, '[skip-tests]')"
+        if: "!contains(needs.check_skip_flags.outputs.head-commit-message, '[skip-tests]')"
         uses: r-lib/actions/check-r-package@v2    
         with:
           args: 'c("--no-manual", "--as-cran", "--run-dontrun", "--run-donttest")'
