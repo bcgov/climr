@@ -20,10 +20,16 @@ jobs:
       - name: Get repo at last commit
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          ref: ${{github.event.after}}
       - name: Save commit message
         id: get_head_commit_message
-        run: echo "HEAD_COMMIT_MESSAGE=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
+        run: |
+          MSG=$(git log --format=%B -n 1 ${{github.event.after}})
+          echo "${MSG}" >> "$GITHUB_OUTPUT"
+      - name: Echo commit message
+        run: echo "Commit SHA: ${{github.event.after}}, commit message: ${{jobs.check_skip_flags.head-commit-message}}"
+
 
   R-CMD-check:
     env:
