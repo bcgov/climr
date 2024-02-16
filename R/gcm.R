@@ -1,10 +1,10 @@
-#' Create GCM inputs for `downscale` using data on Postgis database.
+#' Retrieve GCM anomalies for `downscale`.
 #' 
 #' @return A `list` of `SpatRasters`, each with possibly multiple layers, that can
 #'   be used with [`downscale()`].
 #' 
 #' @description
-#' `gcm_input` creates GCM climate periods inputs, given chosen GCMs, SSPs, 
+#' `gcm_input` retrieves anomalies for GCM data, given chosen GCMs, SSPs, 
 #'  periods and runs.
 #' 
 #' @template dbCon
@@ -15,6 +15,11 @@
 #' @template max_run
 #' @template cache
 #' 
+#' @details
+#' This function returns a list with one slot for each requested GCM. Rasters inside the list contain anomalies for all requested SSPs, runs, and periods.
+#' In general this function should only be used in combination with [`downscale()`].
+#' 
+#' 
 #' @seealso [downscale()]
 #' 
 #' @importFrom terra rast writeRaster ext nlyr
@@ -23,7 +28,7 @@
 #' @importFrom uuid UUIDgenerate
 #' @import data.table
 #' 
-#' @examples {
+#' @examples
 #' library(terra)
 #' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10), id = 1:10)
 #' 
@@ -40,7 +45,6 @@
 #' lyrs <- grep("ensemble", names(gcm$`ACCESS-ESM1-5`))
 #' 
 #' plot(gcm$`ACCESS-ESM1-5`[[lyrs]])
-#' }
 #' 
 #' @rdname gcm-input-data
 #' @export
@@ -70,18 +74,24 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 
 
 #' @description
-#' `gcm_hist_input` creates GCM **historic** time series inputs, given chosen GCMs, SSPs, 
+#' `gcm_hist_input` creates GCM **historic** time series inputs, given chosen GCMs,
 #'  years and runs.
 #'   
 #' @template dbCon
 #' @template bbox
 #' @template gcm
 #' @param years numeric. Vector of desired years. Must be in `1851:2015`.
-#'   Can be obtained from [`list_gcm_period()`]. Default to [`list_gcm_period()`].
+#'   Default is `1901:1950`.
 #' @template max_run
 #' @template cache
 #' 
 #' @seealso [list_gcm_period()], [`list_gcm_period()`]
+#' 
+#' @return A `list` of `SpatRasters`, each with possibly multiple layers, that can
+#'   be used with [`downscale()`].
+#'   
+#' @details This function returns a list with one slot for each requested GCM. Rasters inside the list contain anomalies for all runs and years.
+#' In general this function should only be used in combination with [`downscale()`].
 #' 
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
@@ -128,7 +138,7 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 # period <- 2020:2050
 
 #' @description
-#' `gcm_ts_input` creates GCM time series inputs, given chosen GCMs, SSPs, 
+#' `gcm_ts_input` creates future GCM time series inputs, given chosen GCMs, SSPs, 
 #'  years and runs.
 #' 
 #' @template dbCon
@@ -139,13 +149,20 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 #' @template max_run
 #' @template cache
 #' 
+#' @return A `list` of `SpatRasters`, each with possibly multiple layers, that can
+#'   be used with [`downscale()`].
+#'   
+#' @details This function returns a list with one slot for each requested GCM. Rasters inside the list contain anomalies for all SSPs, runs and years.
+#' In general this function should only be used in combination with [`downscale()`]. Note that if you request multiple runs, multiple SSPs, and a lot of years,
+#' it will take a while to download the data (there's lot of it).
+#' 
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @import uuid
 #' @import data.table
 #' 
-#' @examples {
+#' @examples
 #' library(terra)
 #' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10), id = 1:10)
 #' 
@@ -162,7 +179,6 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), years = 1901:19
 #' lyrs <- grep("ensemble", names(gcm_ts$`ACCESS-ESM1-5`))
 #' 
 #' plot(gcm_ts$`ACCESS-ESM1-5`[[lyrs]])
-#' }
 #' 
 #' @rdname gcm-input-data
 #' @export
@@ -188,6 +204,7 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(),
 #' @return A character vector of unique values.
 #' 
 #' @importFrom data.table fread
+#' @noRd
 list_unique <- function(files, col_num) {
   collection <- character()
   for (file in files) {
@@ -224,6 +241,7 @@ list_unique <- function(files, col_num) {
 #' @importFrom data.table fread
 #'
 #' @return `SpatRaster`
+#' @noRd
 process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnames, dbCon, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   #gcm_nm <- gsub("-", ".", gcm_nm)
@@ -253,15 +271,24 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
   
   if (!needDownload) {
     setorder(bnds, -numlay)
-    for (i in 1:nrow(bnds)) {
-      isin <- is_in_bbox(bbox, matrix(bnds[i, 2:5]))
-      if (isin) break
-    }
-    if (isin) {
-      oldid <- bnds$uid[i]
+    
+    spat_match <- lapply(1:nrow(bnds), FUN = \(x){if(is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]})
+    spat_match <- spat_match[!sapply(spat_match,is.null)]
+
+    if (length(spat_match) > 0) {
       periods <- fread(file.path(cPath, "meta_period.csv"))
       ssps <- fread(file.path(cPath, "meta_ssp.csv"))
-      if (all(period %in% periods[uid == oldid, period]) & all(ssp %in% ssps[uid == oldid, ssp]) & max_run <= bnds[uid == oldid, max_run]) {
+      isin <- FALSE
+      for(oldid in spat_match){
+        if (all(period %in% periods[uid == oldid, period]) & 
+            all(ssp %in% ssps[uid == oldid, ssp]) & 
+            max_run <= bnds[uid == oldid, max_run]) {
+          isin <- TRUE
+          break
+        }
+      }
+      
+    if (isin) {
         message("Retrieving from cache...")
         gcm_rast <- rast(file.path(cPath, paste0(oldid, ".tif")))
         layinfo <- data.table(fullnm = names(gcm_rast))
@@ -329,6 +356,7 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
 #' @importFrom data.table fread
 #'
 #' @return `SpatRaster`
+#' @noRd
 process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbnames_hist, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   
@@ -357,14 +385,22 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
   
   if (!needDownload) {
     setorder(bnds, -numlay)
-    for (i in 1:nrow(bnds)) {
-      isin <- is_in_bbox(bbox, matrix(bnds[i, 2:5]))
-      if (isin) break
-    }
-    if (isin) {
-      oldid <- bnds$uid[i]
+    
+    spat_match <- lapply(1:nrow(bnds), FUN = \(x){if(is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]})
+    spat_match <- spat_match[!sapply(spat_match,is.null)]
+    
+    if (length(spat_match) > 0) {
       yeardat <- fread(file.path(cPath, "meta_years.csv"))
-      if (all(years %in% yeardat[uid == oldid, years]) & max_run <= bnds[uid == oldid, max_run]) {
+      isin <- FALSE
+      for(oldid in spat_match){ ##see if any have all required variables
+        if (all(years %in% yeardat[uid == oldid, years]) 
+            & max_run <= bnds[uid == oldid, max_run]) {
+          isin <- TRUE
+          break
+        }
+      }
+      
+    if (isin) {
         message("Retrieving from cache...")
         gcm_rast <- rast(file.path(cPath, paste0(oldid, ".tif")))
         layinfo <- data.table(fullnm = names(gcm_rast))
@@ -427,6 +463,7 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
 #' @importFrom data.table fread
 #'
 #' @return a `SpatRaster`
+#' @noRd
 process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   
@@ -457,15 +494,24 @@ process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts,
   
   if (!needDownload) {
     setorder(bnds, -numlay)
-    for (i in 1:nrow(bnds)) {
-      isin <- is_in_bbox(bbox, matrix(bnds[i, 2:5]))
-      if (isin) break
-    }
-    if (isin) {
-      oldid <- bnds$uid[i]
+    
+    spat_match <- lapply(1:nrow(bnds), FUN = \(x){if(is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]})
+    spat_match <- spat_match[!sapply(spat_match,is.null)]
+    
+    if (length(spat_match) > 0) {
       periods <- fread(file.path(cPath, "meta_period.csv"))
       ssps <- fread(file.path(cPath, "meta_ssp.csv"))
-      if (all(period %in% periods[uid == oldid, period]) & all(ssp %in% ssps[uid == oldid, ssp]) & max_run <= bnds[uid == oldid, max_run]) {
+      isin <- FALSE
+      for(oldid in spat_match){ ##see if any have all required variables
+        if (all(period %in% periods[uid == oldid, period]) & 
+            all(ssp %in% ssps[uid == oldid, ssp]) & 
+            max_run <= bnds[uid == oldid, max_run]) {
+          isin <- TRUE
+          break
+        }
+      }
+    
+    if (isin) {
         message("Retrieving from cache...")
         gcm_rast <- rast(file.path(cPath, paste0(oldid, ".tif")))
         layinfo <- data.table(fullnm = names(gcm_rast))

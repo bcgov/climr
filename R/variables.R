@@ -1,6 +1,6 @@
 #' Available climate variables
 #'
-#' List of available climate variables in ClimateBC.
+#' List of available climate variables in climr
 #'
 #' @format A `data.table` with columns:
 #' \describe{
@@ -10,5 +10,4 @@
 #'   \item{Category}{time resolution (e.g., annual, monthly, seasonal, etc.)}
 #'   \item{Scale}{whether the variable has been scaled, or is in raw values}
 #' }
-#' @source todo add/describe source
 "variables"

@@ -6,6 +6,7 @@
 #' @return a `data.table`
 #'
 #' @importFrom data.table set setcolorder
+#' @noRd
 append_clim_vars <- function(dt, vars) {
   # Return variable or create it if not found in dt
   v <- function(nm) {

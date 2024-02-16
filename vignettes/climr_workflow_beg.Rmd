@@ -1,0 +1,101 @@
+---
+title: "`climr` workflow - beginner"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
+description: >
+  Learn the basic `climr` workflow.
+vignette: >
+  %\VignetteIndexEntry{`climr` workflow - beginner}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+bibliography: references.bib
+link-citations: true
+code_folding: show
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  fig.dim = c(7, 5),
+  fig.align = "center"
+)
+
+if (!require(ggplot2)) {
+  warning("'ggplot2' is not installed. Some visuals won't be available.")
+}
+
+cpath <- if (interactive()) {
+  normalizePath("climr.cache", winslash = "/")
+} else {
+  normalizePath(file.path(tempdir(), "climr.cache"), winslash = "/")
+}
+options("climr.cache.path" = cpath)
+```
+
+
+The most basic use of `climr` is to pass a `data.table` of point coordinates, IDs
+and elevation to `climr_downscale()` and select the type of climate projection or 
+values wanted - e.g. below we ask for future projections in three periods, using
+two emissions scenarios and two General Circulation Models. We also specify we want
+3 individual runs of each model/scenario combination, in addition to the ensemble mean
+(returned by default).
+
+```{r}
+library(climr)
+
+## A data.table of point coordinates, IDs and elevation
+data("xyzDT")
+
+## if you just want to downscale points and not think about what happening behind the scenes, use this function
+ds_out <- climr_downscale(xyz = xyzDT, which_normal = "auto", 
+                          gcm_models = c("ACCESS-ESM1-5", "EC-Earth3"), 
+                          ssp = c("ssp370","ssp245"), 
+                          gcm_period = c("2021_2040", "2041_2060","2061_2080"),
+                          #gcm_ts_years = 2020:2060,
+                          max_run = 3, # we want 3 individual runs for each model
+                          vars = c("PPT","CMD","CMI"))
+```
+
+These functions are useful to list available options:
+
+```{r, eval = FALSE}
+list_gcm()
+list_gcm_period()
+list_ssp()
+list_variables()
+```
+
+```{r, echo = FALSE, results = "asis"}
+knitr::kable(ds_out[id == head(id, 1)], caption = "'ds_out' table - Output from `climr_downscale`. Outputs are shown for one location ('id')")
+```
+
+Alternatively, you may want to download and investigate the normals and anomalies
+before downscaling. See the section "Workflow with `*_input` functions and `downscale`"
+in `vignette("vignettes/climr_workflow_int.Rmd")` for an example.
+
+#### Adding / Modifying climate variables
+
+All climate variables are computed via [R/append_clim_vars.R](./R/append_clim_vars.R).
+Add or modify entries in the variables list as needed.
+Use function `v` to handle dependencies (i.e. `v("Tmin")` instead of `dt$Tmin` / `dt[["Tmin"]]`).
+
+#### Lapse rates details
+
+See `vignette("vignettes/lapse_rates.Rmd")` for details.
+
+#### Use of terra package
+
+Instead of implementing custom algorithms for bilinear interpolation and raster manipulation, this package use `terra`.
+Long term, it will benefit from any performance improvement in `terra`.
+`terra` is a replacement for the `raster` package.
+
+Data pivot using `data.table` dcast is the most resource expensive operation of the `downscale` function according to profiling using `profvis`.
+

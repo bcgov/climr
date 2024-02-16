@@ -4,7 +4,7 @@
 #' @template td
 #'
 #' @return numeric. Extreme Minimum Temperature
-#'
+#' @noRd
 calc_EMT <- function(t_min_list, td) {
   tmin1 <- t_min_list[[1]]
   tmin12 <- t_min_list[[12]]
@@ -22,7 +22,7 @@ calc_EMT <- function(t_min_list, td) {
 #' @template td
 #'
 #' @return numeric. Extreme Maximum Temperature
-#'
+#' @noRd
 calc_EXT <- function(t_max_list, td) {
   tmax7 <- t_max_list[[7]]
   tmax8 <- t_max_list[[8]]

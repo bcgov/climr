@@ -4,6 +4,7 @@
 * code further streamlined
 * new messages warn user about meaningless `downscale`/`climr_downscale` argument combinations
 * argument options in `climr_downscale(..., which_normal)` now match the options of `normal_input(..., normal)`
+* add `plot_bivariate()` function to generate plots showing climate model ensemble variation in recent and future climate change. 
 * new functions `list_historic_ts` and `list_gcm_ts` to get available years for historic/future time series
 
 ## Behaviour changes
@@ -20,6 +21,10 @@
 ## Bugfixes
 * fixed temperature values of composite anomalies
 * name of composite anomalies changed to "normal_composite" in `normal_input(..., normal)`.
+
+## Documentation
+* added vignettes
+* `pkgdown` website for `climr` is live
 
 # `climr` 0.0.1
 
