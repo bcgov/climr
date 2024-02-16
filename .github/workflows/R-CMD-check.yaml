@@ -15,7 +15,7 @@ jobs:
     name: Check skip flags
     runs-on: ubuntu-latest
     outputs:
-      head-commit-message: ${{ steps.get_head_commit_message.outputs.headCommitMsg }}
+      head-commit-message: ${{ steps.check_skip_flags.outputs.COMMITMSG }}
     steps:
       - name: Get repo at last commit
         uses: actions/checkout@v4
@@ -25,10 +25,10 @@ jobs:
       - name: Save commit message
         id: get_head_commit_message
         run: |
-          MSG=$(git log --format=%B -n 1 ${{github.event.after}})
-          echo "${MSG}" >> "$GITHUB_OUTPUT"
+          echo "COMMITMSG=$(git log --format=%B -n 1 ${{ github.event.after }})" >> "$GITHUB_OUTPUT"
       - name: Echo commit message
-        run: echo "Commit SHA: ${{github.event.after}}, commit message: ${{jobs.check_skip_flags.head-commit-message}}"
+        run: | 
+          echo "commit message: ${{ steps.check_skip_flags.COMMITMSG }}"
 
 
   R-CMD-check:
