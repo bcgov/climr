@@ -21,12 +21,18 @@
 #'   Global climate model time series for historical scenario to be downscaled. Default to `NULL`.
 #' @param historic_ts `list` of `SpatRasters`. Outputs from [`historic_input_ts()`].
 #'   Observed climate time series to be downscaled. Default to `NULL`.
-#' @template return_normal
-#' @template vars
+#' @param return_normal logical. Return downscaled normal period (1961-1990)? Default `TRUE`.
+#' @param vars character. A vector of climate variables to compute. Supported variables
+#'   can be obtained with [`list_variables()`]. Definitions can be found in this package
+#'  `variables` dataset. Default to monthly PPT, Tmax, Tmin.
 #' @param ppt_lr logical. Apply elevation adjustment to precipitation. Default to FALSE.
 #' @param nthread integer. Number of parallel threads to use to do computations. Default to 1L.
-#' @template out_spatial
-#' @template plot
+#' @param out_spatial logical. Should a SpatVector be returned instead of a
+#'   `data.frame`.
+#' @param plot character. If `out_spatial` is TRUE, the name of a variable to plot.
+#'   If the variable exists in `normal`, then its normal values will also be plotted. 
+#'   Otherwise, normal January total precipitation (PPT01) values will be plotted.
+#'   Defaults to no plotting (NULL).
 #'
 #' @import data.table
 #' @importFrom terra extract rast sources ext xres yres crop plot as.polygons
@@ -62,7 +68,7 @@
 #'
 #' downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)
 downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL,
-                      gcm_hist = NULL, historic_ts = NULL, return_normal = FALSE,
+                      gcm_hist = NULL, historic_ts = NULL, return_normal = TRUE,
                       vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))),
                       ppt_lr = FALSE, nthread = 1L, out_spatial = FALSE, plot = NULL) {
   ## checks

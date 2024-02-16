@@ -47,13 +47,11 @@
 #' @param gcm_hist_years character.  Timeseries years for GCM simulations of the
 #'   historical scenario. See [`list_gcm_hist_ts()`] for available years.
 #' @template max_run
-#' @template return_normal
-#' @template vars
 #' @param cache logical. Cache data locally? Default `TRUE`
-#' @template out_spatial
-#' @template plot
+#' @param ... other arguments passed to [`downscale()`]. Namely: `return_normal`, 
+#'   `vars`, `out_spatial` and `plot`
 
-#' @return `data.frame` of downscaled climate variables for each location.
+#' @return `data.table` of downscaled climate variables for each location.
 #'   All outputs are returned in one table.
 
 #' @importFrom sf st_as_sf st_join
@@ -122,9 +120,8 @@
 climr_downscale <- function(xyz, which_normal = "auto", historic_period = NULL, historic_ts = NULL,
                             gcm_models = NULL, ssp = list_ssp(),
                             gcm_period = NULL, gcm_ts_years = list_gcm_ts(),
-                            gcm_hist_years = list_historic_ts(), max_run = 0L, return_normal = TRUE,
-                            vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))), cache = TRUE,
-                            out_spatial = FALSE, plot = NULL) {
+                            gcm_hist_years = list_historic_ts(), max_run = 0L,
+                            cache = TRUE, ...) {
   message("Welcome to climr!")
 
   ## checks
@@ -244,10 +241,7 @@ climr_downscale <- function(xyz, which_normal = "auto", historic_period = NULL, 
     gcm = gcm,
     gcm_ts = gcm_ts,
     gcm_hist = gcm_hist,
-    return_normal = return_normal,
-    vars = vars,
-    out_spatial = out_spatial,
-    plot = plot
+    ...
   )
 
   if (which_normal != "auto") {
@@ -273,10 +267,7 @@ climr_downscale <- function(xyz, which_normal = "auto", historic_period = NULL, 
       gcm = gcm,
       gcm_ts = gcm_ts,
       gcm_hist = gcm_hist,
-      return_normal = return_normal,
-      vars = vars,
-      out_spatial = out_spatial,
-      plot = plot
+      ...
     )
 
     if (!is.null(dbCon)) poolClose(dbCon)
