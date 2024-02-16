@@ -16,6 +16,12 @@
     (temperature and precipitation) are then used to estimate derived variables
     (e.g., degree-days) based on published equations and parameters from  Wang et al. 2016.">
 <title>Downscaling of global climate data • climr</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
@@ -31,6 +37,7 @@
     climate maps. Elevation-adjusted monthly values of basic climate elements
     (temperature and precipitation) are then used to estimate derived variables
     (e.g., degree-days) based on published equations and parameters from  Wang et al. 2016.">
+<meta property="og:image" content="https://bcgov.github.io/climr/logo.svg">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -44,7 +51,7 @@
     
     <a class="navbar-brand me-2" href="index.html">climr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,15 +90,17 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="climr-an-r-package-of-downscaled-climate-data-for-north-america">
-<code>climr</code>: An R package of downscaled climate data for North America<a class="anchor" aria-label="anchor" href="#climr-an-r-package-of-downscaled-climate-data-for-north-america"></a>
-</h1></div>
+<div class="page-header">
+<img src="logo.svg" class="logo" alt=""><h1 id="climr-">
+<code>climr</code> <a class="anchor" aria-label="anchor" href="#climr-"></a>
+</h1>
+</div>
 <!-- badges: start -->
 
 <!-- badges: end -->
 <div class="section level2">
-<h2 id="about-climr">About <code>climr</code>
-<a class="anchor" aria-label="anchor" href="#about-climr"></a>
+<h2 id="climr-an-r-package-of-downscaled-climate-data-for-north-america">
+<code>climr</code>: An R package of downscaled climate data for North America<a class="anchor" aria-label="anchor" href="#climr-an-r-package-of-downscaled-climate-data-for-north-america"></a>
 </h2>
 <p><code>climr</code> is an experimental R package that builds on the downscaling concepts operationalized in the <a href="https://climatena.ca/" target="_blank" class="external-link">ClimateNA</a> tool (Wang et al. 2016). It provides downscaling of observational and simulated climate data using change-factor (a.k.a. climate imprint) downscaling, a simple method that adds low-spatial-resolution climate anomalies to a high-spatial-resolution reference climatological map, with additional elevation adjustment for “scale-free” downscaling. <code>climr</code> is designed to be fast and to minimize local data storage requirements. To do so, it uses a remote PostGIS database, and optionally caches data locally.</p>
 <div class="section level3">
@@ -107,10 +116,10 @@
 <div class="section level3">
 <h3 id="data-sources">Data Sources<a class="anchor" aria-label="anchor" href="#data-sources"></a>
 </h3>
-<p>The reference climatologies for British Columbia are the <a href="https://www.pacificclimate.org/data/prism-climatology-and-monthly-timeseries" class="external-link">BC PRISM maps</a> provided by Pacific Climate Impacts Consortium. Reference climatologies for North America are the ClimateNA [@wang2016] mosaics of PRISM (BC, US) and WorldClim (rest of North America). The ClimateNA mosaics are accessed from <a href="https://adaptwest.databasin.org/pages/adaptwest-climatena/" class="external-link">AdaptWest</a>.</p>
+<p>The reference climatologies for British Columbia are the <a href="https://www.pacificclimate.org/data/prism-climatology-and-monthly-timeseries" class="external-link">BC PRISM maps</a> provided by Pacific Climate Impacts Consortium. Reference climatologies for North America are the ClimateNA (Wang et al. 2016) mosaics of PRISM (BC, US) and WorldClim (rest of North America). The ClimateNA mosaics are accessed from <a href="https://adaptwest.databasin.org/pages/adaptwest-climatena/" class="external-link">AdaptWest</a>.</p>
 <p>A high resolution composite climatology of BC PRISM, adjusted US PRISM and DAYMET (Alberta and Saskatchewan), is also available for Western Canada and Western US.</p>
-<p>Historical observational time series are derived using <a href="https://climatena.ca/" class="external-link">ClimateNA</a> [@wang2016].</p>
-<p>The CMIP6 global climate model data were downloaded and subsetted to North America by Tongli Wang, Associate Professor at the UBC Department of Forest and Conservation Sciences. The 13 global climate models selected for <code>climr</code>, and best practices for ensemble analysis, are described in @mahony2022 .</p>
+<p>Historical observational time series are derived using <a href="https://climatena.ca/" class="external-link">ClimateNA</a> (Wang et al. 2016).</p>
+<p>The CMIP6 global climate model data were downloaded and subsetted to North America by Tongli Wang, Associate Professor at the UBC Department of Forest and Conservation Sciences. The 13 global climate models selected for <code>climr</code>, and best practices for ensemble analysis, are described in Mahony (2022).</p>
 </div>
 </div>
 <div class="section level2">
@@ -144,10 +153,13 @@
 <p>Licensed under the Apache License, Version 2.0 (the “License”); you may not use this file except in compliance with the License. You may obtain a copy of the License at</p>
 <p><a href="http://www.apache.org/licenses/LICENSE-2.0" class="external-link uri">http://www.apache.org/licenses/LICENSE-2.0</a></p>
 <p>Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an “AS IS” BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.</p>
+<p><code>climr</code> logo uses icon designed by Freepik, Flaticon.com, available <a href="https://www.flaticon.com/free-icon/pin_6093139" class="external-link">here</a>.</p>
 </div>
 <div class="section level3">
 <h3 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h3>
+<p>Mahony, Colin. 2022. “Rationale for the ClimateBC/NA 8-Model Ensemble Mean.” <a href="http://climatena.ca/downloads/ClimateNA_8ModelRationale_Mahony_07May2022.pdf" class="external-link">http://climatena.ca/downloads/ClimateNA_8ModelRationale_Mahony_07May2022.pdf</a>.</p>
+<p>Wang, Tongli, Andreas Hamann, Dave Spittlehouse, and Carlos Carroll. 2016. “Locally Downscaled and Spatially Customizable Climate Data for Historical and Future Periods for North America.” Edited by Inés Álvarez. PLOS ONE 11 (6): <a href="https://doi.org/10.1371/journal.pone.0156720" class="external-link">e0156720</a>.</p>
 </div>
 </div>
 </div>
