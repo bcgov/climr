@@ -1,7 +1,7 @@
 Package: climr
 Title: Downscaling of global climate data
-Version: 0.0.2.9005
-Date: 14-02-2024
+Version: 0.0.3.9001
+Date: 16-02-2024
 Authors@R: c(
     person("Kiri","Daust", email = "kiri.daust@gov.bc.ca", role = "aut"),
     person("Colin", "Mahony", email = "Colin.Mahony@gov.bc.ca", role = c("aut", "cre"),
@@ -10,10 +10,10 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-2945-356X")),
     person("Ceres", "Barros", email = "ceres.barros@gov.bc.ca", role = c("aut"),
            comment = c(ORCID = "0000-0003-4036-977X")),       
-    person("Francois", "Bornais", email = "francois@boostao.ca", role = c("aut")),
+    person("Francois", "Bornais", email = "francois@boostao.ca", role = c("ctb")),
     person(family = "Province of British Columbia", role = c("cph", "fnd")))
-Description: This package replicate the basic approach of ClimateNA (climatena.ca),
-    but with (1) improved speed, (2) Multiple runs of each GCM, (3) cloud delivery, and (4) 
+Description: This package replicates the basic approach of ClimateNA (climatena.ca),
+    but with (1) improved speed, (2) multiple runs of each GCM, (3) cloud delivery, and (4) 
     programmatic access via R.
     A simple downscaling method is used to bias-correct low-resolution (~100km) global
     climate model anomalies to high-resolution (2km) maps of historical climate, with
@@ -21,7 +21,7 @@ Description: This package replicate the basic approach of ClimateNA (climatena.c
     empirical lapse rates (local relationship of climate to elevation) of the 2km
     climate maps. Elevation-adjusted monthly values of basic climate elements
     (temperature and precipitation) are then used to estimate derived variables
-    (e.g., degree-days) based on published equations and parameters from 2016 Wang et al.
+    (e.g., degree-days) based on published equations and parameters from  Wang et al. 2016.
 License: Apache License (== 2)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -36,12 +36,18 @@ Imports:
     sf,
     uuid
 Suggests: 
+    ggplot2,
+    knitr,
     parallel,
+    plotly,
     rmarkdown,
     remotes,
+    stinepack,
     testthat (>= 3.0.0),
+    utils,
     withr
 Depends: 
     R (>= 4.0)
 Config/testthat/edition: 3
 LazyData: true
+VignetteBuilder: knitr

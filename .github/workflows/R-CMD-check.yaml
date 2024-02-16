@@ -12,7 +12,14 @@ name: R-CMD-check
 
 jobs:
   R-CMD-check:
-    if: "!contains(github.event.commits[0].message, '[skip-ci]')"
+    env:
+      _SP_EVOLUTION_STATUS_: 2
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+      R_REPRODUCIBLE_RUN_ALL_EXAMPLES: true
+      R_REPRODUCIBLE_RUN_ALL_TESTS: true
+      
+    if: "!contains(github.event.head_commit.message, '[skip-ci]')"
     runs-on: ${{ matrix.config.os }}
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
@@ -31,17 +38,16 @@ jobs:
           # - {os: ubuntu-20.04,   r: 'oldrel'}
           # - {os: ubuntu-20.04,   r: '4.1'}
 
-    env:
-      _SP_EVOLUTION_STATUS_: 2
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
-      R_REPRODUCIBLE_RUN_ALL_EXAMPLES: true
-      R_REPRODUCIBLE_RUN_ALL_TESTS: true
-
     steps:
+      - name: Install X11 dependencies on MacOS
+        if: runner.os == 'macOS'
+        run: |
+          brew install --cask xquartz
+          
       - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
+      
 
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -52,12 +58,22 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: |
+            any::plotly
             any::rcmdcheck
             any::Rcpp
             any::remotes
+            any::stinepack
             any::withr
 
-      - uses: r-lib/actions/check-r-package@v2
+      - name: Package checks
+        if: "contains(github.event.head_commit.message, '[skip-tests]')"
+        uses: r-lib/actions/check-r-package@v2    
+        with:
+          args: 'c("--no-manual", "--as-cran", "--no-tests", "--no-examples")'
+          
+      - name: Package checks
+        if: "!contains(github.event.head_commit.message, '[skip-tests]')"
+        uses: r-lib/actions/check-r-package@v2    
         with:
           args: 'c("--no-manual", "--as-cran", "--run-dontrun", "--run-donttest")'
 

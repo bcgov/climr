@@ -1,0 +1,204 @@
+---
+title: "`climr` downscaling methods"
+Author: "Colin Mahony"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
+description: >
+  A brief explanation of the downscaling 
+  methdology used in `climr`
+vignette: >
+  %\VignetteIndexEntry{`climr` downscaling methods}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+editor_options: 
+  markdown: 
+    wrap: 72
+bibliography: references.bib
+link-citations: true
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = FALSE,
+  results = "hide",
+  message = FALSE,
+  warning = FALSE,
+  fig.dim = c(7, 4)
+)
+
+library(climr)
+library(terra)
+dbCon <- data_connect()
+bdy <- unwrap(get(data("vancouver", envir = new.env()))) ## new.env() makes sure the original object doesn't clutter .GlobalEnv as we assign it to another obj
+```
+
+Downscaling is the process of converting low-spatial-resolution climate data to high resolution. `climr` adapts a downscaling approach originally implemented in [ClimateNA](https://climatena.ca/) [@wang2016] by Dr. Tongli Wang (University of British Columbia), Dr. Andreas Hamann (University of Alberta), and Dave Spittlehouse (BC Ministry of Forests). This approach downscales climate data in three stages:
+
+1.  *Change-factor downscaling* of coarse-resolution (50-200km grid) monthly temperature and precipitation data from climate models or observational sources to high-resolution (1-4km grid);
+2.  *Elevation adjustment* of temperature variables to provide scales finer than the high-resolution reference grid; and
+3.  *Calculating derived variables* from the downscaled monthly temperature and precipitation variables.
+
+#### Stage 1: change-factor (aka "delta") downscaling
+
+`climr` uses a simple method called change-factor downscaling. In method is sometimes referred to as the climate imprint method [@hunter2005], the delta method [@wang2016], or simple mean bias correction [@maraun2016]. This method adds low-spatial-resolution anomalies (e.g., from a climate model) to a high-resolution gridded climate map (Tabor and Williams 2010). While change-factor downscaling is too simplistic for downscaling of daily time series or extremes indices, it is sufficient for downscaling temperature and precipitation data at low temporal resolution (e.g., 20-year climate averages).
+
+The default high-resolution climate maps used by `climr` are 800m gridded maps of mean daily maximum temperature (T~max~), mean daily minimum temperature (T~min~), and precipitation (PPT) for the 1961-1990 period. `climr` uses a custom composite of climate maps from multiple sources: [PRISM Climate Group](https://prism.oregonstate.edu/) (USA), [Pacific Climate Impacts Consortium](https://www.pacificclimate.org/data/prism-climatology-and-monthly-timeseries) (BC), and [Daymet](https://daymet.ornl.gov/) (Mexico and Canada outside BC). There is one map for each month of the year, for a total of 36 climate maps. Here is what the July T~max~ reference map looks like in the vicinity of Vancouver, BC.
+
+```{r, fig.cap = "`climr` *1961-1990 reference climate map for July T~max~*"}
+studyarea <- ext(c(-124, -120, 49, 50.5))
+thebb <- rev(as.vector(studyarea)) # this is a patch until we fix the get_bb() and normal_input() function
+refNormals <- normal_input(
+  dbCon = dbCon,
+  normal = "normal_composite",
+  bbox = thebb, cache = TRUE
+)
+breaks <- seq(7, 33, 0.1)
+colPal <- colorRampPalette(rev(hcl.colors(11, "RdYlBu")))
+
+plot(refNormals$Tmax07,
+  col = colPal(length(breaks) - 1),
+  breaks = breaks, type = "continuous", ext = studyarea
+)
+plot(bdy, add = TRUE)
+```
+
+Global climate model data are at much lower resolution (60-200km grid scale). Here is the change in July T~max~ for the EC-Earth3 global climate model for the 2041-2060 time period, relative to the model's 1961-1990 climate. In this case, the warming is greater in areas further (eastward) from the coast.
+
+```{r, fig.cap = "*Low-resolution anomalies (change) in July T~max~ for the EC-Earth3 global climate model for the 2041-2060 time period, relative to the model's 1961-1990 climate*"}
+gcm <- gcm_input(dbCon,
+  bbox = thebb,
+  gcm = c("EC-Earth3"),
+  ssp = c("ssp245"),
+  period = "2041_2060",
+  max_run = 0,
+  cache = TRUE
+)
+lyrs <- grep("Tmax_07", names(gcm$`EC-Earth3`))
+gcm_example <- gcm$`EC-Earth3`[[lyrs]] # TODO need to figure out how to better call the gcm raster
+plot(gcm_example, col = colPal(99), ext = studyarea)
+plot(bdy, add = T)
+```
+
+To downscale the GCM projection, we first interpolate the low-resolution GCM anomaly (in this case, the temperature change from 1961-1990 to 2041-2060) to the resolution of the detailed reference climate map:
+
+```{r, fig.cap = "*Interpolation of the low-resolution climate model anomalies to the same high resolution as the reference climate map.*"}
+gcm_example_interp <- project(gcm_example, refNormals, method = "bilinear")
+plot(gcm_example_interp, col = colPal(99), ext = studyarea)
+plot(bdy, add = T)
+```
+
+Then we add these smoothed anomalies to the high-resolution 1961-1990 climate map, resulting in a high-resolution map of the simulated climate in 2041-2060.
+
+```{r, fig.cap = "*Downscaled 2041-2060 July T~max~ for the EC-Earth model, resulting from addition of the interpolated low-resolution model anomalies (change factors) to the high resolution 1961-1990 reference climate.*"}
+gcm_example_downscaled <- refNormals$Tmax07 + gcm_example_interp
+plot(gcm_example_downscaled,
+  col = colPal(length(breaks) - 1),
+  breaks = breaks, type = "continuous", ext = studyarea
+) # TODO scale this color ramp the same as the refnormals map above.
+plot(bdy, add = T)
+```
+
+In the case of precipitation, we multiply the reference climate by the relative anomaly (e.g., multiply by 1.07 for a 7% increase in precipitation), rather than adding the absolute anomaly.
+
+The example above illustrates how change-factor downscaling is able to represent the effect of the ocean in reducing warming rates in coastal areas, because this large-scale effect is represented at the coarse resolution of in the global climate model. However, the downscaling here produced a uniform warming rate from valley bottom to mountain top. In reality, we would expect some large elevation-dependent differences in warming rate due for example to changes in snowpack. The inability to represent changes that occur at spatial scales smaller than the (very large) global climate model grid cells is an important weakness of change-factor downscaling and other statistical downscaling methods. Similarly, change-factor downscaling can't represent the role of other fine-scale features like lakes, vegetation, cold-air pooling, and soil moisture. These are important considerations when interpreting the results of statistical downscaling.
+
+#### Stage 2: Elevation adjustment
+
+`climr` uses elevation adjustment to downscale temperature variables to scales finer than the resolution of the reference climate map. It does this by inferring a relationship between temperature and elevation, known as a lapse rate, from the reference climate maps. The local lapse rate is calculated for each grid cell of the reference climate map using a linear regression of temperature to elevation among the focal cell and its 8 neighbours. The gridded lapse rates are included in the `SpatRaster` returned by the `normal_input()` function used above. This is the `climr` lapse rate layer for July T~max~:
+
+```{r, fig.cap = "*July T~max~ lapse rates (change in temperature relative to elevation; ^o^C/m) used for elevation adjustment*"}
+lapse <- crop(refNormals$lr_Tmax07, studyarea)
+toChange <- abs(values(lapse)) > quantile(abs(values(lapse)), 0.995, na.rm = TRUE)
+lapse[toChange] <- quantile(abs(values(lapse)), 0.99, na.rm = TRUE)
+plot(lapse, col = colPal(99))
+plot(bdy, add = TRUE)
+```
+
+This example indicates that the BC PRISM maps for July T~max~ have lower lapse rates in maritime influenced mountains (4^o^C/km) than in mountains with less maritime influence (8^o^C/km). The map of lapse rates has artefacts in areas with no relief; these artefacts have no consequence unless users supply elevations for these areas that deviate substantially from realistic ground elevations in areas of flat topography (e.g., asking `climr` to provide climate values for 200m elevation on the Fraser River delta, which is uniformly at sea level).
+
+We can use the `climr_downscale()` function with a 90m digital elevation model (DEM) to illustrate the elevation adjustment on Vancouver's north shore mountains, shown below.
+
+```{r figures-side, fig.cap = "*1961-1990 July T~max~ in the 800m reference clmate map (left) and elevation-adjusted to a 90m grid (right).*", fig.dim = c(7, 3), fig.show = "hold"}
+dem_aoi <- unwrap(get(data("dem_vancouver", envir = new.env()))) ### get the sample DEM for the North Shore of Vancouver
+points_dat <- as.data.frame(dem_aoi, cells = TRUE, xy = TRUE) ## convert dem cells to data frame
+colnames(points_dat) <- c("id", "lon", "lat", "elev") ## rename the columns to standard climr format
+clim.aoi <- climr_downscale(points_dat,
+  which_normal = "normal_composite",
+  gcm_models = list_gcm()[4],
+  ssp = list_ssp()[2],
+  gcm_period = list_gcm_period()[3],
+  max_run = 0,
+  return_normal = TRUE,
+  vars = c("Tmax07", "Tave01", "DD_0_01")
+)
+X <- dem_aoi
+values(X) <- NA
+X[clim.aoi[PERIOD == "1961_1990", id]] <- clim.aoi[PERIOD == "1961_1990", Tmax07]
+par(mfrow = c(1, 2))
+breaks <- seq(14.5, 23.5, 0.1)
+
+plot(refNormals$Tmax07,
+  col = colPal(length(breaks) - 1), breaks = breaks,
+  type = "continuous", ext = ext(dem_aoi),
+  main = "climr reference map (800m grid)", cex.main = 0.8
+)
+plot(bdy, add = TRUE)
+plot(X,
+  col = colPal(length(breaks) - 1), breaks = breaks,
+  type = "continuous", ext = ext(dem_aoi),
+  main = "elevation-adjusted map (90m grid)", cex.main = 0.8
+)
+plot(bdy, add = TRUE)
+```
+
+Elevation adjustment provides a visually appealing map and can be useful in improving precision in climate values for points of interest in areas of steep topography. However, it is important to remember that the `climr` output only represents the effects of regional climate and elevation. Microclimatic factors such as aspect, vegetation, water bodies, frost pooling, and soil moisture are not represented in these maps. 
+
+By default, `climr` doesn't apply elevation adjustment to precipitation, because in most cases elevation does not influence precipitation at scales less than 1km. Instead, precipitation at scales finer than 800m is simply interpolated from the nearest four grid points in the reference map. Users can choose to apply elevation-adjustment to precipitation by selecting `ppt_lr = TRUE` in the `downscale()` function. 
+
+#### Stage 3: Derived variables
+
+The value of delta downscaling isn't just in obtaining the new absolute values of temperature and precipitation. It allows us to calculate anomalies in other indices that don't scale linearly with temperature or precipitation, such as degree-days or precipitation as snow.
+
+`climr` currently uses the ClimateNA derived variable equations [@wang2016]. These equations are developed by fitting non-linear models of the relationship between the variable of interest calculated from daily weather station data and monthly temperature and/or precipitation at these weather stations. For example, the equations for January degree-days below 0^o^C and 18^o^C are derived by fitting a piecewise function of these variables to January mean temperature for the 1961-1990 period at 4891 stations across North America, shown below in Figure 4 from @wang2016:
+
+```{r, fig.cap = "Figure 4 from @wang2016, illustrating the derivation of equations for January degree-days below 0^o^C and 18^o^C based on January mean temperature at North American weather stations", results='asis', out.width = "70%"}
+knitr::include_graphics(normalizePath("assets/WangEtAl2016_Fig4.png", winslash = "/"), 
+                        rel_path = FALSE)
+```
+
+Using the `climr` output for the EC-Earth3 climate model, we can compare the change in January mean temperature to change in January degree days below 0^o^C in the 2041-2060 period relative to the 1961-1990 baseline. January mean temperature is interpolated directly from the GCM, so the only variation in the climate change trend in this variable is the transition from one GCM grid cell to its neighbours. In contrast, January degree-days below 0^o^C, while derived directly from January mean temperature, has strong elevation-dependence in its climate change trend.
+
+```{r, fig.cap = "*Downscaled change in January mean temperature (left) and its derived variable January degree days below 0^o^C (right), using the EC-Earth model simulation for 2041-2060.*", fig.show = "hold", fig.dim = c(7, 3)}
+Tave.ref <- Tave.proj <- DD_0.ref <- DD_0.proj <- X
+Tave.ref[clim.aoi[PERIOD == "1961_1990", id]] <- clim.aoi[PERIOD == "1961_1990", Tave01]
+Tave.proj[clim.aoi[PERIOD == "2041_2060", id]] <- clim.aoi[PERIOD == "2041_2060", Tave01]
+DD_0.ref[clim.aoi[PERIOD == "1961_1990", id]] <- clim.aoi[PERIOD == "1961_1990", DD_0_01]
+DD_0.proj[clim.aoi[PERIOD == "2041_2060", id]] <- clim.aoi[PERIOD == "2041_2060", DD_0_01]
+par(mfrow = c(1, 2))
+colPal2 <- colorRampPalette(hcl.colors(9, "Reds"))(99)
+plot(Tave.ref - Tave.proj, col = colPal2, main = "Change in January mean temperature", cex.main = 0.8)
+plot(bdy, add = T)
+plot(DD_0.proj - DD_0.ref, col = colPal2, main = "Change in January degree-days <0C", cex.main = 0.8)
+plot(bdy, add = T)
+```
+
+## `climr` data sources
+
+#### High-resolution climate maps used by `climr`
+
+The default climate maps for `climr` are a composite for western North America south of 60^o^N (800m grid scale). We compiled this composite from [PRISM Climate Group](https://prism.oregonstate.edu/) (USA), [Pacific Climate Impacts Consortium](https://www.pacificclimate.org/data/prism-climatology-and-monthly-timeseries) (BC), and [Daymet](https://daymet.ornl.gov/) (Canada outside BC). We recommend this reference climate map for the following reasons: (1) the 800m resolution preserves localized lapse rates (e.g. temperature inversions) that are averaged out by the 4km ClimateNA composite; (2) the PRISM climatology for BC is preserved by blending outwards from the BC border; (3) lapse rates in the Alberta Rockies are better defined; and (4) T~min~ for Washington, Idaho, and Montana are reconstructed to correct for unrealistic lapse rates.
+
+`climr` provides two other options for the high-resolution reference climate map:
+
+1.  The ClimateNA composite for North America, at 4km grid scale [@wang2016]. This composite is compiled from separate PRISM climate surfaces for BC, Alaska, Yukon/Alberta/Saskatchewan/Manitoba, and the contiguous US, and WorldClim [@fick2017] in the remainder of the continent.
+2.  User-supplied climate maps. the `downscale()` function can accept any climate map as the reference normals. This allows the user to provide their own reference climate maps, such as: (1) Alternative publicly available gridded climatologies such as CHELSA, Daymet, or Worldclim; (2) output of weather models (e.g., WRF); or (3) custom super-high resolution climate maps for small study areas.
+
+#### Historical observational time series and climates
+
+`climr` provides historical observed climates for annual time series from 1901-present and for 10-year, 20-year, and 30-year periods from 1951-2020. These are downscaled in the same way as global climate model data: by adding low-resolution anomalies (change factors) to the high-resolution reference climate map. Temperature anomalies are from the Climatic Research Unit (CRU) Time Series dataset. Precipitation anomalies are from the Global Precipitation Climatology Centre global dataset, which has a better representation of Canadian precipitation stations than the CRU Time Series dataset.
+
+## References

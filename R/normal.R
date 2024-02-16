@@ -1,4 +1,9 @@
-#' Create normal baseline inputs for `downscale` from PostGIS database.
+#' Retrieve climatologies for normal period
+#' @description
+#' This function downloads (or retrieves from cache) monthly Tmin, Tmax, and PPT variables 
+#' for the specified climatology and for the specified bounding box. It is intended for use with [`downscale()`],
+#' but can also be used as a stand-alone climatology.
+#' 
 #' 
 #' @template dbCon
 #' @template bbox
@@ -7,6 +12,11 @@
 #'
 #' @return A `SpatRaster` containing normals, lapse rates
 #'   and digital elevation model layers, that can be used with [`downscale()`]. 
+#'   
+#' @details
+#' The first 36 layers of the output raster correspond with the actual climate variables. The raster also contains 
+#' lapse rates for each variable, and a corresponding digital elevation model. 
+#' 
 #'
 #' @seealso [downscale()]
 #'
@@ -15,7 +25,7 @@
 #' @importFrom uuid UUIDgenerate
 #' @rdname normal-input-data
 #' @export
-normal_input <- function(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE) {
+normal_input <- function(dbCon, bbox, normal = "normal_na", cache = TRUE) {
   ## checks
   if (is(normal, "character")) {
     match.arg(normal, list_normal())
@@ -34,7 +44,7 @@ normal_input <- function(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE)
   ## check cached
   needDownload <- TRUE
   
-  cPath <- file.path(cache_path(), "/normal/", normal)
+  cPath <- file.path(cache_path(), "normal", normal)
   
   if (dir.exists(cPath)) {
     bnds <- try(fread(file.path(cPath, "meta_data.csv")), silent = TRUE)
@@ -87,11 +97,11 @@ normal_input <- function(dbCon, bbox = NULL, normal = "normal_na", cache = TRUE)
     if (cache) {
       message("Caching data...")
       uid <- UUIDgenerate()
-      if (!dir.exists(paste0(cache_path(), "/normal/", normal))) dir.create(paste0(cache_path(), "/normal/", normal), recursive = TRUE)
-      writeRaster(res, paste0(cache_path(), "/normal/", normal, "/", uid, ".tif"))
+      dir.create(cPath, recursive = TRUE, showWarnings = FALSE)
+      writeRaster(res, file.path(cPath, paste0(uid, ".tif")))
       rastext <- ext(res)
       temp <- data.table(uid = uid, ymax = rastext[4] + 0.1, ymin = rastext[3] - 0.1, xmax = rastext[2] + 0.1, xmin = rastext[1] - 0.1)
-      fwrite(temp, file = paste0(cache_path(), "/normal/", normal, "/meta_data.csv"), append = TRUE)
+      fwrite(temp, file = file.path(cPath, "meta_data.csv"), append = TRUE)
     }  
   }
   

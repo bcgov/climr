@@ -9,6 +9,7 @@
 #' \dontrun{
 #' climr:::calc_NFFD(3, 2.05)
 #' }
+#' @noRd
 calc_NFFD <- function(m, tmin) {
   if (FALSE) {
     a <- T0 <- b <- NULL
