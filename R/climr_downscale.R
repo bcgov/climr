@@ -128,7 +128,7 @@ climr_downscale <- function(xyz, which_normal = "auto", historic_period = NULL, 
   .checkClimrDwnsclArgs(
     xyz, which_normal, historic_period, historic_ts,
     gcm_models, ssp, gcm_period, gcm_ts_years,
-    gcm_hist_years, max_run, vars
+    gcm_hist_years, max_run
   )
 
   expectedCols <- c("lon", "lat", "elev", "id")

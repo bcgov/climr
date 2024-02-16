@@ -667,9 +667,8 @@ unpackRasters <- function(ras) {
 #' @noRd
 .checkClimrDwnsclArgs <- function(xyz, which_normal = NULL, historic_period = NULL, historic_ts = NULL,
                                   gcm_models = NULL, ssp = list_ssp(), gcm_period = NULL, gcm_ts_years = NULL,
-                                  gcm_hist_years = NULL, max_run = 0L, vars = list_variables()) {
+                                  gcm_hist_years = NULL, max_run = 0L) {
   ssp <- match.arg(ssp, list_ssp(), several.ok = TRUE)
-  vars <- match.arg(vars, list_variables(), several.ok = TRUE)
 
   if (!is.null(which_normal)) {
     which_normal <- match.arg(which_normal, c("auto", list_normal()))
