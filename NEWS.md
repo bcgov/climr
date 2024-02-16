@@ -19,6 +19,9 @@
 * fixing `historic_input_ts` to get only queried years
 * `get_bb` follows column names
 
+## Other
+* `climr_downscale` now accepts `...` to pass arguments to `downscale`
+
 # `climr` 0.0.2
 
 ## Bugfixes
