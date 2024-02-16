@@ -277,3 +277,68 @@ climr_downscale <- function(xyz, which_normal = "auto", historic_period = NULL, 
     return(res_all)
   }
 }
+
+
+#' Check `climr_downscale` arguments
+#'
+#' @inheritParams climr_downscale
+#'
+#' @return NULL
+#' @noRd
+.checkClimrDwnsclArgs <- function(xyz, which_normal = NULL, historic_period = NULL, historic_ts = NULL,
+                                  gcm_models = NULL, ssp = list_ssp(), gcm_period = NULL, gcm_ts_years = NULL,
+                                  gcm_hist_years = NULL, max_run = 0L) {
+  ssp <- match.arg(ssp, list_ssp(), several.ok = TRUE)
+  
+  if (!is.null(which_normal)) {
+    which_normal <- match.arg(which_normal, c("auto", list_normal()))
+  }
+  
+  if (!is.null(historic_period)) {
+    historic_period <- match.arg(historic_period, list_historic(), several.ok = TRUE)
+  }
+  
+  if (!is.null(historic_ts)) {
+    if (!all(historic_ts %in% 1902:2015)) {
+      stop("'historic_ts' must be in 1902:2015")
+    }
+  }
+  
+  if (!is.null(gcm_models)) {
+    gcm_models <- match.arg(gcm_models, list_gcm(), several.ok = TRUE)
+  }
+  
+  if (!is.null(gcm_period)) {
+    gcm_period <- match.arg(gcm_period, list_gcm_period(), several.ok = TRUE)
+  }
+  
+  if (!is.null(gcm_ts_years)) {
+    if (!all(gcm_ts_years %in% 2015:2100)) {
+      stop("'gcm_ts_years' must be in 2015:2100")
+    }
+  }
+  
+  msg <- "'max_run' must be 0 or larger"
+  if (!inherits(max_run, c("integer", "numeric"))) {
+    stop(msg)
+  } else if (max_run < 0) {
+    stop(msg)
+  }
+  
+  ## check for "silly" parameter combinations
+  if (!is.null(gcm_models) &
+      all(is.null(gcm_hist_years), is.null(gcm_ts_years), is.null(gcm_period), is.null(ssp))) {
+    message("'gcm_models' will be ignored, since 'gcm_hist_years', 'gcm_ts_years', 'gcm_period' and 'ssp' are missing")
+  }
+  
+  if (is.null(gcm_models) &
+      any(!is.null(gcm_hist_years), !is.null(gcm_ts_years), !is.null(gcm_period), !is.null(ssp))) {
+    message("'gcm_models' is missing. 'gcm_hist_years', 'gcm_ts_years', 'gcm_period' and 'ssp' will be ignored")
+  }
+  
+  if ((!is.null(max_run) | max_run > 0) &
+      is.null(gcm_models)) {
+    message("'gcm_models' is missing. 'max_run' will be ignored")
+  }
+  return(invisible(NULL))
+}
