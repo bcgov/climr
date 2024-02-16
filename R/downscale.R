@@ -74,7 +74,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL,
   ## checks
   .checkDwnsclArgs(
     xyz, normal, gcm, historic, gcm_ts, gcm_hist,
-    historic_ts, return_normal, vars
+    historic_ts, return_normal, out_spatial, plot, vars
   )
 
   expectedCols <- c("lon", "lat", "elev", "id")
@@ -731,9 +731,17 @@ unpackRasters <- function(ras) {
 #' @noRd
 .checkDwnsclArgs <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, gcm_hist = NULL,
                              historic_ts = NULL, return_normal = FALSE,
-                             vars = list_variables()) {
+                             out_spatial = FALSE, plot = NULL, vars = list_variables()) {
   vars <- match.arg(vars, list_variables(), several.ok = TRUE)
 
+  if (!out_spatial %in% c(TRUE, FALSE)) {
+    stop("'out_spatial' must be TRUE or FALSE")
+  }
+  
+  plot <- if (!is.null(plot)) {
+    match.arg(plot,list_variables())
+  }
+  
   if (!isTRUE(attr(normal, "builder") == "climr")) {
     stop(
       "Please use `normal_input` function to create `normal`.",
