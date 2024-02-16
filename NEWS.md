@@ -21,6 +21,10 @@
 * fixed temperature values of composite anomalies
 * name of composite anomalies changed to "normal_composite" in `normal_input(..., normal)`.
 
+## Documentation
+* added vignettes
+* `pkgdown` website for `climr` is live
+
 # `climr` 0.0.1
 
 ## Enhancements

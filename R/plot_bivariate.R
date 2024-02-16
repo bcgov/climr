@@ -42,8 +42,10 @@
 #' # draw the plot
 #' plot_bivariate(my_points)
 #' 
-#' # export plot to the working directory
-#' png(filename="plot_test.png", type="cairo", units="in", width=6, height=5, pointsize=10, res=300)
+#' # export plot to a temporary directory
+#' figDir <- tempdir()
+#' png(filename = file.path(figDir, "plot_test.png"), type = "cairo", units = "in",
+#'     width = 6, height = 5, pointsize = 10, res = 300)
 #' plot_bivariate(my_points)
 #' dev.off()
 #' 

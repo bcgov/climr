@@ -9,6 +9,7 @@
 #' \dontrun{
 #' climr:::calc_RH(tmmin = 10, tmmax = 40)
 #' }
+#' @noRd
 calc_RH <- function(tmmin, tmmax) {
   es_tmin <- calc_SVP(tmmin)
   es_tmax <- calc_SVP(tmmax)
@@ -27,6 +28,7 @@ calc_RH <- function(tmmin, tmmax) {
 #'
 #' @references Hogg, E.H. (1997). Temporal scaling of moisture and the forest-grassland boundary in western Canada. Agricultural and Forest Meteorology, Research on Forest Environmental Influences in a Changing World, 84, 115–122.
 #' @importFrom data.table fifelse
+#' @noRd
 calc_PET <- function(tave, tmmin, tmmax, alt) {
   D <- 0.5 * (.calc_SVP(tmmax) - .calc_SVP(tmmin)) - .calc_SVP(tmmin - 2.5)
   pet <- fifelse(
@@ -42,7 +44,7 @@ calc_PET <- function(tave, tmmin, tmmax, alt) {
 
 #' Calculate Saturated Vapour Pressure at a temperature t
 #' @template t
-
+#' @noRd
 calc_SVP <- function(t) {
   svp <- .calc_SVP(t)
   i <- which(t < 0)
@@ -52,6 +54,7 @@ calc_SVP <- function(t) {
 
 #' internal utility function
 #' @template t
+#' @noRd
 .calc_SVP <- function(t) {
   return(0.6105 * exp((17.273 * t) / (t + 237.3)))
 }
