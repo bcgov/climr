@@ -24,17 +24,23 @@ downscale(
 \item{xyz}{a \code{data.frame} with the following columns "long", "lat", "elev",
 and a unique "id". Any extra columns will be ignored and not output.}
 
-\item{normal}{\code{SpatRaster}. Outputs from \code{\link[=normal_input]{normal_input()}}. The high-resolution climate maps for use as the downscaling baseline.}
+\item{normal}{\code{SpatRaster}. Outputs from \code{\link[=normal_input]{normal_input()}}. The high-resolution
+climate maps for use as the downscaling baseline.}
 
-\item{gcm}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=gcm_input]{gcm_input()}}. Global climate model data for 20-year normal periods to be downscaled. Default to \code{NULL}.}
+\item{gcm}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=gcm_input]{gcm_input()}}. Global
+climate model data for 20-year normal periods to be downscaled. Default to \code{NULL}.}
 
-\item{historic}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=historic_input]{historic_input()}}. Observed climate data for 20-year normal periods to be downscaled. Default to \code{NULL}.}
+\item{historic}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=historic_input]{historic_input()}}.
+Observed climate data for 20-year normal periods to be downscaled. Default to \code{NULL}.}
 
-\item{gcm_ts}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=gcm_ts_input]{gcm_ts_input()}}. Global climate model time series for ssp-rcp scenarios to be downscaled. Default to \code{NULL}.}
+\item{gcm_ts}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=gcm_ts_input]{gcm_ts_input()}}.
+Global climate model time series for ssp-rcp scenarios to be downscaled. Default to \code{NULL}.}
 
-\item{gcm_hist}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=gcm_hist_input]{gcm_hist_input()}}. Global climate model time series for historical scenario to be downscaled. Default to \code{NULL}.}
+\item{gcm_hist}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=gcm_hist_input]{gcm_hist_input()}}.
+Global climate model time series for historical scenario to be downscaled. Default to \code{NULL}.}
 
-\item{historic_ts}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=historic_input_ts]{historic_input_ts()}}. Observed climate time series to be downscaled. Default to \code{NULL}.}
+\item{historic_ts}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=historic_input_ts]{historic_input_ts()}}.
+Observed climate time series to be downscaled. Default to \code{NULL}.}
 
 \item{return_normal}{logical. Return downscaled climate values for the reference normal period (1961-1990)? Default \code{TRUE}.}
 
@@ -78,7 +84,7 @@ xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = r
 thebb <- get_bb(xyz)
 normal <- normal_input(dbCon = dbCon, bbox = thebb, cache = TRUE)
 
-## pick one GCM, one SSP and one period from the list of available options 
+## pick one GCM, one SSP and one period from the list of available options
 gcm <- gcm_input(dbCon, thebb, gcm = list_gcm()[3], list_ssp()[1], list_gcm_period()[2])
 
 ## notice coarseness of the data

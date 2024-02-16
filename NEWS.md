@@ -1,3 +1,7 @@
+# `climr` 1.0.0
+## Enhancements
+* new functions `list_historic_ts` and `list_gcm_ts` to get available years for historic/future time series
+
 # `climr` 0.0.3
 ## Enhancements
 * new tests comparing to reference outputs

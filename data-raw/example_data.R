@@ -5,19 +5,19 @@ library(bcdata)
 library(data.table)
 
 ## coastline of Vancouver
-vancouver <- vect("data-raw/Coast_Vancouver.shp") 
+vancouver <- vect("data-raw/Coast_Vancouver.shp")
 
 ## DEM of North Vancouver (smaller than coastline)
 dem_vancouver <- rast("data-raw/example_VanNorthShore.tif")
 
-dem_vancouver_lowres <- project(dem_vancouver, crs(dem_vancouver), res = 0.005) 
+dem_vancouver_lowres <- project(dem_vancouver, crs(dem_vancouver), res = 0.005)
 
 ## sample of points in North Vancouver
 vancouver_points <- as.points(dem_vancouver)
 points2sample <- which(vancouver_points$WNA_DEM_SRT_30m > 0)
 set.seed(123)
 samp <- sample(points2sample, 1000, replace = FALSE)
-vancouver_points <- vancouver_points[samp,]
+vancouver_points <- vancouver_points[samp, ]
 vancouver_points[, 1] <- NULL
 vancouver_points$id <- 1:nrow(vancouver_points)
 
@@ -47,13 +47,13 @@ coltab(BECz_vancouver_ras) <- coltb[, .(value, col)]
 
 ## adjusted precipitation stations from PCIC (https://services.pacificclimate.org/met-data-portal-pcds/app/)
 weather_stations <- fread("data-raw/station-metadata-by-history_BC.csv")
-weather_stations$`Elevation (m)` <- as.numeric(weather_stations$`Elevation (m)`) 
+weather_stations$`Elevation (m)` <- as.numeric(weather_stations$`Elevation (m)`)
 
 ## a simplified version
-xyzDT <- weather_stations[, .(`Station ID`, Longitude, Latitude, `Elevation (m)`)]  
+xyzDT <- weather_stations[, .(`Station ID`, Longitude, Latitude, `Elevation (m)`)]
 setnames(xyzDT, c("id", "lon", "lat", "elev"))
 xyzDT <- unique(xyzDT)
-xyzDT <- xyzDT[!duplicated(id),]  ## still many duplicated stations with slightly different coords/elev
+xyzDT <- xyzDT[!duplicated(id), ] ## still many duplicated stations with slightly different coords/elev
 xyzDT <- xyzDT[complete.cases(xyzDT)]
 
 weather_stations <- weather_stations[!is.na(`Elevation (m)`)]
@@ -80,4 +80,3 @@ usethis::use_data(BECz_vancouver_ras, overwrite = TRUE, internal = FALSE)
 usethis::use_data(BECcols, overwrite = TRUE, internal = FALSE)
 usethis::use_data(weather_stations, overwrite = TRUE, internal = FALSE)
 usethis::use_data(xyzDT, overwrite = TRUE, internal = FALSE)
-

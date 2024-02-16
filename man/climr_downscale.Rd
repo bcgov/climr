@@ -12,8 +12,8 @@ climr_downscale(
   gcm_models = NULL,
   ssp = list_ssp(),
   gcm_period = NULL,
-  gcm_ts_years = NULL,
-  gcm_hist_years = NULL,
+  gcm_ts_years = list_gcm_ts(),
+  gcm_hist_years = list_historic_ts(),
   max_run = 0L,
   return_normal = TRUE,
   vars = sort(sprintf(c("PPT\%02d", "Tmax\%02d", "Tmin\%02d"), sort(rep(1:12, 3)))),
@@ -26,24 +26,35 @@ climr_downscale(
 \item{xyz}{a \code{data.frame} with the following columns "long", "lat", "elev",
 and a unique "id". Any extra columns will be ignored and not output.}
 
-\item{which_normal}{character. Which climatological normals map to use as the high-resolution reference climate map for downscaling.
-Default is "auto", which selects, for each query point, the best available climatological normals map in declining order of normals_bc, normals_composite, and normals_na.
-Other options are one of \code{\link[=list_normal]{list_normal()}}, which will provide a consistent reference map for all points.}
+\item{which_normal}{character. Which climatological normals map to use as the
+high-resolution reference climate map for downscaling. Default is "auto",
+which selects, for each query point, the best available climatological
+normals map in declining order of normals_bc, normals_composite, and normals_na.
+Other options are one of \code{\link[=list_normal]{list_normal()}}, which will provide a consistent
+reference map for all points.}
 
-\item{historic_period}{character. Which historic period for observed climate data, averaged over this period. Options are \code{\link[=list_historic]{list_historic()}}. Default \code{NULL}}
+\item{historic_period}{character. Which historic period for observed climate
+data, averaged over this period. Options are \code{\link[=list_historic]{list_historic()}}. Default \code{NULL}}
 
-\item{historic_ts}{integer. Vector of years to obtain individual years or time series of observed climate data. Must be in \code{1902:2015}. Default \code{NULL}}
+\item{historic_ts}{integer. Vector of years to obtain individual years or time
+series of observed climate data. Default \code{NULL}. See \code{\link[=list_historic_ts]{list_historic_ts()}}
+for available years.}
 
-\item{gcm_models}{character. Vector of global climate model names. Options are \code{\link[=list_gcm]{list_gcm()}}. Used for gcm periods, gcm timeseries, and historic timeseries. Default \code{NULL}}
+\item{gcm_models}{character. Vector of global climate model names. Options
+are \code{\link[=list_gcm]{list_gcm()}}. Used for gcm periods, gcm timeseries, and historic timeseries.
+Defaults to \code{NULL}.}
 
 \item{ssp}{character. Vector of SSP-RCP scenarios (representative concentration pathways paired with shared socioeconomic pathways).
 Options are \code{\link[=list_ssp]{list_ssp()}}. Defaults to all scenarios available.}
 
-\item{gcm_period}{character. 20-year normal periods for GCM simulations. Options are \code{\link[=list_gcm_period]{list_gcm_period()}}}
+\item{gcm_period}{character. 20-year normal periods for GCM simulations.
+Options are \code{\link[=list_gcm_period]{list_gcm_period()}}.}
 
-\item{gcm_ts_years}{character. Timeseries years for GCM simulations of future scenarios specified by \code{ssp}. Must be in \code{2015:2100}}
+\item{gcm_ts_years}{character. Timeseries years for GCM simulations of future
+scenarios specified by \code{ssp}. See \code{\link[=list_gcm_ts]{list_gcm_ts()}} for available years.}
 
-\item{gcm_hist_years}{character.  Timeseries years for GCM simulations of the historical scenario. Must be in \code{1851:2014}}
+\item{gcm_hist_years}{character.  Timeseries years for GCM simulations of the
+historical scenario. See \code{\link[=list_gcm_hist_ts]{list_gcm_hist_ts()}} for available years.}
 
 \item{max_run}{integer. Maximum number of model runs to include.
 A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
@@ -71,8 +82,10 @@ Defaults to no plotting (NULL).}
 All outputs are returned in one table.
 }
 \description{
-\code{climr_downscale()} provides downscaled climate variables for user-specified locations.
-\code{climr_downscale()} adapts a simple change-factor (aka "delta') downscaling approach originally implemented in \href{https://climatena.ca/}{ClimateNA}.
+\code{climr_downscale()} provides downscaled climate variables for user-specified
+locations.
+\code{climr_downscale()} adapts a simple change-factor (aka "delta') downscaling
+approach originally implemented in \href{https://climatena.ca/}{ClimateNA}.
 This approach downscales climate data in three stages:
 \enumerate{
 \item \emph{Change-factor downscaling} of coarse-resolution (50-200km grid) monthly temperature and precipitation data from climate models or observational sources to high-resolution (800m grid);
@@ -84,9 +97,12 @@ See \code{vignette("methods_downscaling", package = "climr")} for a description 
 \code{climr_downscale()} is a user-friendly wrapper for \code{downscale()}
 }
 \details{
-\code{\link[=downscale]{downscale()}} parameters can be applied in \code{climr_downscale()}. For example, setting \code{ppt_lr = TRUE} in \code{climr_downscale()} will apply elevation adjustment to precipitation values.
+\code{\link[=downscale]{downscale()}} parameters can be applied in \code{climr_downscale()}. For example,
+setting \code{ppt_lr = TRUE} in \code{climr_downscale()} will apply elevation adjustment to precipitation values.
 
-Although \code{which_normal = "auto"} is the default, users are cautioned that this can produce artefacts associated with downscaling to different reference climate maps within and outside the western North American boundary of \code{normal_composite}.
+Although \code{which_normal = "auto"} is the default, users are cautioned that
+this can produce artefacts associated with downscaling to different reference
+climate maps within and outside the western North American boundary of \code{normal_composite}.
 We recommend that queries spanning this boundary use \code{which_normal = "normal_na"}.
 }
 \examples{
@@ -94,8 +110,10 @@ library(data.table)
 library(terra)
 set.seed(123)
 dbCon <- data_connect()
-xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10),
-                  id = 1:10)
+xyz <- data.frame(
+  lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10),
+  id = 1:10
+)
 
 ## get bounding box based on input points
 thebb <- get_bb(xyz)
@@ -103,35 +121,45 @@ historic <- historic_input(dbCon, thebb, period = "2001_2020")
 plot(historic[[1]][[2]])
 
 ## provide or create a lon, lat, elev, and optionally id, dataframe - usually read from csv file
-in_xyz <- data.frame(lon = c(-127.70521, -127.62279, -127.56235, -127.7162,
-                              -127.18585, -127.1254, -126.94957, -126.95507),
-                     lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
-                     elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
-                     id = 1:8,
-                     Zone = c(rep("CWH",3), rep("CDF",5)),
-                     Subzone = c("vm1","vm2","vs1",rep("mm",3),"dk","dc"))
+in_xyz <- data.frame(
+  lon = c(
+    -127.70521, -127.62279, -127.56235, -127.7162,
+    -127.18585, -127.1254, -126.94957, -126.95507
+  ),
+  lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
+  elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
+  id = 1:8,
+  Zone = c(rep("CWH", 3), rep("CDF", 5)),
+  Subzone = c("vm1", "vm2", "vs1", rep("mm", 3), "dk", "dc")
+)
 
 ## historic observational time series
-vars <- c("PPT","CMD","Tave07")
-climate_norms_hist <- climr_downscale(xyz = in_xyz, which_normal = "auto",
-                                      return_normal = TRUE,
-                                      historic_period = "2001_2020",
-                                      vars = vars,
-                                      out_spatial = TRUE, plot = "PPT") ##specify desired variables to plot
+vars <- c("PPT", "CMD", "Tave07")
+climate_norms_hist <- climr_downscale(
+  xyz = in_xyz, which_normal = "auto",
+  return_normal = TRUE,
+  historic_period = "2001_2020",
+  vars = vars,
+  out_spatial = TRUE, plot = "PPT"
+) ## specify desired variables to plot
 
 ## as a data.table
-climate_norms_hist <- climr_downscale(xyz = in_xyz, which_normal = "auto",
-                                      return_normal = TRUE,
-                                      vars = vars,
-                                      out_spatial = FALSE, plot = "PPT") ##specify desired variables to plot
+climate_norms_hist <- climr_downscale(
+  xyz = in_xyz, which_normal = "auto",
+  return_normal = TRUE,
+  vars = vars,
+  out_spatial = FALSE, plot = "PPT"
+) ## specify desired variables to plot
 
 ## future projections
-climate_norms_fut <- climr_downscale(xyz = in_xyz, which_normal = "auto",
-                                     gcm_models = c("ACCESS-ESM1-5"),
-                                     ssp = c("ssp370"),
-                                     gcm_period = c("2021_2040"),
-                                     #gcm_ts_years = 2020:2060,
-                                     max_run = 3, #' we want 3 individual runs for each model
-                                     vars = vars)
+climate_norms_fut <- climr_downscale(
+  xyz = in_xyz, which_normal = "auto",
+  gcm_models = c("ACCESS-ESM1-5"),
+  ssp = c("ssp370"),
+  gcm_period = c("2021_2040"),
+  # gcm_ts_years = 2020:2060,
+  max_run = 3, #' we want 3 individual runs for each model
+  vars = vars
+)
 
 }

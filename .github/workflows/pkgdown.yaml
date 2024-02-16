@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - development
   pull_request:
     branches:
       - main
@@ -17,14 +16,19 @@ name: pkgdown
 
 jobs:
   pkgdown:
+    if: "!contains(github.event.head_commit.message, '[skip-pkgdown]')"
     runs-on: ubuntu-latest
+
     # Only restrict concurrency for non-PR jobs
     concurrency:
       group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
+
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
     permissions:
       contents: write
+
     steps:
       - uses: actions/checkout@v4
 
