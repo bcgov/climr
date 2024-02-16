@@ -6,6 +6,7 @@
 #' @return a `data.table`
 #'
 #' @importFrom data.table set setcolorder
+#' @noRd
 append_clim_vars <- function(dt, vars) {
   # Return variable or create it if not found in dt
   v <- function(nm) {
@@ -113,40 +114,40 @@ append_clim_vars <- function(dt, vars) {
       set(dt, j = "Tave12", value = (v("Tmax12") + v("Tmin12")) / 2)
     },
     "PET01" = function() {
-      set(dt, j = "PET01", value = calc_PET(v("Tave01"), v("Tmin01"), v("Tmax01"), v("Elev")))
+      set(dt, j = "PET01", value = calc_PET(v("Tave01"), v("Tmin01"), v("Tmax01"), v("elev")))
     },
     "PET02" = function() {
-      set(dt, j = "PET02", value = calc_PET(v("Tave02"), v("Tmin02"), v("Tmax02"), v("Elev")))
+      set(dt, j = "PET02", value = calc_PET(v("Tave02"), v("Tmin02"), v("Tmax02"), v("elev")))
     },
     "PET03" = function() {
-      set(dt, j = "PET03", value = calc_PET(v("Tave03"), v("Tmin03"), v("Tmax03"), v("Elev")))
+      set(dt, j = "PET03", value = calc_PET(v("Tave03"), v("Tmin03"), v("Tmax03"), v("elev")))
     },
     "PET04" = function() {
-      set(dt, j = "PET04", value = calc_PET(v("Tave04"), v("Tmin04"), v("Tmax04"), v("Elev")))
+      set(dt, j = "PET04", value = calc_PET(v("Tave04"), v("Tmin04"), v("Tmax04"), v("elev")))
     },
     "PET05" = function() {
-      set(dt, j = "PET05", value = calc_PET(v("Tave05"), v("Tmin05"), v("Tmax05"), v("Elev")))
+      set(dt, j = "PET05", value = calc_PET(v("Tave05"), v("Tmin05"), v("Tmax05"), v("elev")))
     },
     "PET06" = function() {
-      set(dt, j = "PET06", value = calc_PET(v("Tave06"), v("Tmin06"), v("Tmax06"), v("Elev")))
+      set(dt, j = "PET06", value = calc_PET(v("Tave06"), v("Tmin06"), v("Tmax06"), v("elev")))
     },
     "PET07" = function() {
-      set(dt, j = "PET07", value = calc_PET(v("Tave07"), v("Tmin07"), v("Tmax07"), v("Elev")))
+      set(dt, j = "PET07", value = calc_PET(v("Tave07"), v("Tmin07"), v("Tmax07"), v("elev")))
     },
     "PET08" = function() {
-      set(dt, j = "PET08", value = calc_PET(v("Tave08"), v("Tmin08"), v("Tmax08"), v("Elev")))
+      set(dt, j = "PET08", value = calc_PET(v("Tave08"), v("Tmin08"), v("Tmax08"), v("elev")))
     },
     "PET09" = function() {
-      set(dt, j = "PET09", value = calc_PET(v("Tave09"), v("Tmin09"), v("Tmax09"), v("Elev")))
+      set(dt, j = "PET09", value = calc_PET(v("Tave09"), v("Tmin09"), v("Tmax09"), v("elev")))
     },
     "PET10" = function() {
-      set(dt, j = "PET10", value = calc_PET(v("Tave10"), v("Tmin10"), v("Tmax10"), v("Elev")))
+      set(dt, j = "PET10", value = calc_PET(v("Tave10"), v("Tmin10"), v("Tmax10"), v("elev")))
     },
     "PET11" = function() {
-      set(dt, j = "PET11", value = calc_PET(v("Tave11"), v("Tmin11"), v("Tmax11"), v("Elev")))
+      set(dt, j = "PET11", value = calc_PET(v("Tave11"), v("Tmin11"), v("Tmax11"), v("elev")))
     },
     "PET12" = function() {
-      set(dt, j = "PET12", value = calc_PET(v("Tave12"), v("Tmin12"), v("Tmax12"), v("Elev")))
+      set(dt, j = "PET12", value = calc_PET(v("Tave12"), v("Tmin12"), v("Tmax12"), v("elev")))
     },
     "CMI" = function() {
       set(dt, j = "CMI", value = v("PPT") - (v("PET01") + v("PET02") + v("PET03") + v("PET04") + v("PET05") + v("PET06") + v("PET07") + v("PET08") + v("PET09") + v("PET10") + v("PET11") + v("PET12")))
@@ -260,40 +261,40 @@ append_clim_vars <- function(dt, vars) {
       set(dt, j = "RH12", value = calc_RH(v("Tmin12"), v("Tmax12")))
     },
     "Eref01" = function() {
-      set(dt, j = "Eref01", value = calc_Eref(1, v("Tmin01"), v("Tmax01"), v("Lat")))
+      set(dt, j = "Eref01", value = calc_Eref(1, v("Tmin01"), v("Tmax01"), v("lat")))
     },
     "Eref02" = function() {
-      set(dt, j = "Eref02", value = calc_Eref(2, v("Tmin02"), v("Tmax02"), v("Lat")))
+      set(dt, j = "Eref02", value = calc_Eref(2, v("Tmin02"), v("Tmax02"), v("lat")))
     },
     "Eref03" = function() {
-      set(dt, j = "Eref03", value = calc_Eref(3, v("Tmin03"), v("Tmax03"), v("Lat")))
+      set(dt, j = "Eref03", value = calc_Eref(3, v("Tmin03"), v("Tmax03"), v("lat")))
     },
     "Eref04" = function() {
-      set(dt, j = "Eref04", value = calc_Eref(4, v("Tmin04"), v("Tmax04"), v("Lat")))
+      set(dt, j = "Eref04", value = calc_Eref(4, v("Tmin04"), v("Tmax04"), v("lat")))
     },
     "Eref05" = function() {
-      set(dt, j = "Eref05", value = calc_Eref(5, v("Tmin05"), v("Tmax05"), v("Lat")))
+      set(dt, j = "Eref05", value = calc_Eref(5, v("Tmin05"), v("Tmax05"), v("lat")))
     },
     "Eref06" = function() {
-      set(dt, j = "Eref06", value = calc_Eref(6, v("Tmin06"), v("Tmax06"), v("Lat")))
+      set(dt, j = "Eref06", value = calc_Eref(6, v("Tmin06"), v("Tmax06"), v("lat")))
     },
     "Eref07" = function() {
-      set(dt, j = "Eref07", value = calc_Eref(7, v("Tmin07"), v("Tmax07"), v("Lat")))
+      set(dt, j = "Eref07", value = calc_Eref(7, v("Tmin07"), v("Tmax07"), v("lat")))
     },
     "Eref08" = function() {
-      set(dt, j = "Eref08", value = calc_Eref(8, v("Tmin08"), v("Tmax08"), v("Lat")))
+      set(dt, j = "Eref08", value = calc_Eref(8, v("Tmin08"), v("Tmax08"), v("lat")))
     },
     "Eref09" = function() {
-      set(dt, j = "Eref09", value = calc_Eref(9, v("Tmin09"), v("Tmax09"), v("Lat")))
+      set(dt, j = "Eref09", value = calc_Eref(9, v("Tmin09"), v("Tmax09"), v("lat")))
     },
     "Eref10" = function() {
-      set(dt, j = "Eref10", value = calc_Eref(10, v("Tmin10"), v("Tmax10"), v("Lat")))
+      set(dt, j = "Eref10", value = calc_Eref(10, v("Tmin10"), v("Tmax10"), v("lat")))
     },
     "Eref11" = function() {
-      set(dt, j = "Eref11", value = calc_Eref(11, v("Tmin11"), v("Tmax11"), v("Lat")))
+      set(dt, j = "Eref11", value = calc_Eref(11, v("Tmin11"), v("Tmax11"), v("lat")))
     },
     "Eref12" = function() {
-      set(dt, j = "Eref12", value = calc_Eref(12, v("Tmin12"), v("Tmax12"), v("Lat")))
+      set(dt, j = "Eref12", value = calc_Eref(12, v("Tmin12"), v("Tmax12"), v("lat")))
     },
     "CMD01" = function() {
       set(dt, j = "CMD01", value = calc_CMD(v("Eref01"), v("PPT01")))
@@ -674,11 +675,11 @@ append_clim_vars <- function(dt, vars) {
   }
 
   # Remove unwanted variables
-  j_out <- names(dt)[!names(dt) %in% c("ID", "GCM", "SSP", "RUN", "PERIOD", vars)]
+  j_out <- names(dt)[!names(dt) %in% c("id", "GCM", "SSP", "RUN", "PERIOD", vars)]
   if (length(j_out)) {
     set(dt, j = j_out, value = NULL)
   }
 
   # Reorder to match vars
-  setcolorder(dt, c(names(dt)[names(dt) %in% c("ID", "GCM", "SSP", "RUN", "PERIOD")], vars))
+  setcolorder(dt, c(names(dt)[names(dt) %in% c("id", "GCM", "SSP", "RUN", "PERIOD")], vars))
 }

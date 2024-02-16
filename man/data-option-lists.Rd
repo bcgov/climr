@@ -22,12 +22,17 @@ list_normal()
 
 list_historic()
 
-list_variables(only_extra = FALSE)
+list_variables(
+  set = c("All", "Monthly", "Seasonal", "Annual"),
+  only_extra = FALSE
+)
 }
 \arguments{
 \item{dbCon}{A db connection object created by \code{data_connect}.}
 
 \item{gcm}{Character vector to specify requested GCMs}
+
+\item{set}{character. One of All, Monthly, Seasonal, Annual, or any combination thereof. Defaults to "All".}
 
 \item{only_extra}{logical. Should Tmin, Tmax and PPT be excluded? Defaults to FALSE.}
 }

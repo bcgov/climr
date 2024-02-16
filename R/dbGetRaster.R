@@ -1,7 +1,7 @@
 #' Download raster with bounding box from PostGIS
 #' @template conn
 #' @param name character. Table name in database.
-#' @param tile TODO
+#' @param tile Logical. Retrieve data in tiles to avoid overloading the database?
 #' @param rast character. Name of column which stores raster data.
 #'   Defaults to "rast"
 #' @template bands
@@ -15,7 +15,7 @@
 #' @importFrom DBI dbQuoteIdentifier dbGetQuery
 #' @export
 pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
-                       boundary = NULL) {
+                       boundary) {
   ## Check and prepare the schema.name
   name1 <- name
   nameque <- paste(name1, collapse = ".")
@@ -170,11 +170,17 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
 #' Find bounding box of data
 #'
 #' @param in_xyz `data.table` (or `data.frame`) of points to downscale
-
-#' @return integer. A bounding box (e.g. `c(51,50,-121,-122)`)
+#'  with columns "lon", "lat", "elev" and "id"
+#' @return numeric vector. Bounding box coordinates with order ymax,ymin,xmax,xmin (e.g. `c(51, 50, -121, -122)`).
 #' @export
 get_bb <- function(in_xyz) {
-  return(c(max(in_xyz[, 2]), min(in_xyz[, 2]), max(in_xyz[, 1]), min(in_xyz[, 1])))
+  .checkXYZ(copy(in_xyz))
+  thebb <- c(max(in_xyz[, "lat"]), min(in_xyz[, "lat"]), max(in_xyz[, "lon"]), min(in_xyz[, "lon"]))
+  
+  if (any(is.na(thebb))) {
+    stop("Couldn't guess bounding box. Are there NA's in 'xyz'?")
+  }
+  return(thebb)
 }
 
 
@@ -195,6 +201,7 @@ get_bb <- function(in_xyz) {
 #'
 #' @importFrom DBI dbGetQuery
 #' @importFrom terra rast
+#' @noRd
 make_raster <- function(boundary, conn, rastque, nameque, projID, bands) {
   cat(".")
   info <- dbGetQuery(conn, paste0(
