@@ -82,8 +82,8 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 #' @template dbCon
 #' @template bbox
 #' @template gcm
-#' @param years numeric. Vector of desired years. Must be in `1851:2015`.
-#'   Default is `1901:1950`.
+#' @param years numeric. Vector of desired years. Default is `1901:1950`.
+#'   See [`list_gcm_hist_ts()`] for available years.
 #' @template max_run
 #' @template cache
 #'

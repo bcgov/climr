@@ -120,8 +120,9 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 #' @template dbCon
 #' @template bbox
 #' @template cache
-#' @param years numeric. Years to retrieve historic anomalies for, in `1902:2022`. Default `2010:2022`
-#' @return List of length 1 containing a `SpatRaster` 
+#' @param years numeric. Years to retrieve historic anomalies for. Defaults to `2010:2022`.
+#'   See [`list_historic_ts()`] for available years.
+#' @return List of length 1 containing a `SpatRaster`
 #' @details
 #' The returned raster contains anomalies for each year specified in `years`. In general this
 #' function should only be used in conjunction with [`downscale()`].
