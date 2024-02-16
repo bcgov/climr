@@ -733,7 +733,10 @@ unpackRasters <- function(ras) {
                              historic_ts = NULL, return_normal = FALSE,
                              out_spatial = FALSE, plot = NULL, vars = list_variables()) {
   vars <- match.arg(vars, list_variables(), several.ok = TRUE)
-
+  
+  if (!return_normal %in% c(TRUE, FALSE)) {
+    stop("'return_normal' must be TRUE or FALSE")
+  }
   if (!out_spatial %in% c(TRUE, FALSE)) {
     stop("'out_spatial' must be TRUE or FALSE")
   }
