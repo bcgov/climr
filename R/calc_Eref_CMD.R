@@ -20,7 +20,7 @@ calc_Eref <- function(m, tmmin, tmmax, latitude) {
     (1.18 - 0.0065 * latitude[i])
 
   Eref[is.na(tmmax)] <- tmmax[is.na(tmmax)] ## use tmmax[is.na(tmmax)] to respect NA type
-  
+
   return(Eref)
 }
 
@@ -33,10 +33,10 @@ calc_CMD <- function(Eref, PPT) {
   CMD <- numeric(length(Eref))
   i <- which(Eref > PPT)
   CMD[i] <- Eref[i] - PPT[i]
-  
-  ## return 0s to NaNs if missing values 
-  CMD[is.na(Eref)] <- Eref[is.na(Eref)]   ## use Eref[is.na(Eref)] to respect NA type
-  
+
+  ## return 0s to NaNs if missing values
+  CMD[is.na(Eref)] <- Eref[is.na(Eref)] ## use Eref[is.na(Eref)] to respect NA type
+
   return(CMD)
 }
 

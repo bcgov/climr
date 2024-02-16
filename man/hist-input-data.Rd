@@ -19,7 +19,8 @@ Can be obtained from \code{\link[=list_historic]{list_historic()}}. Default to "
 
 \item{cache}{logical. Specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 
-\item{years}{numeric. Years to retrieve historic anomalies for, in \code{1902:2022}. Default \code{2010:2022}}
+\item{years}{numeric. Years to retrieve historic anomalies for. Defaults to \code{2010:2022}.
+See \code{\link[=list_historic_ts]{list_historic_ts()}} for available years.}
 }
 \value{
 A \code{list} of \code{SpatRasters}, each with possibly multiple layers, that can

@@ -13,20 +13,20 @@
 recycle_borders <- function(mat, nr, nc) {
   # Instantiate an extended border representation
   res <- matrix(nrow = nr + 2L, ncol = nc + 2L)
-  
+
   # Fill the representation starting with the original data in the center
   res[2L:(nr + 1L), 2L:(nc + 1L)] <- mat
-  
+
   # Recycle the borders
   # North
-  res[1L, 2L:(nc + 1L)] <- mat[1L,]
+  res[1L, 2L:(nc + 1L)] <- mat[1L, ]
   # South
-  res[(nr + 2L), 2L:(nc + 1L)] <- mat[nr,]
+  res[(nr + 2L), 2L:(nc + 1L)] <- mat[nr, ]
   # West
   res[2L:(nr + 1L), 1L] <- mat[, 1L]
   # East
   res[2L:(nr + 1L), nc + 2L] <- mat[, nc]
-  
+
   # Recycle the corners
   # North-West
   res[1L, 1L] <- mat[1L, 1L]
@@ -36,7 +36,7 @@ recycle_borders <- function(mat, nr, nc) {
   res[(nr + 2L), 1L] <- mat[nr, 1L]
   # South-East
   res[(nr + 2L), (nc + 2L)] <- mat[nr, nc]
-  
+
   return(res)
 }
 
@@ -62,9 +62,9 @@ sum_matrix <- function(x) {
 #' @param x A `list` of matrices of the same dimensions.
 #' @param y A `list` of matrices of the same dimensions as x and the same
 #' length as x.
-#' 
-#' @return a `list` of matrices. 
-#' 
+#'
+#' @return a `list` of matrices.
+#'
 #' @noRd
 prod_matrix <- function(x, y) {
   ## TODO: check that list lengths are the same
@@ -81,9 +81,9 @@ prod_matrix <- function(x, y) {
 #' @param x A `list` of matrices of the same dimensions.
 #' @param y A `list` of matrices of the same dimensions as x and the same
 #' length as x.
-#' 
-#' @return a `list` of matrices. 
-#' 
+#'
+#' @return a `list` of matrices.
+#'
 #' @noRd
 delta_matrix <- function(x, y) {
   ## TODO: check that list lengths are the same
@@ -94,12 +94,12 @@ delta_matrix <- function(x, y) {
 #' Matrix exponentiation to *e* (`exp`)
 #'  This returns a list of matrices after applying exponent `exp` to each
 #'  matrix cell
-#'  
+#'
 #' @param x A `list` of matrices.
 #' @param exp numeric. The exponent value.
-#' 
-#' @return a `list` of matrices. 
-#' 
+#'
+#' @return a `list` of matrices.
+#'
 #' @noRd
 sup <- function(x, exp) {
   if (length(exp) > 1) stop("'exp' should have a single value")
@@ -110,13 +110,13 @@ sup <- function(x, exp) {
 #'
 #' Returns the predicted simple linear regression values using
 #'   a pre-calculated beta coefficient matrix.
-#'   
+#'
 #' @param x A `list` of matrices of the same dimensions.
 #' @param beta_coef A `matrix` of beta coefficients, with the same dimensions as
 #'   the matrices in x.
-#'   
-#' @return a `list` of predicted values. 
-#'   
+#'
+#' @return a `list` of predicted values.
+#'
 #' @noRd
 fitted <- function(x, beta_coef) {
   ## TODO: no intercept?
@@ -135,14 +135,14 @@ fitted <- function(x, beta_coef) {
 #' @param nc integer. The number of columns in the original matrix used by `[recycle_borders()]`
 #' @param NA_replace logical. Should NA delta results be replaced by zeros.
 #'   Defaults to TRUE.
-#'  
-#' @return a `list` of matrices.  
-#'   
+#'
+#' @return a `list` of matrices.
+#'
 #' @noRd
 deltas <- function(mat, nr, nc, NA_replace = TRUE) {
   # Reference values
   ref <- mat[c(-1L, -(nr + 2L)), c(-1L, -(nc + 2L))]
-  
+
   # Surrounding values
   res <- list(
     northwest = mat[-(nr + 1L):-(nr + 2L), -(nc + 1L):-(nc + 2L)] - ref,
@@ -154,23 +154,23 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
     southwest = mat[-1L:-2L, -(nc + 1L):-(nc + 2L)] - ref,
     west      = mat[c(-1L, -(nr + 2L)), -(nc + 1L):-(nc + 2L)] - ref
   )
-  
+
   # Only the deltas are replaced by 0.
   if (isTRUE(NA_replace)) {
     res <- lapply(res, NArep)
   }
-  
+
   return(res)
 }
 
 #' Calculation of gridded lapse rates
-#' 
+#'
 #' @description
-#' This function computes lapse rates (a linear relationship of a climate variable to elevation) across user-provided rasters. 
-#' Lapse rates are calculated using simple linear regression (without the intercept) using the focal cell and its eight neighbors as observations. 
-#' These gridded lapse rates are used in [`downscale()`] and [`climr_downscale()`] for elevation adjustment of climate values during downscaling to user-specified locations. 
+#' This function computes lapse rates (a linear relationship of a climate variable to elevation) across user-provided rasters.
+#' Lapse rates are calculated using simple linear regression (without the intercept) using the focal cell and its eight neighbors as observations.
+#' These gridded lapse rates are used in [`downscale()`] and [`climr_downscale()`] for elevation adjustment of climate values during downscaling to user-specified locations.
 #' The method is illustrated in the vignette `vignette("lapse_rates")`
-#' 
+#'
 #' @param normal a `SpatRaster` stack. climate rasters to compute lapse rates for. Build with this package functions.
 #' @template dem
 #' @param NA_replace logical. Should NA lapse rate results be replaced by zeros. Default to TRUE.
@@ -192,7 +192,7 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize = TRUE) {
   # Transform normal to list, capture names before
   normal_names <- names(normal)
-  
+
   # Validation
   if (nlyr(normal) != 36L || !all(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3))) %in% names(normal))) {
     stop(
@@ -211,7 +211,7 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
     warning("Normal and Digital elevation model rasters have different extents. They must be the same. Resampling dem to match.")
     dem <- resample(dem, normal, method = "bilinear")
   }
-  
+
   # Compute everything related to the dem and independant of normal
   n_r <- nrow(dem)
   n_c <- ncol(dem)
@@ -224,7 +224,7 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
   n_sc <- length(x_i)
   # Sums of x squared
   sum_xx <- sum_matrix(sup(x_i, 2))
-  
+
   if (isTRUE(nthread > 1L)) {
     if (!requireNamespace("parallel")) {
       message("nthreads is >1, but 'parallel' package is not available.")
@@ -233,20 +233,20 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
       nthread <- 1L
     }
   }
-  
+
   if (isTRUE(nthread > 1L)) {
     message("Parallelising lapse rate computations across ", nthread, " threads")
-    
+
     # initiate cluster
     if (Sys.info()["sysname"] != "Windows") {
       cl <- parallel::makeForkCluster(nthread)
     } else {
       cl <- parallel::makePSOCKcluster(nthread)
     }
-    
+
     # destroy cluster on exit
     on.exit(parallel::stopCluster(cl), add = TRUE)
-    
+
     res <- parallel::parLapply(
       cl = cl,
       X = shush(lapply(as.list(normal), as.matrix, wide = TRUE)),
@@ -271,7 +271,7 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
       NA_replace = NA_replace
     )
   }
-  
+
   # Transform back into SpatRaster
   if (isTRUE(rasterize)) {
     res <- shush(
@@ -285,10 +285,10 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
     )
     crs(res) <- crs(normal)
   }
-  
+
   # Set names of lapse rates to match normal
   names(res) <- normal_names
-  
+
   return(res)
 }
 
@@ -307,7 +307,7 @@ NArep <- function(x) {
 #' TODO: add documentation here
 
 #' For the lapse rate, x is the elevation, and y is the normal
-#' 
+#'
 #' @param y_i TODO
 #' @param x_i TODO
 #' @param n_r TODO
@@ -335,11 +335,11 @@ lapse_rate_redux <- function(y_i, x_i, n_r, n_c, n_sc, sum_xx, NA_replace) {
   # We can combine the resulting matrices to get the
   # coefficient of determination and multiply by beta coefficient
   lapse_rate <- beta_coef * mss / (mss + rss)
-  
+
   if (isTRUE(NA_replace)) {
     lapse_rate[is.na(lapse_rate)] <- 0L
   }
-  
+
   # And we can return the lapse rate
   return(lapse_rate)
 }
