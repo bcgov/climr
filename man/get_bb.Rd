@@ -7,10 +7,11 @@
 get_bb(in_xyz)
 }
 \arguments{
-\item{in_xyz}{\code{data.table} (or \code{data.frame}) of points to downscale}
+\item{in_xyz}{\code{data.table} (or \code{data.frame}) of points to downscale
+with columns "lon", "lat", "elev" and "id"}
 }
 \value{
-integer. A bounding box (e.g. \code{c(51,50,-121,-122)})
+numeric vector. Bounding box coordinates with order ymax,ymin,xmax,xmin (e.g. \code{c(51, 50, -121, -122)}).
 }
 \description{
 Find bounding box of data

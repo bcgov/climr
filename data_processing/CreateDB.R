@@ -7,15 +7,14 @@ library(analogsea)
 library(ssh)
 
 
-bc_rast <- rast("C:/DataFiles/bc_normal/Year_1901MP/PPT01.asc")
+bc_rast <- rast("../Common_Files/composite_wna_wlrdem.tif")[[32]]
+plot(bc_rast)
 bc_rast[!is.na(bc_rast)] <- 1L
-na_rast <- rast("C:/DataFiles/Normal_1961_1990MP/PPT07.asc")
-plot(na_rast)
-bc_rast2 <- resample(bc_rast, na_rast)
-bc_rast2 <- crop(bc_rast2,bc_rast)
+plot(bc_rast)
+bc_rast2 <- terra::aggregate(bc_rast, fact = 4, fun = "max")
 plot(bc_rast2)
-bc_outline <- bc_rast2
-writeRaster(bc_outline, filename = "inst/extdata/bc_outline.tif", datatype = "INT1U")
+
+writeRaster(bc_rast2, filename = "inst/extdata/wna_outline.tif", datatype = "INT1U")
 
 ##process NA normals
 # Load normal files
@@ -35,7 +34,7 @@ lr <- lapse_rate(
   normal = d,
   dem = dem,
   NA_replace = TRUE,
-  nthread = 2,
+  nthread = 4,
   rasterize = TRUE
 )
 names(lr) <- paste0("lr_",names(lr))

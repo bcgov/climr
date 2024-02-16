@@ -1,6 +1,18 @@
 ###Prep historic modelled timeseries
 library(terra)
 library(data.table)
+library(climr)
+
+ppt <- rast("Y:\\TransferAnomalies/delta.from.1961_1990.to.2001_2020.Pr.tif")
+tmax <- rast("Y:\\TransferAnomalies/delta.from.1961_1990.to.2001_2020.Tmax.tif")
+tmin <- rast("Y:\\TransferAnomalies/delta.from.1961_1990.to.2001_2020.Tmin.tif")
+dbCon <- data_connect()
+nms <- dbGetQuery(dbCon, "select * from historic_layers")
+allr <- c(ppt,tmax,tmin)
+names(allr) <- nms$fullnm
+writeRaster(allr, "Colin_2001_2020.tif", gdal="COMPRESS=NONE")
+
+
 allgcms <- list.files("C:/Users/kdaust/LocalFiles/ProcessedGCMs/gcm/historic/")
 gcm_nm <- allgcms[1]
 ref_rast <- rast("C:/DataFiles/ProcessedRasters/Normal_NA.wlrdem.tif")
