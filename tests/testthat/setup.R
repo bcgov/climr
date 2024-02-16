@@ -9,6 +9,6 @@ isInRange <- function(x, y) {
   if (!inherits(y, c("numeric", "integer"))) {
     stop("y must be numeric/integer")
   }
-  
+
   (min(x) >= min(y)) & (max(x) <= max(y))
 }

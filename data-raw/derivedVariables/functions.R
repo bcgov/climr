@@ -6,7 +6,7 @@ nffd_param <- read.csv(file = "data-raw/derivedVariables/optimizedParameterTable
 # m: month of the year
 # tm: min temperature for that month
 nffd <- function(m, tm) {
-  optimized_params <- nffd_param[nffd_param$Month == m,]
+  optimized_params <- nffd_param[nffd_param$Month == m, ]
 
   a <- optimized_params$a
   b <- optimized_params$b
@@ -50,8 +50,7 @@ pas_param <- read.csv(file = "data-raw/derivedVariables/optimizedParameterTables
 # m: month of the year
 # tm: min temperature for that month
 pas <- function(m, tm) {
-  
-  optimized_params <- pas_param[pas_param$Month == m,]
+  optimized_params <- pas_param[pas_param$Month == m, ]
 
   b <- optimized_params$b
   t0 <- optimized_params$T0
@@ -137,9 +136,9 @@ dd <- function(m, tm) {
   } else {
     dd_param <- dd_param_above_18
   }
-  
-  optimized_params <- dd_param[dd_param$Month == m,]
-    
+
+  optimized_params <- dd_param[dd_param$Month == m, ]
+
   k <- optimized_params$a
   a <- optimized_params$a
   b <- optimized_params$b

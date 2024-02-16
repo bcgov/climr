@@ -1,7 +1,7 @@
 #' Be quiet
-#' 
+#'
 #' Suppresses messaging.
-#' 
+#'
 #' @param expr expression to evaluate in quite mode.
 #'
 #' @noRd

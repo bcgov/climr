@@ -55,13 +55,15 @@ library(climr)
 data("xyzDT")
 
 ## if you just want to downscale points and not think about what happening behind the scenes, use this function
-ds_out <- climr_downscale(xyz = xyzDT, which_normal = "auto", 
-                          gcm_models = c("ACCESS-ESM1-5", "EC-Earth3"), 
-                          ssp = c("ssp370","ssp245"), 
-                          gcm_period = c("2021_2040", "2041_2060","2061_2080"),
-                          #gcm_ts_years = 2020:2060,
-                          max_run = 3, # we want 3 individual runs for each model
-                          vars = c("PPT","CMD","CMI"))
+ds_out <- climr_downscale(
+  xyz = xyzDT, which_normal = "auto",
+  gcm_models = c("ACCESS-ESM1-5", "EC-Earth3"),
+  ssp = c("ssp370", "ssp245"),
+  gcm_period = c("2021_2040", "2041_2060", "2061_2080"),
+  # gcm_ts_years = 2020:2060,
+  max_run = 3, # we want 3 individual runs for each model
+  vars = c("PPT", "CMD", "CMI")
+)
 ```
 
 These functions are useful to list available options:
