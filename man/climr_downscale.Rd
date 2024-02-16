@@ -15,11 +15,8 @@ climr_downscale(
   gcm_ts_years = list_gcm_ts(),
   gcm_hist_years = list_historic_ts(),
   max_run = 0L,
-  return_normal = TRUE,
-  vars = sort(sprintf(c("PPT\%02d", "Tmax\%02d", "Tmin\%02d"), sort(rep(1:12, 3)))),
   cache = TRUE,
-  out_spatial = FALSE,
-  plot = NULL
+  ...
 )
 }
 \arguments{
@@ -60,25 +57,13 @@ historical scenario. See \code{\link[=list_gcm_hist_ts]{list_gcm_hist_ts()}} for
 A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
 are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
-\item{return_normal}{logical. Return downscaled climate values for the reference normal period (1961-1990)? Default \code{TRUE}.}
-
-\item{vars}{character. A vector of climate variables to compute.
-Options are \code{\link[=list_variables]{list_variables()}}.
-Definitions can be found by calling \code{View(variables)} and queried by loading the 'variables' object into the R environment with \code{data(variables)}.
-Defaults to monthly PPT, Tmax, Tmin.}
-
 \item{cache}{logical. Cache data locally? Default \code{TRUE}}
 
-\item{out_spatial}{logical. Should a SpatVector be returned instead of a
-\code{data.frame}.}
-
-\item{plot}{character. If \code{out_spatial} is TRUE, the name of a variable to plot.
-If the variable exists in \code{normal}, then its normal values will also be plotted.
-Otherwise, normal January total precipitation (PPT01) values will be plotted.
-Defaults to no plotting (NULL).}
+\item{...}{other arguments passed to \code{\link[=downscale]{downscale()}}. Namely: \code{return_normal},
+\code{vars}, \code{out_spatial} and \code{plot}}
 }
 \value{
-\code{data.frame} of downscaled climate variables for each location.
+\code{data.table} of downscaled climate variables for each location.
 All outputs are returned in one table.
 }
 \description{
