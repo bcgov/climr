@@ -1,8 +1,8 @@
 #' Add extra climate variables to a `data.table`
-#' 
+#'
 #' @param dt A `data.table` with TminXX, TmaxXX, PPTXX for XX in 01 to 12.
 #' @param vars A character vector of climate variables to compute.
-#' 
+#'
 #' @return a `data.table`
 #'
 #' @importFrom data.table set setcolorder
@@ -669,7 +669,7 @@ append_clim_vars <- function(dt, vars) {
 
   # Append vars except default one
   vars2 <- vars[!vars %in% sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))]
-  vars2 <- vars2[order(match(vars2, names(appenders)))]   ## run functions in the order of appenders
+  vars2 <- vars2[order(match(vars2, names(appenders)))] ## run functions in the order of appenders
   for (var in vars2) {
     f(var)
   }
