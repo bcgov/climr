@@ -33,14 +33,14 @@ and a unique "id". Any extra columns will be ignored and not output.}
 
 \item{period_focal}{character. The 20-year period for which to plot the ensemble detail. options are \code{list_gcm_period()}.}
 
-\item{gcm_models}{character. Vector of GCM names. Options are \code{\link[=list_gcm]{list_gcm()}}. Used for gcm periods, gcm timeseries, and historic timeseries. Default \code{NULL}}
+\item{gcm_models}{character. Vector of global climate model names. Options are \code{\link[=list_gcm]{list_gcm()}}. Used for gcm periods, gcm timeseries, and historic timeseries. Default \code{NULL}}
 
-\item{ssp}{character. Vector of labels of the shared socioeconomic pathways to use.
-See available options with \code{\link[=list_ssp]{list_ssp()}}. Defaults to all SSPs available.}
+\item{ssp}{character. Vector of SSP-RCP scenarios (representative concentration pathways paired with shared socioeconomic pathways).
+Options are \code{\link[=list_ssp]{list_ssp()}}. Defaults to all scenarios available.}
 
-\item{historic_period}{character. Which historic period. Default \code{NULL}}
+\item{historic_period}{character. Which historic period for observed climate data, averaged over this period. Options are \code{\link[=list_historic]{list_historic()}}. Default \code{NULL}}
 
-\item{gcm_period}{character. Requested future periods. Options are \code{\link[=list_gcm_period]{list_gcm_period()}}}
+\item{gcm_period}{character. 20-year normal periods for GCM simulations. Options are \code{\link[=list_gcm_period]{list_gcm_period()}}}
 
 \item{max_run}{integer. Maximum number of model runs to include.
 A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
@@ -89,8 +89,10 @@ my_points <- data.frame(lon = c(-123.4404, -123.5064, -124.2317),
 # draw the plot
 plot_bivariate(my_points)
 
-# export plot to the working directory
-png(filename="plot_test.png", type="cairo", units="in", width=6, height=5, pointsize=10, res=300)
+# export plot to a temporary directory
+figDir <- tempdir()
+png(filename = file.path(figDir, "plot_test.png"), type = "cairo", units = "in",
+    width = 6, height = 5, pointsize = 10, res = 300)
 plot_bivariate(my_points)
 dev.off()
 
