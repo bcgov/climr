@@ -26,7 +26,7 @@ jobs:
         run: echo "HEAD_COMMIT_MESSAGE=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
 
   R-CMD-check:
-    if: "!contains(needs.check_skip_flags.outputs.head-commit-message, '[skip-ci]')"
+    if: "!contains($GITHUB_OUTPUT, '[skip-ci]')"
     runs-on: ${{ matrix.config.os }}
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
@@ -80,13 +80,13 @@ jobs:
             any::withr
 
       - name: Package checks
-        if: "contains(needs.check_skip_flags.outputs.head-commit-message, '[skip-tests]')"
+        if: "contains($GITHUB_OUTPUT, '[skip-tests]')"
         uses: r-lib/actions/check-r-package@v2    
         with:
           args: 'c("--no-manual", "--as-cran", "--no-tests", "--no-examples")'
           
       - name: Package checks
-        if: "!contains(needs.check_skip_flags.outputs.head-commit-message, '[skip-tests]')"
+        if: "!contains($GITHUB_OUTPUT, '[skip-tests]')"
         uses: r-lib/actions/check-r-package@v2    
         with:
           args: 'c("--no-manual", "--as-cran", "--run-dontrun", "--run-donttest")'
