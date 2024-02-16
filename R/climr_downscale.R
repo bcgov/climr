@@ -41,8 +41,11 @@
 #'   Defaults to `NULL`.
 #' @template ssp
 #' @param gcm_period character. 20-year normal periods for GCM simulations.
-#' @param gcm_ts_years character. Timeseries years for GCM simulations of future scenarios specified by `ssp`. Must be in `2015:2100`
-#' @param gcm_hist_years character.  Timeseries years for GCM simulations of the historical scenario. Must be in `1851:2014`
+#'   Options are [`list_gcm_period()`].
+#' @param gcm_ts_years character. Timeseries years for GCM simulations of future
+#'   scenarios specified by `ssp`. See [`list_gcm_ts()`] for available years.
+#' @param gcm_hist_years character.  Timeseries years for GCM simulations of the
+#'   historical scenario. See [`list_gcm_hist_ts()`] for available years.
 #' @template max_run
 #' @template return_normal
 #' @template vars
