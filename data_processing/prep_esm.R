@@ -4,6 +4,7 @@
 library(terra)
 library(stringr)
 library(data.table)
+library(climr)
 
 monthdays <- c(31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
 monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12")
@@ -12,22 +13,23 @@ monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11"
 # step 3: export rasters of change
 # ==========================================
 
-dirs <- list.dirs("C:\\Users\\kdaust\\LocalFiles\\CMIP6_GCMs")
+dirs <- list.dirs("../Common_Files/CMIP6_GCMs/")
 gcms <- unique(sapply(strsplit(dirs, "/"), "[", 2))
-select <- c(2,4,5,8,9,10,12,13,15,16,18)
-gcms <- gcms[select]
+gcms_use <- list_gcm()
+all(gcms_use %in% gcms)
 
 startyear.ref <- 1961
 endyear.ref <- 1990
 
-minyear <- 2020
+minyear <- 2015
 maxyear <- 2100
 
-gcm <- gcms[1]
-for(gcm in gcms[-c(1:4)]) {
+gcms <- gcms_use
+gcm <- gcms[6]
+for(gcm in gcms[-(1:10)]) {
   
   #process the climate elements
-  dir <- paste("C:\\Users\\kdaust\\LocalFiles\\CMIP6_GCMs", gcm, sep="\\")
+  dir <- paste("../Common_Files/CMIP6_GCMs/", gcm, sep="/")
   files <- list.files(dir)
   element.list <- sapply(strsplit(files, "_"), "[", 1)
   scenario.list <- sapply(strsplit(files, "_"), "[", 4)
@@ -38,7 +40,7 @@ for(gcm in gcms[-c(1:4)]) {
   scenarios <- unique(scenario.list)
   
   # run=runs[1]
-  element=elements[3]
+  element=elements[1]
   for(element in elements) {
     
     # read in the raw time series for the historical runs
@@ -49,10 +51,10 @@ for(gcm in gcms[-c(1:4)]) {
     for(run.ref in runs.ref) {
       files.run <- files.ref[grep(run.ref, files.ref)]
       if(gcm=="AWI-CM-1-1-MR") files.run <- files.run[which(str_sub(files.run, -9,-6)%in%startyear.ref:2014)]
-      if(gcm=="EC-Earth3") files.run <- files.run[which(str_sub(files.run, -9,-6)%in%startyear.ref:2014)]
-      if(gcm=="MPI-ESM1-2-HR") files.run <- files.run[which(str_sub(files.run, -9,-6)%in%startyear.ref:2014)]
-      if(gcm=="GISS-E2-1-G") files.run <- files.run[3:4]
+      #if(gcm=="MPI-ESM1-2-HR") files.run <- files.run[which(str_sub(files.run, -9,-6)%in%startyear.ref:2014)]
+      #if(gcm=="GISS-E2-1-G") files.run <- files.run[3:4]
       if(gcm=="INM-CM5-0") files.run <- files.run[2]
+      if(gcm=="GFDL-ESM4") files.run <- files.run[2]
       temp <- terra::rast(paste(dir, files.run, sep="\\"))
       dates <- time(temp)
       ref.months <- month(dates)
@@ -84,12 +86,12 @@ for(gcm in gcms[-c(1:4)]) {
     
     
     # compile future periods
-    scenario <- "ssp245"
+    scenario <- scenarios[3]
     for(scenario in scenarios[-1]) {
         s <- which(element.list==element & scenario.list==scenario)
         files.proj <- files[s]
         runs.proj <- unique(run.list[s])
-        run.proj <- runs.proj[2]
+        #run.proj <- runs.proj[3]
         run_list <- list()
         for(run.proj in runs.proj) {
           files.run <- files.proj[grep(run.proj, files.proj)]
@@ -128,18 +130,20 @@ for(gcm in gcms[-c(1:4)]) {
     }
     
     # write data out for the GCMxElement 
-    dir.create(sprintf("C:\\Users\\kdaust\\LocalFiles\\ProcessedGCMs/gcm/%s/gcmData", gcm), recursive = TRUE)
+    dir.create(sprintf("../Common_Files/ProcessedGCMs/%s/gcmData", gcm), recursive = TRUE)
     # writeRaster(compiled, paste(sprintf("C:\\Users\\kdaust\\LocalFiles\\ProcessedGCMs/gcm/%s/gcmData", gcm), gcm, element, "tif", sep="."), overwrite=TRUE, format="CDF", varname=element, varunit=if(element=="pr") "mm" else "degC", 
     #             longname="", xname="latitude",   yname="longitude",zname="index",
     #             zunit="numeric")
-    terra::writeRaster(compiled, paste(sprintf("C:\\Users\\kdaust\\LocalFiles\\ProcessedGCMs/gcm/%s/gcmData", gcm), gcm, element, "tif", sep="."), overwrite=TRUE)
-    write.csv(names(compiled), paste(sprintf("C:\\Users\\kdaust\\LocalFiles\\ProcessedGCMs/gcm/%s/gcmData", gcm), gcm, element, "csv", sep=".")) # this is the metadata for each raster
+    terra::writeRaster(compiled, paste(sprintf("../Common_Files/ProcessedGCMs/%s/gcmData", gcm), gcm, element, "tif", sep="."), overwrite=TRUE)
+    write.csv(names(compiled), paste(sprintf("../Common_Files/ProcessedGCMs/%s/gcmData", gcm), gcm, element, "csv", sep=".")) # this is the metadata for each raster
     
     print(element)
   }
   print(gcm)
 }
 
+
+rast("../Common_Files/CMIP6_GCMs/MPI-ESM1-2-HR/")
 library(terra)
 test <- rast(compiled)
 t2 <- rast("C:/Users/kdaust/LocalFiles/CMIP6_GCMs/CanESM5/pr_Amon_CanESM5_ssp245_r1i1p1f1_gn_201501-210012.nc")
