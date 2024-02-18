@@ -25,15 +25,13 @@ To do so, it uses a remote PostGIS database, and optionally caches data locally.
 
 ### Data Sources
 
-The reference climatologies for British Columbia are the [BC PRISM maps](https://www.pacificclimate.org/data/prism-climatology-and-monthly-timeseries) provided by Pacific Climate Impacts Consortium.
-Reference climatologies for North America are the ClimateNA (Wang et al. 2016) mosaics of PRISM (BC, US) and WorldClim (rest of North America).
+The high resolution reference climate maps for Western Canada and Western US are a custom 800m-resolution mosaic of [BC PRISM](https://www.pacificclimate.org/data/prism-climatology-and-monthly-timeseries), adjusted [US PRISM](https://prism.oregonstate.edu/normals/), [Western Canada PRISM](https://prism.oregonstate.edu/projects/canw.php), and [Daymet](https://daymet.ornl.gov/overview) (Alberta and Saskatchewan). 
+Reference climatologies for North America are the 4km-resolution ClimateNA (Wang et al. 2016) mosaics of PRISM (BC, US, W. Canada) and WorldClim (rest of North America).
 The ClimateNA mosaics are accessed from [AdaptWest](https://adaptwest.databasin.org/pages/adaptwest-climatena/).
 
-A high resolution composite climatology of BC PRISM, adjusted US PRISM and DAYMET (Alberta and Saskatchewan), is also available for Western Canada and Western US.
+Historical observational time series are obtained from [ClimateNA](https://climatena.ca/) (Wang et al. 2016).
 
-Historical observational time series are derived using [ClimateNA](https://climatena.ca/) (Wang et al. 2016).
-
-The CMIP6 global climate model data were downloaded and subsetted to North America by Tongli Wang, Associate Professor at the UBC Department of Forest and Conservation Sciences.
+CMIP6 global climate model simulations were downloaded from the [Earth System Grid Federation](https://aims2.llnl.gov/search/cmip6). The majority of these downloads were conducted by Tongli Wang, Associate Professor at the UBC Department of Forest and Conservation Sciences.
 The 13 global climate models selected for `climr`, and best practices for ensemble analysis, are described in Mahony (2022).
 
 ## Installation
@@ -80,6 +78,10 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the License for the specific language governing permissions and limitations under the License.
 
 `climr` logo uses icon designed by Freepik, Flaticon.com, available [here](https://www.flaticon.com/free-icon/pin_6093139).
+
+### References
+
+We acknowledge the World Climate Research Programme, which, through its Working Group on Coupled Modelling, coordinated and promoted CMIP6. We thank the climate modeling groups for producing and making available their model output, the Earth System Grid Federation (ESGF) for archiving the data and providing access, and the multiple funding agencies who support CMIP6 and ESGF. 
 
 ### References
 
