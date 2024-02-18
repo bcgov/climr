@@ -1,12 +1,22 @@
-#' Create normal baseline inputs for `downscale` from PostGIS database.
-#' 
+#' Retrieve climatologies for normal period
+#' @description
+#' This function downloads (or retrieves from cache) monthly Tmin, Tmax, and PPT variables
+#' for the specified climatology and for the specified bounding box. It is intended for use with [`downscale()`],
+#' but can also be used as a stand-alone climatology.
+#'
+#'
 #' @template dbCon
 #' @template bbox
 #' @template normal
 #' @template cache
 #'
 #' @return A `SpatRaster` containing normals, lapse rates
-#'   and digital elevation model layers, that can be used with [`downscale()`]. 
+#'   and digital elevation model layers, that can be used with [`downscale()`].
+#'
+#' @details
+#' The first 36 layers of the output raster correspond with the actual climate variables. The raster also contains
+#' lapse rates for each variable, and a corresponding digital elevation model.
+#'
 #'
 #' @seealso [downscale()]
 #'
@@ -21,31 +31,54 @@ normal_input <- function(dbCon, bbox, normal = "normal_na", cache = TRUE) {
     match.arg(normal, list_normal())
   } else {
     if (!is(normal, "SpatRaster")) {
-      stop("'normal' must be one of 'list_normal()' or a SpatRaster with 36 layers",
-           " of normal climate variables")
+      stop(
+        "'normal' must be one of 'list_normal()' or a SpatRaster with 36 layers",
+        " of normal climate variables"
+      )
     }
   }
-  
+
   if (!is(cache, "logical")) {
     stop("please pass a logical value to 'cache'")
   }
-  
+
+  ## check cached
   ## check cached
   needDownload <- TRUE
-  
+
   cPath <- file.path(cache_path(), "normal", normal)
+
   if (dir.exists(cPath)) {
     bnds <- try(fread(file.path(cPath, "meta_data.csv")), silent = TRUE)
-    
+
     if (is(bnds, "try-error")) {
       ## try to get the data again
-      message("Meta-data file no longer exists of is unreadable.",
-              " Downloading the data again")
+      message(
+        "Metadata file no longer exists or is unreadable.",
+        " Downloading the data again"
+      )
     } else {
       needDownload <- FALSE
     }
   }
-  
+
+
+  if (!needDownload) {
+    for (i in 1:nrow(bnds)) {
+      isin <- is_in_bbox(bbox, matrix(bnds[i, 2:5]))
+      if (isin) break
+    }
+    if (isin) {
+      message("Retrieving from cache...")
+      oldid <- bnds$uid[i]
+      res <- rast(file.path(cPath, paste0(oldid, ".tif")))
+      attr(res, "builder") <- "climr"
+    } else {
+      message("Not fully cached :( Will download more")
+      needDownload <- TRUE
+    }
+  }
+
   if (needDownload) {
     message("Downloading new data...")
     res <- pgGetTerra(dbCon, normal, tile = TRUE, boundary = bbox, bands = 1:73)
@@ -68,25 +101,14 @@ normal_input <- function(dbCon, bbox, normal = "normal_na", cache = TRUE) {
     if (cache) {
       message("Caching data...")
       uid <- UUIDgenerate()
-      if (!dir.exists(cPath)) dir.create(cPath, recursive = TRUE)
+      dir.create(cPath, recursive = TRUE, showWarnings = FALSE)
       writeRaster(res, file.path(cPath, paste0(uid, ".tif")))
       rastext <- ext(res)
       temp <- data.table(uid = uid, ymax = rastext[4] + 0.1, ymin = rastext[3] - 0.1, xmax = rastext[2] + 0.1, xmin = rastext[1] - 0.1)
       fwrite(temp, file = file.path(cPath, "meta_data.csv"), append = TRUE)
     }
-  } else {
-    for (i in 1:nrow(bnds)) {
-      isin <- is_in_bbox(bbox, matrix(bnds[i, 2:5]))
-      if (isin) break
-    }
-    if (isin) {
-      message("Retrieving from cache...")
-      oldid <- bnds$uid[i]
-      res <- rast(file.path(cPath, paste0(oldid, ".tif")))
-      attr(res, "builder") <- "climr"
-    }
   }
-  
+
   # Return preprocessed raster
   return(res)
 }

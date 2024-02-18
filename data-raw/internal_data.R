@@ -55,5 +55,6 @@ dbnames_ts <- structure(list(
   )
 ), class = "data.frame", row.names = c(NA, -13L))
 
-usethis::use_data(param, dbnames, dbnames_hist, dbnames_ts, 
-                  overwrite = TRUE, internal = TRUE)
+usethis::use_data(param, dbnames, dbnames_hist, dbnames_ts,
+  overwrite = TRUE, internal = TRUE
+)

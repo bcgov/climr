@@ -1,0 +1,65 @@
+url: https://bcgov.github.io/climr/ 
+
+template:
+  bootstrap: 5
+
+reference:
+- title: "Downscaling functions"
+  desc: >
+    Functions to used to downscale climate variables
+  contents:
+  - climr
+  - climr_downscale
+  - downscale
+  - lapse_rate
+- title: "Downloading raw climate inputs"
+  desc: >
+    Functions to download climate normals and
+    historic/future anomalies used for downscaling
+    climate elements and derived variables
+  contents:
+  - normal_input
+  - gcm_input
+  - gcm_ts_input
+  - gcm_hist_input
+  - historic_input
+  - historic_input_ts
+- title: "Database and caching"
+  desc: > 
+    Functions used to interact with the PostGIS server
+    and the data cache folder
+  contents:
+  - cache_clear
+  - cache_path
+  - data_connect
+  - pgGetTerra
+- title: "Data"
+  desc: >
+    Datasets used in vignettes and examples,
+    available climate variables and functions listing 
+    available data.
+  contents:
+  - xyzDT
+  - BECz_vancouver
+  - BECz_vancouver_ras
+  - BECcols
+  - dem_vancouver
+  - dem_vancouver_lowres
+  - vancouver
+  - vancouver_points
+  - vancouver_poly
+  - weather_stations
+  - variables
+  - list_normal
+  - list_historic
+  - list_gcm
+  - list_gcm_period
+  - list_ssp
+  - list_run
+  - list_variables
+- title: "Utilities"
+  desc: >
+    Other useful functions
+  contents:
+  - get_bb
+  - plot_bivariate

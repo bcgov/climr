@@ -1,3 +1,10 @@
+#' @keywords internal
+"_PACKAGE"
+
+## usethis namespace: start
+## usethis namespace: end
+NULL
+
 # On load, instantiate either as new or from cache
 #' @importFrom data.table fwrite
 #' @importFrom RPostgres dbGetQuery
@@ -5,12 +12,12 @@
 #' @noRd
 .onLoad <- function(libname, pkgname) {
   rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
-  
+
   packageStartupMessage("Downloading and Caching ESM run info :)")
   dbCon <- data_connect()
   on.exit(try(pool::poolClose(dbCon)), add = TRUE)
-  
-  if (is.null(dbCon)){
+
+  if (is.null(dbCon)) {
     warning("Could not connect to server. Only cached normal periods will be available.")
   } else {
     dir.create(rInfoPath, recursive = TRUE, showWarnings = FALSE)
@@ -29,6 +36,3 @@
 #     .climr[["files_uid_db"]] <- readRDS(uid_db())
 #   }
 # }
-
-#' Climate variables definition
-"variables"

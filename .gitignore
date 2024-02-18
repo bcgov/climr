@@ -2,3 +2,9 @@
 .Rproj.user
 .Rhistory
 .httr-oauth
+inst/doc
+
+climr.cache/
+/doc/
+/Meta/
+docs
