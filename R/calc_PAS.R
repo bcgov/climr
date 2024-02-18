@@ -10,6 +10,7 @@
 #' \dontrun{
 #' climr:::calc_PAS(4, 2, 600)
 #' }
+#' @noRd
 calc_PAS <- function(m, tmin, PPT) {
   if (FALSE) {
     T0 <- a <- b <- NULL

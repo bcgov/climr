@@ -4,6 +4,7 @@
 #' @template tmmax
 #' @template latitude
 #' @return numeric. Reference evaporation (Eref)
+#' @noRd
 calc_Eref <- function(m, tmmin, tmmax, latitude) {
   Eref <- numeric(length(tmmax))
   tmean <- (tmmax + tmmin) / 2
@@ -19,7 +20,7 @@ calc_Eref <- function(m, tmmin, tmmax, latitude) {
     (1.18 - 0.0065 * latitude[i])
 
   Eref[is.na(tmmax)] <- tmmax[is.na(tmmax)] ## use tmmax[is.na(tmmax)] to respect NA type
-  
+
   return(Eref)
 }
 
@@ -27,14 +28,15 @@ calc_Eref <- function(m, tmmin, tmmax, latitude) {
 #' @param Eref Reference evaporation
 #' @template PPT
 #' @return numeric. Climatic moisture deficit
+#' @noRd
 calc_CMD <- function(Eref, PPT) {
   CMD <- numeric(length(Eref))
   i <- which(Eref > PPT)
   CMD[i] <- Eref[i] - PPT[i]
-  
-  ## return 0s to NaNs if missing values 
-  CMD[is.na(Eref)] <- Eref[is.na(Eref)]   ## use Eref[is.na(Eref)] to respect NA type
-  
+
+  ## return 0s to NaNs if missing values
+  CMD[is.na(Eref)] <- Eref[is.na(Eref)] ## use Eref[is.na(Eref)] to respect NA type
+
   return(CMD)
 }
 
@@ -43,6 +45,7 @@ calc_CMD <- function(Eref, PPT) {
 #' @param tm numeric. Monthly mean temperature for the corresponding month.
 #' @template latitude
 #' @return numeric. Extraterrestrial radiation estimation in mm/day
+#' @noRd
 calc_S0_I <- function(d, tm, latitude) {
   # BASIC COMPUTER PROGRAM FOR ESTIMATING DAILY RA VALUES
   # D=JULIAN DAY (JANUARY 1=1)
@@ -73,6 +76,7 @@ calc_S0_I <- function(d, tm, latitude) {
 #' @template tm
 #' @template latitude
 #' @return numeric. Extraterrestrial radiation estimation in mm/day
+#' @noRd
 calc_S0_II <- function(m, tm, latitude) {
   # BASIC COMPUTER PROGRAM FOR ESTIMATING MONTHLY RA VALUES
   # DEC=DECLINATION OF THE SUN IN RADIANS
