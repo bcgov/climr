@@ -12,16 +12,17 @@ Authors@R: c(
            comment = c(ORCID = "0000-0003-4036-977X")),       
     person("Francois", "Bornais", email = "francois@boostao.ca", role = c("ctb")),
     person(family = "Province of British Columbia", role = c("cph", "fnd")))
-Description: This package replicates the basic approach of ClimateNA (climatena.ca),
-    but with (1) improved speed, (2) multiple runs of each GCM, (3) cloud delivery, and (4) 
-    programmatic access via R.
-    A simple downscaling method is used to bias-correct low-resolution (~100km) global
-    climate model anomalies to high-resolution (2km) maps of historical climate, with
-    further elevation adjustment to user-specified elevation grids/points based on
-    empirical lapse rates (local relationship of climate to elevation) of the 2km
-    climate maps. Elevation-adjusted monthly values of basic climate elements
-    (temperature and precipitation) are then used to estimate derived variables
+Description: `climr` is an experimental R package that builds on the downscaling concepts 
+    operationalized in the ClimateNA tool (climatena.ca) (Wang et al. 2016).
+    It provides downscaling of observational and simulated climate data using change-factor 
+    downscaling, a simple method that adds low-spatial-resolution 
+    climate anomalies to a high-spatial-resolution reference climatological map, with additional 
+    elevation adjustment for temperature. Elevation-adjusted monthly values of basic climate 
+    elements (temperature and precipitation) are then used to estimate derived variables 
     (e.g., degree-days) based on published equations and parameters from  Wang et al. 2016.
+    `climr` is designed to be fast and to minimize local data storage requirements. To do so, 
+    it uses a remote PostGIS database, and optionally caches data locally.
+
 License: Apache License (== 2)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
