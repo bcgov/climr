@@ -76,7 +76,7 @@ dem_vancouver <- get(data("dem_vancouver")) |>
 vancouver_poly <- get(data("vancouver_poly")) |>
   unwrap()
 
-dem_vancouver <- crop(dem_vancouver, vancouver_poly)
+dem_vancouver <- mask(dem_vancouver, vancouver_poly)
 ```
 
 ```{r, echo = FALSE, results = "hide", fig.cap = "Digital Elevation Model of North Vancouver w/ and w/o values outside polygon area", fig.show = "hold", fig.dim = c(7,3), out.width = "100%"}
