@@ -41,11 +41,13 @@
 #'   Defaults to `NULL`.
 #' @template ssp
 #' @param gcm_period character. 20-year normal periods for GCM simulations.
-#'   Options are [`list_gcm_period()`].
+#'   Options are [`list_gcm_period()`]. Defaults to `NULL`.
 #' @param gcm_ts_years character. Timeseries years for GCM simulations of future
 #'   scenarios specified by `ssp`. See [`list_gcm_ts()`] for available years.
+#'   Defaults to `NULL`.
 #' @param gcm_hist_years character.  Timeseries years for GCM simulations of the
 #'   historical scenario. See [`list_gcm_hist_ts()`] for available years.
+#'   Defaults to `NULL`.
 #' @template max_run
 #' @template return_normal
 #' @template vars
@@ -120,9 +122,9 @@
 #'
 #' @export
 climr_downscale <- function(xyz, which_normal = "auto", historic_period = NULL, historic_ts = NULL,
-                            gcm_models = NULL, ssp = list_ssp(),
-                            gcm_period = NULL, gcm_ts_years = list_gcm_ts(),
-                            gcm_hist_years = list_historic_ts(), max_run = 0L, return_normal = TRUE,
+                            gcm_models = NULL, ssp = NULL,
+                            gcm_period = NULL, gcm_ts_years = NULL,
+                            gcm_hist_years = NULL, max_run = 0L, return_normal = TRUE,
                             vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))), cache = TRUE,
                             out_spatial = FALSE, plot = NULL) {
   message("Welcome to climr!")
