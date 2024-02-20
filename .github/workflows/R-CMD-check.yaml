@@ -11,16 +11,36 @@ on:
 name: R-CMD-check
 
 jobs:
+  get_message:
+    runs-on: ubuntu-latest
+    outputs:
+      commitmsg: ${{ steps.getmsg.outputs.msg }}
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+    
+      - name: Set tags env variables
+        id: getmsg
+        run: |
+          # Get your last commit message, not the merge commit.
+          msg=$(git log -1 --no-merges --pretty=%B)
+          echo "msg=$(git log -1 --no-merges --pretty=%B)" >> "$GITHUB_OUTPUT"
+          echo "commit message: $msg"
+
   R-CMD-check:
+    needs: get_message
+    runs-on: ${{ matrix.config.os }}
+    if: "!contains(needs.get_message.outputs.commitmsg, '[skip-ci]')"
+    
     env:
       _SP_EVOLUTION_STATUS_: 2
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       R_REPRODUCIBLE_RUN_ALL_EXAMPLES: true
       R_REPRODUCIBLE_RUN_ALL_TESTS: true
-      
-    if: "!contains(github.event.head_commit.message, '[skip-ci]')"
-    runs-on: ${{ matrix.config.os }}
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
 
@@ -39,6 +59,10 @@ jobs:
           # - {os: ubuntu-20.04,   r: '4.1'}
 
     steps:
+      - name: Check commit message
+        run: |
+          echo "${{ needs.get_message.outputs.commitmsg }}"
+          
       - name: Install X11 dependencies on MacOS
         if: runner.os == 'macOS'
         run: |
@@ -66,13 +90,13 @@ jobs:
             any::withr
 
       - name: Package checks
-        if: "contains(github.event.head_commit.message, '[skip-tests]')"
+        if: "contains(needs.get_message.outputs.commitmsg, '[skip-tests]')"
         uses: r-lib/actions/check-r-package@v2    
         with:
           args: 'c("--no-manual", "--as-cran", "--no-tests", "--no-examples")'
           
       - name: Package checks
-        if: "!contains(github.event.head_commit.message, '[skip-tests]')"
+        if: "!contains(needs.get_message.outputs.commitmsg, '[skip-tests]')"
         uses: r-lib/actions/check-r-package@v2    
         with:
           args: 'c("--no-manual", "--as-cran", "--run-dontrun", "--run-donttest")'
