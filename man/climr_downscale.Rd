@@ -10,10 +10,10 @@ climr_downscale(
   historic_period = NULL,
   historic_ts = NULL,
   gcm_models = NULL,
-  ssp = list_ssp(),
+  ssp = NULL,
   gcm_period = NULL,
-  gcm_ts_years = list_gcm_ts(),
-  gcm_hist_years = list_historic_ts(),
+  gcm_ts_years = NULL,
+  gcm_hist_years = NULL,
   max_run = 0L,
   cache = TRUE,
   ...
@@ -45,13 +45,15 @@ Defaults to \code{NULL}.}
 Options are \code{\link[=list_ssp]{list_ssp()}}. Defaults to all scenarios available.}
 
 \item{gcm_period}{character. 20-year normal periods for GCM simulations.
-Options are \code{\link[=list_gcm_period]{list_gcm_period()}}.}
+Options are \code{\link[=list_gcm_period]{list_gcm_period()}}. Defaults to \code{NULL}.}
 
 \item{gcm_ts_years}{character. Timeseries years for GCM simulations of future
-scenarios specified by \code{ssp}. See \code{\link[=list_gcm_ts]{list_gcm_ts()}} for available years.}
+scenarios specified by \code{ssp}. See \code{\link[=list_gcm_ts]{list_gcm_ts()}} for available years.
+Defaults to \code{NULL}.}
 
 \item{gcm_hist_years}{character.  Timeseries years for GCM simulations of the
-historical scenario. See \code{\link[=list_gcm_hist_ts]{list_gcm_hist_ts()}} for available years.}
+historical scenario. See \code{\link[=list_gcm_hist_ts]{list_gcm_hist_ts()}} for available years.
+Defaults to \code{NULL}.}
 
 \item{max_run}{integer. Maximum number of model runs to include.
 A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
