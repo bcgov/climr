@@ -399,7 +399,7 @@ centroids.
 **We advise *against* doing this unless your polygons are so small that
 the centroid reflects the overall polygon's climate conditions.**
 
-```{r, eval = FALSE, results = "hide"}
+```{r, results = "hide"}
 vancouver_poly <- get(data("vancouver_poly")) |>
   unwrap()
 dem_vancouver <- get(data("dem_vancouver")) |>
