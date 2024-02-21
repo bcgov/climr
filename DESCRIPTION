@@ -22,7 +22,6 @@ Description: `climr` is an experimental R package that builds on the downscaling
     (e.g., degree-days) based on published equations and parameters from  Wang et al. 2016.
     `climr` is designed to be fast and to minimize local data storage requirements. To do so, 
     it uses a remote PostGIS database, and optionally caches data locally.
-
 License: Apache License (== 2)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
