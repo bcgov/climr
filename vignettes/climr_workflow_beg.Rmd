@@ -40,7 +40,7 @@ cpath <- if (interactive()) {
 options("climr.cache.path" = cpath)
 ```
 
-###Using the `climr_downscale()` function
+### Using the `climr_downscale()` function
 
 The basic use of `climr` is to pass a `data.table` of point coordinates,
 IDs and elevation to `climr_downscale()` and select the type of climate
@@ -78,7 +78,7 @@ The resulting output is a data.table, printed below:
 knitr::kable(ds_out[id == head(id, 1)], caption = "'ds_out' table - Output from `climr_downscale`. Outputs are shown for one location ('id')")
 ```
 
-###Listing available options
+### Listing available options
 
 The `list_*` functions (see ?list_gcm) are useful to see available options, for example:
 
@@ -90,7 +90,7 @@ list_ssp()
 
 These functions can be used as arguments in `climr_downscale()`. For example, `vars = list_variables()` could be specified to obtain data for all available variables, or `gcm_models = list_gcm()[c(1,4,5,6,7,10,11,12)]` could be used to specify the eight-gcm ensemble recommended by Mahony et al. (2022). 
 
-###Working with raster data
+### Working with raster data
 A common use of `climr` is to obtain climate data for a user-provided raster grid. Here is some sample code showing how to do so. We convert a digital elevation model (DEM) into a table of points (one per grid cell) which we use as the `climr` input table. Then we take the `climr` input and populate the raster grid with a climate variable. 
 
 ```{r, eval = TRUE}
@@ -98,10 +98,11 @@ library(terra)
 library(data.table)
 
 ## get the sample digital elevation model (dem) provided with `climr`
-dem_vancouver <- get(data("dem_vancouver")) |> unwrap()
+dem_vancouver <- get(data("dem_vancouver")) |> 
+  unwrap()
 
 ## convert the DEM to a data.frame
-my_grid <- as.data.frame(dem_vancouver, cells=T, xy=T)
+my_grid <- as.data.frame(dem_vancouver, cells = TRUE, xy = TRUE)
 colnames(my_grid) <- c("id", "lon", "lat", "elev") # rename column names to what climr expects
 
 ## A simple climr query. This will return the observed 1961-1990 and 2001-2020 mean annual temperature (MAT) for the raster grid points. 
@@ -112,17 +113,16 @@ ds_out <- climr_downscale(
 )
 
 ## populate the raster grid with the downscaled climate values
-my_clim <- dem_vancouver # use the DEM as a template raster
-values(my_clim) <- NA # remove the elevation values from the 
-my_clim[ds_out[PERIOD=="2001_2020", id]] <- ds_out[PERIOD=="2001_2020", MAT] # populate the raster cells with the 2001-2020 mean annual temperature (MAT) values, using the `id` field as the link. 
+my_clim <- rast(dem_vancouver) # use the DEM as a template raster
+my_clim[ds_out[PERIOD == "2001_2020", id]] <- ds_out[PERIOD == "2001_2020", MAT] # populate the raster cells with the 2001-2020 mean annual temperature (MAT) values, using the `id` field as the link. 
 
-plot(my_clim, main="2001-2020 mean annual temperature (MAT)")
+plot(my_clim, main = "2001-2020 mean annual temperature (MAT)")
 
 ```
 
 See `vignette("vignettes/climr_with_rasters.Rmd")` for more details on using `climr` with rasters and spatial data. 
 
-###Looking under the hood
+### Looking under the hood
 
-You can download and investigate the raw data that climr uses for downscaling, such as the reference climatological maps, the observational time series, and the GCM anomalies. See the section "Workflow with `*_input` functions and `downscale`" in
+You can download and investigate the raw data that `climr` uses for downscaling, such as the reference climatological maps, the observational time series, and the GCM anomalies. See the section "Workflow with `*_input` functions and `downscale`" in
 `vignette("vignettes/climr_workflow_int.Rmd")` for an example.
