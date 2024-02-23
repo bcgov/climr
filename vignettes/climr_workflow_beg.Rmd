@@ -40,64 +40,89 @@ cpath <- if (interactive()) {
 options("climr.cache.path" = cpath)
 ```
 
+### Using the `climr_downscale()` function
 
-The most basic use of `climr` is to pass a `data.table` of point coordinates, IDs
-and elevation to `climr_downscale()` and select the type of climate projection or 
-values wanted - e.g. below we ask for future projections in three periods, using
-two emissions scenarios and two General Circulation Models. We also specify we want
-3 individual runs of each model/scenario combination, in addition to the ensemble mean
-(returned by default).
+The basic use of `climr` is to pass a `data.table` of point coordinates,
+IDs and elevation to `climr_downscale()` and select the type of climate
+projection or values wanted - e.g. below we ask for future projections
+in two periods, using two emissions scenarios and two General
+Circulation Models. We also specify we want 3 individual runs of each
+model/scenario combination, in addition to the ensemble mean (returned
+by default).
 
 ```{r}
 library(climr)
 
-## A data.table of point coordinates, IDs and elevation
-data("xyzDT")
+## provide a data.frame or data.table of point coordinates, IDs and elevation
+my_points <- data.frame(
+  lon = c(-123.4404, -123.5064, -124.2317),
+  lat = c(48.52631, 48.46807, 49.21999),
+  elev = c(52, 103, 357),
+  id = LETTERS[1:3]
+)
 
-## if you just want to downscale points and not think about what happening behind the scenes, use this function
+## climr query for the data.frame
 ds_out <- climr_downscale(
-  xyz = xyzDT, which_normal = "auto",
-  gcm_models = c("ACCESS-ESM1-5", "EC-Earth3"),
-  ssp = c("ssp370", "ssp245"),
-  gcm_period = c("2021_2040", "2041_2060", "2061_2080"),
-  # gcm_ts_years = 2020:2060,
-  max_run = 3, # we want 3 individual runs for each model
+  xyz = my_points, which_normal = "auto",
+  gcm_models = c("GFDL-ESM4", "EC-Earth3"), # specify two global climate models
+  ssp = c("ssp370", "ssp245"), # specify two greenhouse gas concentration scenarios
+  gcm_period = c("2001_2020", "2041_2060"), # specify two 20-year periods
+  max_run = 3, # specify 3 individual runs for each model
   vars = c("PPT", "CMD", "CMI")
 )
 ```
 
-These functions are useful to list available options:
-
-```{r, eval = FALSE}
-list_gcm()
-list_gcm_period()
-list_ssp()
-list_variables()
-```
+The resulting output is a data.table, printed below:
 
 ```{r, echo = FALSE, results = "asis"}
 knitr::kable(ds_out[id == head(id, 1)], caption = "'ds_out' table - Output from `climr_downscale`. Outputs are shown for one location ('id')")
 ```
 
-Alternatively, you may want to download and investigate the normals and anomalies
-before downscaling. See the section "Workflow with `*_input` functions and `downscale`"
-in `vignette("vignettes/climr_workflow_int.Rmd")` for an example.
+### Listing available options
 
-#### Adding / Modifying climate variables
+The `list_*` functions (see ?list_gcm) are useful to see available options, for example:
 
-All climate variables are computed via [R/append_clim_vars.R](./R/append_clim_vars.R).
-Add or modify entries in the variables list as needed.
-Use function `v` to handle dependencies (i.e. `v("Tmin")` instead of `dt$Tmin` / `dt[["Tmin"]]`).
+```{r, eval = TRUE}
+list_gcm()
+list_gcm_period()
+list_ssp()
+```
 
-#### Lapse rates details
+These functions can be used as arguments in `climr_downscale()`. For example, `vars = list_variables()` could be specified to obtain data for all available variables, or `gcm_models = list_gcm()[c(1,4,5,6,7,10,11,12)]` could be used to specify the eight-gcm ensemble recommended by Mahony et al. (2022). 
 
-See `vignette("vignettes/lapse_rates.Rmd")` for details.
+### Working with raster data
+A common use of `climr` is to obtain climate data for a user-provided raster grid. Here is some sample code showing how to do so. We convert a digital elevation model (DEM) into a table of points (one per grid cell) which we use as the `climr` input table. Then we take the `climr` input and populate the raster grid with a climate variable. 
 
-#### Use of terra package
+```{r, eval = TRUE}
+library(terra)
+library(data.table)
 
-Instead of implementing custom algorithms for bilinear interpolation and raster manipulation, this package use `terra`.
-Long term, it will benefit from any performance improvement in `terra`.
-`terra` is a replacement for the `raster` package.
+## get the sample digital elevation model (dem) provided with `climr`
+dem_vancouver <- get(data("dem_vancouver")) |> 
+  unwrap()
 
-Data pivot using `data.table` dcast is the most resource expensive operation of the `downscale` function according to profiling using `profvis`.
+## convert the DEM to a data.frame
+my_grid <- as.data.frame(dem_vancouver, cells = TRUE, xy = TRUE)
+colnames(my_grid) <- c("id", "lon", "lat", "elev") # rename column names to what climr expects
 
+## A simple climr query. This will return the observed 1961-1990 and 2001-2020 mean annual temperature (MAT) for the raster grid points. 
+ds_out <- climr_downscale(
+  xyz = my_grid, 
+  historic_period = "2001_2020", 
+  vars = c("MAT")
+)
+
+## populate the raster grid with the downscaled climate values
+my_clim <- rast(dem_vancouver) # use the DEM as a template raster
+my_clim[ds_out[PERIOD == "2001_2020", id]] <- ds_out[PERIOD == "2001_2020", MAT] # populate the raster cells with the 2001-2020 mean annual temperature (MAT) values, using the `id` field as the link. 
+
+plot(my_clim, main = "2001-2020 mean annual temperature (MAT)")
+
+```
+
+See `vignette("vignettes/climr_with_rasters.Rmd")` for more details on using `climr` with rasters and spatial data. 
+
+### Looking under the hood
+
+You can download and investigate the raw data that `climr` uses for downscaling, such as the reference climatological maps, the observational time series, and the GCM anomalies. See the section "Workflow with `*_input` functions and `downscale`" in
+`vignette("vignettes/climr_workflow_int.Rmd")` for an example.

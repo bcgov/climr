@@ -1,4 +1,4 @@
-#' Change-factor downscaling of observed and simulated climate data
+#' Change-factor downscaling of user-supplied climate data
 #'
 #' @description
 #' `downscale()` is the engine for [`climr_downscale()`].

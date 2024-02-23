@@ -69,7 +69,7 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
     max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE
   )
   attr(res, "builder") <- "climr"
-
+  
   # Return a list of SpatRasters, one element for each model
   return(res)
 }
@@ -559,14 +559,14 @@ process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts,
     layerinfo <- dbGetQuery(dbCon, q)
     message("Downloading GCM anomalies")
     message("Precip...")
-    gcm_rast_ppt <- pgGetTerra(dbCon, paste0(gcmcode, "_ppt"), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
-    names(gcm_rast_ppt) <- gsub("Tmax", "PPT", layerinfo$fullnm)
+    gcm_rast_ppt <- pgGetTerra(dbCon, gsub("VAR","ppt",gcmcode), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
+    names(gcm_rast_ppt) <- gsub("tasmin", "PPT", layerinfo$fullnm)
     message("Tmax...")
-    gcm_rast_tmax <- pgGetTerra(dbCon, paste0(gcmcode, "_tmax"), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
-    names(gcm_rast_tmax) <- layerinfo$fullnm
+    gcm_rast_tmax <- pgGetTerra(dbCon, gsub("VAR","tmax",gcmcode), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
+    names(gcm_rast_tmax) <- gsub("tasmin", "Tmax", layerinfo$fullnm)
     message("Tmin...")
-    gcm_rast_tmin <- pgGetTerra(dbCon, paste0(gcmcode, "_tmin"), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
-    names(gcm_rast_tmin) <- gsub("Tmax", "Tmin", layerinfo$fullnm)
+    gcm_rast_tmin <- pgGetTerra(dbCon, gsub("VAR","tmin",gcmcode), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
+    names(gcm_rast_tmin) <- gsub("tasmin", "Tmin", layerinfo$fullnm)
     gcm_rast <- c(gcm_rast_ppt, gcm_rast_tmax, gcm_rast_tmin)
 
     if (cache) {
