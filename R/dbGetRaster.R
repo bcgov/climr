@@ -24,7 +24,7 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
   ## rast query name
   rastque <- dbQuoteIdentifier(conn, rast)
 
-  projID <- dbGetQuery(conn, paste0("select ST_SRID(", rastque, ") as srid from ", nameque, " where rid = 1;"))$srid[1]
+  projID <- dbGetQuery(conn, paste0("select ST_SRID(", rastque, ") as srid from \"", nameque, "\" where rid = 1;"))$srid[1]
 
   if (length(bands) > 1664) { ## maximum number of columns
     info <- dbGetQuery(conn, paste0(
@@ -36,7 +36,7 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
             st_width(rast) as cols,
             st_height(rast) as rows
             from
-            (select st_union(", rastque, ",", 1, ") rast from ", nameque, "\n
+            (select st_union(", rastque, ",", 1, ") rast from \"", nameque, "\" \n
             WHERE ST_Intersects(",
       rastque, ",ST_SetSRID(ST_GeomFromText('POLYGON((", boundary[4],
       " ", boundary[1], ",", boundary[4], " ", boundary[2],
@@ -52,7 +52,7 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
 
       rast_vals_temp <- dbGetQuery(conn, paste0(
         "SELECT ", paste(bandqs1, collapse = ","),
-        " from (SELECT ST_Union(rast) rast FROM ", nameque, " WHERE ST_Intersects(",
+        " from (SELECT ST_Union(rast) rast FROM \"", nameque, " \" WHERE ST_Intersects(",
         rastque, ",ST_SetSRID(ST_GeomFromText('POLYGON((", boundary[4],
         " ", boundary[1], ",", boundary[4], " ", boundary[2],
         ",\n  ", boundary[3], " ", boundary[2], ",", boundary[3],
@@ -215,7 +215,7 @@ make_raster <- function(boundary, conn, rastque, nameque, projID, bands) {
               st_width(rast) as cols,
               st_height(rast) as rows
               from
-              (select st_union(", rastque, ",", 1, ") rast from ", nameque, "\n
+              (select st_union(", rastque, ",", 1, ") rast from \"", nameque, "\" \n
               WHERE ST_Intersects(",
     rastque, ",ST_SetSRID(ST_GeomFromText('POLYGON((", boundary[4],
     " ", boundary[1], ",", boundary[4], " ", boundary[2],
@@ -226,7 +226,7 @@ make_raster <- function(boundary, conn, rastque, nameque, projID, bands) {
   bandqs1 <- paste0("UNNEST(ST_Dumpvalues(rast, ", bands, ")) as vals_", bands)
   rast_vals <- dbGetQuery(conn, paste0(
     "SELECT ", paste(bandqs1, collapse = ","),
-    " from (SELECT ST_Union(rast) rast FROM ", nameque, " WHERE ST_Intersects(",
+    " from (SELECT ST_Union(rast) rast FROM \"", nameque, "\" WHERE ST_Intersects(",
     rastque, ",ST_SetSRID(ST_GeomFromText('POLYGON((", boundary[4],
     " ", boundary[1], ",", boundary[4], " ", boundary[2],
     ",\n  ", boundary[3], " ", boundary[2], ",", boundary[3],
