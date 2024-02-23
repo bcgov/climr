@@ -12,7 +12,7 @@ downscale(
   gcm_ts = NULL,
   gcm_hist = NULL,
   historic_ts = NULL,
-  return_normal = FALSE,
+  return_normal = TRUE,
   vars = sort(sprintf(c("PPT\%02d", "Tmax\%02d", "Tmin\%02d"), sort(rep(1:12, 3)))),
   ppt_lr = FALSE,
   nthread = 1L,
@@ -42,12 +42,11 @@ Global climate model time series for historical scenario to be downscaled. Defau
 \item{historic_ts}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=historic_input_ts]{historic_input_ts()}}.
 Observed climate time series to be downscaled. Default to \code{NULL}.}
 
-\item{return_normal}{logical. Return downscaled climate values for the reference normal period (1961-1990)? Default \code{TRUE}.}
+\item{return_normal}{logical. Return downscaled normal period (1961-1990)? Default \code{TRUE}.}
 
-\item{vars}{character. A vector of climate variables to compute.
-Options are \code{\link[=list_variables]{list_variables()}}.
-Definitions can be found by calling \code{View(variables)} and queried by loading the 'variables' object into the R environment with \code{data(variables)}.
-Defaults to monthly PPT, Tmax, Tmin.}
+\item{vars}{character. A vector of climate variables to compute. Supported variables
+can be obtained with \code{\link[=list_variables]{list_variables()}}. Definitions can be found in this package
+\code{variables} dataset. Default to monthly PPT, Tmax, Tmin.}
 
 \item{ppt_lr}{logical. Apply elevation adjustment to precipitation. Default to FALSE.}
 

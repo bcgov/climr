@@ -45,7 +45,7 @@ Options are \code{\link[=list_ssp]{list_ssp()}}. Defaults to all scenarios avail
 data, averaged over this period. Options are \code{\link[=list_historic]{list_historic()}}. Default \code{NULL}}
 
 \item{gcm_period}{character. 20-year normal periods for GCM simulations.
-Options are \code{\link[=list_gcm_period]{list_gcm_period()}}.}
+Options are \code{\link[=list_gcm_period]{list_gcm_period()}}. Defaults to \code{NULL}.}
 
 \item{max_run}{integer. Maximum number of model runs to include.
 A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
