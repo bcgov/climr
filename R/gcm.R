@@ -69,7 +69,7 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
     max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE
   )
   attr(res, "builder") <- "climr"
-
+  
   # Return a list of SpatRasters, one element for each model
   return(res)
 }
