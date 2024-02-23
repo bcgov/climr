@@ -76,7 +76,7 @@ dem_vancouver <- get(data("dem_vancouver")) |>
 vancouver_poly <- get(data("vancouver_poly")) |>
   unwrap()
 
-dem_vancouver <- crop(dem_vancouver, vancouver_poly)
+dem_vancouver <- mask(dem_vancouver, vancouver_poly)
 ```
 
 ```{r, echo = FALSE, results = "hide", fig.cap = "Digital Elevation Model of North Vancouver w/ and w/o values outside polygon area", fig.show = "hold", fig.dim = c(7,3), out.width = "100%"}
@@ -130,7 +130,7 @@ We can now pass our table of cell locations to `climr_downscale()`:
 ## in this case there's really no need for a spatial output format
 dwscl_out <- climr_downscale(xyzDT,
   which_normal = "auto",
-  gcm_models = list_gcm()[1:3],
+  gcm_models = list_gcm()[1],
   ssp = list_ssp()[1],
   gcm_period = list_gcm_period(),
   max_run = 0L, return_normal = FALSE,
@@ -163,7 +163,7 @@ dwscl_Ras
 ```{r, echo = FALSE, results = "hide", fig.show = "hold", fig.cap = "`climr_downscale()` outputs converted to raster layers", fig.dim = c(15,9), out.width = "100%"}
 minmax <- range(dwscl_out$MAT)
 
-gcmstr <- paste(list_gcm()[1:3], collapse = "|")
+gcmstr <- paste(list_gcm()[1], collapse = "|")
 titles <- sub(paste0("(", gcmstr, ")\\.([[:digit:]]{4})_([[:digit:]]{4})"), "\\1\\\n\\2-\\3", names(dwscl_Ras))
 plot(dwscl_Ras,
   main = titles, nc = 5, nr = 3,
@@ -222,10 +222,10 @@ The process to convert the downscaled data to raster format is the same
 as before, because we again used the raster cell IDs as point location
 IDs (`xyzDT$id`):
 
-```{r}
+```{r, eval = FALSE}
 dwscl_out <- climr_downscale(xyzDT,
   which_normal = "auto",
-  gcm_models = list_gcm()[1:3],
+  gcm_models = list_gcm()[1],
   ssp = list_ssp()[1],
   gcm_period = list_gcm_period(),
   max_run = 0L, return_normal = FALSE,
@@ -286,7 +286,7 @@ As before, pass your `data.table` of point locations to
 ```{r, results = "hide"}
 dwscl_out <- climr_downscale(xyzDT,
   which_normal = "auto",
-  gcm_models = list_gcm()[1:3],
+  gcm_models = list_gcm()[1],
   ssp = list_ssp()[1],
   gcm_period = list_gcm_period(),
   max_run = 0L, return_normal = FALSE,
@@ -302,7 +302,7 @@ dwscl_outLong <- as.data.table(dwscl_out, geom = "XY") |>
   vect(geom = c("x", "y"), crs = crs(dem_vancouver))
 
 lyrs <- setdiff(names(dwscl_outLong), c("elev", "id", "SSP", "RUN"))
-gcmstr <- paste(list_gcm()[1:3], collapse = "|")
+gcmstr <- paste(list_gcm()[1], collapse = "|")
 titles <- sub(paste0("(", gcmstr, ")_([[:digit:]]{4})_([[:digit:]]{4})"), "\\1\\\n\\2-\\3", lyrs)
 plot(dwscl_outLong, lyrs,
   main = titles, nc = 5, nr = 3,
@@ -345,7 +345,7 @@ setnames(xyzDT, c("id", "elev", "lon", "lat"))
 
 dwscl_out <- climr_downscale(xyzDT,
   which_normal = "auto",
-  gcm_models = list_gcm()[1:3],
+  gcm_models = list_gcm()[1],
   ssp = list_ssp()[1],
   gcm_period = list_gcm_period(),
   vars = "MAT", max_run = 0L,
@@ -371,7 +371,7 @@ dwscl_outLong <- as.data.table(dwscl_out, geom = "XY") |>
   vect(geom = c("x", "y"), crs = crs(dem_vancouver))
 
 lyrs <- setdiff(names(dwscl_outLong), c("elev", "id", "SSP", "RUN"))
-gcmstr <- paste(list_gcm()[1:3], collapse = "|")
+gcmstr <- paste(list_gcm()[1], collapse = "|")
 titles <- sub(paste0("(", gcmstr, ")_([[:digit:]]{4})_([[:digit:]]{4})"), "\\1\\\n\\2-\\3", lyrs)
 plot(dwscl_outLong, lyrs,
   main = titles, nc = 5, nr = 3,
@@ -419,7 +419,7 @@ setnames(xyzDT, c("id", "elev", "lon", "lat"))
 
 dwscl_outGrid <- climr_downscale(xyzDT,
   which_normal = "auto",
-  gcm_models = list_gcm()[1:3],
+  gcm_models = list_gcm()[1],
   ssp = list_ssp()[1],
   gcm_period = list_gcm_period(),
   max_run = 0L, return_normal = FALSE,
