@@ -2,6 +2,10 @@
 ## Enhancements
 * new functions `list_historic_ts` and `list_gcm_ts` to get available years for historic/future time series
 
+# `climr` 0.0.3.9002
+## Bug Fixes
+* Fix gcm time series on database
+
 # `climr` 0.0.3
 ## Enhancements
 * new tests comparing to reference outputs
