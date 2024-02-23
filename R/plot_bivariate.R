@@ -125,7 +125,7 @@ plot_bivariate <- function(
     if (interactive == FALSE) {
       # BASE PLOT
       # initiate the plot
-      par(mar = c(3, 4, 0, 1), mgp = c(1.25, 0.25, 0), cex = 1.5)
+      par(mar = c(3, 4, 0.5, 0.5), mgp = c(1.25, 0.25, 0), cex = 1.5)
       plot(data.all$xanom, data.all$yanom,
         col = "white", tck = 0, xaxt = "n", yaxt = "n", ylab = "",
         xlab = paste("Change in", variables$Variable[which(variables$Code == xvar)])
