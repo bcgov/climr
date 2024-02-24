@@ -3,6 +3,24 @@ url: https://bcgov.github.io/climr/
 template:
   bootstrap: 5
 
+articles:
+- title: "`climr` workflows"
+  desc: "How to use `climr`, from beginner to advanced operations"
+  navbar: "`climr` workflows"
+  contents:
+  - climr_workflow_beg
+  - climr_workflow_int
+  - climr_with_rasters
+- title: "Methods"
+  navbar: "Methods"
+  desc: "Climate downscaling methods used in `climr`"
+  contents:
+  - methods_downscaling
+  - lapse_rates
+- title: "Caching"
+  contents:
+  - caching
+
 reference:
 - title: "Downscaling functions"
   desc: >
