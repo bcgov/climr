@@ -86,7 +86,7 @@ plot_bivariate <- function(
     show_trajectories = TRUE,
     interactive = FALSE,
     cache = TRUE) {
-  if (!requireNamespace("stinepack")) {
+  if (!requireNamespace("stinepack", quietly = TRUE)) {
     stop("package stinepack must be installed to use this function")
   } else {
     data("variables", envir = environment())
@@ -187,7 +187,7 @@ plot_bivariate <- function(
         bty = "n", cex = 0.8
       )
     } else {
-      if (!requireNamespace("plotly")) {
+      if (!requireNamespace("plotly", quietly = TRUE)) {
         stop("package 'plotly' must be installed when 'interactive==TRUE'")
       } else {
         # PLOTLY PLOT

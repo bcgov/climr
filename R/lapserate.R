@@ -226,7 +226,7 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
   sum_xx <- sum_matrix(sup(x_i, 2))
 
   if (isTRUE(nthread > 1L)) {
-    if (!requireNamespace("parallel")) {
+    if (!requireNamespace("parallel", quietly = TRUE)) {
       message("nthreads is >1, but 'parallel' package is not available.")
       message("Setting nthreads to 1 and running computations in sequential mode.")
       message("If you wish to parallelise please run install.packages('parallel')")

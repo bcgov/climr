@@ -81,7 +81,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL,
   xyz <- .checkXYZ(copy(xyz), expectedCols)
 
   if (isTRUE(nthread > 1L)) {
-    if (!requireNamespace("parallel")) {
+    if (!requireNamespace("parallel", quietly = TRUE)) {
       message("nthreads is >1, but 'parallel' package is not available.")
       message("Setting nthreads to 1 and running computations in sequential mode.")
       message("If you wish to parallelise please run install.packages('parallel')")
