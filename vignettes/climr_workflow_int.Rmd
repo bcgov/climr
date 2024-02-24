@@ -1,5 +1,5 @@
 ---
-title: "`climr` workflow - intermediate"
+title: "Intermediate `climr` workflow"
 output: 
   rmarkdown::html_vignette:
     toc: true
