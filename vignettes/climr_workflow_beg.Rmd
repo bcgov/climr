@@ -1,5 +1,5 @@
 ---
-title: "`climr` workflow - beginner"
+title: "Beginner `climr` workflow"
 output: 
   rmarkdown::html_vignette:
     toc: true
@@ -17,6 +17,7 @@ bibliography: references.bib
 link-citations: true
 code_folding: show
 ---
+
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
