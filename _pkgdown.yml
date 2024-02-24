@@ -29,7 +29,6 @@ reference:
   - climr
   - climr_downscale
   - downscale
-  - lapse_rate
 - title: "Downloading raw climate inputs"
   desc: >
     Functions to download climate normals and
@@ -51,6 +50,13 @@ reference:
   - cache_path
   - data_connect
   - pgGetTerra
+- title: "Utilities"
+  desc: >
+    Other useful functions
+  contents:
+  - get_bb
+  - lapse_rate
+  - plot_bivariate
 - title: "Data"
   desc: >
     Datasets used in vignettes and examples,
@@ -75,9 +81,3 @@ reference:
   - list_ssp
   - list_run
   - list_variables
-- title: "Utilities"
-  desc: >
-    Other useful functions
-  contents:
-  - get_bb
-  - plot_bivariate
