@@ -7,7 +7,7 @@ output:
 description: >
   More advanced `climr` workflows.
 vignette: >
-  %\VignetteIndexEntry{`climr` workflow - intermediate}
+  %\VignetteIndexEntry{Intermediate `climr` workflow}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
