@@ -57,15 +57,23 @@ reference:
   desc: >
     Other useful functions
   contents:
+  - plot_bivariate
   - get_bb
   - lapse_rate
-  - plot_bivariate
 - title: "Data"
   desc: >
-    Datasets used in vignettes and examples,
     available climate variables and functions listing 
     available data.
+    Datasets used in vignettes and examples,
   contents:
+  - variables
+  - list_normal
+  - list_historic
+  - list_gcm
+  - list_gcm_period
+  - list_ssp
+  - list_run
+  - list_variables
   - xyzDT
   - BECz_vancouver
   - BECz_vancouver_ras
@@ -76,11 +84,3 @@ reference:
   - vancouver_points
   - vancouver_poly
   - weather_stations
-  - variables
-  - list_normal
-  - list_historic
-  - list_gcm
-  - list_gcm_period
-  - list_ssp
-  - list_run
-  - list_variables

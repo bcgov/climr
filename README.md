@@ -52,18 +52,18 @@ remotes::install_github("bcgov/climr@devl")
 
 See:
 
--   `vignette("vignettes/climr_workflow_beg.Rmd")` for a simple `climr` workflow;
+-   `vignette("climr_workflow_beg")` for a simple `climr` workflow;
 
--   `vignette("vignettes/climr_workflow_int.Rmd")` provides a deeper dive into `climr`
+-   `vignette("climr_workflow_int")` for a deeper dive into `climr`
 and more advanced examples of how it can be used;
 
--   `vignette("vignettes/climr_with_rasters.Rmd")` covers several examples of how 
+-   `vignette("climr_with_rasters")` for several examples of how 
 to work with `climr` using spatial inputs and outputs, such as raster and vector data.
 
 ## Methods
 
-For an overview of dowscaling methods used in `climr` see `vignette("vignettes/lapse_rates.Rmd")`
-and `vignette("vignettes/methods_downscaling.Rmd")`
+For an overview of downscaling methods used in `climr` see `vignette("lapse_rates")`
+and `vignette("methods_downscaling")`
 
 ### License
 

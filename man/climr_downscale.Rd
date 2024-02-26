@@ -79,7 +79,7 @@ This approach downscales climate data in three stages:
 \item \emph{Elevation adjustment} of temperature variables to provide scales finer than the high-resolution reference grid; and
 \item \emph{Calculating derived variables} from the downscaled monthly temperature and precipitation variables.
 }
-See \code{vignette("methods_downscaling", package = "climr")} for a description of the downscaling methodology.
+See \code{vignette("methods_downscaling")} for a description of the downscaling methodology.
 
 \code{climr_downscale()} is a user-friendly wrapper for \code{downscale()}
 }
