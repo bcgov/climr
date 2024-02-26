@@ -7,7 +7,7 @@ output:
 description: >
   Learn the basic `climr` workflow.
 vignette: >
-  %\VignetteIndexEntry{`climr` workflow - beginner}
+  %\VignetteIndexEntry{Beginner `climr` workflow}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 

@@ -39,33 +39,33 @@ Starting with equal extent digital elevation model raster (x) and 36 climate var
 
 We first convert rasters to matrices as this is way easier to handle for this type of operation.  
   
-![Base matrix](./assets/grid.svg)  
+![Base matrix](./grid.svg)  
   
 From there, since we want to compute everything in one swell swoop, we create border extended matrices to handle lapse rates values at the edge of a raster.
   
 Starting with sides  
-![side extended matrix](./assets/grid2.svg)  
+![side extended matrix](./grid2.svg)  
   
 Then corners  
-![Corner extended matrix](./assets/grid3.svg)  
+![Corner extended matrix](./grid3.svg)  
   
 Next step is to sample the extended matrices 8 times and compute the differences with the original matrices. This is going to give us a stack of 8 matrices for each 36 variables that will be used to compute the linear regression coefficients.
   
-![North-west sample](./assets/grid4.svg)  
+![North-west sample](./grid4.svg)  
   
-![North sample](./assets/grid5.svg)  
+![North sample](./grid5.svg)  
   
-![North-east sample](./assets/grid6.svg)  
+![North-east sample](./grid6.svg)  
   
-![East sample](./assets/grid7.svg)  
+![East sample](./grid7.svg)  
   
-![South-east sample](./assets/grid8.svg)  
+![South-east sample](./grid8.svg)  
   
-![South sample](./assets/grid9.svg)  
+![South sample](./grid9.svg)  
   
-![South-west sample](./assets/grid10.svg)  
+![South-west sample](./grid10.svg)  
   
-![West sample](./assets/grid11.svg)  
+![West sample](./grid11.svg)  
   
 Regresssion coefficients are computed using the following methods and the R² adjustment applied.
 

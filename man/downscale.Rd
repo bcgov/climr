@@ -2,7 +2,7 @@
 % Please edit documentation in R/downscale.R
 \name{downscale}
 \alias{downscale}
-\title{Change-factor downscaling of observed and simulated climate data}
+\title{Change-factor downscaling of user-supplied climate data}
 \usage{
 downscale(
   xyz,

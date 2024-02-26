@@ -3,17 +3,17 @@
 \docType{data}
 \name{BECcols}
 \alias{BECcols}
-\title{Colour sscheme for Biogeoclimatic Ecological Classification Zones}
+\title{Colour scheme for Biogeoclimatic Ecological Classification Zones}
 \format{
 a \code{data.table}
 }
 \source{
-colour scheme commonly used by the BC provincial government.
+A standard colour scheme used by the BC provincial government.
 }
 \usage{
 BECcols
 }
 \description{
-A \code{data.table} with RGB and HEX colours for biogeoclimatic zones in BC.
+A \code{data.table} with standard RGB and HEX colours for biogeoclimatic zones in BC.
 }
 \keyword{datasets}
