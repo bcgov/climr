@@ -52,7 +52,7 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
 
       rast_vals_temp <- dbGetQuery(conn, paste0(
         "SELECT ", paste(bandqs1, collapse = ","),
-        " from (SELECT ST_Union(rast) rast FROM \"", nameque, " \" WHERE ST_Intersects(",
+        " from (SELECT ST_Union(rast) rast FROM \"", nameque, "\" WHERE ST_Intersects(",
         rastque, ",ST_SetSRID(ST_GeomFromText('POLYGON((", boundary[4],
         " ", boundary[1], ",", boundary[4], " ", boundary[2],
         ",\n  ", boundary[3], " ", boundary[2], ",", boundary[3],
