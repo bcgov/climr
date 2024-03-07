@@ -2,16 +2,32 @@ library(data.table)
 library(terra)
 library(climr)
 
+list_variables("Monthly")
 ## A data.table of point coordinates, IDs and elevation
 data("xyzDT")
 temp <- xyzDT[1:4,]
+mods <- c(c("ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5", "CNRM-ESM2-1", "EC-Earth3", 
+            "GISS-E2-1-G", "INM-CM5-0", "IPSL-CM6A-LR", "MIROC6", 
+            "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL"))
 ## if you just want to downscale points and not think about what happening behind the scenes, use this function
 ds_out <- climr_downscale(
   xyz = temp, 
   which_normal = "auto",
-  gcm_models = c("ACCESS-ESM1-5"),
+  gcm_models = mods,
   ssp = c("ssp245"),
-  gcm_period = list_gcm_period()[2],
+  gcm_ts_years = 2015:2030,
   max_run = 3, # we want 3 individual runs for each model
-  vars = c("PPT", "CMD", "CMI")
+  vars = c("PPT", "CMI04","CMI06","CMI07", "CMI")
 )
+
+coords <- fread("../../../Downloads/coords.csv")
+get_bb(coords)
+
+bb <- c(57.1763589075024, 52.7889907334224, -124.01035407693, -130.046934182713)
+dbCon <- data_connect()
+clim_vars <- normal_input(dbCon, bb, normal = "normal_composite")
+
+tic()
+clim_vars <- climr_downscale(coords, which_normal = "normal_composite", 
+                                              vars = list_variables(), return_normal = T)
+toc()

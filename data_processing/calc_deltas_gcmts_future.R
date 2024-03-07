@@ -9,13 +9,13 @@ library(terra)
 library(sf)
 rst <- rast("../../R Assist/smlRast.tif")
 las1 <- readLAS("../../R Assist/smlLaz.laz")
-las2 <- vect(st_as_sf(las1)) ##terra doesn't directly convert las so converting to sf first
+las1 <- st_as_sf(las1)
+crds <- sf::st_coordinates(las1)
+las1 <- cbind(las1,crds)
+las2 <- vect(las1) ##terra doesn't directly convert las so converting to sf first
 plot(rst$smlRast_1)
 points(las2)
-
-point_count <- rasterize(las2, rst, fun = "count") ##now can just rasterize the point cloud and supply functions
-plot(point_count)
-point_mean <- rasterize(las2, rst, field = "Intensity", fun = "mean") ##for summary functions like mean, need to specify field
+point_mean <- rasterize(las2, rst, field = "Z", fun = "mean") ##for summary functions like mean, need to specify field
 plot(point_mean)
 
 # in_dir <- "../../list_csv_test/"
