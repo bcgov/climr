@@ -29,18 +29,18 @@ dbnames <- structure(list(
   )
 ), class = "data.frame", row.names = c(NA, -13L))
 
-dbnames_hist <- structure(list(
+dbnames_hist <- data.table(
   GCM = c(
     "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5",
-    "CNRM-ESM2-1", "EC-Earth3", "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0",
-    "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL"
+    "EC-Earth3", "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0",
+    "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0"
   ),
   dbname = c(
-    "access_hist", "bcc_hist", "canesm_hist", "cnrm_hist",
+    "access_hist", "bcc_hist", "canesm_hist",
     "ec_earth_hist", "gfdl_hist", "giss_hist", "inm_hist", "ipsl_hist",
-    "miroc6_hist", "mpi_hist", "mri_hist", "ukesm_hist"
+    "miroc6_hist", "mpi_hist", "mri_hist"
   )
-), class = "data.frame", row.names = c(NA, -13L))
+)
 
 dbnames_ts <- structure(list(
   GCM = c(

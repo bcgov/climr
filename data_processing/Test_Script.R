@@ -14,10 +14,23 @@ ds_out <- climr_downscale(
   xyz = temp, 
   which_normal = "auto",
   gcm_models = mods,
-  ssp = c("ssp245"),
-  gcm_ts_years = 2015:2030,
-  max_run = 3, # we want 3 individual runs for each model
+  historic_ts = 1950:1965,
+  gcm_hist_years = 1950:1965,
+  max_run = 0, # we want 3 individual runs for each model
   vars = c("PPT", "CMI04","CMI06","CMI07", "CMI")
+)
+
+ds_out_ts <- climr_downscale(
+  xyz = temp,
+  which_normal = "auto",
+  historic_ts = 2001:2015,     
+  gcm_ts_years = 2015:2040,     ## currently starting at 2021
+  gcm_models = "CanESM5",
+  gcm_hist_years = 2001:2014,
+  ssp = "ssp245",
+  max_run = 1,
+  return_normal = TRUE, ## to return the 1961-1990 normals period
+  vars = c("MAT", "PPT", "CMI07")
 )
 
 coords <- fread("../../../Downloads/coords.csv")
