@@ -152,6 +152,42 @@ append_clim_vars <- function(dt, vars) {
     "CMI" = function() {
       set(dt, j = "CMI", value = v("PPT") - (v("PET01") + v("PET02") + v("PET03") + v("PET04") + v("PET05") + v("PET06") + v("PET07") + v("PET08") + v("PET09") + v("PET10") + v("PET11") + v("PET12")))
     },
+    "CMI01" = function() {
+      set(dt, j = "CMI01", value = v("PPT01") - v("PET01"))
+    },
+    "CMI02" = function() {
+      set(dt, j = "CMI02", value = v("PPT02") - v("PET02"))
+    },
+    "CMI03" = function() {
+      set(dt, j = "CMI03", value = v("PPT03") - v("PET03"))
+    },
+    "CMI04" = function() {
+      set(dt, j = "CMI04", value = v("PPT04") - v("PET04"))
+    },
+    "CMI05" = function() {
+      set(dt, j = "CMI05", value = v("PPT05") - v("PET05"))
+    },
+    "CMI06" = function() {
+      set(dt, j = "CMI06", value = v("PPT06") - v("PET06"))
+    },
+    "CMI07" = function() {
+      set(dt, j = "CMI07", value = v("PPT07") - v("PET07"))
+    },
+    "CMI08" = function() {
+      set(dt, j = "CMI08", value = v("PPT08") - v("PET08"))
+    },
+    "CMI09" = function() {
+      set(dt, j = "CMI09", value = v("PPT09") - v("PET09"))
+    },
+    "CMI10" = function() {
+      set(dt, j = "CMI10", value = v("PPT10") - v("PET10"))
+    },
+    "CMI11" = function() {
+      set(dt, j = "CMI11", value = v("PPT11") - v("PET11"))
+    },
+    "CMI12" = function() {
+      set(dt, j = "CMI12", value = v("PPT12") - v("PET12"))
+    },
     "NFFD01" = function() {
       set(dt, j = "NFFD01", value = calc_NFFD(1, v("Tmin01")))
     },
