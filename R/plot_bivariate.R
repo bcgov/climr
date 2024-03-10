@@ -120,7 +120,7 @@ plot_bivariate <- function(
     # ensemble mean for the selected period
     ensMean <- data[!is.na(GCM) & RUN == "ensembleMean" & PERIOD == period_focal, .(xanom = mean(xanom), yanom = mean(yanom)), ]
     # observed climate
-    obs <- data[is.na(GCM) & PERIOD == period_focal]
+    obs <- data[is.na(GCM) & PERIOD == historic_period]
 
     if (interactive == FALSE) {
       # BASE PLOT
