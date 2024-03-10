@@ -6,6 +6,7 @@
 ## Bug Fixes
 * Updated future timeseries  data to include full 2015-2100 period and added missing models. 
 * Restructured naming scheme for timeseries data, updated internal `dbnames` table, and updated `postgresql` functions to allow hyphens in table names. 
+* Fixed bug in `plot_bivariate()` for focal periods after 2001-2020. 
 
 # `climr` 0.0.3
 ## Enhancements
