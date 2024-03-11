@@ -324,13 +324,14 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
 
   if (needDownload) {
     q <- paste0(
-      "select fullnm, laynum from esm_layers where mod = '", gcm_nm, "' and scenario in ('", paste(ssp, collapse = "','"),
+      "select * from esm_layers_period where mod = '", gcm_nm, "' and scenario in ('", paste(ssp, collapse = "','"),
       "') and period in ('", paste(period, collapse = "','"), "') and run in ('", paste(sel_runs, collapse = "','"), "')"
     )
     # print(q)
-    layerinfo <- dbGetQuery(dbCon, q)
+    layerinfo <- as.data.table(dbGetQuery(dbCon, q))
     message("Downloading GCM anomalies")
     gcm_rast <- pgGetTerra(dbCon, gcmcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
+    layerinfo[,fullnm := paste0(mod,var,month,scenario,run,period)]
     names(gcm_rast) <- layerinfo$fullnm
 
     if (cache) {
