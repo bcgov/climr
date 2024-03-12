@@ -10,7 +10,8 @@ mods <- c(c("ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5", "CNRM-ESM2-1", "EC-Earth3
             "GISS-E2-1-G", "INM-CM5-0", "IPSL-CM6A-LR", "MIROC6", 
             "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL"))
 
-
+mods <- c("ACCESS-ESM1-5", "IPSL-CM6A-LR", "MIROC6", 
+            "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL")
 
 gcmres <- gcm_input(
   dbCon = data_connect(),
@@ -28,6 +29,19 @@ plot(gcm[[1]][[1]], add=T, legend=F)
 
 plot(gcmres[[1]])
 ## if you just want to downscale points and not think about what happening behind the scenes, use this function
+
+ds_out <- climr_downscale(
+  xyz = temp, 
+  which_normal = "auto",
+  gcm_models = mods,
+  gcm_period = list_gcm_period(),
+  ssp = list_ssp(),
+  max_run = 3, # we want 3 individual runs for each model
+  vars = c("PPT", "CMI04","CMI06","CMI07", "CMI")
+)
+
+
+
 ds_out <- climr_downscale(
   xyz = temp, 
   which_normal = "auto",

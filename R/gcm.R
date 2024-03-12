@@ -331,7 +331,7 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
     layerinfo <- as.data.table(dbGetQuery(dbCon, q))
     message("Downloading GCM anomalies")
     gcm_rast <- pgGetTerra(dbCon, gcmcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
-    layerinfo[,fullnm := paste0(mod,var,month,scenario,run,period)]
+    layerinfo[,fullnm := paste(mod,var,month,scenario,run,period,sep = "_")]
     names(gcm_rast) <- layerinfo$fullnm
 
     if (cache) {
