@@ -48,3 +48,21 @@ get_bb <- function(in_xyz) {
 }
 
 
+#' Check that BB is within the lat/long EPSG bounding box
+#'
+#' @template bbox
+#'
+#' @return NULL
+#' @noRd
+.check_bb <- function (bbox) {
+  ## check projection
+  minLon <- -180.0 
+  minLat <- -90.0
+  maxLon <- 180.0
+  maxLat <- 90.0
+  
+  if (any((bbox[4] < minLon), (bbox[3] > maxLon),
+      (bbox[2] < minLat), (bbox[1] > bbox))) {
+    stop("lon and lat are not in lat/long projection EPSG:4326")
+  }
+}
