@@ -56,10 +56,10 @@ get_bb <- function(in_xyz) {
 #' @noRd
 .check_bb <- function (bbox) {
   ## check projection
-  minLon <- -180.0 
-  minLat <- -90.0
-  maxLon <- 180.0
-  maxLat <- 90.0
+  minLon <- -179.0625 
+  maxLon <- -51.5625
+  minLat <- 14.375
+  maxLat <- 83.125
   
   if (any((bbox[4] < minLon), (bbox[3] > maxLon),
       (bbox[2] < minLat), (bbox[1] > maxLat))) {
