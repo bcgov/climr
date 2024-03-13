@@ -62,7 +62,7 @@ get_bb <- function(in_xyz) {
   maxLat <- 90.0
   
   if (any((bbox[4] < minLon), (bbox[3] > maxLon),
-      (bbox[2] < minLat), (bbox[1] > bbox))) {
+      (bbox[2] < minLat), (bbox[1] > maxLat))) {
     stop("lon and lat are not in lat/long projection EPSG:4326")
   }
 }
