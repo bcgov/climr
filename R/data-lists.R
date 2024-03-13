@@ -46,7 +46,7 @@ list_gcm_period <- function() {
 #' @rdname data-option-lists
 #' @export
 list_run <- function(dbCon, gcm) {
-  sort(dbGetQuery(dbCon, paste0("SELECT DISTINCT run FROM esm_layers WHERE mod IN ('", paste(gcm, collapse = "','", "')")))[, 1])
+  sort(dbGetQuery(dbCon, paste0("SELECT DISTINCT run FROM esm_layers_period WHERE mod IN ('", paste(gcm, collapse = "','", "')")))[, 1])
 }
 
 #' @description

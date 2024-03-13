@@ -1,6 +1,7 @@
 library(terra)
 library(stringr)
 library(data.table)
+library(climr)
 
 period_start <- c(2001,2021,2041,2061,2081)
 period_end <- c(2020,2040,2060,2080,2100)
@@ -13,22 +14,18 @@ monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11"
 # step 3: export rasters of change
 # ==========================================
 
-dirs <- list.dirs("C:\\Users\\kdaust\\LocalFiles\\CMIP6_GCMs")
-gcms <- unique(sapply(strsplit(dirs, "/"), "[", 2))
-select <- c(2,4,5,8,9,10,12,13,15,16,18)
-gcms <- gcms[select]
+dirs <- list.dirs("../Common_Files/CMIP6_GCMs/")
+gcms <- list_gcm() 
 
 startyear.ref <- 1961
 endyear.ref <- 1990
-
-minyear <- 2020
-maxyear <- 2100
+na_ext <- ext(c(-180, -52.5, 14, 84))
 
 gcm <- gcms[1]
-for(gcm in gcms[-c(1:4)]) {
+for(gcm in gcms[1:5]) {
   
   #process the climate elements
-  dir <- paste("C:\\Users\\kdaust\\LocalFiles\\CMIP6_GCMs", gcm, sep="\\")
+  dir <- paste("../Common_Files/CMIP6_GCMs/", gcm, sep="\\")
   files <- list.files(dir)
   element.list <- sapply(strsplit(files, "_"), "[", 1)
   scenario.list <- sapply(strsplit(files, "_"), "[", 4)
@@ -39,7 +36,7 @@ for(gcm in gcms[-c(1:4)]) {
   scenarios <- unique(scenario.list)
   
   # run=runs[1]
-  element=elements[3]
+  element=elements[1]
   for(element in elements) {
     
     # read in the raw time series for the historical runs
@@ -49,11 +46,14 @@ for(gcm in gcms[-c(1:4)]) {
     run.ref <- runs.ref[1]
     for(run.ref in runs.ref) {
       files.run <- files.ref[grep(run.ref, files.ref)]
-      if(gcm=="AWI-CM-1-1-MR") files.run <- files.run[which(str_sub(files.run, -9,-6)%in%startyear.ref:2014)]
-      if(gcm=="EC-Earth3") files.run <- files.run[which(str_sub(files.run, -9,-6)%in%startyear.ref:2014)]
-      if(gcm=="MPI-ESM1-2-HR") files.run <- files.run[which(str_sub(files.run, -9,-6)%in%startyear.ref:2014)]
-      if(gcm=="GISS-E2-1-G") files.run <- files.run[3:4]
-      if(gcm=="INM-CM5-0") files.run <- files.run[2]
+      if(gcm=="GFDL-ESM4") files.run <- files.run[which(str_sub(files.run, -9,-6)%in%startyear.ref:2014)]
+      if(gcm=="INM-CM5-0") files.run <- files.run[which(str_sub(files.run, -9,-6)%in%startyear.ref:2014)]
+      
+      # if(gcm=="AWI-CM-1-1-MR") files.run <- files.run[which(str_sub(files.run, -9,-6)%in%startyear.ref:2014)]
+      # if(gcm=="EC-Earth3") files.run <- files.run[which(str_sub(files.run, -9,-6)%in%startyear.ref:2014)]
+      # if(gcm=="MPI-ESM1-2-HR") files.run <- files.run[which(str_sub(files.run, -9,-6)%in%startyear.ref:2014)]
+      # if(gcm=="GISS-E2-1-G") files.run <- files.run[3:4]
+      # if(gcm=="INM-CM5-0") files.run <- files.run[2]
       temp <- terra::rast(paste(dir, files.run, sep="\\"))
       dates <- time(temp)
       ref.months <- month(dates)
@@ -83,42 +83,69 @@ for(gcm in gcms[-c(1:4)]) {
     names(ref.ensembleMean) <- paste(gcm, element, monthcodes, "reference", "ensembleMean", startyear.ref, endyear.ref, sep="_")
     compiled <- ref.ensembleMean
     
-    
     # compile future periods
-    scenario <- "ssp245"
+    scenario <- "ssp126"
     for(scenario in scenarios[-1]) {
       s <- which(element.list==element & scenario.list==scenario)
       files.proj <- files[s]
       runs.proj <- unique(run.list[s])
-      run.proj <- runs.proj[2]
+      s_hist <- which(element.list==element & scenario.list=="historical")
+      files.hist <- files[s_hist]
+      runs.hist <- unique(run.list[s_hist])
       run_list <- list()
       for(run.proj in runs.proj) {
         files.run <- files.proj[grep(run.proj, files.proj)]
+        run_nm <- gsub(".*_","", run.proj)
+        files.run.hist <- files.hist[grep(run_nm, files.hist)]
+        if(length(files.run.hist) == 0) next
+        if(gcm=="GFDL-ESM4") files.run.hist <- files.run.hist[which(str_sub(files.run.hist, -9,-6)%in%startyear.ref:2014)]
+        if(gcm=="INM-CM5-0") files.run.hist <- files.run.hist[which(str_sub(files.run.hist, -9,-6)%in%startyear.ref:2014)]
         #if(gcm=="EC-Earth3") files.run <- files.run[which(str_sub(files.run, -9,-6)%in%year)]
         #if(gcm=="MPI-ESM1-2-HR") files.run <- files.run[which(str_sub(files.run, -9,-6)%in%(startyear-5):(endyear+5))]
-        temp <- terra::rast(paste(dir, files.run, sep="\\"))
-        proj.months <- month(time(temp))
-        proj.yrs <- year(time(temp))
-        if(element == "pr") {
-          temp <- temp * 86400 * mean(monthdays)
-          # for(m in 1:12) {
-          #   temp[[which(proj.months == m)]] <- temp[[which(proj.months == m)]] * 86400 * monthdays[m]
-          # }
+        if(gcm=="GFDL-ESM4"){
+          tempx <- terra::rast(paste(dir, files.run, sep="\\"))
+          temp_hist <- terra::rast(paste(dir, files.run.hist, sep="\\"))
+          tempx <- project(tempx, temp_hist)
+          temp_proj <- crop(tempx, temp_hist)
         }else{
-          temp <- temp - 273.15
+          temp_proj <- terra::rast(paste(dir, files.run, sep="\\"))
+          temp_hist <- terra::rast(paste(dir, files.run.hist, sep="\\"))
+        }
+
+        proj.yrs <- year(time(temp_proj))
+        proj.yrs.hist <- year(time(temp_hist))
+        if(element == "pr") {
+          temp_proj <- temp_proj * 86400 * mean(monthdays)
+          temp_hist <- temp_hist * 86400 * mean(monthdays)
+        }else{
+          temp_proj <- temp_proj - 273.15
+          temp_hist <- temp_hist - 273.15
         } 
-        r <- temp[[proj.yrs %in% minyear:maxyear]]
-        proj.months <- month(time(r))
-        proj.yrs <- year(time(r))
-        names(r) <- paste(gcm, element, monthcodes[proj.months], run.proj, proj.yrs, sep="_")
-        run_list[[run.proj]] <- r
+        
+        for(yri in 1:5){
+          if(yri == 1){
+            r_period <- c(temp_hist[[proj.yrs.hist %in% period_start[yri]:period_end[yri]]], 
+                          temp_proj[[proj.yrs %in% period_start[yri]:period_end[yri]]])
+          }else{
+            r_period <- temp_proj[[proj.yrs %in% period_start[yri]:period_end[yri]]]
+          }
+          mnths_period <- months(time(r_period))
+          for(m in 1:12) {
+            ref_temp <- mean(r_period[[mnths_period == month.name[m]]])
+            period_mean <- if(m==1) ref_temp else c(period_mean, ref_temp)
+          }
+          names(period_mean) <- paste(gcm, element, monthcodes, scenario, run.proj, period_start[yri], period_end[yri], sep="_")
+          future_pers <- if(yri == 1) period_mean else c(future_pers,period_mean)
+        }
+
+        run_list[[run.proj]] <- future_pers
         print(run.proj)
       }
       
       t1 <- sds(run_list)
       proj.ensembleMean <- app(t1, mean)
-      proj.months <- month(time(proj.ensembleMean))
-      proj.yrs <- year(time(proj.ensembleMean))
+      proj.months <- rep(1:12, nlyr(proj.ensembleMean)/12)
+      proj.yrs <- rep(c("2001_2020","2021_2040","2041_2060","2061_2080","2081_2100"), each = 12)
       names(proj.ensembleMean) <- paste(gcm, element, monthcodes[proj.months], scenario, "ensembleMean", proj.yrs, sep="_")
       
       proj.runs <- rast(t1)
@@ -129,13 +156,9 @@ for(gcm in gcms[-c(1:4)]) {
     }
     
     # write data out for the GCMxElement 
-    dir.create(sprintf("C:\\Users\\kdaust\\LocalFiles\\ProcessedGCMs/gcm/%s/gcmData", gcm), recursive = TRUE)
-    # writeRaster(compiled, paste(sprintf("C:\\Users\\kdaust\\LocalFiles\\ProcessedGCMs/gcm/%s/gcmData", gcm), gcm, element, "tif", sep="."), overwrite=TRUE, format="CDF", varname=element, varunit=if(element=="pr") "mm" else "degC", 
-    #             longname="", xname="latitude",   yname="longitude",zname="index",
-    #             zunit="numeric")
-    terra::writeRaster(compiled, paste(sprintf("C:\\Users\\kdaust\\LocalFiles\\ProcessedGCMs/gcm/%s/gcmData", gcm), gcm, element, "tif", sep="."), overwrite=TRUE)
-    write.csv(names(compiled), paste(sprintf("C:\\Users\\kdaust\\LocalFiles\\ProcessedGCMs/gcm/%s/gcmData", gcm), gcm, element, "csv", sep=".")) # this is the metadata for each raster
-    
+    dir.create(sprintf("../Common_Files/GCM_Periods/%s", gcm), recursive = TRUE)
+    terra::writeRaster(compiled, paste(sprintf("../Common_Files/GCM_Periods/%s/", gcm), gcm, element, "tif", sep="."), overwrite=TRUE)
+
     print(element)
   }
   print(gcm)

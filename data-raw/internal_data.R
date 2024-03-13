@@ -16,18 +16,30 @@ param <- list(
 
 ## `dbnames*` data objects
 
-dbnames <- structure(list(
+# dbnames <- structure(list(
+#   GCM = c(
+#     "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5",
+#     "CNRM-ESM2-1", "EC-Earth3", "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0",
+#     "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL"
+#   ),
+#   dbname = c(
+#     "gcm_access", "gcm_bcc", "gcm_canesm", "gcm_cnrm",
+#     "gcm_ecearth", "gcm_gfdl", "gcm_giss", "gcm_inm", "gcm_ipsl",
+#     "gcm_miroc6", "gcm_mpi1", "gcm_mpi2", "gcm_ukesm"
+#   )
+# ), class = "data.frame", row.names = c(NA, -13L))
+
+dbnames <- data.table(
   GCM = c(
     "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5",
     "CNRM-ESM2-1", "EC-Earth3", "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0",
     "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL"
   ),
-  dbname = c(
-    "gcm_access", "gcm_bcc", "gcm_canesm", "gcm_cnrm",
-    "gcm_ecearth", "gcm_gfdl", "gcm_giss", "gcm_inm", "gcm_ipsl",
-    "gcm_miroc6", "gcm_mpi1", "gcm_mpi2", "gcm_ukesm"
-  )
-), class = "data.frame", row.names = c(NA, -13L))
+  dbname = c("gcm_access-esm1-5", "gcm_bcc-csm2-mr", "gcm_canesm5", "gcm_cnrm-esm2-1", 
+            "gcm_ec-earth3", "gcm_gfdl-esm4", "gcm_giss-e2-1-g", "gcm_inm-cm5-0", 
+            "gcm_ipsl-cm6a-lr", "gcm_miroc6", "gcm_mpi-esm1-2-hr", "gcm_mri-esm2-0", 
+            "gcm_ukesm1-0-ll")
+)
 
 dbnames_hist <- data.table(
   GCM = c(
