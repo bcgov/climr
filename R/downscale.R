@@ -79,6 +79,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL,
 
   expectedCols <- c("lon", "lat", "elev", "id")
   xyz <- .checkXYZ(copy(xyz), expectedCols)
+  get_bb(xyz) # we don't need a bbox, but this the projection of xyz
 
   if (isTRUE(nthread > 1L)) {
     if (!requireNamespace("parallel", quietly = TRUE)) {
@@ -653,7 +654,7 @@ unpackRasters <- function(ras) {
   if (!inherits(xyz$id, colTypes)) {
     stop("'xyz$id' must be an column of type ", paste(colTypes, collapse = ", "))
   }
-
+  
   return(xyz)
 }
 
