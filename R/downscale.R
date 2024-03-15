@@ -454,8 +454,22 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
   )
   # Extract gcm bilinear interpolations
   # Cropping will reduce the size of data to load in memory
+  browser()
   climaterast <- crop(climaterast, ex, snap = "out")
-  climaterast <- extract(x = climaterast, y = xyz[, .(lon, lat)], method = "bilinear")
+  gc(reset = TRUE)  ## free unused memory
+  ## we may run out of memory if there are MANY rasters
+  out <- try(extract(x = climaterast[[1:2]], y = xyz[, .(lon, lat)], method = "bilinear"))
+  out2 <- lapply(climaterast[[1:2]], extract, y = xyz[, .(lon, lat)], method = "bilinear")
+  out2 <- lapply(out2, as.data.table) |>
+    lapply(FUN = setkeyv, cols = "ID")
+  
+  out2 <- Reduce(merge, out2)
+  
+  if (is(out, "simple-error") & grepl("bad_alloc", out)) {
+    message("System may be out of memory to extract climate values froma large raster stack")
+    message("Attempting to extract sequentially")
+
+  }
 
   # Create match set to match with res names
   labels <- vapply(
