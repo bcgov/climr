@@ -2,6 +2,27 @@ library(data.table)
 library(terra)
 library(climr)
 
+library(rworldmap)
+library(climr)
+library(pool)
+data("countriesCoarse")
+
+par(mar=c(1,1,1,1), mfrow=c(3,5))
+dbCon <- data_connect()
+gcm <- gcm_input(
+  dbCon = dbCon,
+  bbox = c(80, 20, -50, -170),
+  gcm = list_gcm(),
+  ssp = list_ssp()[2],
+  period = list_gcm_period()[2],
+)
+
+for(i in 1:length(list_gcm())){
+  plot(gcm[[i]][[7]], legend=F, main=list_gcm()[i])
+  plot(countriesCoarse, add = T, xlim=c(-170, -50), ylim=c(20,80))
+}
+poolClose(dbCon)
+
 list_variables("Monthly")
 ## A data.table of point coordinates, IDs and elevation
 data("xyzDT")
@@ -25,7 +46,8 @@ plot(gcmres$`ACCESS-ESM1-5`[[6]])
 library(rworldmap)
 data("countriesCoarse")
 plot(countriesCoarse, xlim=c(-170, -50), ylim=c(20,80))
-plot(gcm[[1]][[1]], add=T, legend=F)
+plot(gcmres[[1]][[7]], legend=F)
+plot(countriesCoarse, xlim=c(-170, -50), ylim=c(20,80), add = T)
 
 plot(gcmres[[1]])
 ## if you just want to downscale points and not think about what happening behind the scenes, use this function
@@ -34,8 +56,9 @@ ds_out <- climr_downscale(
   xyz = temp, 
   which_normal = "auto",
   gcm_models = mods,
-  gcm_period = list_gcm_period(),
-  ssp = list_ssp(),
+  gcm_period = list_gcm_period()[2],
+  gcm_ts_years = 2020:2050,
+  ssp = list_ssp()[4],
   max_run = 3, # we want 3 individual runs for each model
   vars = c("PPT", "CMI04","CMI06","CMI07", "CMI")
 )
@@ -55,9 +78,8 @@ ds_out <- climr_downscale(
 ds_out_ts <- climr_downscale(
   xyz = temp,
   which_normal = "auto",
-  historic_ts = 2001:2015,     
   gcm_ts_years = 2015:2040,     ## currently starting at 2021
-  gcm_models = "CanESM5",
+  gcm_models = list_gcm()[1:5],
   gcm_hist_years = 2001:2014,
   ssp = "ssp245",
   max_run = 1,
