@@ -87,6 +87,11 @@ ds_out_ts <- climr_downscale(
   vars = c("MAT", "PPT", "CMI07")
 )
 
+tout <- climr_downscale(xyz = temp,
+                        which_normal = "auto",
+                        gcm_models = list_gcm()[1:3],
+                        gcm_ts_years = 2020:2050)
+
 coords <- fread("../../../Downloads/coords.csv")
 get_bb(coords)
 
