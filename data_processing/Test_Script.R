@@ -7,6 +7,28 @@ library(climr)
 library(pool)
 data("countriesCoarse")
 
+
+data("xyzDT")
+temp <- xyzDT[1:4,]
+dbCon <- data_connect()
+test <- gcm_ts_input(dbCon, bbox = get_bb(temp),
+                     gcm = list_gcm()[3], 
+                     ssp = list_ssp()[c(1,2,4)], 
+                     max_run = 3,
+                     years = 2015:2100)
+t1 <- test$CanESM5
+writeRaster(t1, "Test.grd", filetype = "ENVI", overwrite = T)
+t2 <- rast("Test.grd")
+plot(t1)
+
+
+projected <- climr_downscale(temp, gcm_models = list_gcm()[3], 
+                             ssp = list_ssp()[c(1,2,4)], 
+                             max_run = 10,
+                             gcm_hist_years = 1851:2014, 
+                             gcm_ts_years = 2015:2100, 
+                             vars = "Tmax07")
+
 par(mar=c(1,1,1,1), mfrow=c(3,5))
 dbCon <- data_connect()
 gcm <- gcm_input(
@@ -89,8 +111,9 @@ ds_out_ts <- climr_downscale(
 
 tout <- climr_downscale(xyz = temp,
                         which_normal = "auto",
-                        gcm_models = list_gcm()[1:3],
-                        gcm_ts_years = 2020:2050)
+                        gcm_models = list_gcm(),
+                        gcm_ts_years = 2080:2100,
+                        ssp = "ssp245")
 
 coords <- fread("../../../Downloads/coords.csv")
 get_bb(coords)
