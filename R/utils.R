@@ -27,3 +27,42 @@ is_in_bbox <- function(newbb, oldbb) {
     FALSE
   }
 }
+
+#' Find bounding box of data
+#'
+#' @param in_xyz `data.table` (or `data.frame`) of points to downscale
+#'  with columns "lon", "lat", "elev" and "id"
+#' @return numeric vector. Bounding box coordinates with order ymax,ymin,xmax,xmin (e.g. `c(51, 50, -121, -122)`).
+#' @export
+get_bb <- function(in_xyz) {
+  .checkXYZ(copy(in_xyz))
+  thebb <- c(max(in_xyz[, "lat"]), min(in_xyz[, "lat"]), max(in_xyz[, "lon"]), min(in_xyz[, "lon"]))
+  
+  if (any(is.na(thebb))) {
+    stop("Couldn't guess bounding box. Are there NA's in 'xyz'?")
+  }
+  
+  .check_bb(thebb)
+  
+  return(thebb)
+}
+
+
+#' Check that BB is within the lat/long EPSG bounding box
+#'
+#' @template bbox
+#'
+#' @return NULL
+#' @noRd
+.check_bb <- function (bbox) {
+  ## check projection
+  minLon <- -179.0625 
+  maxLon <- -51.5625
+  minLat <- 14.375
+  maxLat <- 83.125
+  
+  if (any((bbox[4] < minLon), (bbox[3] > maxLon),
+      (bbox[2] < minLat), (bbox[1] > maxLat))) {
+    stop("lon and lat are not in lat/long projection EPSG:4326")
+  }
+}

@@ -41,6 +41,10 @@ normal_input <- function(dbCon, bbox, normal = "normal_na", cache = TRUE) {
   if (!is(cache, "logical")) {
     stop("please pass a logical value to 'cache'")
   }
+  
+  if (!is.null(bbox)) {
+    .check_bb(bbox)
+  }
 
   ## check cached
   ## check cached

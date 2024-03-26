@@ -28,6 +28,11 @@
 #' @rdname hist-input-data
 #' @export
 historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache = TRUE) {
+  ## checks
+  if (!is.null(bbox)) {
+    .check_bb(bbox)
+  }
+  
   dbnames2 <- structure(list(
     PERIOD = c("2001_2020"),
     dbname = c("historic_periods")
@@ -136,6 +141,11 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 #' @rdname hist-input-data
 #' @export
 historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRUE) {
+  ## checks
+  if (!is.null(bbox)) {
+    .check_bb(bbox)
+  }
+  
   dbcode <- "historic_ts"
   ts_name <- "climatebc"
 
