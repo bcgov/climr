@@ -3,6 +3,7 @@
 library(terra)
 library(stringr)
 library(data.table)
+library(climr)
 
 monthdays <- c(31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
 monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12")
@@ -11,22 +12,21 @@ monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11"
 # step 3: export rasters of change
 # ==========================================
 
-dirs <- list.dirs("C:\\Users\\kdaust\\LocalFiles\\CMIP6_GCMs")
+dirs <- "../Common_Files/CMIP6_GCMs/"
 gcms <- unique(sapply(strsplit(dirs, "/"), "[", 2))
-select <- c(2,4,5,8,9,10,12,13,15,16,18)
-gcms <- gcms[select]
+gcms <- list_gcm()
 
 startyear.ref <- 1961
 endyear.ref <- 1990
 
 minyear <- 1850
-maxyear <- 2010
+maxyear <- 2015
 
 gcm <- gcms[1]
-for(gcm in gcms[-c(1:5)]) {
+for(gcm in gcms) {
   
   #process the climate elements
-  dir <- paste("C:\\Users\\kdaust\\LocalFiles\\CMIP6_GCMs", gcm, sep="\\")
+  dir <- paste(dirs, gcm, sep="/")
   files <- list.files(dir)
   element.list <- sapply(strsplit(files, "_"), "[", 1)
   scenario.list <- sapply(strsplit(files, "_"), "[", 4)
@@ -54,7 +54,7 @@ for(gcm in gcms[-c(1:5)]) {
       #if(gcm=="INM-CM5-0") files.run <- files.run[2]
       
       if(length(files.run) == 1) {
-        temp <- terra::rast(paste(dir, files.run, sep="\\"))
+        temp <- terra::rast(paste(dir, files.run, sep="/"))
       }else if(length(files.run) == 2) {
         refrast <- terra::rast(paste(dir, files.run[2], sep="\\"))
         t1 <- terra::rast(paste(dir, files.run[1], sep="\\"))
@@ -145,12 +145,12 @@ for(gcm in gcms[-c(1:5)]) {
     compiled <- c(compiled, proj.ensembleMean, proj.runs)
     
     # write data out for the GCMxElement 
-    dir.create(sprintf("C:\\Users\\kdaust\\LocalFiles\\ProcessedGCMs/gcm/historic/%s/", gcm), recursive = TRUE)
+    dir.create(sprintf("../Common_Files/gcmts_historic/%s/", gcm), recursive = TRUE)
     # writeRaster(compiled, paste(sprintf("C:\\Users\\kdaust\\LocalFiles\\ProcessedGCMs/gcm/%s/gcmData", gcm), gcm, element, "tif", sep="."), overwrite=TRUE, format="CDF", varname=element, varunit=if(element=="pr") "mm" else "degC", 
     #             longname="", xname="latitude",   yname="longitude",zname="index",
     #             zunit="numeric")
-    terra::writeRaster(compiled, paste(sprintf("C:\\Users\\kdaust\\LocalFiles\\ProcessedGCMs/gcm/historic/%s/", gcm), gcm, element, "tif", sep="."), overwrite=TRUE)
-    write.csv(names(compiled), paste(sprintf("C:\\Users\\kdaust\\LocalFiles\\ProcessedGCMs/gcm/historic/%s/", gcm), gcm, element, "csv", sep=".")) # this is the metadata for each raster
+    terra::writeRaster(compiled, paste(sprintf("../Common_Files/gcmts_historic/%s/", gcm), gcm, element, "tif", sep="."), overwrite=TRUE)
+    #write.csv(names(compiled), paste(sprintf("C:\\Users\\kdaust\\LocalFiles\\ProcessedGCMs/gcm/historic/%s/", gcm), gcm, element, "csv", sep=".")) # this is the metadata for each raster
     
     print(element)
   }
