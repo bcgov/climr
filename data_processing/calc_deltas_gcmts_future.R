@@ -4,22 +4,6 @@ library(climr)
 library(lidR)
 library(sf)
 
-r <- rast("../Common_Files/GCM_Periods/ACCESS-ESM1-5/.ACCESS-ESM1-5.tasmax.tif")
-
-library(lidR)
-library(terra)
-library(sf)
-rst <- rast("../../R Assist/smlRast.tif")
-las1 <- readLAS("../../R Assist/smlLaz.laz")
-las1 <- st_as_sf(las1)
-crds <- sf::st_coordinates(las1)
-las1 <- cbind(las1,crds)
-las2 <- vect(las1) ##terra doesn't directly convert las so converting to sf first
-plot(rst$smlRast_1)
-points(las2)
-point_mean <- rasterize(las2, rst, field = "Z", fun = "mean") ##for summary functions like mean, need to specify field
-plot(point_mean)
-
 # in_dir <- "../../list_csv_test/"
 # dirlist <- list.dirs(in_dir)
 # use_dirs <- dirlist[grep("ccc",dirlist)]

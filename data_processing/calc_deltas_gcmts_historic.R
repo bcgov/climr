@@ -1,16 +1,17 @@
 library(terra)
 library(data.table)
 library(climr)
-library(sf)
 
-in_dir <- "../Common_Files/GCM_Periods/"
-out_dir <- "../Common_Files/gcm_period_deltas/"
-temp <- rast("../Common_Files/colin_climatology/composite_WNA_1961_1990_Pr01.tif")
-gcms <- list.dirs(in_dir, full.names = FALSE, recursive = FALSE)
-na_ext <- ext(c(-179.4375, -52.3125, 13.455323687013, 82.9744960699135))
-na_ext <- ext(temp)
+# in_dir <- "../../list_csv_test/"
+# dirlist <- list.dirs(in_dir)
+# use_dirs <- dirlist[grep("ccc",dirlist)]
+# use_files <- sapply(use_dirs, FUN = \(x) {list.files(x, full.names = T)})
+# flist <- lapply(use_files, FUN = \(x) {fread(x)})
+
+in_dir <- "../Common_Files/gcmts_historic/"
+out_dir <- "../Common_Files/gcmts_historic/processed_deltas/"
+gcms <- list_gcm()
 gcm_nm <- gcms[1]
-
 for(gcm_nm in gcms) {
   ###gcm time series
   cat(gcm_nm)
@@ -25,7 +26,11 @@ for(gcm_nm in gcms) {
   # r_tmax <- crop(rast(mod.files[grep("tasmax.tif",mod.files)]),na_ext)
   
   
-  plot(r_ppt[[1]])
+  plot(r_tmax[[7]])
+  # 
+  # t1 <- r[[1]]
+  # plot(t1)
+  # t2 <- crop(t1,temp)
   names(r_ppt) <- gsub("_pr_", "_PPT_", names(r_ppt), fixed = TRUE)
   names(r_tmax) <- gsub("_tasmax_", "_Tmax_", names(r_tmax), fixed = TRUE)
   names(r_tmin) <- gsub("_tasmin_", "_Tmin_", names(r_tmin), fixed = TRUE)
@@ -66,11 +71,11 @@ for(gcm_nm in gcms) {
   
   terra::writeRaster(
     c(r_tmin, r_tmax, r_ppt),
-    file.path(paste0(out_dir, sprintf("gcm.%s.deltas.tif", gcm_nm))),
+    file.path(paste0(out_dir, sprintf("gcmtshist.%s.deltas.tif", gcm_nm))),
     overwrite = TRUE,
     gdal="COMPRESS=NONE"
   )
-  
+
 }
 
 
@@ -81,41 +86,18 @@ conn <- dbConnect(RPostgres::Postgres(),dbname = 'climr',
                   user = 'postgres',
                   password = '')
 
-in_dir <- "../Common_Files/gcm_period_deltas/"
-
-for(i in 1:13) {
-  gcm <- gcms[i]
-  cat(gcm,"\n")
-  temp <- rast(paste0(in_dir,"/gcm.",gcm,".deltas.tif"))
-  metadat <- names(temp)
-  metadat <- gsub("ensembleMean","none_ensembleMean",metadat)
-  metadt <- data.table(Orig = metadat)
-  metadt[,c("Mod","Var","Month","Scenario","Sc2", "Run","DtStart","DtEnd") := tstrsplit(Orig, "_")]
-  metadt[,Period := paste(DtStart,DtEnd,sep = "_")]
-  metadt[,c("DtStart","DtEnd","Sc2","Orig") := NULL]
-  setnames(metadt,c("mod","var","month","scenario","run","period"))
-  metadt[,laynum := seq_along(metadt$mod)]
-  dbWriteTable(conn, name = "esm_layers_period", metadt, row.names = FALSE, append = TRUE)
-}
-
-dbExecute(conn,"create index on esm_layers_period(mod,scenario)")
-
-
+in_dir <- "../Common_Files/gcmts_historic/processed_deltas/"
 
 for(gcm_nm in gcms) {
   cat(gcm_nm,"\n")
-  mod.files <- list.files(paste0(in_dir,gcm_nm,"/"), full.names = TRUE, pattern = "\\.tif", all.files = TRUE)
-  rtmin <- rast(mod.files[grep("pr.tif",mod.files)])
+  rt <- rast(file.path(in_dir,paste0("gcmtshist.",gcm_nm,".deltas.tif")))
   nms <- names(rt)
-  nms2 <- gsub("1961_1990","1961",nms)
+  nms <- gsub("historical_","",nms)
+  metadt <- data.table(fullnm = nms)
+  metadt[,c("mod","var","month","run","year") := tstrsplit(fullnm, "_")]
+  metadt[,laynum := seq_along(year)]
   
-  metadt <- data.table(fullnm = nms2)
-  metadt[,c("mod","var","month","scenario","run","period") := tstrsplit(fullnm, "_")]
-  #metadt[run == "Mean", run := "ensembleMean"]
-  metadt[,var := NULL]
-  metadt[,laynum := seq_along(period)]
-  
-  dbWriteTable(conn, "esm_layers_ts", metadt, row.names = F, append = TRUE)
+  dbWriteTable(conn, "esm_layers_hist", metadt, row.names = F, append = TRUE)
   
 }
-dbExecute(conn,"create index on esm_layers_ts(mod,run,period)")
+dbExecute(conn,"create index on esm_layers_hist(mod,run,year)")
