@@ -290,7 +290,11 @@ climr_downscale <- function(xyz, which_normal = "auto", historic_period = NULL, 
 .checkClimrDwnsclArgs <- function(xyz, which_normal = NULL, historic_period = NULL, historic_ts = NULL,
                                   gcm_models = NULL, ssp = list_ssp(), gcm_period = NULL, gcm_ts_years = NULL,
                                   gcm_hist_years = NULL, max_run = 0L) {
-  ssp <- match.arg(ssp, list_ssp(), several.ok = TRUE)
+  if(is.null(ssp) & (!is.null(gcm_period) | !is.null(gcm_ts_years))){
+    stop("ssp must be specified")
+  }
+  
+  if(!is.null(ssp))  ssp <- match.arg(ssp, list_ssp(), several.ok = TRUE)
   
   if (!is.null(which_normal)) {
     which_normal <- match.arg(which_normal, c("auto", list_normal()))

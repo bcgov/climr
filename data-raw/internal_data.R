@@ -44,14 +44,13 @@ dbnames <- data.table(
 dbnames_hist <- data.table(
   GCM = c(
     "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5",
-    "EC-Earth3", "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0",
-    "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0"
+    "CNRM-ESM2-1", "EC-Earth3", "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0",
+    "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL"
   ),
-  dbname = c(
-    "access_hist", "bcc_hist", "canesm_hist",
-    "ec_earth_hist", "gfdl_hist", "giss_hist", "inm_hist", "ipsl_hist",
-    "miroc6_hist", "mpi_hist", "mri_hist"
-  )
+  dbname = c("hist_access-esm1-5", "hist_bcc-csm2-mr", "hist_canesm5", "hist_cnrm-esm2-1", 
+             "hist_ec-earth3", "hist_gfdl-esm4", "hist_giss-e2-1-g", "hist_inm-cm5-0", 
+             "hist_ipsl-cm6a-lr", "hist_miroc6", "hist_mpi-esm1-2-hr", "hist_mri-esm2-0", 
+             "hist_ukesm1-0-ll")
 )
 
 dbnames_ts <- structure(list(
