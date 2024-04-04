@@ -487,6 +487,7 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
 #' @return a `SpatRaster`
 #' @noRd
 process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache) { ## need to update to all GCMs
+  if(gcm_nm %in% dbnames$GCM){
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
 
   rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
@@ -541,7 +542,12 @@ process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts,
         
         if (isin) {
           message("Retrieving from cache...")
-          gcm_rast <- rast(file.path(cPath, paste0(oldid, ".tif")))
+          gcm_rast <- tryCatch(
+            rast(file.path(cPath, paste0(oldid, ".tif"))),
+            error = function(e) {
+              rast(file.path(cPath, paste0(oldid, ".grd")))
+            }
+            )
           layinfo <- data.table(fullnm = names(gcm_rast))
           layinfo[, c("Mod", "Var", "Month", "Scenario", "Run", "Year") := tstrsplit(fullnm, "_")]
           layinfo[, laynum := seq_along(fullnm)]
@@ -567,21 +573,24 @@ process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts,
       message("Downloading GCM anomalies")
       message("Precip...")
       gcm_rast_ppt <- pgGetTerra(dbCon, gsub("VAR","ppt",gcmcode), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
-      names(gcm_rast_ppt) <- gsub("tasmin", "PPT", layerinfo$fullnm)
+      names(gcm_rast_ppt) <- gsub("PPT", "PPT", layerinfo$fullnm)
       message("Tmax...")
       gcm_rast_tmax <- pgGetTerra(dbCon, gsub("VAR","tmax",gcmcode), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
-      names(gcm_rast_tmax) <- gsub("tasmin", "Tmax", layerinfo$fullnm)
+      names(gcm_rast_tmax) <- gsub("PPT", "Tmax", layerinfo$fullnm)
       message("Tmin...")
       gcm_rast_tmin <- pgGetTerra(dbCon, gsub("VAR","tmin",gcmcode), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
-      names(gcm_rast_tmin) <- gsub("tasmin", "Tmin", layerinfo$fullnm)
+      names(gcm_rast_tmin) <- gsub("PPT", "Tmin", layerinfo$fullnm)
       gcm_rast <- c(gcm_rast_ppt, gcm_rast_tmax, gcm_rast_tmin)
       
       if (cache) {
         message("Caching data...")
         uid <- UUIDgenerate()
         dir.create(cPath, recursive = TRUE, showWarnings = FALSE)
-        
-        writeRaster(gcm_rast, file.path(cPath, paste0(uid, ".tif")))
+        if(nlyr(gcm_rast) > 65500){ ##geotifs are limited to 65535 layers
+          writeRaster(gcm_rast, file.path(cPath, paste0(uid, ".grd")), filetype = "ENVI")
+        }else{
+          writeRaster(gcm_rast, file.path(cPath, paste0(uid, ".tif")))
+        }
         rastext <- ext(gcm_rast)
         t1 <- data.table(
           uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1],
@@ -597,5 +606,5 @@ process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts,
     
     return(gcm_rast)
   }
-  
+  }
 }
