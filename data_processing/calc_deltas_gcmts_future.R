@@ -10,14 +10,14 @@ library(sf)
 # use_files <- sapply(use_dirs, FUN = \(x) {list.files(x, full.names = T)})
 # flist <- lapply(use_files, FUN = \(x) {fread(x)})
 
-in_dir <- "../Common_Files/ProcessedGCMs/"
+in_dir <- "../Common_Files/gcmts_future/"
 out_dir <- "../Common_Files/gcmts_deltas/"
 temp <- rast("../Common_Files/colin_climatology/composite_WNA_1961_1990_Pr01.tif")
 gcms <- list.dirs(in_dir, full.names = FALSE, recursive = FALSE)
 na_ext <- ext(c(-179.4375, -52.3125, 13.455323687013, 82.9744960699135))
 na_ext <- ext(temp)
-gcm_nm <- gcms[1]
-for(gcm_nm in gcms[-(1:5)]) {
+gcm_nm <- gcms[5]
+for(gcm_nm in gcms[-c(1:5)]) {
   ###gcm time series
   cat(gcm_nm)
   mod.files <- list.files(paste0(in_dir,gcm_nm,"/"), full.names = TRUE, pattern = "\\.tif", all.files = TRUE)
@@ -97,21 +97,18 @@ for(gcm_nm in gcms[-(1:5)]) {
 
 library(RPostgres)
 conn <- dbConnect(RPostgres::Postgres(),dbname = 'climr',
-                  host = '',
+                  host = '146.190.244.244',
                   port = 5432,
                   user = 'postgres',
-                  password = '')
+                  password = 'climr2022')
 
-temp <- rast("../Common_Files/gcmts_deltas/")
 
 for(gcm_nm in gcms) {
   cat(gcm_nm,"\n")
-  mod.files <- list.files(paste0(in_dir,gcm_nm,"/"), full.names = TRUE, pattern = "\\.tif", all.files = TRUE)
-  rtmin <- rast(mod.files[grep("pr.tif",mod.files)])
-  nms <- names(rt)
-  nms2 <- gsub("1961_1990","1961",nms)
-  
-  metadt <- data.table(fullnm = nms2)
+  rtmin <- rast(paste0(out_dir,sprintf("gcmts.ppt.%s.deltas.tif", gcm_nm)))
+  nms <- names(rtmin)
+
+  metadt <- data.table(fullnm = nms)
   metadt[,c("mod","var","month","scenario","run","period") := tstrsplit(fullnm, "_")]
   #metadt[run == "Mean", run := "ensembleMean"]
   metadt[,var := NULL]

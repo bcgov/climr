@@ -167,7 +167,8 @@ test_that("test downscale outputs with gcm, gcm_hist, gcm_ts, historic and histo
         xyz = ref_xyz,
         normal = normal,
         var = list_variables(),
-        new = argvalue
+        new = argvalue,
+        return_normal = FALSE
       )
       names(allArgs) <- sub("new", argname, names(allArgs))
       out <- do.call(downscale, allArgs)
@@ -196,7 +197,6 @@ test_that("test downscale outputs with gcm, gcm_hist, gcm_ts, historic and histo
       cols <- names(which(dwnscaleOut[, sapply(.SD, is.numeric)]))
       dwnscaleOut[, (cols) := lapply(.SD, round, digits = 4), .SDcols = cols]
       ref[, (cols) := lapply(.SD, round, digits = 4), .SDcols = cols]
-
       return(identical(dwnscaleOut, ref))
     }
   )
