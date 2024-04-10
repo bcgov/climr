@@ -82,7 +82,8 @@ test_that("test cache in default location", {
   cache_clear()
   ds_res <- climr_downscale(xyz,
     which_normal = "normal_bc", historic_period = "2001_2020",
-    gcm_models = list_gcm()[1], gcm_period = "2041_2060"
+    gcm_models = list_gcm()[1], gcm_period = "2041_2060",
+    ssp = list_ssp()[2]
   )
   cachedirs <- normalizePath(list.dirs(cache_path(), recursive = FALSE), winslash = "/")
   test <- all(expecteddirs %in% cachedirs)
@@ -114,7 +115,8 @@ test_that("test cache in custom location", {
   cache_clear()
   ds_res <- climr_downscale(xyz,
     which_normal = "auto", historic_period = "2001_2020",
-    gcm_models = list_gcm()[1], gcm_period = "2041_2060"
+    gcm_models = list_gcm()[1], gcm_period = "2041_2060",
+    ssp = list_ssp()[2]
   )
 
   cachedirs <- normalizePath(list.dirs(cache_path(), recursive = FALSE), winslash = "/")
