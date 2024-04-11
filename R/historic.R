@@ -1,24 +1,24 @@
 #' Download historic period anomalies.
-#' 
+#'
 #' @description
 #' `historic_input` produces anomalies of historic observed climate for a given **period**.
-#' 
+#'
 #' @return A `list` of `SpatRasters`, each with possibly multiple layers, that can
 #'   be used with [`downscale()`]. Each element of the list corresponds to a particular period, and the
 #'   values of the `SpatRaster` are anomalies of the historic period compare to the normal period.
-#' 
+#'
 #' @template dbCon
 #' @template bbox
-#' @param period character. Vector of labels of the periods to use. 
+#' @param period character. Vector of labels of the periods to use.
 #'   Can be obtained from [`list_historic()`]. Default to "2001_2020".
 #' @template cache
-#' 
+#'
 #' @seealso [downscale()], [`list_historic()`]
 #' @details
-#' Generally, this function should only be used in combination with [`downscale()`] as the values 
-#' returned in the rasters are anomalies compared to the 1961-1990 normal period, 
-#' and are usually not meaningful without the whole downscale process. 
-#' 
+#' Generally, this function should only be used in combination with [`downscale()`] as the values
+#' returned in the rasters are anomalies compared to the 1961-1990 normal period,
+#' and are usually not meaningful without the whole downscale process.
+#'
 #'
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
@@ -28,6 +28,11 @@
 #' @rdname hist-input-data
 #' @export
 historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache = TRUE) {
+  ## checks
+  if (!is.null(bbox)) {
+    .check_bb(bbox)
+  }
+  
   dbnames2 <- structure(list(
     PERIOD = c("2001_2020"),
     dbname = c("historic_periods")
@@ -35,19 +40,21 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 
 
   dbcode <- dbnames2$dbname[dbnames2$PERIOD %in% period]
-  
+
   ## check cached
   needDownload <- TRUE
-  
+
   cPath <- file.path(cache_path(), "historic", dbcode)
-  
+
   if (dir.exists(cPath)) {
     bnds <- try(fread(file.path(cPath, "meta_area.csv")), silent = TRUE)
-    
+
     if (is(bnds, "try-error")) {
       ## try to get the data again
-      message("Metadata file no longer exists or is unreadable.",
-              " Downloading the data again")
+      message(
+        "Metadata file no longer exists or is unreadable.",
+        " Downloading the data again"
+      )
     } else {
       needDownload <- FALSE
     }
@@ -85,12 +92,12 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
     message("Downloading historic anomalies")
     hist_rast <- pgGetTerra(dbCon, dbcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
     names(hist_rast) <- layerinfo$fullnm
-    
+
     if (cache) {
       message("Caching data...")
       uid <- UUIDgenerate()
       dir.create(cPath, recursive = TRUE, showWarnings = FALSE)
-      
+
       writeRaster(hist_rast, file.path(cPath, paste0(uid, ".tif")))
       rastext <- ext(hist_rast)
       t1 <- data.table(
@@ -101,12 +108,12 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
       fwrite(t1, file = file.path(cPath, "meta_area.csv"), append = TRUE)
       fwrite(t2, file = file.path(cPath, "meta_period.csv"), append = TRUE)
     }
-    
+
     hist_rast <- list(hist_rast)
     attr(hist_rast, "builder") <- "climr"
     names(hist_rast) <- period
   }
- 
+
   return(hist_rast)
 }
 
@@ -114,17 +121,18 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 #' Retrieve historic anomalies for specified years
 #' @description
 #' `historic_input_ts` produces anomalies of historic observed climate for a given **time series**.
-#' 
+#'
 #' @template dbCon
 #' @template bbox
 #' @template cache
-#' @param years numeric. Years to retrieve historic anomalies for, in `1902:2022`. Default `2010:2022`
-#' @return List of length 1 containing a `SpatRaster` 
+#' @param years numeric. Years to retrieve historic anomalies for. Defaults to `2010:2022`.
+#'   See [`list_historic_ts()`] for available years.
+#' @return List of length 1 containing a `SpatRaster`
 #' @details
 #' The returned raster contains anomalies for each year specified in `years`. In general this
 #' function should only be used in conjunction with [`downscale()`].
-#' 
-#' 
+#'
+#'
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head tail
 #' @importFrom RPostgres dbGetQuery
@@ -133,42 +141,51 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 #' @rdname hist-input-data
 #' @export
 historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRUE) {
+  ## checks
+  if (!is.null(bbox)) {
+    .check_bb(bbox)
+  }
+  
   dbcode <- "historic_ts"
   ts_name <- "climatebc"
 
   ## check cached
   needDownload <- TRUE
-  
+
   cPath <- file.path(cache_path(), "historic_ts", ts_name)
-  
+
   if (dir.exists(cPath)) {
     bnds <- try(fread(file.path(cPath, "meta_area.csv")), silent = TRUE)
-    
+
     if (is(bnds, "try-error")) {
       ## try to get the data again
-      message("Metadata file no longer exists or is unreadable.",
-              " Downloading the data again")
+      message(
+        "Metadata file no longer exists or is unreadable.",
+        " Downloading the data again"
+      )
     } else {
       needDownload <- FALSE
     }
   }
-  
-  
+
+
   if (!needDownload) {
     setorder(bnds, -numlay)
-    
-    spat_match <- lapply(1:nrow(bnds), FUN = \(x){if(is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]})
-    spat_match <- spat_match[!sapply(spat_match,is.null)]
+
+    spat_match <- lapply(1:nrow(bnds), FUN = \(x){
+      if (is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]
+    })
+    spat_match <- spat_match[!sapply(spat_match, is.null)]
     if (length(spat_match) > 0) {
       periods <- fread(file.path(cPath, "meta_period.csv"))
       isin <- FALSE
-      for(oldid in spat_match){
+      for (oldid in spat_match) {
         if (all(years %in% periods[uid == oldid, period])) {
           isin <- TRUE
           break
         }
       }
-      
+
       if (isin) {
         message("Retrieving from cache...")
         hist_rast <- rast(file.path(cPath, paste0(oldid, ".tif")))
@@ -193,12 +210,12 @@ historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRU
     message("Downloading historic anomalies")
     hist_rast <- pgGetTerra(dbCon, dbcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
     names(hist_rast) <- layerinfo$fullnm
-    
+
     if (cache) {
       message("Caching data...")
       uid <- UUIDgenerate()
       dir.create(cPath, recursive = TRUE, showWarnings = FALSE)
-      
+
       writeRaster(hist_rast, file.path(cPath, paste0(uid, ".tif")))
       rastext <- ext(hist_rast)
       t1 <- data.table(
@@ -209,12 +226,12 @@ historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRU
       fwrite(t1, file = file.path(cPath, "meta_area.csv"), append = TRUE)
       fwrite(t2, file = file.path(cPath, "meta_period.csv"), append = TRUE)
     }
-    
+
     hist_rast <- list(hist_rast)
     attr(hist_rast, "builder") <- "climr"
     names(hist_rast) <- paste(years[1], tail(years, 1), sep = ":")
   }
-  
+
   return(hist_rast)
 }
 

@@ -76,7 +76,7 @@ dem_vancouver <- get(data("dem_vancouver")) |>
 vancouver_poly <- get(data("vancouver_poly")) |>
   unwrap()
 
-dem_vancouver <- crop(dem_vancouver, vancouver_poly)
+dem_vancouver <- mask(dem_vancouver, vancouver_poly)
 ```
 
 ```{r, echo = FALSE, results = "hide", fig.cap = "Digital Elevation Model of North Vancouver w/ and w/o values outside polygon area", fig.show = "hold", fig.dim = c(7,3), out.width = "100%"}
@@ -90,7 +90,7 @@ dem_vancouver <- get(data("dem_vancouver")) |>
 vancouver_poly <- get(data("vancouver_poly")) |>
   unwrap()
 
-par(mfrow = c(1,2))
+par(mfrow = c(1, 2))
 
 cols <- hcl.colors(100, "Earth")
 plot(dem_vancouver, main = "Original DEM", col = cols)
@@ -99,7 +99,7 @@ plot(dem_vancouver, main = "Original DEM", col = cols)
 dem_vancouver <- mask(dem_vancouver, vancouver_poly)
 plot(dem_vancouver, main = "Masked DEM", col = cols)
 
-par(mfrow = c(1,1))
+par(mfrow = c(1, 1))
 ```
 
 When making a table of raster cell (centroid) coordinates we must
@@ -111,7 +111,7 @@ format.
 ## xy = TRUE ensures we get cell (centroid) coordinates
 ## cell = TRUE ensures we get cell ID numbers, which will be the point location IDs.
 xyzDT <- dem_vancouver |>
-  as.data.frame(., xy = TRUE, cell = TRUE) |>  
+  as.data.frame(., xy = TRUE, cell = TRUE) |>
   as.data.table()
 
 ## rename colums to climr standard
@@ -128,12 +128,14 @@ We can now pass our table of cell locations to `climr_downscale()`:
 
 ```{r, results = "hide"}
 ## in this case there's really no need for a spatial output format
-dwscl_out <- climr_downscale(xyzDT, which_normal = "auto",
-                             gcm_models = list_gcm()[1:3],
-                             ssp = list_ssp()[1],
-                             gcm_period = list_gcm_period(),
-                             max_run = 0L, return_normal = FALSE,
-                             vars = "MAT", out_spatial = FALSE)
+dwscl_out <- climr_downscale(xyzDT,
+  which_normal = "auto",
+  gcm_models = list_gcm()[1],
+  ssp = list_ssp()[1],
+  gcm_period = list_gcm_period(),
+  max_run = 0L, return_normal = FALSE,
+  vars = "MAT", out_spatial = FALSE
+)
 ```
 
 To convert the outputs back into raster format, we simply need to use
@@ -147,7 +149,7 @@ downscaled `MAT` values.
 ```{r}
 tempRas <- rast(dem_vancouver)
 
-dwscl_Ras <- sapply(split(dwscl_out, by = c("GCM", "PERIOD")) , function(DT, tempRas) {
+dwscl_Ras <- sapply(split(dwscl_out, by = c("GCM", "PERIOD")), function(DT, tempRas) {
   tempRas[DT$id] <- DT$MAT
   return(tempRas)
 }, tempRas = tempRas)
@@ -161,11 +163,13 @@ dwscl_Ras
 ```{r, echo = FALSE, results = "hide", fig.show = "hold", fig.cap = "`climr_downscale()` outputs converted to raster layers", fig.dim = c(15,9), out.width = "100%"}
 minmax <- range(dwscl_out$MAT)
 
-gcmstr <- paste(list_gcm()[1:3], collapse = "|")
-titles <- sub(paste0("(", gcmstr, ")\\.([[:digit:]]{4})_([[:digit:]]{4})"), "\\1\\\n\\2-\\3", names(dwscl_Ras)) 
-plot(dwscl_Ras, main = titles, nc = 5, nr = 3,
-     type = "continuous", col = hcl.colors(100, "Reds", rev = 1), 
-     range = minmax, plg = list(title = "MAT"), mar = c(0.1, 1, 1, 3))
+gcmstr <- paste(list_gcm()[1], collapse = "|")
+titles <- sub(paste0("(", gcmstr, ")\\.([[:digit:]]{4})_([[:digit:]]{4})"), "\\1\\\n\\2-\\3", names(dwscl_Ras))
+plot(dwscl_Ras,
+  main = titles, nc = 5, nr = 3,
+  type = "continuous", col = hcl.colors(100, "Reds", rev = 1),
+  range = minmax, plg = list(title = "MAT"), mar = c(0.1, 1, 1, 3)
+)
 ```
 
 #### Raster without elevation values
@@ -192,7 +196,7 @@ BECz_vancouver_ras <- mask(BECz_vancouver_ras, vancouver_poly)
 
 ## raster to data.table and rename columns to climr standard
 xyzDT <- BECz_vancouver_ras |>
-  as.data.frame(., xy = TRUE, cell = TRUE) |>  
+  as.data.frame(., xy = TRUE, cell = TRUE) |>
   as.data.table()
 setnames(xyzDT, c("id", "lon", "lat", "ZONE"))
 
@@ -205,28 +209,32 @@ xyzDT$elev <- extract(dem_vancouver_lowres, xyzDT[, .(lon, lat)])[names(dem_vanc
 ```
 
 ```{r, fig.cap = "Rasters used to derive point locations (left) and elevation values (right).", fig.dim = c(7,3)}
-par(mfrow = c(1,2))
+par(mfrow = c(1, 2))
 plot(BECz_vancouver_ras, main = "BGC zones N Vancouver")
-plot(dem_vancouver_lowres, main = "Low res. DEM",
-     col = hcl.colors(100, "Earth"))
-par(mfrow = c(1,1))
+plot(dem_vancouver_lowres,
+  main = "Low res. DEM",
+  col = hcl.colors(100, "Earth")
+)
+par(mfrow = c(1, 1))
 ```
 
 The process to convert the downscaled data to raster format is the same
 as before, because we again used the raster cell IDs as point location
 IDs (`xyzDT$id`):
 
-```{r}
-dwscl_out <- climr_downscale(xyzDT, which_normal = "auto",
-                             gcm_models = list_gcm()[1:3],
-                             ssp = list_ssp()[1],
-                             gcm_period = list_gcm_period(),
-                             max_run = 0L, return_normal = FALSE,
-                             vars = "MAT", out_spatial = FALSE)
+```{r, eval = FALSE}
+dwscl_out <- climr_downscale(xyzDT,
+  which_normal = "auto",
+  gcm_models = list_gcm()[1],
+  ssp = list_ssp()[1],
+  gcm_period = list_gcm_period(),
+  max_run = 0L, return_normal = FALSE,
+  vars = "MAT", out_spatial = FALSE
+)
 
 tempRas <- rast(BECz_vancouver_ras)
 
-dwscl_Ras <- sapply(split(dwscl_out, by = c("GCM", "PERIOD")) , function(DT, tempRas) {
+dwscl_Ras <- sapply(split(dwscl_out, by = c("GCM", "PERIOD")), function(DT, tempRas) {
   tempRas[DT$id] <- DT$MAT
   return(tempRas)
 }, tempRas = tempRas)
@@ -249,8 +257,8 @@ dem_vancouver <- get(data("dem_vancouver")) |>
 dem_vancouver <- mask(dem_vancouver, vancouver_poly)
 
 ## extract points at a coarser scale, but elevation at original scale
-lowRes_ras <- rast(dem_vancouver) 
-lowRes_ras <- project(lowRes_ras, crs(lowRes_ras), res = 0.01) 
+lowRes_ras <- rast(dem_vancouver)
+lowRes_ras <- project(lowRes_ras, crs(lowRes_ras), res = 0.01)
 
 lowRes_ras[] <- 1
 lowRes_ras <- mask(lowRes_ras, vancouver_poly) ## set water back to NA
@@ -264,7 +272,7 @@ setnames(xyzDT, c("id", "elev", "lon", "lat"))
 
 ## exclude NAs
 xyzDT <- xyzDT[complete.cases(xyzDT)]
-lowRes_points <- lowRes_points[lowRes_points$id %in% xyzDT$id,]
+lowRes_points <- lowRes_points[lowRes_points$id %in% xyzDT$id, ]
 ```
 
 ```{r, echo = FALSE, results = "hide", fig.cap = "Points extracted from raster", fig.show = "hold", out.width = "70%"}
@@ -276,12 +284,14 @@ As before, pass your `data.table` of point locations to
 `climr_downscale`:
 
 ```{r, results = "hide"}
-dwscl_out <- climr_downscale(xyzDT, which_normal = "auto",
-                                   gcm_models = list_gcm()[1:3],
-                                   ssp = list_ssp()[1],
-                                   gcm_period = list_gcm_period(),
-                                   max_run = 0L, return_normal = FALSE,
-                                   vars = "MAT", out_spatial = TRUE)
+dwscl_out <- climr_downscale(xyzDT,
+  which_normal = "auto",
+  gcm_models = list_gcm()[1],
+  ssp = list_ssp()[1],
+  gcm_period = list_gcm_period(),
+  max_run = 0L, return_normal = FALSE,
+  vars = "MAT", out_spatial = TRUE
+)
 ```
 
 ```{r, echo = FALSE, results = "hide", fig.show = "hold", fig.cap = "Plot of spatial outputs from `climr_downscale()` using more spaced point locations", fig.dim = c(15,9), out.width = "100%"}
@@ -292,11 +302,13 @@ dwscl_outLong <- as.data.table(dwscl_out, geom = "XY") |>
   vect(geom = c("x", "y"), crs = crs(dem_vancouver))
 
 lyrs <- setdiff(names(dwscl_outLong), c("elev", "id", "SSP", "RUN"))
-gcmstr <- paste(list_gcm()[1:3], collapse = "|")
-titles <- sub(paste0("(", gcmstr, ")_([[:digit:]]{4})_([[:digit:]]{4})"), "\\1\\\n\\2-\\3", lyrs) 
-plot(dwscl_outLong, lyrs, main = titles, nc = 5, nr = 3,
-     type = "continuous", col = hcl.colors(100, "Reds", rev = 1), 
-     range = minmax, plg = list(title = "MAT"), mar = c(0.1, 1, 1, 3))
+gcmstr <- paste(list_gcm()[1], collapse = "|")
+titles <- sub(paste0("(", gcmstr, ")_([[:digit:]]{4})_([[:digit:]]{4})"), "\\1\\\n\\2-\\3", lyrs)
+plot(dwscl_outLong, lyrs,
+  main = titles, nc = 5, nr = 3,
+  type = "continuous", col = hcl.colors(100, "Reds", rev = 1),
+  range = minmax, plg = list(title = "MAT"), mar = c(0.1, 1, 1, 3)
+)
 ```
 
 ### Vector inputs/outputs
@@ -331,13 +343,15 @@ xyzDT <- extract(dem_vancouver, vancouver_points, xy = TRUE) |>
   as.data.table()
 setnames(xyzDT, c("id", "elev", "lon", "lat"))
 
-dwscl_out <- climr_downscale(xyzDT, which_normal = "auto",
-                             gcm_models = list_gcm()[1:3],
-                             ssp = list_ssp()[1],
-                             gcm_period = list_gcm_period(),
-                             vars = "MAT", max_run = 0L, 
-                             return_normal = FALSE,
-                             out_spatial = TRUE)
+dwscl_out <- climr_downscale(xyzDT,
+  which_normal = "auto",
+  gcm_models = list_gcm()[1],
+  ssp = list_ssp()[1],
+  gcm_period = list_gcm_period(),
+  vars = "MAT", max_run = 0L,
+  return_normal = FALSE,
+  out_spatial = TRUE
+)
 dwscl_out
 ```
 
@@ -357,11 +371,13 @@ dwscl_outLong <- as.data.table(dwscl_out, geom = "XY") |>
   vect(geom = c("x", "y"), crs = crs(dem_vancouver))
 
 lyrs <- setdiff(names(dwscl_outLong), c("elev", "id", "SSP", "RUN"))
-gcmstr <- paste(list_gcm()[1:3], collapse = "|")
-titles <- sub(paste0("(", gcmstr, ")_([[:digit:]]{4})_([[:digit:]]{4})"), "\\1\\\n\\2-\\3", lyrs) 
-plot(dwscl_outLong, lyrs, main = titles, nc = 5, nr = 3,
-     type = "continuous", col = hcl.colors(100, "Reds", rev = 1), 
-     range = minmax, plg = list(title = "MAT"), mar = c(0.1, 1, 1, 3))
+gcmstr <- paste(list_gcm()[1], collapse = "|")
+titles <- sub(paste0("(", gcmstr, ")_([[:digit:]]{4})_([[:digit:]]{4})"), "\\1\\\n\\2-\\3", lyrs)
+plot(dwscl_outLong, lyrs,
+  main = titles, nc = 5, nr = 3,
+  type = "continuous", col = hcl.colors(100, "Reds", rev = 1),
+  range = minmax, plg = list(title = "MAT"), mar = c(0.1, 1, 1, 3)
+)
 ```
 
 ### Polygon vector data
@@ -393,7 +409,7 @@ centrds <- centroids(vancouver_poly, inside = TRUE)
 
 ## get polygon areas and exclude very large polygon centroids
 centrds$area <- expanse(vancouver_poly)
-centrds <- centrds[centrds$area < 50000,]
+centrds <- centrds[centrds$area < 50000, ]
 
 ## we retained only 3 points
 
@@ -401,12 +417,14 @@ xyzDT <- extract(dem_vancouver, centrds, xy = TRUE) |>
   as.data.table()
 setnames(xyzDT, c("id", "elev", "lon", "lat"))
 
-dwscl_outGrid <- climr_downscale(xyzDT, which_normal = "auto",
-                                 gcm_models = list_gcm()[1:3],
-                                 ssp = list_ssp()[1],
-                                 gcm_period = list_gcm_period(),
-                                 max_run = 0L, return_normal = FALSE,
-                                 vars = "MAT", out_spatial = TRUE)
+dwscl_outGrid <- climr_downscale(xyzDT,
+  which_normal = "auto",
+  gcm_models = list_gcm()[1],
+  ssp = list_ssp()[1],
+  gcm_period = list_gcm_period(),
+  max_run = 0L, return_normal = FALSE,
+  vars = "MAT", out_spatial = TRUE
+)
 ```
 
 ```{r, echo = FALSE, fig.show = "hold", fig.cap = "Excluded (grey) and retained (blue) polygon centroids", fig.dim = c(7,5), out.width="70%"}

@@ -55,7 +55,8 @@ are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
 \item{cache}{logical. Specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 
-\item{years}{Numeric or character vector in \code{2020:2100}. Defaults to \code{2020:2030}.}
+\item{years}{Numeric or character vector in \code{2020:2100}. Defaults to \code{2020:2030}.
+See \code{\link[=list_gcm_ts]{list_gcm_ts()}} for available years.}
 }
 \value{
 A \code{list} of \code{SpatRasters}, each with possibly multiple layers, that can
@@ -96,7 +97,7 @@ xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = r
 thebb <- get_bb(xyz)
 
 ## get database connection
-dbCon <- data_connect() 
+dbCon <- data_connect()
 on.exit(try(pool::poolClose(dbCon)))
 
 gcm <- gcm_input(dbCon, thebb, list_gcm()[1], list_ssp()[1])
@@ -107,22 +108,22 @@ lyrs <- grep("ensemble", names(gcm$`ACCESS-ESM1-5`))
 plot(gcm$`ACCESS-ESM1-5`[[lyrs]])
 
 {
-library(terra)
-xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10), id = 1:10)
+  library(terra)
+  xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10), id = 1:10)
 
-## get bounding box based on input points
-thebb <- get_bb(xyz)
+  ## get bounding box based on input points
+  thebb <- get_bb(xyz)
 
-## get database connection
-dbCon <- data_connect()
-on.exit(try(pool::poolClose(dbCon)))
+  ## get database connection
+  dbCon <- data_connect()
+  on.exit(try(pool::poolClose(dbCon)))
 
-gcm_hist <- gcm_hist_input(dbCon, thebb, list_gcm()[1])
+  gcm_hist <- gcm_hist_input(dbCon, thebb, list_gcm()[1])
 
-## show ensemble means only
-lyrs <- grep("ensemble", names(gcm_hist$`ACCESS-ESM1-5`))
+  ## show ensemble means only
+  lyrs <- grep("ensemble", names(gcm_hist$`ACCESS-ESM1-5`))
 
-plot(gcm_hist$`ACCESS-ESM1-5`[[lyrs]])
+  plot(gcm_hist$`ACCESS-ESM1-5`[[lyrs]])
 }
 
 library(terra)
@@ -132,7 +133,7 @@ xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = r
 thebb <- get_bb(xyz)
 
 ## get database connection
-dbCon <- data_connect() 
+dbCon <- data_connect()
 on.exit(try(pool::poolClose(dbCon)))
 
 gcm_ts <- gcm_ts_input(dbCon, thebb, list_gcm()[1], list_ssp()[1])

@@ -9,10 +9,10 @@ test_that("recycle_borders works", {
   expect_equal(nrow(expanded_mat), 5)
 
   # values from news col and row should be recylcled
-  expect_equal(expanded_mat[1, 2:4], test_mat[1,])
-  expect_equal(expanded_mat[5, 2:4], test_mat[3,])
+  expect_equal(expanded_mat[1, 2:4], test_mat[1, ])
+  expect_equal(expanded_mat[5, 2:4], test_mat[3, ])
   expect_equal(expanded_mat[2:4, 1], test_mat[, 1])
-  expect_equal(expanded_mat[5, 2:4], test_mat[3,])
+  expect_equal(expanded_mat[5, 2:4], test_mat[3, ])
 })
 
 test_that("sum_matrix works", {

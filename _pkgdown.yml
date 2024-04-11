@@ -1,7 +1,28 @@
 url: https://bcgov.github.io/climr/ 
 
+development:
+  mode: auto
+
 template:
   bootstrap: 5
+
+articles:
+- title: "`climr` workflows"
+  desc: "How to use `climr`, from beginner to advanced operations"
+  navbar: "`climr` workflows"
+  contents:
+  - climr_workflow_beg
+  - climr_workflow_int
+  - climr_with_rasters
+- title: "Methods"
+  navbar: "Methods"
+  desc: "Climate downscaling methods used in `climr`"
+  contents:
+  - methods_downscaling
+  - lapse_rates
+- title: "Caching"
+  contents:
+  - caching
 
 reference:
 - title: "Downscaling functions"
@@ -11,7 +32,6 @@ reference:
   - climr
   - climr_downscale
   - downscale
-  - lapse_rate
 - title: "Downloading raw climate inputs"
   desc: >
     Functions to download climate normals and
@@ -33,12 +53,27 @@ reference:
   - cache_path
   - data_connect
   - pgGetTerra
+- title: "Utilities"
+  desc: >
+    Other useful functions
+  contents:
+  - plot_bivariate
+  - get_bb
+  - lapse_rate
 - title: "Data"
   desc: >
-    Datasets used in vignettes and examples,
     available climate variables and functions listing 
     available data.
+    Datasets used in vignettes and examples,
   contents:
+  - variables
+  - list_normal
+  - list_historic
+  - list_gcm
+  - list_gcm_period
+  - list_ssp
+  - list_run
+  - list_variables
   - xyzDT
   - BECz_vancouver
   - BECz_vancouver_ras
@@ -49,17 +84,3 @@ reference:
   - vancouver_points
   - vancouver_poly
   - weather_stations
-  - variables
-  - list_normal
-  - list_historic
-  - list_gcm
-  - list_gcm_period
-  - list_ssp
-  - list_run
-  - list_variables
-- title: "Utilities"
-  desc: >
-    Other useful functions
-  contents:
-  - get_bb
-  - plot_bivariate
