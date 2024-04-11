@@ -1,7 +1,8 @@
 Package: climr
-Title: Downscaling of global climate data
-Version: 0.0.3
-Date: 16-02-2024
+Title: Downscaling climate data in R
+Version: 0.0.4
+Date: 10-04-2024
+
 Authors@R: c(
     person("Kiri","Daust", email = "kiri.daust@gov.bc.ca", role = "aut"),
     person("Colin", "Mahony", email = "Colin.Mahony@gov.bc.ca", role = c("aut", "cre"),
@@ -12,20 +13,20 @@ Authors@R: c(
            comment = c(ORCID = "0000-0003-4036-977X")),       
     person("Francois", "Bornais", email = "francois@boostao.ca", role = c("ctb")),
     person(family = "Province of British Columbia", role = c("cph", "fnd")))
-Description: This package replicates the basic approach of ClimateNA (climatena.ca),
-    but with (1) improved speed, (2) multiple runs of each GCM, (3) cloud delivery, and (4) 
-    programmatic access via R.
-    A simple downscaling method is used to bias-correct low-resolution (~100km) global
-    climate model anomalies to high-resolution (2km) maps of historical climate, with
-    further elevation adjustment to user-specified elevation grids/points based on
-    empirical lapse rates (local relationship of climate to elevation) of the 2km
-    climate maps. Elevation-adjusted monthly values of basic climate elements
-    (temperature and precipitation) are then used to estimate derived variables
+Description: `climr` is an R package that builds on the downscaling concepts 
+    operationalized in the ClimateNA tool (climatena.ca) (Wang et al. 2016).
+    It provides downscaling of observational and simulated climate data using change-factor 
+    downscaling, a simple method that adds low-spatial-resolution 
+    climate anomalies to a high-spatial-resolution reference climatological map, with additional 
+    elevation adjustment for temperature. Elevation-adjusted monthly values of basic climate 
+    elements (temperature and precipitation) are then used to estimate derived variables 
     (e.g., degree-days) based on published equations and parameters from  Wang et al. 2016.
+    `climr` is designed to be fast and to minimize local data storage requirements. To do so, 
+    it uses a remote PostGIS database, and optionally caches data locally.
 License: Apache License (== 2)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Imports: 
     data.table,
     DBI,

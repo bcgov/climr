@@ -8,6 +8,9 @@
 \alias{list_normal}
 \alias{list_historic}
 \alias{list_variables}
+\alias{list_historic_ts}
+\alias{list_gcm_ts}
+\alias{list_gcm_hist_ts}
 \title{List available runs, global circulation models, periods and climate scenarios}
 \usage{
 list_gcm()
@@ -26,6 +29,12 @@ list_variables(
   set = c("All", "Monthly", "Seasonal", "Annual"),
   only_extra = FALSE
 )
+
+list_historic_ts()
+
+list_gcm_ts()
+
+list_gcm_hist_ts()
 }
 \arguments{
 \item{dbCon}{A db connection object created by \code{data_connect}.}
@@ -53,6 +62,12 @@ a character vector.
 \code{list_historic} lists available historic periods
 
 \code{list_variables} lists climate variables
+
+\code{list_historic_ts} lists available years for historic time series
+
+\code{list_gcm_ts} lists available years for future projections' time series
+
+\code{list_gcm_hist_ts} lists available years for historic projections' time series
 }
 \details{
 Currently available normals (\code{list_normal()}) are:

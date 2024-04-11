@@ -20,12 +20,12 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
   name1 <- name
   nameque <- paste(name1, collapse = ".")
   namechar <- gsub("'", "''", paste(gsub('^"|"$', "", name1), collapse = "."))
-  
+
   ## rast query name
   rastque <- dbQuoteIdentifier(conn, rast)
-  
-  projID <- dbGetQuery(conn, paste0("select ST_SRID(", rastque, ") as srid from ", nameque, " where rid = 1;"))$srid[1]
-  
+
+  projID <- dbGetQuery(conn, paste0("select ST_SRID(", rastque, ") as srid from \"", nameque, "\" where rid = 1;"))$srid[1]
+
   if (length(bands) > 1664) { ## maximum number of columns
     info <- dbGetQuery(conn, paste0(
       "select
@@ -36,7 +36,7 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
             st_width(rast) as cols,
             st_height(rast) as rows
             from
-            (select st_union(", rastque, ",", 1, ") rast from ", nameque, "\n
+            (select st_union(", rastque, ",", 1, ") rast from \"", nameque, "\" \n
             WHERE ST_Intersects(",
       rastque, ",ST_SetSRID(ST_GeomFromText('POLYGON((", boundary[4],
       " ", boundary[1], ",", boundary[4], " ", boundary[2],
@@ -49,10 +49,10 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
       bands_temp <- bands[brks[i]:(brks[i + 1] - 1)]
       bandqs1 <- paste0("UNNEST(ST_Dumpvalues(rast, ", bands_temp, ")) as vals_", bands_temp)
       bandqs2 <- paste0("ST_Union(rast", rastque, ",", bands_temp, ") rast_", bands_temp)
-      
+
       rast_vals_temp <- dbGetQuery(conn, paste0(
         "SELECT ", paste(bandqs1, collapse = ","),
-        " from (SELECT ST_Union(rast) rast FROM ", nameque, " WHERE ST_Intersects(",
+        " from (SELECT ST_Union(rast) rast FROM \"", nameque, "\" WHERE ST_Intersects(",
         rastque, ",ST_SetSRID(ST_GeomFromText('POLYGON((", boundary[4],
         " ", boundary[1], ",", boundary[4], " ", boundary[2],
         ",\n  ", boundary[3], " ", boundary[2], ",", boundary[3],
@@ -81,7 +81,7 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
     # if(boundary[1] - boundary[2] > max_dist | boundary[3] - boundary[4] > max_dist) {
     x_seq <- unique(c(seq(boundary[2], boundary[1], by = max_dist), boundary[1]))
     y_seq <- unique(c(seq(boundary[4], boundary[3], by = max_dist), boundary[3]))
-    
+
     boundary_ls <- list()
     if (length(x_seq) < 2 | length(y_seq) < 2) {
       boundary_ls[["11"]] <- boundary
@@ -92,12 +92,14 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
         }
       }
     }
-    
-    
-    r_list <- lapply(boundary_ls, FUN = make_raster, 
-                     conn = conn, rastque = rastque, 
-                     nameque = nameque, projID = projID, 
-                     bands = bands)
+
+
+    r_list <- lapply(boundary_ls,
+      FUN = make_raster,
+      conn = conn, rastque = rastque,
+      nameque = nameque, projID = projID,
+      bands = bands
+    )
     r_list <- r_list[!sapply(r_list, is.null)]
     if (length(r_list) > 1) {
       rout <- merge(sprc(r_list))
@@ -167,35 +169,17 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
 # cells <- cellFromXY(rout, t3)
 
 
-#' Find bounding box of data
-#'
-#' @param in_xyz `data.table` (or `data.frame`) of points to downscale
-#'  with columns "lon", "lat", "elev" and "id"
-#' @return numeric vector. Bounding box coordinates with order ymax,ymin,xmax,xmin (e.g. `c(51, 50, -121, -122)`).
-#' @export
-get_bb <- function(in_xyz) {
-  .checkXYZ(copy(in_xyz))
-  thebb <- c(max(in_xyz[, "lat"]), min(in_xyz[, "lat"]), max(in_xyz[, "lon"]), min(in_xyz[, "lon"]))
-  
-  if (any(is.na(thebb))) {
-    stop("Couldn't guess bounding box. Are there NA's in 'xyz'?")
-  }
-  return(thebb)
-}
-
-
-
 #' Make raster from a boundary
 #'
 #' Used internally to access the PostGRS database and
 #' create a `SpatRaster` using a given spatial boundary
 #'
-#' @template boundary 
+#' @template boundary
 #' @template conn
 #' @param rastque character. The "rast" query name obtained with e.g. `dbQuoteIdentifier(conn, "rast")`
 #' @param nameque character. The "schema.name"
 #' @param projID character. projID in data.base
-#' @template bands 
+#' @template bands
 #'
 #' @return a `SpatRaster`
 #'
@@ -213,7 +197,7 @@ make_raster <- function(boundary, conn, rastque, nameque, projID, bands) {
               st_width(rast) as cols,
               st_height(rast) as rows
               from
-              (select st_union(", rastque, ",", 1, ") rast from ", nameque, "\n
+              (select st_union(", rastque, ",", 1, ") rast from \"", nameque, "\" \n
               WHERE ST_Intersects(",
     rastque, ",ST_SetSRID(ST_GeomFromText('POLYGON((", boundary[4],
     " ", boundary[1], ",", boundary[4], " ", boundary[2],
@@ -224,7 +208,7 @@ make_raster <- function(boundary, conn, rastque, nameque, projID, bands) {
   bandqs1 <- paste0("UNNEST(ST_Dumpvalues(rast, ", bands, ")) as vals_", bands)
   rast_vals <- dbGetQuery(conn, paste0(
     "SELECT ", paste(bandqs1, collapse = ","),
-    " from (SELECT ST_Union(rast) rast FROM ", nameque, " WHERE ST_Intersects(",
+    " from (SELECT ST_Union(rast) rast FROM \"", nameque, "\" WHERE ST_Intersects(",
     rastque, ",ST_SetSRID(ST_GeomFromText('POLYGON((", boundary[4],
     " ", boundary[1], ",", boundary[4], " ", boundary[2],
     ",\n  ", boundary[3], " ", boundary[2], ",", boundary[3],

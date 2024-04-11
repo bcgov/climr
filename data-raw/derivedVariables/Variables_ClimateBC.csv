@@ -234,3 +234,15 @@ RH09,September relative humidity,September,Monthly,Raw
 RH10,October relative humidity,October,Monthly,Raw
 RH11,November relative humidity,November,Monthly,Raw
 RH12,December relative humidity,December,Monthly,Raw
+CMI01,Climate Moisture Index (monthly),January,Monthly,Raw
+CMI02,Climate Moisture Index (monthly),February,Monthly,Raw
+CMI03,Climate Moisture Index (monthly),March,Monthly,Raw
+CMI04,Climate Moisture Index (monthly),April,Monthly,Raw
+CMI05,Climate Moisture Index (monthly),May,Monthly,Raw
+CMI06,Climate Moisture Index (monthly),June,Monthly,Raw
+CMI07,Climate Moisture Index (monthly),July,Monthly,Raw
+CMI08,Climate Moisture Index (monthly),August,Monthly,Raw
+CMI09,Climate Moisture Index (monthly),September,Monthly,Raw
+CMI10,Climate Moisture Index (monthly),October,Monthly,Raw
+CMI11,Climate Moisture Index (monthly),November,Monthly,Raw
+CMI12,Climate Moisture Index (monthly),December,Monthly,Raw

@@ -24,7 +24,7 @@
 
 #' Example low resolution DEM
 #'
-#' A lower resolution version of `dem_vancouver`, 
+#' A lower resolution version of `dem_vancouver`,
 #' re-projected at 0.005 degrees.
 #' To use this data set, you need to `terra::unwrap`
 #' it first, e.g.:
@@ -72,7 +72,7 @@
 #' Example Biogeoclimatic Ecological Classification Zones in raster format
 #'
 #' A categorical raster of biogeoclimatic zones in the coast of Vancouver, BC, Canada.
-#' Derived from `BECz_vancouver` using `dem_vancouver` as the template for extent, 
+#' Derived from `BECz_vancouver` using `dem_vancouver` as the template for extent,
 #' resolution and projection information.
 #' To use this data set, you need to `terra::unwrap`
 #' it first, e.g.:
@@ -97,7 +97,7 @@
 #' A points shapefile of weather stations in BC from the
 #' Pacific Climate Impacts Consortium. Stations without elevation
 #' data were excluded.
-#' 
+#'
 #' To use this data set, you need to `terra::unwrap`
 #' it first, e.g.:
 #' `weather_stations <- terra::unwrap(get(data(weather_stations)))`
@@ -107,7 +107,7 @@
 "weather_stations"
 
 #' Example table of point locations
-#' 
+#'
 #' A `data.table` of point locations with elevation.
 #' It is a simplified and cleaned-up version of the `weather_stations` dataset,
 #' where incomplete cases were removed.

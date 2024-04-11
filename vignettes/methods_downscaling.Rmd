@@ -166,8 +166,9 @@ The value of delta downscaling isn't just in obtaining the new absolute values o
 `climr` currently uses the ClimateNA derived variable equations [@wang2016]. These equations are developed by fitting non-linear models of the relationship between the variable of interest calculated from daily weather station data and monthly temperature and/or precipitation at these weather stations. For example, the equations for January degree-days below 0^o^C and 18^o^C are derived by fitting a piecewise function of these variables to January mean temperature for the 1961-1990 period at 4891 stations across North America, shown below in Figure 4 from @wang2016:
 
 ```{r, fig.cap = "Figure 4 from @wang2016, illustrating the derivation of equations for January degree-days below 0^o^C and 18^o^C based on January mean temperature at North American weather stations", results='asis', out.width = "70%"}
-knitr::include_graphics(normalizePath("assets/WangEtAl2016_Fig4.png", winslash = "/"), 
-                        rel_path = FALSE)
+knitr::include_graphics(normalizePath("WangEtAl2016_Fig4.png", winslash = "/"),
+  rel_path = FALSE
+)
 ```
 
 Using the `climr` output for the EC-Earth3 climate model, we can compare the change in January mean temperature to change in January degree days below 0^o^C in the 2041-2060 period relative to the 1961-1990 baseline. January mean temperature is interpolated directly from the GCM, so the only variation in the climate change trend in this variable is the transition from one GCM grid cell to its neighbours. In contrast, January degree-days below 0^o^C, while derived directly from January mean temperature, has strong elevation-dependence in its climate change trend.
