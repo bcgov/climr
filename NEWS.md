@@ -1,12 +1,14 @@
-# `climr` 1.0.0
-## Enhancements
-* new functions `list_historic_ts` and `list_gcm_ts` to get available years for historic/future time series
-
 # `climr` 0.0.4
 ## Bug Fixes
-* Updated future timeseries  data to include full 2015-2100 period and added missing models. 
+* Updated future timeseries data to include full 2015-2100 period and added missing models (built some cool bash scrips using `parallel` to quickly to `raster2pgsql` conversion for large numbers of files). 
+* Updated historic modelled timeseries to extend to 2015. 
 * Restructured naming scheme for timeseries data, updated internal `dbnames` table, and updated `postgresql` functions to allow hyphens in table names. 
+* Reprocessed future GCM periods to include all of North America. 
 * Fixed bug in `plot_bivariate()` for focal periods after 2001-2020. 
+* Fixed caching issue where it would fail for very larger numbers of layers (>65000) by saving as .gri binary files.
+
+## Enhancements
+* Added checks for bounding box projection.
 
 # `climr` 0.0.3
 ## Enhancements
@@ -15,6 +17,7 @@
 * new messages warn user about meaningless `downscale`/`climr_downscale` argument combinations
 * argument options in `climr_downscale(..., which_normal)` now match the options of `normal_input(..., normal)`
 * add `plot_bivariate()` function to generate plots showing climate model ensemble variation in recent and future climate change. 
+* new functions `list_historic_ts` and `list_gcm_ts` to get available years for historic/future time series
 
 ## Behaviour changes
 * `xyz` (argument to `climr_downscale` and `downscale`) and `in_xyz` (argument to `get_bb`), must now be a 4 column `data.table` (or coercible class) with `lon`, `lat`, `elev` and `id` columns. All other columns are ignored and NOT returned. Column order no longer matters.
