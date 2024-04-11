@@ -31,11 +31,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">climr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.0.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,12 +50,16 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/caching.html">caching</a>
+    <h6 class="dropdown-header" data-toc-skip>`climr` workflows</h6>
+    <a class="dropdown-item" href="../articles/climr_workflow_beg.html">Beginner `climr` workflow</a>
+    <a class="dropdown-item" href="../articles/climr_workflow_int.html">Intermediate `climr` workflow</a>
     <a class="dropdown-item" href="../articles/climr_with_rasters.html">Working with rasters and other spatial objects</a>
-    <a class="dropdown-item" href="../articles/climr_workflow_beg.html">`climr` workflow - beginner</a>
-    <a class="dropdown-item" href="../articles/climr_workflow_int.html">`climr` workflow - intermediate</a>
-    <a class="dropdown-item" href="../articles/lapse_rates.html">Lapse rates</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Methods</h6>
     <a class="dropdown-item" href="../articles/methods_downscaling.html">`climr` downscaling methods</a>
+    <a class="dropdown-item" href="../articles/lapse_rates.html">Lapse rates</a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item" href="../articles/index.html">More articles...</a>
   </div>
 </li>
 <li class="nav-item">
@@ -89,10 +93,10 @@
     
 <p>Downscaling is the process of converting low-spatial-resolution
 climate data to high resolution. <code>climr</code> adapts a downscaling
-approach originally implemented in <a href="https://climatena.ca/" class="external-link">ClimateNA</a> <span class="citation">(<a href="#ref-wang2016" role="doc-biblioref">Wang et al. 2016</a>)</span>
-by Dr. Tongli Wang (University of British Columbia), Dr. Andreas Hamann
-(University of Alberta), and Dave Spittlehouse (BC Ministry of Forests).
-This approach downscales climate data in three stages:</p>
+approach originally implemented in <a href="https://climatena.ca/" class="external-link">ClimateNA</a> <span class="citation">(<a href="#ref-wang2016">Wang et al. 2016</a>)</span> by Dr. Tongli Wang
+(University of British Columbia), Dr. Andreas Hamann (University of
+Alberta), and Dave Spittlehouse (BC Ministry of Forests). This approach
+downscales climate data in three stages:</p>
 <ol style="list-style-type: decimal">
 <li>
 <em>Change-factor downscaling</em> of coarse-resolution (50-200km
@@ -110,9 +114,9 @@ temperature and precipitation variables.</li>
 </h4>
 <p><code>climr</code> uses a simple method called change-factor
 downscaling. In method is sometimes referred to as the climate imprint
-method <span class="citation">(<a href="#ref-hunter2005" role="doc-biblioref">Hunter and Meentemeyer 2005</a>)</span>, the delta
-method <span class="citation">(<a href="#ref-wang2016" role="doc-biblioref">Wang et al. 2016</a>)</span>, or simple mean bias
-correction <span class="citation">(<a href="#ref-maraun2016" role="doc-biblioref">Maraun 2016</a>)</span>. This method adds
+method <span class="citation">(<a href="#ref-hunter2005">Hunter and
+Meentemeyer 2005</a>)</span>, the delta method <span class="citation">(<a href="#ref-wang2016">Wang et al. 2016</a>)</span>,
+or simple mean bias correction <span class="citation">(<a href="#ref-maraun2016">Maraun 2016</a>)</span>. This method adds
 low-spatial-resolution anomalies (e.g., from a climate model) to a
 high-resolution gridded climate map (Tabor and Williams 2010). While
 change-factor downscaling is too simplistic for downscaling of daily
@@ -246,19 +250,21 @@ calculate anomalies in other indices that don’t scale linearly with
 temperature or precipitation, such as degree-days or precipitation as
 snow.</p>
 <p><code>climr</code> currently uses the ClimateNA derived variable
-equations <span class="citation">(<a href="#ref-wang2016" role="doc-biblioref">Wang et al. 2016</a>)</span>. These equations are
-developed by fitting non-linear models of the relationship between the
-variable of interest calculated from daily weather station data and
-monthly temperature and/or precipitation at these weather stations. For
-example, the equations for January degree-days below 0<sup>o</sup>C and
-18<sup>o</sup>C are derived by fitting a piecewise function of these
-variables to January mean temperature for the 1961-1990 period at 4891
-stations across North America, shown below in Figure 4 from <span class="citation">Wang et al. (<a href="#ref-wang2016" role="doc-biblioref">2016</a>)</span>:</p>
+equations <span class="citation">(<a href="#ref-wang2016">Wang et al.
+2016</a>)</span>. These equations are developed by fitting non-linear
+models of the relationship between the variable of interest calculated
+from daily weather station data and monthly temperature and/or
+precipitation at these weather stations. For example, the equations for
+January degree-days below 0<sup>o</sup>C and 18<sup>o</sup>C are derived
+by fitting a piecewise function of these variables to January mean
+temperature for the 1961-1990 period at 4891 stations across North
+America, shown below in Figure 4 from <span class="citation">Wang et al.
+(<a href="#ref-wang2016">2016</a>)</span>:</p>
 <div class="figure">
-<img src="assets/WangEtAl2016_Fig4.png" alt="Figure 4 from @wang2016, illustrating the derivation of equations for January degree-days below 0^o^C and 18^o^C based on January mean temperature at North American weather stations" width="70%"><p class="caption">
-Figure 4 from <span class="citation">Wang et al. (<a href="#ref-wang2016" role="doc-biblioref">2016</a>)</span>, illustrating
-the derivation of equations for January degree-days below 0<sup>o</sup>C
-and 18<sup>o</sup>C based on January mean temperature at North American
+<img src="WangEtAl2016_Fig4.png" alt="Figure 4 from @wang2016, illustrating the derivation of equations for January degree-days below 0^o^C and 18^o^C based on January mean temperature at North American weather stations" width="70%"><p class="caption">
+Figure 4 from <span class="citation">Wang et al. (<a href="#ref-wang2016">2016</a>)</span>, illustrating the derivation of
+equations for January degree-days below 0<sup>o</sup>C and
+18<sup>o</sup>C based on January mean temperature at North American
 weather stations
 </p>
 </div>
@@ -300,11 +306,11 @@ reconstructed to correct for unrealistic lapse rates.</p>
 <p><code>climr</code> provides two other options for the high-resolution
 reference climate map:</p>
 <ol style="list-style-type: decimal">
-<li>The ClimateNA composite for North America, at 4km grid scale <span class="citation">(<a href="#ref-wang2016" role="doc-biblioref">Wang et
-al. 2016</a>)</span>. This composite is compiled from separate PRISM
-climate surfaces for BC, Alaska, Yukon/Alberta/Saskatchewan/Manitoba,
-and the contiguous US, and WorldClim <span class="citation">(<a href="#ref-fick2017" role="doc-biblioref">Fick and Hijmans
-2017</a>)</span> in the remainder of the continent.</li>
+<li>The ClimateNA composite for North America, at 4km grid scale <span class="citation">(<a href="#ref-wang2016">Wang et al. 2016</a>)</span>.
+This composite is compiled from separate PRISM climate surfaces for BC,
+Alaska, Yukon/Alberta/Saskatchewan/Manitoba, and the contiguous US, and
+WorldClim <span class="citation">(<a href="#ref-fick2017">Fick and
+Hijmans 2017</a>)</span> in the remainder of the continent.</li>
 <li>User-supplied climate maps. the <code><a href="../reference/downscale.html">downscale()</a></code> function
 can accept any climate map as the reference normals. This allows the
 user to provide their own reference climate maps, such as: (1)
@@ -330,7 +336,7 @@ stations than the CRU Time Series dataset.</p>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-fick2017" class="csl-entry">
 Fick, Stephen E., and Robert J. Hijmans. 2017. <span>“WorldClim 2: New
 1<span>-</span>Km Spatial Resolution Climate Surfaces for Global Land
@@ -369,7 +375,7 @@ Inés Álvarez. <em>PLOS ONE</em> 11 (6): e0156720. <a href="https://doi.org/10.
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.8.</p>
 </div>
 
     </footer>

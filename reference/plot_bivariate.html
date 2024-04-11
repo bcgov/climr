@@ -16,11 +16,11 @@ All climate changes are relative to the 1961-1990 reference period normals."><me
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">climr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.0.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,12 +34,16 @@ All climate changes are relative to the 1961-1990 reference period normals."><me
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/caching.html">caching</a>
+    <h6 class="dropdown-header" data-toc-skip>`climr` workflows</h6>
+    <a class="dropdown-item" href="../articles/climr_workflow_beg.html">Beginner `climr` workflow</a>
+    <a class="dropdown-item" href="../articles/climr_workflow_int.html">Intermediate `climr` workflow</a>
     <a class="dropdown-item" href="../articles/climr_with_rasters.html">Working with rasters and other spatial objects</a>
-    <a class="dropdown-item" href="../articles/climr_workflow_beg.html">`climr` workflow - beginner</a>
-    <a class="dropdown-item" href="../articles/climr_workflow_int.html">`climr` workflow - intermediate</a>
-    <a class="dropdown-item" href="../articles/lapse_rates.html">Lapse rates</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Methods</h6>
     <a class="dropdown-item" href="../articles/methods_downscaling.html">`climr` downscaling methods</a>
+    <a class="dropdown-item" href="../articles/lapse_rates.html">Lapse rates</a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item" href="../articles/index.html">More articles...</a>
   </div>
 </li>
 <li class="nav-item">
@@ -106,11 +110,14 @@ and a unique "id". Any extra columns will be ignored and not output.</p></dd>
 
 
 <dt>period_focal</dt>
-<dd><p>character. The 20-year period for which to plot the ensemble detail. options are <code><a href="data-option-lists.html">list_gcm_period()</a></code>.</p></dd>
+<dd><p>character. The 20-year period for which to plot the ensemble
+detail. options are <code><a href="data-option-lists.html">list_gcm_period()</a></code>.</p></dd>
 
 
 <dt>gcm_models</dt>
-<dd><p>character. Vector of global climate model names. Options are <code><a href="data-option-lists.html">list_gcm()</a></code>. Used for gcm periods, gcm timeseries, and historic timeseries. Default <code>NULL</code></p></dd>
+<dd><p>character. Vector of global climate model names. Options
+are <code><a href="data-option-lists.html">list_gcm()</a></code>. Used for gcm periods, gcm timeseries, and historic timeseries.
+Defaults to <code>NULL</code>.</p></dd>
 
 
 <dt>ssp</dt>
@@ -119,11 +126,13 @@ Options are <code><a href="data-option-lists.html">list_ssp()</a></code>. Defaul
 
 
 <dt>historic_period</dt>
-<dd><p>character. Which historic period for observed climate data, averaged over this period. Options are <code><a href="data-option-lists.html">list_historic()</a></code>. Default <code>NULL</code></p></dd>
+<dd><p>character. Which historic period for observed climate
+data, averaged over this period. Options are <code><a href="data-option-lists.html">list_historic()</a></code>. Default <code>NULL</code></p></dd>
 
 
 <dt>gcm_period</dt>
-<dd><p>character. 20-year normal periods for GCM simulations. Options are <code><a href="data-option-lists.html">list_gcm_period()</a></code></p></dd>
+<dd><p>character. 20-year normal periods for GCM simulations.
+Options are <code><a href="data-option-lists.html">list_gcm_period()</a></code>. Defaults to <code>NULL</code>.</p></dd>
 
 
 <dt>max_run</dt>
@@ -137,11 +146,13 @@ are found in the models data until <code>max_run</code> is reached. Defaults to 
 
 
 <dt>show_runs</dt>
-<dd><p>logical. If TRUE, the individual runs of the model are plotted (for <code>period_focal</code> only) in addition to the single-model ensemble mean.</p></dd>
+<dd><p>logical. If TRUE, the individual runs of the model are plotted (for
+<code>period_focal</code> only) in addition to the single-model ensemble mean.</p></dd>
 
 
 <dt>show_ensMean</dt>
-<dd><p>logical. If TRUE, the multi-model ensemble mean is plotted (for <code>period_focal</code> only).</p></dd>
+<dd><p>logical. If TRUE, the multi-model ensemble mean is plotted (for
+<code>period_focal</code> only).</p></dd>
 
 
 <dt>show_observed</dt>
@@ -149,11 +160,14 @@ are found in the models data until <code>max_run</code> is reached. Defaults to 
 
 
 <dt>show_trajectories</dt>
-<dd><p>logical. If TRUE, the values of the single-model ensemble mean are plotted for all 20-year periods in <code><a href="data-option-lists.html">list_gcm_period()</a></code>, connected by an interpolation spline.</p></dd>
+<dd><p>logical. If TRUE, the values of the single-model ensemble
+mean are plotted for all 20-year periods in <code><a href="data-option-lists.html">list_gcm_period()</a></code>, connected by an
+interpolation spline.</p></dd>
 
 
 <dt>interactive</dt>
-<dd><p>logical. If TRUE, an interactive plot is generated using <code>{plotly}</code>. If FALSE, a plot is generated using base graphics.</p></dd>
+<dd><p>logical. If TRUE, an interactive plot is generated using <code>{plotly}</code>.
+If FALSE, a plot is generated using base graphics.</p></dd>
 
 
 <dt>cache</dt>
@@ -168,26 +182,31 @@ are found in the models data until <code>max_run</code> is reached. Defaults to 
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The input table <code>xyz</code> can be a single location or multiple locations. If multiple locations, the plot provides the mean of the anomalies for these locations.
-The climate change trajectories provided by <code>show_trajectories</code> are points for each of the five 20-year periods specified by <code><a href="data-option-lists.html">list_gcm_period()</a></code>. These points are connected with an interpolation spline when the x variable is monotonic; otherwise the trajectory points are connected by straight lines.
-This plot is designed to be used with a single SSP scenario. If multiple scenarios are passed to the plot, the GCM means and ensemble mean are averaged across the scenarios, but the individual runs for all scenarios are plotted separately.</p>
+    <p>The input table <code>xyz</code> can be a single location or multiple locations. If multiple
+locations, the plot provides the mean of the anomalies for these locations.
+The climate change trajectories provided by <code>show_trajectories</code> are points for
+each of the five 20-year periods specified by <code><a href="data-option-lists.html">list_gcm_period()</a></code>. These points
+are connected with an interpolation spline when the x variable is monotonic;
+otherwise the trajectory points are connected by straight lines.
+This plot is designed to be used with a single SSP scenario. If multiple scenarios
+are passed to the plot, the GCM means and ensemble mean are averaged across the
+scenarios, but the individual runs for all scenarios are plotted separately.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># data frame of arbitrary points on Vancouver Island</span></span></span>
-<span class="r-in"><span><span class="va">my_points</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>lon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">123.4404</span>, <span class="op">-</span><span class="fl">123.5064</span>, <span class="op">-</span><span class="fl">124.2317</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                        lat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">48.52631</span>, <span class="fl">48.46807</span>, <span class="fl">49.21999</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                        elev <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">52</span>, <span class="fl">103</span>, <span class="fl">357</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                        id <span class="op">=</span> <span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">my_points</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  lon <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">123.4404</span>, <span class="op">-</span><span class="fl">123.5064</span>, <span class="op">-</span><span class="fl">124.2317</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  lat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">48.52631</span>, <span class="fl">48.46807</span>, <span class="fl">49.21999</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  elev <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">52</span>, <span class="fl">103</span>, <span class="fl">357</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  id <span class="op">=</span> <span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># draw the plot</span></span></span>
 <span class="r-in"><span><span class="fu">plot_bivariate</span><span class="op">(</span><span class="va">my_points</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required namespace: stinepack</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Welcome to climr!</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Getting normals...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> for BC...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Not fully cached :( Will download more</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Downloading new data...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> .</span>
@@ -224,12 +243,13 @@ This plot is designed to be used with a single SSP scenario. If multiple scenari
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># export plot to a temporary directory</span></span></span>
 <span class="r-in"><span><span class="va">figDir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">png</a></span><span class="op">(</span>filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">figDir</span>, <span class="st">"plot_test.png"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"cairo"</span>, units <span class="op">=</span> <span class="st">"in"</span>,</span></span>
-<span class="r-in"><span>    width <span class="op">=</span> <span class="fl">6</span>, height <span class="op">=</span> <span class="fl">5</span>, pointsize <span class="op">=</span> <span class="fl">10</span>, res <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/png.html" class="external-link">png</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">figDir</span>, <span class="st">"plot_test.png"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"cairo"</span>, units <span class="op">=</span> <span class="st">"in"</span>,</span></span>
+<span class="r-in"><span>  width <span class="op">=</span> <span class="fl">6</span>, height <span class="op">=</span> <span class="fl">5</span>, pointsize <span class="op">=</span> <span class="fl">10</span>, res <span class="op">=</span> <span class="fl">300</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">plot_bivariate</span><span class="op">(</span><span class="va">my_points</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Welcome to climr!</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Getting normals...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> for BC...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Retrieving from cache...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Getting historic...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Retrieving from cache...</span>
@@ -258,7 +278,7 @@ This plot is designed to be used with a single SSP scenario. If multiple scenari
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.8.</p>
 </div>
 
     </footer></div>

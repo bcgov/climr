@@ -6,11 +6,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">climr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.0.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,15 +21,19 @@
       <ul class="navbar-nav me-auto"><li class="nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
-<li class="nav-item dropdown">
+<li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/caching.html">caching</a>
+    <h6 class="dropdown-header" data-toc-skip>`climr` workflows</h6>
+    <a class="dropdown-item" href="../articles/climr_workflow_beg.html">Beginner `climr` workflow</a>
+    <a class="dropdown-item" href="../articles/climr_workflow_int.html">Intermediate `climr` workflow</a>
     <a class="dropdown-item" href="../articles/climr_with_rasters.html">Working with rasters and other spatial objects</a>
-    <a class="dropdown-item" href="../articles/climr_workflow_beg.html">`climr` workflow - beginner</a>
-    <a class="dropdown-item" href="../articles/climr_workflow_int.html">`climr` workflow - intermediate</a>
-    <a class="dropdown-item" href="../articles/lapse_rates.html">Lapse rates</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Methods</h6>
     <a class="dropdown-item" href="../articles/methods_downscaling.html">`climr` downscaling methods</a>
+    <a class="dropdown-item" href="../articles/lapse_rates.html">Lapse rates</a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item" href="../articles/index.html">More articles...</a>
   </div>
 </li>
 <li class="nav-item">
@@ -49,23 +53,34 @@
     </div>
 
     <div class="section ">
-      <h3>All vignettes</h3>
+      <h3><code>climr</code> workflows</h3>
+      <p class="section-desc"></p><p>How to use <code>climr</code>, from beginner to advanced operations</p>
+
+      <dl><dt><a href="climr_workflow_beg.html">Beginner `climr` workflow</a></dt>
+        <dd><p>Learn the basic <code>climr</code> workflow.</p>
+        </dd><dt><a href="climr_workflow_int.html">Intermediate `climr` workflow</a></dt>
+        <dd><p>More advanced <code>climr</code> workflows.</p>
+        </dd><dt><a href="climr_with_rasters.html">Working with rasters and other spatial objects</a></dt>
+        <dd><p>Learn how to use <code>climr</code> when working with spatial input and output objects.</p>
+      </dd></dl></div>
+    <div class="section ">
+      <h3>Methods</h3>
+      <p class="section-desc"></p><p>Climate downscaling methods used in <code>climr</code></p>
+
+      <dl><dt><a href="methods_downscaling.html">`climr` downscaling methods</a></dt>
+        <dd><p>A brief explanation of the downscaling methdology used in <code>climr</code></p>
+        </dd><dt><a href="lapse_rates.html">Lapse rates</a></dt>
+        <dd><p>How lapse rates are calculated</p>
+      </dd></dl></div>
+    <div class="section ">
+      <h3>Caching</h3>
       <p class="section-desc"></p>
 
       <dl><dt><a href="caching.html">caching</a></dt>
         <dd>
-        </dd><dt><a href="climr_with_rasters.html">Working with rasters and other spatial objects</a></dt>
-        <dd><p>Learn how to use <code>climr</code> when working with spatial input and output objects.</p>
-        </dd><dt><a href="climr_workflow_beg.html">`climr` workflow - beginner</a></dt>
-        <dd><p>Learn the basic <code>climr</code> workflow.</p>
-        </dd><dt><a href="climr_workflow_int.html">`climr` workflow - intermediate</a></dt>
-        <dd><p>More advanced <code>climr</code> workflows.</p>
-        </dd><dt><a href="lapse_rates.html">Lapse rates</a></dt>
-        <dd><p>How lapse rates are calculated</p>
-        </dd><dt><a href="methods_downscaling.html">`climr` downscaling methods</a></dt>
-        <dd><p>A brief explanation of the downscaling methdology used in <code>climr</code></p>
       </dd></dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
@@ -73,7 +88,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.8.</p>
 </div>
 
     </footer></div>

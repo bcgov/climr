@@ -6,11 +6,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">climr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.0.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,12 +24,16 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/caching.html">caching</a>
+    <h6 class="dropdown-header" data-toc-skip>`climr` workflows</h6>
+    <a class="dropdown-item" href="../articles/climr_workflow_beg.html">Beginner `climr` workflow</a>
+    <a class="dropdown-item" href="../articles/climr_workflow_int.html">Intermediate `climr` workflow</a>
     <a class="dropdown-item" href="../articles/climr_with_rasters.html">Working with rasters and other spatial objects</a>
-    <a class="dropdown-item" href="../articles/climr_workflow_beg.html">`climr` workflow - beginner</a>
-    <a class="dropdown-item" href="../articles/climr_workflow_int.html">`climr` workflow - intermediate</a>
-    <a class="dropdown-item" href="../articles/lapse_rates.html">Lapse rates</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Methods</h6>
     <a class="dropdown-item" href="../articles/methods_downscaling.html">`climr` downscaling methods</a>
+    <a class="dropdown-item" href="../articles/lapse_rates.html">Lapse rates</a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item" href="../articles/index.html">More articles...</a>
   </div>
 </li>
 <li class="active nav-item">
@@ -50,6 +54,23 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.0.4" id="climr-004">
+<code>climr</code> 0.0.4<a class="anchor" aria-label="anchor" href="#climr-004"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-0-4">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-0-4"></a></h3>
+<ul><li>Updated future timeseries data to include full 2015-2100 period and added missing models (built some cool bash scrips using <code>parallel</code> to quickly to <code>raster2pgsql</code> conversion for large numbers of files).</li>
+<li>Updated historic modelled timeseries to extend to 2015.</li>
+<li>Restructured naming scheme for timeseries data, updated internal <code>dbnames</code> table, and updated <code>postgresql</code> functions to allow hyphens in table names.</li>
+<li>Reprocessed future GCM periods to include all of North America.</li>
+<li>Fixed bug in <code><a href="../reference/plot_bivariate.html">plot_bivariate()</a></code> for focal periods after 2001-2020.</li>
+<li>Fixed caching issue where it would fail for very larger numbers of layers (&gt;65000) by saving as .gri binary files.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="enhancements-0-0-4">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-0-0-4"></a></h3>
+<ul><li>Added checks for bounding box projection.</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.0.3" id="climr-003">
 <code>climr</code> 0.0.3<a class="anchor" aria-label="anchor" href="#climr-003"></a></h2>
 <div class="section level3">
@@ -60,6 +81,7 @@
 <li>argument options in <code>climr_downscale(..., which_normal)</code> now match the options of <code>normal_input(..., normal)</code>
 </li>
 <li>add <code><a href="../reference/plot_bivariate.html">plot_bivariate()</a></code> function to generate plots showing climate model ensemble variation in recent and future climate change.</li>
+<li>new functions <code>list_historic_ts</code> and <code>list_gcm_ts</code> to get available years for historic/future time series</li>
 </ul></div>
 <div class="section level3">
 <h3 id="behaviour-changes-0-0-3">Behaviour changes<a class="anchor" aria-label="anchor" href="#behaviour-changes-0-0-3"></a></h3>
@@ -73,6 +95,12 @@
 <li>fixing <code>historic_input_ts</code> to get only queried years</li>
 <li>
 <code>get_bb</code> follows column names</li>
+</ul></div>
+<div class="section level3">
+<h3 id="other-0-0-3">Other<a class="anchor" aria-label="anchor" href="#other-0-0-3"></a></h3>
+<ul><li>
+<code>climr_downscale</code> now accepts <code>...</code> to pass arguments to <code>downscale</code>
+</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -138,7 +166,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.8.</p>
 </div>
 
     </footer></div>

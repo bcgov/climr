@@ -5,17 +5,8 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="This package replicates the basic approach of ClimateNA (climatena.ca),
-    but with (1) improved speed, (2) multiple runs of each GCM, (3) cloud delivery, and (4) 
-    programmatic access via R.
-    A simple downscaling method is used to bias-correct low-resolution (~100km) global
-    climate model anomalies to high-resolution (2km) maps of historical climate, with
-    further elevation adjustment to user-specified elevation grids/points based on
-    empirical lapse rates (local relationship of climate to elevation) of the 2km
-    climate maps. Elevation-adjusted monthly values of basic climate elements
-    (temperature and precipitation) are then used to estimate derived variables
-    (e.g., degree-days) based on published equations and parameters from  Wang et al. 2016.">
-<title>Downscaling of global climate data • climr</title>
+<meta name="description" content="`climr` is an R package that builds on the downscaling concepts operationalized in the ClimateNA tool (climatena.ca) (Wang et al. 2016). It provides downscaling of observational and simulated climate data using change-factor downscaling, a simple method that adds low-spatial-resolution climate anomalies to a high-spatial-resolution reference climatological map, with additional elevation adjustment for temperature. Elevation-adjusted monthly values of basic climate elements (temperature and precipitation) are then used to estimate derived variables (e.g., degree-days) based on published equations and parameters from Wang et al. 2016. `climr` is designed to be fast and to minimize local data storage requirements. To do so, it uses a remote PostGIS database, and optionally caches data locally.">
+<title>Downscaling climate data in R • climr</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
@@ -26,17 +17,8 @@
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Downscaling of global climate data">
-<meta property="og:description" content="This package replicates the basic approach of ClimateNA (climatena.ca),
-    but with (1) improved speed, (2) multiple runs of each GCM, (3) cloud delivery, and (4) 
-    programmatic access via R.
-    A simple downscaling method is used to bias-correct low-resolution (~100km) global
-    climate model anomalies to high-resolution (2km) maps of historical climate, with
-    further elevation adjustment to user-specified elevation grids/points based on
-    empirical lapse rates (local relationship of climate to elevation) of the 2km
-    climate maps. Elevation-adjusted monthly values of basic climate elements
-    (temperature and precipitation) are then used to estimate derived variables
-    (e.g., degree-days) based on published equations and parameters from  Wang et al. 2016.">
+<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Downscaling climate data in R">
+<meta property="og:description" content="`climr` is an R package that builds on the downscaling concepts operationalized in the ClimateNA tool (climatena.ca) (Wang et al. 2016). It provides downscaling of observational and simulated climate data using change-factor downscaling, a simple method that adds low-spatial-resolution climate anomalies to a high-spatial-resolution reference climatological map, with additional elevation adjustment for temperature. Elevation-adjusted monthly values of basic climate elements (temperature and precipitation) are then used to estimate derived variables (e.g., degree-days) based on published equations and parameters from Wang et al. 2016. `climr` is designed to be fast and to minimize local data storage requirements. To do so, it uses a remote PostGIS database, and optionally caches data locally.">
 <meta property="og:image" content="https://bcgov.github.io/climr/logo.svg">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -47,11 +29,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
     
     <a class="navbar-brand me-2" href="index.html">climr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.0.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,12 +48,16 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="articles/caching.html">caching</a>
+    <h6 class="dropdown-header" data-toc-skip>`climr` workflows</h6>
+    <a class="dropdown-item" href="articles/climr_workflow_beg.html">Beginner `climr` workflow</a>
+    <a class="dropdown-item" href="articles/climr_workflow_int.html">Intermediate `climr` workflow</a>
     <a class="dropdown-item" href="articles/climr_with_rasters.html">Working with rasters and other spatial objects</a>
-    <a class="dropdown-item" href="articles/climr_workflow_beg.html">`climr` workflow - beginner</a>
-    <a class="dropdown-item" href="articles/climr_workflow_int.html">`climr` workflow - intermediate</a>
-    <a class="dropdown-item" href="articles/lapse_rates.html">Lapse rates</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Methods</h6>
     <a class="dropdown-item" href="articles/methods_downscaling.html">`climr` downscaling methods</a>
+    <a class="dropdown-item" href="articles/lapse_rates.html">Lapse rates</a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item" href="articles/index.html">More articles...</a>
   </div>
 </li>
 <li class="nav-item">
@@ -116,10 +102,9 @@
 <div class="section level3">
 <h3 id="data-sources">Data Sources<a class="anchor" aria-label="anchor" href="#data-sources"></a>
 </h3>
-<p>The reference climatologies for British Columbia are the <a href="https://www.pacificclimate.org/data/prism-climatology-and-monthly-timeseries" class="external-link">BC PRISM maps</a> provided by Pacific Climate Impacts Consortium. Reference climatologies for North America are the ClimateNA (Wang et al. 2016) mosaics of PRISM (BC, US) and WorldClim (rest of North America). The ClimateNA mosaics are accessed from <a href="https://adaptwest.databasin.org/pages/adaptwest-climatena/" class="external-link">AdaptWest</a>.</p>
-<p>A high resolution composite climatology of BC PRISM, adjusted US PRISM and DAYMET (Alberta and Saskatchewan), is also available for Western Canada and Western US.</p>
-<p>Historical observational time series are derived using <a href="https://climatena.ca/" class="external-link">ClimateNA</a> (Wang et al. 2016).</p>
-<p>The CMIP6 global climate model data were downloaded and subsetted to North America by Tongli Wang, Associate Professor at the UBC Department of Forest and Conservation Sciences. The 13 global climate models selected for <code>climr</code>, and best practices for ensemble analysis, are described in Mahony (2022).</p>
+<p>The high resolution reference climate maps for Western Canada and Western US are a custom 800m-resolution mosaic of <a href="https://www.pacificclimate.org/data/prism-climatology-and-monthly-timeseries" class="external-link">BC PRISM</a>, adjusted <a href="https://prism.oregonstate.edu/normals/" class="external-link">US PRISM</a>, <a href="https://prism.oregonstate.edu/projects/canw.php" class="external-link">Western Canada PRISM</a>, and <a href="https://daymet.ornl.gov/overview" class="external-link">Daymet</a> (Alberta and Saskatchewan). Reference climatologies for North America are the 4km-resolution ClimateNA (Wang et al. 2016) mosaics of PRISM (BC, US, W. Canada) and WorldClim (rest of North America). The ClimateNA mosaics are accessed from <a href="https://adaptwest.databasin.org/pages/adaptwest-climatena/" class="external-link">AdaptWest</a>.</p>
+<p>Historical observational time series are obtained from <a href="https://climatena.ca/" class="external-link">ClimateNA</a> (Wang et al. 2016).</p>
+<p>CMIP6 global climate model simulations were downloaded from the <a href="https://aims2.llnl.gov/search/cmip6" class="external-link">Earth System Grid Federation</a>. The majority of these downloads were conducted by Tongli Wang, Associate Professor at the UBC Department of Forest and Conservation Sciences. The 13 global climate models selected for <code>climr</code>, and best practices for ensemble analysis, are described in Mahony (2022).</p>
 </div>
 </div>
 <div class="section level2">
@@ -137,15 +122,15 @@
 </h2>
 <p>See:</p>
 <ul>
-<li><p><code>vignette("vignettes/climr_workflow_beg.Rmd")</code> for a simple <code>climr</code> workflow;</p></li>
-<li><p><code>vignette("vignettes/climr_workflow_int.Rmd")</code> provides a deeper dive into <code>climr</code> and more advanced examples of how it can be used;</p></li>
-<li><p><code>vignette("vignettes/climr_with_rasters.Rmd")</code> covers several examples of how to work with <code>climr</code> using spatial inputs and outputs, such as raster and vector data.</p></li>
+<li><p><code><a href="articles/climr_workflow_beg.html">vignette("climr_workflow_beg")</a></code> for a simple <code>climr</code> workflow;</p></li>
+<li><p><code><a href="articles/climr_workflow_int.html">vignette("climr_workflow_int")</a></code> for a deeper dive into <code>climr</code> and more advanced examples of how it can be used;</p></li>
+<li><p><code><a href="articles/climr_with_rasters.html">vignette("climr_with_rasters")</a></code> for several examples of how to work with <code>climr</code> using spatial inputs and outputs, such as raster and vector data.</p></li>
 </ul>
 </div>
 <div class="section level2">
 <h2 id="methods">Methods<a class="anchor" aria-label="anchor" href="#methods"></a>
 </h2>
-<p>For an overview of dowscaling methods used in <code>climr</code> see <code>vignette("vignettes/lapse_rates.Rmd")</code> and <code>vignette("vignettes/methods_downscaling.Rmd")</code></p>
+<p>For an overview of downscaling methods used in <code>climr</code> see <code><a href="articles/lapse_rates.html">vignette("lapse_rates")</a></code> and <code><a href="articles/methods_downscaling.html">vignette("methods_downscaling")</a></code></p>
 <div class="section level3">
 <h3 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
 </h3>
@@ -157,6 +142,11 @@
 </div>
 <div class="section level3">
 <h3 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h3>
+<p>We acknowledge the World Climate Research Programme, which, through its Working Group on Coupled Modelling, coordinated and promoted CMIP6. We thank the climate modeling groups for producing and making available their model output, the Earth System Grid Federation (ESGF) for archiving the data and providing access, and the multiple funding agencies who support CMIP6 and ESGF.</p>
+</div>
+<div class="section level3">
+<h3 id="references-1">References<a class="anchor" aria-label="anchor" href="#references-1"></a>
 </h3>
 <p>Mahony, Colin. 2022. “Rationale for the ClimateBC/NA 8-Model Ensemble Mean.” <a href="http://climatena.ca/downloads/ClimateNA_8ModelRationale_Mahony_07May2022.pdf" class="external-link">http://climatena.ca/downloads/ClimateNA_8ModelRationale_Mahony_07May2022.pdf</a>.</p>
 <p>Wang, Tongli, Andreas Hamann, Dave Spittlehouse, and Carlos Carroll. 2016. “Locally Downscaled and Spatially Customizable Climate Data for Historical and Future Periods for North America.” Edited by Inés Álvarez. PLOS ONE 11 (6): <a href="https://doi.org/10.1371/journal.pone.0156720" class="external-link">e0156720</a>.</p>
@@ -190,13 +180,7 @@
 </ul>
 </div>
 
-<div class="dev-status">
-<h2 data-toc-skip>Dev status</h2>
-<ul class="list-unstyled">
-<li><a href="Redirect-URL"><img src="https://img.shields.io/badge/Lifecycle-Stable-339999" alt="Lifecycle:Stable"></a></li>
-<li><a href="https://app.codecov.io/gh/bcgov/climr/?branch=main" class="external-link"><img src="https://codecov.io/gh/bcgov/climr/branch/main/graph/badge.svg" alt="Codecov test coverage - main"></a></li>
-</ul>
-</div>
+
 
   </aside>
 </div>
@@ -209,7 +193,7 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.8.</p>
 </div>
 
     </footer>
