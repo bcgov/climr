@@ -168,7 +168,7 @@ test_that("test downscale outputs with gcm, gcm_hist, gcm_ts, historic and histo
         normal = normal,
         var = list_variables(),
         new = argvalue,
-        return_normal = FALSE
+        return_normal = TRUE
       )
       names(allArgs) <- sub("new", argname, names(allArgs))
       out <- do.call(downscale, allArgs)
