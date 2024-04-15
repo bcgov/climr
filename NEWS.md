@@ -1,7 +1,7 @@
 # `climr` 0.0.4
 ## Bug Fixes
 * Updated future timeseries data to include full 2015-2100 period and added missing models (built some cool bash scrips using `parallel` to quickly to `raster2pgsql` conversion for large numbers of files). 
-* Updated historic modelled timeseries to extend to 2015. 
+* Updated historic modelled timeseries to extend to December 31, 2014. 
 * Restructured naming scheme for timeseries data, updated internal `dbnames` table, and updated `postgresql` functions to allow hyphens in table names. 
 * Reprocessed future GCM periods to include all of North America. 
 * Fixed bug in `plot_bivariate()` for focal periods after 2001-2020. 
