@@ -65,6 +65,10 @@ to work with `climr` using spatial inputs and outputs, such as raster and vector
 For an overview of downscaling methods used in `climr` see `vignette("lapse_rates")`
 and `vignette("methods_downscaling")`
 
+## Known issues
+
+-   Downloads of time series take a long time. We are looking into ways to speed this up, but until then we recommend users dedicate some time prior to analysis to cache their time series of interest for their areas of interest in a batch. Once the time series are cached, they don't need to be downloaded again. 
+
 ### License
 
 Copyright 2024 Province of British Columbia
