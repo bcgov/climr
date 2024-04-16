@@ -557,7 +557,7 @@ process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts,
         if (isin) {
           message("Retrieving from cache...")
           gcm_rast <- tryCatch(
-            rast(file.path(cPath, paste0(oldid, ".tif"))),
+            suppressWarnings(rast(file.path(cPath, paste0(oldid, ".tif")))),
             error = function(e) {
               rast(file.path(cPath, paste0(oldid, ".grd")))
             }
