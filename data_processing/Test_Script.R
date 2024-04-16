@@ -9,6 +9,28 @@ data("countriesCoarse")
 
 library(climr)
 
+points_downscale_ref <- readRDS("tests/testthat/data/points_downscale_ref.rds")
+pt <- points_downscale_ref
+projected <- climr_downscale(pt, 
+                             gcm_models = list_gcm()[3],
+                             ssp = list_ssp()[c(1,2,4)],
+                             max_run = 10,
+                             gcm_hist_years = 1851:2014, 
+                             gcm_ts_years = 2015:2100, 
+                             vars = "Tmin07"
+)
+
+tic()
+projected <- climr_downscale(pt, 
+                             gcm_models = list_gcm()[3],
+                             ssp = list_ssp()[c(1,2,4)],
+                             max_run = 10,
+                             gcm_hist_years = 1851:2014, 
+                             gcm_ts_years = 2015:2100, 
+                             vars = "Tmin07"
+)
+toc()
+
 
 xyz <- fread("US_TrainingPoints_07April2024.csv")
 xyz <- xyz[,.(ID1, LAT,LON,ELEV_m)]
