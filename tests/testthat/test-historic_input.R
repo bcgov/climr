@@ -76,7 +76,7 @@ test_that("test historic_input_ts", {
   years <- lapply(years, function(year) year:2022)
 
   sapply(years, FUN = function(years) {
-    histtsout <- historic_input_ts(dbCon, thebb, years = years, cache = TRUE)
+    histtsout <- historic_input_ts(dbCon, dataset = "climate_na", thebb, years = years, cache = TRUE)
 
     expect_true(is(histtsout, "list"))
     expect_true(!is.null(names(histtsout)))
@@ -109,7 +109,7 @@ test_that("test historic_input_ts", {
   })
 
   expect_error(historic_input_ts(
-    dbCon = dbCon, bbox = thebb,
+    dbCon = dbCon, dataset = "xxx", bbox = thebb,
     years = "years_test", cache = TRUE
   ))
   ## TODO: THIS IS FAILING AND IT SHOULDN'T

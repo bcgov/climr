@@ -127,7 +127,8 @@ test_that("test climr_dowscale with different argument combinations", {
 
   argsCombos <- expand.grid(
     which_normal = c("auto", "normal_na"), historic_period = c(NA, "2001_2020"),
-    historic_ts = c(NA, "1990:2010"), gcm_models = c(NA, "list_gcm()[2]"),
+    historic_ts = c(NA, "1990:2010"), historic_ts_dataset = c(NA,"cru_gpcc","climate_na"),
+    gcm_models = c(NA, "list_gcm()[2]"),
     ssp = c(NA, "list_ssp()[1:3]"), gcm_period = c(NA, "list_gcm_period()[1]"),
     gcm_ts_years = c(NA, "2040:2050"), gcm_hist_years = c(NA, "1990:2010")
   ) |>
@@ -137,6 +138,14 @@ test_that("test climr_dowscale with different argument combinations", {
   argsCombos[
     is.na(gcm_models),
     `:=`(gcm_period = NA, gcm_ts_years = NA, gcm_hist_years = NA, ssp = NA)
+  ]
+  argsCombos[
+    is.na(historic_ts),
+    `:=`(historic_ts_dataset = NA)
+  ]
+  argsCombos[
+    is.na(historic_ts_dataset),
+    `:=`(historic_ts = NA)
   ]
   argsCombos[
     is.na(gcm_period) & is.na(gcm_ts_years) & is.na(gcm_hist_years),
@@ -153,7 +162,7 @@ test_that("test climr_dowscale with different argument combinations", {
   ]
   argsCombos <- unique(argsCombos)
 
-  argsCombos <- argsCombos[55:72,]
+  argsCombos <- argsCombos[89:108,]
   out <- apply(argsCombos, 1, function(args, xyz) {
     args <- args[!is.na(args)]
     suppressWarnings(args$xyz <- xyz) # coerces to list.
@@ -251,8 +260,8 @@ test_that("test climr_dowscale all periods, all GCMs, all SSPS, all years", {
       xyz,
       which_normal = normal,
       historic_period = list_historic(),
-      # historic_ts = 1901:2015,   ## failing, forces 1902
       historic_ts = 1902:2015,
+      historic_ts_dataset = "climate_na",
       gcm_models = gcms,
       ssp = list_ssp(),
       gcm_period = list_gcm_period(),
