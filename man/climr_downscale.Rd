@@ -9,6 +9,7 @@ climr_downscale(
   which_normal = "auto",
   historic_period = NULL,
   historic_ts = NULL,
+  historic_ts_dataset = NULL,
   gcm_models = NULL,
   ssp = NULL,
   gcm_period = NULL,
