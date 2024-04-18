@@ -23,7 +23,7 @@ conn <- dbConnect(RPostgres::Postgres(),dbname = 'climr',
                   host = '146.190.244.244',
                   port = 5432,
                   user = 'postgres',
-                  password = 'climr2022')
+                  password = '')
 
 
 

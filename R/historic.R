@@ -123,6 +123,7 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 #' `historic_input_ts` produces anomalies of historic observed climate for a given **time series**.
 #'
 #' @template dbCon
+#' @param dataset Character. Which observational dataset to use? Current options are "climate_na" and "cru_gpcc"
 #' @template bbox
 #' @template cache
 #' @param years numeric. Years to retrieve historic anomalies for. Defaults to `2010:2022`.
@@ -140,14 +141,18 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 #' @importFrom uuid UUIDgenerate
 #' @rdname hist-input-data
 #' @export
-historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRUE) {
+historic_input_ts <- function(dbCon, dataset = c("cru_gpcc", "climate_na"), bbox = NULL, years = 2010:2022, cache = TRUE) {
   ## checks
   if (!is.null(bbox)) {
     .check_bb(bbox)
   }
   
-  dbcode <- "historic_ts"
-  ts_name <- "climatebc"
+  if(dataset == "climate_na"){
+    dbcode <- "historic_ts"
+  }else{
+    dbcode <- "historic_cru_gpcc"
+  }
+  ts_name <- dataset
 
   ## check cached
   needDownload <- TRUE
@@ -204,7 +209,7 @@ historic_input_ts <- function(dbCon, bbox = NULL, years = 2010:2022, cache = TRU
   }
 
   if (needDownload) {
-    q <- paste0("select fullnm, laynum from historic_ts_layers where period in ('", paste(years, collapse = "','"), "')")
+    q <- paste0("select fullnm, laynum from ",dbcode,"_layers where period in ('", paste(years, collapse = "','"), "')")
     # print(q)
     layerinfo <- dbGetQuery(dbCon, q)
     message("Downloading historic anomalies")

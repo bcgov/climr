@@ -11,6 +11,14 @@ library(climr)
 
 points_downscale_ref <- readRDS("tests/testthat/data/points_downscale_ref.rds")
 pt <- points_downscale_ref
+
+test1 <- climr_downscale(pt, which_normal = "auto", 
+                         historic_ts = 1960:2022,
+                         historic_ts_dataset = "cru_gpcc",
+                         vars = c("Tmax07","Tmin01","PPT10")
+)
+
+
 projected <- climr_downscale(pt, 
                              gcm_models = list_gcm()[3],
                              ssp = list_ssp()[c(1,2,4)],
