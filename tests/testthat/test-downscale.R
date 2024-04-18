@@ -145,6 +145,7 @@ test_that("test downscale outputs with gcm, gcm_hist, gcm_ts, historic and histo
 
   historic_ts <- historic_input_ts(
     dbCon,
+    dataset = "climate_na",
     thebb
   )
 
