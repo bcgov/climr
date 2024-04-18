@@ -6,6 +6,16 @@ development:
 template:
   bootstrap: 5
 
+home:   
+  sidebar:
+    structure: [links, license, community, citation, authors, dev]
+  links: 
+  - text: GitHub repo
+    href: https://github.com/bcgov/climr
+  - text: Reporting issues
+    href: https://github.com/bcgov/climr/issues
+
+
 articles:
 - title: "`climr` workflows"
   desc: "How to use `climr`, from beginner to advanced operations"
