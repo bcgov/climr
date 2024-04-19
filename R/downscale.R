@@ -455,23 +455,27 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
   )
   # Extract gcm bilinear interpolations
   # Cropping will reduce the size of data to load in memory
-  browser()
+
   climaterast <- crop(climaterast, ex, snap = "out")
   gc(reset = TRUE)  ## free unused memory
-  ## we may run out of memory if there are MANY rasters
-  out <- try(extract(x = climaterast[[1:2]], y = xyz[, .(lon, lat)], method = "bilinear"))
-  out2 <- lapply(climaterast[[1:2]], extract, y = xyz[, .(lon, lat)], method = "bilinear")
-  out2 <- lapply(out2, as.data.table) |>
-    lapply(FUN = setkeyv, cols = "ID")
   
-  out2 <- Reduce(merge, out2)
+  climaterast <- try(extract(x = climaterast, y = xyz[, .(lon, lat)], method = "bilinear"))
   
-  if (is(out, "simple-error") & grepl("bad_alloc", out)) {
-    message("System may be out of memory to extract climate values froma large raster stack")
-    message("Attempting to extract sequentially")
-
-  }
-
+  ## we may have run out of memory if there are MANY rasters
+  ## attempt to get only unique raster cell values 
+  ## (i.e. xyz may be at higher res than the climaterast leading to extracting the same values many times)
+  if (is(climaterast, "try-error")) {
+    if (grepl("bad_alloc", climaterast)) {
+      message("System is out of memory to extract climate values for the supplied coordinates")
+        stop("Insufficient memory to downscale climate data for these many points/climate layers.\n",
+             "  Try reducing number of points/layers.")
+      }
+    } else {
+      stop("Climate value extraction failed.",
+           "\n   Please contact developers with a reproducible example and the error:\n",
+           climaterast) 
+    }
+  
   # Create match set to match with res names
   labels <- vapply(
     strsplit(nm, "_"),
