@@ -171,7 +171,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL,
 
     if (!is.null(plot)) {
       if (!plot %in% vars) {
-        stop("The variable you wish to plot was not dowscaled. Please pass a variable listed in 'vars'")
+        stop("The variable you wish to plot was not downscaled. Please pass a variable listed in 'vars'")
       }
       ## make a mask of the normals data "extent"
       msk <- normal[[1]]
