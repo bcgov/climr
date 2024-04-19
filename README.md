@@ -65,6 +65,10 @@ to work with `climr` using spatial inputs and outputs, such as raster and vector
 For an overview of downscaling methods used in `climr` see `vignette("lapse_rates")`
 and `vignette("methods_downscaling")`
 
+## Known issues
+
+-   Downloads of time series take a long time. We are looking into ways to speed this up, but until then we recommend users dedicate some time prior to analysis to cache their time series of interest for their areas of interest in a batch. Once the time series are cached, they don't need to be downloaded again. 
+
 ### License
 
 Copyright 2024 Province of British Columbia
@@ -79,7 +83,7 @@ See the License for the specific language governing permissions and limitations 
 
 `climr` logo uses icon designed by Freepik, Flaticon.com, available [here](https://www.flaticon.com/free-icon/pin_6093139).
 
-### References
+### Acknowledgements
 
 We acknowledge the World Climate Research Programme, which, through its Working Group on Coupled Modelling, coordinated and promoted CMIP6. We thank the climate modeling groups for producing and making available their model output, the Earth System Grid Federation (ESGF) for archiving the data and providing access, and the multiple funding agencies who support CMIP6 and ESGF. 
 

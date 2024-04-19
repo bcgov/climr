@@ -7,6 +7,71 @@ library(climr)
 library(pool)
 data("countriesCoarse")
 
+library(climr)
+
+points_downscale_ref <- readRDS("tests/testthat/data/points_downscale_ref.rds")
+pt <- points_downscale_ref
+
+test1 <- climr_downscale(pt, which_normal = "auto", 
+                         historic_ts = 1960:2022,
+                         historic_ts_dataset = "cru_gpcc",
+                         vars = c("Tmax07","Tmin01","PPT10")
+)
+
+
+projected <- climr_downscale(pt, 
+                             gcm_models = list_gcm()[3],
+                             ssp = list_ssp()[c(1,2,4)],
+                             max_run = 10,
+                             gcm_hist_years = 1851:2014, 
+                             gcm_ts_years = 2015:2100, 
+                             vars = "Tmin07"
+)
+
+tic()
+projected <- climr_downscale(pt, 
+                             gcm_models = list_gcm()[3],
+                             ssp = list_ssp()[c(1,2,4)],
+                             max_run = 10,
+                             gcm_hist_years = 1851:2014, 
+                             gcm_ts_years = 2015:2100, 
+                             vars = "Tmin07"
+)
+toc()
+
+
+xyz <- fread("US_TrainingPoints_07April2024.csv")
+xyz <- xyz[,.(ID1, LAT,LON,ELEV_m)]
+setnames(xyz, c("id","lat","lon","elev"))
+
+clim_vars <- climr_downscale(xyz, which_normal = "auto", vars = climr::list_variables(), return_normal = TRUE, cache = TRUE)
+climdup <- clim_vars[duplicated(clim_vars$id),]
+
+pt <- temp[1,]
+projected <- climr_downscale(pt, 
+                             gcm_models = list_gcm()[1],
+                             ssp = list_ssp()[c(4)],
+                             max_run = 10,
+                             gcm_hist_years = 1851:2014, 
+                             gcm_ts_years = 2015:2100, 
+                             vars = "Tmax07"
+)
+
+gcms <- na.omit(unique(projected$GCM))[1]
+ssps <- na.omit(unique(projected$SSP))[1]
+runs <- unique(projected$RUN)
+runs <- runs[grep("r", runs)]
+
+par(mar=c(3,3,0.1, 0.1), mgp=c(1.5, 0.25, 0), tck=-0.01)
+plot(projected$PERIOD, projected$Tmax07, col="white")
+for(run in runs){
+  s <- which(projected$RUN==run)
+  lines(projected$PERIOD[s], projected$Tmax07[s], col=which(runs==run))
+  # Sys.sleep(1)
+}
+lines(projected$PERIOD[projected$RUN=="ensembleMean"], projected$Tmax07[projected$RUN=="ensembleMean"], col=1, lwd=3)
+mtext(paste(gcms, ssps), side=3, line=-1.5, adj=0.05)
+
 
 data("xyzDT")
 temp <- xyzDT[1:4,]
