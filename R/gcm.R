@@ -50,23 +50,27 @@
 #' @export
 gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), period = list_gcm_period(), max_run = 0L, cache = TRUE) {
   ## checks
+  if (!is.null(bbox)) {
+    .check_bb(bbox)
+  }
+  
   gcm <- match.arg(gcm, list_gcm(), several.ok = TRUE)
   ssp <- match.arg(ssp, list_ssp(), several.ok = TRUE)
   period <- match.arg(period, list_gcm_period(), several.ok = TRUE)
-
+  
   if (!is(max_run, "numeric")) {
     stop("please pass a numeric value to 'max_runs'")
   }
-
+  
   if (!is(cache, "logical")) {
     stop("please pass a logical value to 'cache'")
   }
-
+  
   # Load each file individually + select layers
   res <- sapply(gcm, process_one_gcm2,
-    ssp = ssp, period = period,
-    bbox = bbox, dbnames = dbnames, dbCon = dbCon,
-    max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE
+                ssp = ssp, period = period,
+                bbox = bbox, dbnames = dbnames, dbCon = dbCon,
+                max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE
   )
   attr(res, "builder") <- "climr"
   
@@ -124,15 +128,20 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 #' @export
 gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(),
                            years = 1901:1950, max_run = 0L, cache = TRUE) {
+  ## checks
+  if (!is.null(bbox)) {
+    .check_bb(bbox)
+  }
+  
   # Load each file individually + select layers
   res <- sapply(gcm, process_one_gcm3,
-    years = years,
-    dbCon = dbCon, bbox = bbox, dbnames = dbnames_hist,
-    max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE
+                years = years,
+                dbCon = dbCon, bbox = bbox, dbnames = dbnames_hist,
+                max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE
   )
   res <- res[!sapply(res, is.null)] ##remove NULL
   attr(res, "builder") <- "climr"
-
+  
   # Return a list of SpatRasters, one element for each model
   return(res)
 }
@@ -191,16 +200,21 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(),
 #' @export
 gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(),
                          years = 2020:2030, max_run = 0L, cache = TRUE) {
+  ## checks
+  if (!is.null(bbox)) {
+    .check_bb(bbox)
+  }
+  
   if (nrow(dbnames_ts) < 1) stop("That isn't a valid GCM")
   # Load each file individually + select layers
   res <- sapply(gcm, process_one_gcm4,
-    ssp = ssp, period = years,
-    dbnames = dbnames_ts, bbox = bbox, dbCon = dbCon,
-    max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE
+                ssp = ssp, period = years,
+                dbnames = dbnames_ts, bbox = bbox, dbCon = dbCon,
+                max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE
   )
   res <- res[!sapply(res, is.null)] ##remove NULL
   attr(res, "builder") <- "climr"
-
+  
   # Return a list of SpatRasters, one element for each model
   return(res)
 }
@@ -256,21 +270,21 @@ list_unique <- function(files, col_num) {
 process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnames, dbCon, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   # gcm_nm <- gsub("-", ".", gcm_nm)
-
+  
   rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
-
+  
   runs <- fread(file.path(rInfoPath, "gcm_period.csv"))
   runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssp, run]))
   sel_runs <- runs[1:(max_run + 1L)]
-
+  
   ## check cached
   needDownload <- TRUE
-
+  
   cPath <- file.path(cache_path(), "gcm", gcmcode)
-
+  
   if (dir.exists(cPath)) {
     bnds <- try(fread(file.path(cPath, "meta_area.csv")), silent = TRUE)
-
+    
     if (is(bnds, "try-error")) {
       ## try to get the data again
       message(
@@ -281,28 +295,28 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
       needDownload <- FALSE
     }
   }
-
+  
   if (!needDownload) {
     setorder(bnds, -numlay)
-
+    
     spat_match <- lapply(1:nrow(bnds), FUN = \(x){
       if (is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]
     })
     spat_match <- spat_match[!sapply(spat_match, is.null)]
-
+    
     if (length(spat_match) > 0) {
       periods <- fread(file.path(cPath, "meta_period.csv"))
       ssps <- fread(file.path(cPath, "meta_ssp.csv"))
       isin <- FALSE
       for (oldid in spat_match) {
         if (all(period %in% periods[uid == oldid, period]) &
-          all(ssp %in% ssps[uid == oldid, ssp]) &
-          max_run <= bnds[uid == oldid, max_run]) {
+            all(ssp %in% ssps[uid == oldid, ssp]) &
+            max_run <= bnds[uid == oldid, max_run]) {
           isin <- TRUE
           break
         }
       }
-
+      
       if (isin) {
         message("Retrieving from cache...")
         gcm_rast <- rast(file.path(cPath, paste0(oldid, ".tif")))
@@ -321,7 +335,7 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
       needDownload <- TRUE
     }
   }
-
+  
   if (needDownload) {
     q <- paste0(
       "select * from esm_layers_period where mod = '", gcm_nm, "' and scenario in ('", paste(ssp, collapse = "','"),
@@ -333,12 +347,12 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
     gcm_rast <- pgGetTerra(dbCon, gcmcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
     layerinfo[,fullnm := paste(mod,var,month,scenario,run,period,sep = "_")]
     names(gcm_rast) <- layerinfo$fullnm
-
+    
     if (cache) {
       message("Caching data...")
       uid <- UUIDgenerate()
       dir.create(cPath, recursive = TRUE, showWarnings = FALSE)
-
+      
       writeRaster(gcm_rast, file.path(cPath, paste0(uid, ".tif")))
       rastext <- ext(gcm_rast)
       t1 <- data.table(
@@ -352,7 +366,7 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
       fwrite(t3, file = file.path(cPath, "meta_ssp.csv"), append = TRUE)
     }
   }
-
+  
   return(gcm_rast)
 }
 
@@ -489,9 +503,9 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
 process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache) { ## need to update to all GCMs
   if(gcm_nm %in% dbnames$GCM){
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
-
+  
   rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
-
+  
   runs <- fread(file.path(rInfoPath, "gcm_ts.csv"))
   runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssp, run]))
   if (length(runs) < 1) {
@@ -543,7 +557,7 @@ process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts,
         if (isin) {
           message("Retrieving from cache...")
           gcm_rast <- tryCatch(
-            rast(file.path(cPath, paste0(oldid, ".tif"))),
+            suppressWarnings(rast(file.path(cPath, paste0(oldid, ".tif")))),
             error = function(e) {
               rast(file.path(cPath, paste0(oldid, ".grd")))
             }

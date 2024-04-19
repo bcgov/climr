@@ -7,7 +7,13 @@
 \usage{
 historic_input(dbCon, bbox = NULL, period = list_historic(), cache = TRUE)
 
-historic_input_ts(dbCon, bbox = NULL, years = 2010:2022, cache = TRUE)
+historic_input_ts(
+  dbCon,
+  dataset = c("cru_gpcc", "climate_na"),
+  bbox = NULL,
+  years = 2010:2022,
+  cache = TRUE
+)
 }
 \arguments{
 \item{dbCon}{A db connection object created by \code{data_connect}.}
@@ -18,6 +24,8 @@ historic_input_ts(dbCon, bbox = NULL, years = 2010:2022, cache = TRUE)
 Can be obtained from \code{\link[=list_historic]{list_historic()}}. Default to "2001_2020".}
 
 \item{cache}{logical. Specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
+
+\item{dataset}{Character. Which observational dataset to use? Current options are "climate_na" and "cru_gpcc"}
 
 \item{years}{numeric. Years to retrieve historic anomalies for. Defaults to \code{2010:2022}.
 See \code{\link[=list_historic_ts]{list_historic_ts()}} for available years.}

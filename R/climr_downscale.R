@@ -119,7 +119,10 @@
 #' )
 #'
 #' @export
-climr_downscale <- function(xyz, which_normal = "auto", historic_period = NULL, historic_ts = NULL,
+climr_downscale <- function(xyz, which_normal = "auto", 
+                            historic_period = NULL, 
+                            historic_ts = NULL,
+                            historic_ts_dataset = NULL,
                             gcm_models = NULL, ssp = NULL,
                             gcm_period = NULL, gcm_ts_years = NULL,
                             gcm_hist_years = NULL, max_run = 0L,
@@ -128,7 +131,7 @@ climr_downscale <- function(xyz, which_normal = "auto", historic_period = NULL, 
 
   ## checks
   .checkClimrDwnsclArgs(
-    xyz, which_normal, historic_period, historic_ts,
+    xyz, which_normal, historic_period, historic_ts, historic_ts_dataset,
     gcm_models, ssp, gcm_period, gcm_ts_years,
     gcm_hist_years, max_run
   )
@@ -174,7 +177,7 @@ climr_downscale <- function(xyz, which_normal = "auto", historic_period = NULL, 
     normal <- normal_input(dbCon = dbCon, normal = "normal_composite", bbox = thebb, cache = cache)
   } else {
     # message("Normals not specified, using highest resolution available for each point")
-    bc_outline <- rast(system.file("extdata", "bc_outline.tif", package = "climr"))
+    bc_outline <- rast(system.file("extdata", "wna_outline.tif", package = "climr"))
     pnts <- extract(bc_outline, xyz[, .(lon, lat)], method = "simple")
     bc_ids <- xyz[["id"]][!is.na(pnts$PPT01)]
     if (length(bc_ids) >= 1) {
@@ -193,7 +196,8 @@ climr_downscale <- function(xyz, which_normal = "auto", historic_period = NULL, 
     historic_period <- historic_input(dbCon, bbox = thebb, period = historic_period, cache = cache)
   }
   if (!is.null(historic_ts)) {
-    historic_ts <- historic_input_ts(dbCon, bbox = thebb, years = historic_ts, cache = cache)
+    historic_ts <- historic_input_ts(dbCon, dataset = historic_ts_dataset, 
+                                     bbox = thebb, years = historic_ts, cache = cache)
   }
 
   if (!is.null(gcm_models)) {
@@ -288,7 +292,7 @@ climr_downscale <- function(xyz, which_normal = "auto", historic_period = NULL, 
 #' @return NULL
 #' @noRd
 .checkClimrDwnsclArgs <- function(xyz, which_normal = NULL, historic_period = NULL, historic_ts = NULL,
-                                  gcm_models = NULL, ssp = list_ssp(), gcm_period = NULL, gcm_ts_years = NULL,
+                                  historic_ts_dataset = NULL, gcm_models = NULL, ssp = list_ssp(), gcm_period = NULL, gcm_ts_years = NULL,
                                   gcm_hist_years = NULL, max_run = 0L) {
   if(is.null(ssp) & (!is.null(gcm_period) | !is.null(gcm_ts_years))){
     stop("ssp must be specified")
@@ -305,8 +309,25 @@ climr_downscale <- function(xyz, which_normal = "auto", historic_period = NULL, 
   }
   
   if (!is.null(historic_ts)) {
-    if (!all(historic_ts %in% 1902:2015)) {
-      stop("'historic_ts' must be in 1902:2015")
+    if(is.null(historic_ts_dataset)){
+      stop("'historic_ts_dataset' must be specified.")
+    }
+    if(historic_ts_dataset == "cru_gpcc"){
+      if (!all(historic_ts %in% 1901:2022)) {
+        stop("'historic_ts' must be in 1901:2022")
+      }
+    }else if(historic_ts_dataset == "climate_na"){
+      if (!all(historic_ts %in% 1902:2015)) {
+        stop("'historic_ts' must be in 1902:2015")
+      }
+    }else{
+      stop("historic_ts_dataset must be either 'cru_gpcc' or 'climate_na'")
+    }
+  }
+  
+  if(!is.null(historic_ts_dataset)){
+    if(is.null(historic_ts)){
+      stop("'historic_ts' must be specified")
     }
   }
   
