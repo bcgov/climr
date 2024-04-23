@@ -171,7 +171,7 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL,
 
     if (!is.null(plot)) {
       if (!plot %in% vars) {
-        stop("The variable you wish to plot was not dowscaled. Please pass a variable listed in 'vars'")
+        stop("The variable you wish to plot was not downscaled. Please pass a variable listed in 'vars'")
       }
       ## make a mask of the normals data "extent"
       msk <- normal[[1]]
@@ -455,9 +455,27 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
   )
   # Extract gcm bilinear interpolations
   # Cropping will reduce the size of data to load in memory
-  climaterast <- crop(climaterast, ex, snap = "out")
-  climaterast <- extract(x = climaterast, y = xyz[, .(lon, lat)], method = "bilinear")
 
+  climaterast <- crop(climaterast, ex, snap = "out")
+  gc(reset = TRUE)  ## free unused memory
+  
+  climaterast <- try(extract(x = climaterast, y = xyz[, .(lon, lat)], method = "bilinear"))
+  
+  ## we may have run out of memory if there are MANY rasters
+  ## attempt to get only unique raster cell values 
+  ## (i.e. xyz may be at higher res than the climaterast leading to extracting the same values many times)
+  if (is(climaterast, "try-error")) {
+    if (grepl("bad_alloc", climaterast)) {
+      message("System is out of memory to extract climate values for the supplied coordinates")
+        stop("Insufficient memory to downscale climate data for these many points/climate layers.\n",
+             "  Try reducing number of points/layers.")
+      }
+    } else {
+      stop("Climate value extraction failed.",
+           "\n   Please contact developers with a reproducible example and the error:\n",
+           climaterast) 
+    }
+  
   # Create match set to match with res names
   labels <- vapply(
     strsplit(nm, "_"),
