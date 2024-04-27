@@ -29,12 +29,7 @@
 #'
 #' @examples
 #' # data frame of arbitrary points on Vancouver Island
-#' my_points <- data.frame(
-#'   lon = c(-123.4404, -123.5064, -124.2317),
-#'   lat = c(48.52631, 48.46807, 49.21999),
-#'   elev = c(52, 103, 357),
-#'   id = LETTERS[1:3]
-#' )
+#' my_points <- data.frame(lon = -127.7300, lat = 55.34114, elev = 711, id = 1)
 #'
 #' # draw the plot
 #' plot_timeSeries(my_points)
@@ -54,7 +49,7 @@ plot_timeSeries <- function(
     xyz,
     observations = c("climateNA"),
     variable1 = "Tave_sm",
-    variable2 = "Tave_wt",
+    variable2 = NULL,
     gcms.ts = list_gcm()[c(1,4,5,7,10,11,12)],
     gcms.compare = NA,
     ssps = list_ssp()[1:3],
@@ -77,9 +72,6 @@ plot_timeSeries <- function(
   } else {
     data("variables", envir = environment())
     
-    # variable type for default scaling (percent or absolute)
-    var_type <- variables$Scale[which(variables$Code == xvar)]
-    
     colors <- c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C", "#FB9A99", "#E31A1C", "#FDBF6F", "#FF7F00", "#CAB2D6", "#6A3D9A", "#1e90ff", "#B15928", "#FFFF99")
     ColScheme <- colors[1:length(gcm_models)]
     
@@ -88,11 +80,11 @@ plot_timeSeries <- function(
     scenario.names <- c("Historical simulations", "SSP1-2.6", "SSP2-4.5", "SSP3-7.0", "SSP5-8.5")
     
     # generate the climate data
-    data <- climr_downscale(pt, 
+    data <- climr_downscale(xyz, 
                             gcm_models = list_gcm(),
                             ssp = list_ssp(),
                             max_run = 10,
-                            historic_ts = 1901:2022,
+                            historic_ts = 1902:2015,
                             gcm_hist_years = 1901:2014, 
                             gcm_ts_years = 2015:2100
     )
@@ -103,11 +95,13 @@ plot_timeSeries <- function(
     num <- 1
     for(num in nums){
       
-      # data for observations
-      yeartime <- get(paste("yeartime",num,sep=""))
-      element <- get(paste("element",num,sep=""))
+      # components of the variable (note this will not work for monthly variables until we change the variable naming convention to underscore delimitated (e.g., Tave_01 instead of the current Tave01))
       variable <- get(paste("variable",num,sep=""))
+      variable.components <- unlist(strsplit(variable, "_"))
+      yeartime <- if(length(variable.components)==1) NA else variable.components[length(variable.components)] #do by length because some elements have an underscore in them
+      element <- if(length(grep("DD_0|DD_18", variable))==1) paste(variable.components[1:2], collapse="_") else variable.components[1]
       
+      # data for observations
       obs.ts.mean <- read.csv(paste("data/ts.obs.mean.", ecoprov, ".csv", sep=""))
       
       x1 <- unique(obs.ts.mean[,1])
