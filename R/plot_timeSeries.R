@@ -59,8 +59,8 @@ plot_timeSeries <- function(
     gcms.compare = NA,
     ssps = list_ssp()[1:3],
     nums = c(1),
-    biascorrect = T,
-    showrange = T,
+    biascorrect = T,  #TODO
+    showrange = T, 
     yfit = T,
     cex = 1,
     compare.ensemble = "None",
@@ -70,8 +70,6 @@ plot_timeSeries <- function(
     refline = T,
     yearlines = T,
     mode = "Ensemble",
-    gcms.ts1 = gcms[4],
-    gcms.ts2 = gcms[select8],
     interactive = FALSE,
     cache = TRUE) {
   if (!requireNamespace("stinepack", quietly = TRUE)) {
@@ -497,7 +495,7 @@ plot_timeSeries <- function(
       f <- if(length(gcms.ts>0)) 6 else NA
       g <- if(compare.ensemble!="None") 7 else NA
       s <- !is.na(c(a,b,c,d,e,f,g))
-      legend.GCM <- if(mode=="Ensemble") paste("Simulated (", length(gcms.ts2), " GCMs)", sep="")  else paste("Simulated (", gcms.ts1, ")", sep="")
+      legend.GCM <- if(mode=="Ensemble") paste("Simulated (", length(gcms.ts), " GCMs)", sep="")  else paste("Simulated (", gcms.ts, ")", sep="")
       legend.compare <- paste("Simulated (", length(gcms.compare), " GCMs)", sep="")  
       legend("topleft", title = "", legend=c("Observed (PCIC)", "Observed (ClimateBC)", "ERA5 reanalysis", "ERA5-land reanalysis", "Observed (GISTEMP)", legend.GCM, legend.compare)[s], bty="n",
              lty=c(1,1,1,1,1,1,2)[s], 
