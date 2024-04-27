@@ -56,8 +56,8 @@ plot_timeSeries <- function(
     variable1 = "Tave_sm",
     variable2 = "Tave_wt",
     gcms.ts = list_gcm()[c(1,4,5,7,10,11,12)],
-    gcms.compare = NA, #remove
-    scenarios1 = c(scenarios[1:4]),
+    gcms.compare = NA,
+    ssps = list_ssp()[1:3],
     nums = c(1),
     biascorrect = T,
     showrange = T,
@@ -84,6 +84,10 @@ plot_timeSeries <- function(
     
     colors <- c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C", "#FB9A99", "#E31A1C", "#FDBF6F", "#FF7F00", "#CAB2D6", "#6A3D9A", "#1e90ff", "#B15928", "#FFFF99")
     ColScheme <- colors[1:length(gcm_models)]
+    
+    scenarios.selected <- c("historical", ssps)
+    scenarios <- c("historical", list_ssp())
+    scenario.names <- c("Historical simulations", "SSP1-2.6", "SSP2-4.5", "SSP3-7.0", "SSP5-8.5")
     
     # generate the climate data
     data <- climr_downscale(pt, 
@@ -121,7 +125,7 @@ plot_timeSeries <- function(
         ## Note: rather than reading in a single large data file, this app stores data in many (~2000) small files, and reads them in on demand by user input
         data <- read.csv(paste("data/", paste(ensstat, ecoprov, get(paste("variable",num, sep="")), "csv", sep="."), sep=""))
         temp.historical <- data[which(data[,1]=="historical"),-1]
-        for(scenario in scenarios1){
+        for(scenario in scenarios.selected){
           temp <- data[which(data[,1]==scenario),-1]
           if(scenario != "historical"){
             temp <- rbind(temp.historical[dim(temp.historical)[1],match(names(temp), names(temp.historical))], temp) # add last year of historical runs
@@ -229,8 +233,8 @@ plot_timeSeries <- function(
       # time series for the comparison ensemble
       colScheme <- c("gray60", "dodgerblue4", "seagreen", "darkorange3", "darkred")
       if(compare.ensemble!="None"){
-        # scenario <- scenarios1[1]
-        for(scenario in scenarios1[order(c(1,4,5,3,2)[which(scenarios%in%scenarios1)])]){
+        # scenario <- scenarios.selected[1]
+        for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])]){
           
           for(ensstat in ensstats){
             temp <- get(paste(ensstat, scenario, num, sep="."))
@@ -261,7 +265,7 @@ plot_timeSeries <- function(
         }
         
         # overlay the ensemble mean lines on top of all polygons
-        for(scenario in scenarios1[order(c(1,4,5,3,2)[which(scenarios%in%scenarios1)])]){
+        for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])]){
           if(showmean==T) lines(get(paste("x", scenario, sep=".")), get(paste("ensmean", scenario, sep=".")), col=colScheme[which(scenarios==scenario)], lwd=2, lty=2)
         }
       }
@@ -270,8 +274,8 @@ plot_timeSeries <- function(
       if(compile==T) gcms.ts <- "compile" #this prevents the plotting of individual GCM projections and plots a single envelope for the ensemble as a whole. 
       gcm <- gcms.ts[1]
       for(gcm in gcms.ts){
-        # scenario <- scenarios1[1]
-        for(scenario in scenarios1[order(c(1,4,5,3,2)[which(scenarios%in%scenarios1)])]){
+        # scenario <- scenarios.selected[1]
+        for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])]){
           
           for(ensstat in ensstats){
             temp <- get(paste(ensstat, scenario, num, sep="."))
@@ -287,12 +291,12 @@ plot_timeSeries <- function(
         
         if(showrange==T) {
           if(simplify==F){
-            for(scenario in scenarios1[order(c(1,4,5,3,2)[which(scenarios%in%scenarios1)])]){
+            for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])]){
               x <- get(paste("x", scenario, sep="."))
               polygon(c(x, rev(x)), c(get(paste("ensmin", scenario, sep=".")), rev(get(paste("ensmax", scenario, sep=".")))), col=alpha(colScheme[which(scenarios==scenario)], if(gcm=="ensemble") 0.35 else 0.35), border=colScheme[which(scenarios==scenario)])
             }
           } else {
-            scenarios.select <- scenarios1[order(c(1,4,5,3,2)[which(scenarios%in%scenarios1)])][-1]
+            scenarios.select <- scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])][-1]
             for(scenario in scenarios.select){
               if(scenario==scenarios.select[1]){ # need to run spline through the historical/projected transition
                 x4 <- c(x.historical, get(paste("x", scenario, sep="."))[-1])
@@ -328,13 +332,13 @@ plot_timeSeries <- function(
         
         # overlay the ensemble mean lines on top of all polygons
         if(showmean==T){
-          for(scenario in scenarios1[order(c(1,4,5,3,2)[which(scenarios%in%scenarios1)])]){
+          for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])]){
             if(simplify==F) lines(x=get(paste("x", scenario, sep=".")), y=get(paste("ensmean", scenario, sep=".")), col=colScheme[which(scenarios==scenario)], lwd=2)
             
             # calculate a spline through the time series (used for plotting and the text warming value)
             if(scenario=="historical"){ # need to run spline through the historical/projected transition
-              x4 <- c(x.historical, get(paste("x", scenarios1[2], sep=".")))
-              y4 <- c(ensmean.historical, get(paste("ensmean", scenarios1[2], sep=".")))
+              x4 <- c(x.historical, get(paste("x", scenarios.selected[2], sep=".")))
+              y4 <- c(ensmean.historical, get(paste("ensmean", scenarios.selected[2], sep=".")))
             } else {
               x4 <- c(x.historical, get(paste("x", scenario, sep=".")))
               y4 <- c(ensmean.historical, get(paste("ensmean", scenario, sep=".")))
@@ -503,7 +507,7 @@ plot_timeSeries <- function(
              pt.bg = c(NA, NA,NA,NA,NA,NA,NA)[s], 
              pt.cex=c(NA,NA,NA,NA,NA,NA,NA)[s])
       
-      s <- rev(which(scenarios[-1]%in%scenarios1))
+      s <- rev(which(scenarios[-1]%in%scenarios.selected))
       legend("top", title = "Scenarios", legend=c("Historical", scenario.names[-1][s]), bty="n",
              lty=c(NA,NA,NA,NA,NA)[c(1,s+1)], col=colScheme[c(1,s+1)], lwd=c(NA,NA,NA,NA,NA)[c(1,s+1)], pch=c(22,22,22,22,22)[c(1,s+1)], pt.bg = alpha(colScheme[c(1,s+1)], 0.35), pt.cex=c(2,2,2,2,2)[c(1,s+1)])
       
