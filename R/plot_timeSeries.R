@@ -54,7 +54,6 @@ plot_timeSeries <- function(
     gcms.compare = NA,
     ssps = list_ssp()[1:3],
     nums = c(1),
-    biascorrect = T,  #TODO
     showrange = T, 
     yfit = T,
     cex = 1,
@@ -124,18 +123,6 @@ plot_timeSeries <- function(
           if(scenario == "historical") if(ensstat=="ensmean") baseline.mod <- apply(temp[which(temp[,1]%in%1961:1990),-1], 2, mean)
           
           alldata <- c(alldata, as.vector(unlist(temp[-1]))) #store values in a big vector for maintaining a constant ylim
-          # optional bias correction
-          if(biascorrect==T){
-            if(element=="PPT"){
-              delta <- baseline.obs/baseline.mod
-              delta <- delta[which(names(delta)!="compile")]
-              temp[,-1] <- sweep(temp[,-1], 2, delta, '*')
-            } else {
-              delta <- baseline.obs-baseline.mod
-              delta <- delta[which(names(delta)!="compile")]
-              temp[,-1] <- sweep(temp[,-1], 2, delta[match(names(temp[-1]), names(delta))], '+')
-            }
-          }
           temp$compile <- if(length(gcms.ts)==0) rep(NA, dim(temp)[1]) else if(length(gcms.ts)==1) temp[,which(names(temp)==gcms.ts)] else apply(temp[,which(names(temp)%in%gcms.ts)], 1, substr(ensstat, 4, nchar(ensstat)), na.rm=T)
           if(is.na(gcms.compare)!=T) temp$compare <- apply(temp[,which(names(temp)%in%gcms.compare)], 1, substr(ensstat, 4, nchar(ensstat)), na.rm=T)
           assign(paste(ensstat, scenario, num, sep="."), temp)
@@ -174,7 +161,6 @@ plot_timeSeries <- function(
         y.era5 <- era5.ts.mean[,which(names(era5.ts.mean)==variable)]
         baseline.era5 <- mean(y.era5[which(x.era5%in%1981:2010)]) # for ERA5, because it has different bias prior to 1979
         bias.era5 <- baseline.obs.1981 - baseline.era5
-        if(biascorrect==T) y.era5 <- y.era5+bias.era5
         recent.era5 <- mean(y.era5[which(x.era5%in%2013:2022)], na.rm=T)
       }
       
@@ -185,7 +171,6 @@ plot_timeSeries <- function(
         y.era5land <- era5land.ts.mean[,which(names(era5land.ts.mean)==variable)]
         baseline.era5land <- mean(y.era5land[which(x.era5land%in%1981:2010)]) # for ERA5, because it has different bias prior to 1979
         bias.era5land <- baseline.obs.1981 - baseline.era5land
-        if(biascorrect==T) y.era5land <- y.era5land+bias.era5land
         recent.era5land <- mean(y.era5land[which(x.era5land%in%2013:2022)], na.rm=T)
       }
       
@@ -206,7 +191,6 @@ plot_timeSeries <- function(
       #   y.cru <- cru.ts.mean[,which(names(cru.ts.mean)==variable)]
       #   baseline.cru <- mean(y.cru[which(x.cru%in%1961:1990)])
       #   bias.cru <- baseline.obs - baseline.cru
-      #   if(biascorrect==T) y.cru <- y.cru+bias.cru
       #   recent.cru <- mean(y.cru[which(x.cru%in%2014:2023)], na.rm=T)
       # }
       
@@ -217,7 +201,6 @@ plot_timeSeries <- function(
         y.giss <- giss.ts.mean[,which(names(giss.ts.mean)==variable)]
         baseline.giss <- mean(y.giss[which(x.giss%in%1961:1990)])
         bias.giss <- baseline.obs - baseline.giss
-        if(biascorrect==T) y.giss <- y.giss+bias.giss
         recent.giss <- mean(y.giss[which(x.giss%in%2013:2022)], na.rm=T)
       }
       
