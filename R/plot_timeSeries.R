@@ -48,7 +48,7 @@
 plot_timeSeries <- function(
     xyz,
     observations = c("climateNA"),
-    variable1 = "Tave_sm",
+    variable1 = "Tmax_sm",
     variable2 = NULL,
     gcms.ts = list_gcm()[c(1,4,5,7,10,11,12)],
     gcms.compare = NA,
@@ -86,7 +86,8 @@ plot_timeSeries <- function(
                             max_run = 10,
                             historic_ts = 1902:2015,
                             gcm_hist_years = 1901:2014, 
-                            gcm_ts_years = 2015:2100
+                            gcm_ts_years = 2015:2100, 
+                            vars = list_variables()
     )
     
     ## Assemble the data that will be used in the plot
@@ -102,10 +103,8 @@ plot_timeSeries <- function(
       element <- if(length(grep("DD_0|DD_18", variable))==1) paste(variable.components[1:2], collapse="_") else variable.components[1]
       
       # data for observations
-      obs.ts.mean <- read.csv(paste("data/ts.obs.mean.", ecoprov, ".csv", sep=""))
-      
-      x1 <- unique(obs.ts.mean[,1])
-      y1 <- obs.ts.mean[,which(names(obs.ts.mean)==variable)]
+      x1 <- data[is.na(GCM) & PERIOD%in%1901:2100, PERIOD] # specified up to 2100 to allow for future updates to the time series data
+      y1 <- data[is.na(GCM) & PERIOD%in%1901:2100, get(variable)]
       baseline.obs <- mean(y1[which(x1%in%1961:1990)])
       alldata <- c(alldata, y1) #store values in a big vector for maintaining a constant ylim
       visibledata <- c(visibledata, y1) #store values in a big vector for maintaining a constant ylim
