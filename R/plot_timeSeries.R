@@ -71,12 +71,21 @@ plot_timeSeries <- function(
   } else {
     data("variables", envir = environment())
     
-    colors <- c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C", "#FB9A99", "#E31A1C", "#FDBF6F", "#FF7F00", "#CAB2D6", "#6A3D9A", "#1e90ff", "#B15928", "#FFFF99")
-    ColScheme <- colors[1:length(gcm_models)]
-    
+    # Scenario definitions
     scenarios.selected <- c("historical", ssps)
     scenarios <- c("historical", list_ssp())
     scenario.names <- c("Historical simulations", "SSP1-2.6", "SSP2-4.5", "SSP3-7.0", "SSP5-8.5")
+    
+    # yeartime definitions
+    monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12")
+    seasonmonth.mat <- matrix(monthcodes[c(12, 1:11)],4, byrow=T)
+    seasons <- c("wt", "sp", "sm", "at")
+    season.names <- c("Winter", "Spring", "Summer", "Autumn")
+    yeartimes <- c(seasons, monthcodes)
+    yeartime.names <- c(season.names, month.name)
+    
+    # ensemble statistics definitions
+    ensstats <- c("ensmin", "ensmax", "ensmean")
     
     # generate the climate data
     data <- climr_downscale(xyz, 
@@ -108,15 +117,13 @@ plot_timeSeries <- function(
       alldata <- c(alldata, y1) #store values in a big vector for maintaining a constant ylim
       visibledata <- c(visibledata, y1) #store values in a big vector for maintaining a constant ylim
       
-      #data for GCMs
+      #compile the ensemble statistics (mean, min, max)  into a wide-format table by year and GCM
       # ensstat <- ensstats[1]
-      for(ensstat in ensstats[c(3,1,2)]){ #need to reorder the enstats so that mean comes first, for bias correction
-        # scenario <- scenarios[1]
-        ## Note: rather than reading in a single large data file, this app stores data in many (~2000) small files, and reads them in on demand by user input
-        data <- read.csv(paste("data/", paste(ensstat, ecoprov, get(paste("variable",num, sep="")), "csv", sep="."), sep=""))
-        temp.historical <- data[which(data[,1]=="historical"),-1]
+      for(ensstat in ensstats){ 
+        temp.historical <- data[!is.na(GCM) & is.na(SSP), get(variable)]
+        # scenario <- scenarios[2]
         for(scenario in scenarios.selected){
-          temp <- data[which(data[,1]==scenario),-1]
+          temp <- data[!is.na(GCM) & SSP==scenario, get(variable)]
           if(scenario != "historical"){
             temp <- rbind(temp.historical[dim(temp.historical)[1],match(names(temp), names(temp.historical))], temp) # add last year of historical runs
           }
