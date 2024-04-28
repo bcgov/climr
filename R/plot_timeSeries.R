@@ -53,10 +53,10 @@ library(data.table)
 library(stinepack)
 library(scales)
 xyz = my_points
-observations = c("climateNA")
+observations = c("climatena") 
 variable1 = "Tmax_sm"
 variable2 = "Tmin_sm"
-gcms.ts = list_gcm()[c(1,4,5,7,10,11,12)]
+gcms.ts = list_gcm()[c(1)]
 ssps = list_ssp()[1:3]
 showrange = T 
 yfit = T
@@ -74,7 +74,7 @@ cache = TRUE
 
 plot_timeSeries <- function(
     xyz,
-    observations = c("climateNA"),
+    observations = c("climatena"), #TODO we will have to resolve the inconsistencies with the dataset naming convention in climr (ideally changing the climr naming)
     variable1 = "Tmax_sm",
     variable2 = "Tmin_sm",
     gcms.ts = list_gcm()[c(1,4,5,7,10,11,12)],
@@ -287,63 +287,62 @@ plot_timeSeries <- function(
       # }
       
       # data for observations
-      x.climatena <- data[is.na(GCM) & PERIOD%in% 1901-2100]
-      y.climatena <- obs.ts.mean[,which(names(obs.ts.mean)==variable)]
+      x.climatena <- as.numeric(data[is.na(GCM) & PERIOD%in%1900:2100, "PERIOD"][[1]])
+      y.climatena <- data[is.na(GCM) & PERIOD%in%1900:2100, get(variable)]
       baseline.obs <- mean(y.climatena[which(x.climatena%in%1961:1990)])
       baseline.obs.1981 <- mean(y.climatena[which(x.climatena%in%1981:2010)]) # for ERA5, because it has different bias prior to 1979
       recent.climatena <- mean(y.climatena[which(x.climatena%in%2013:2022)])
       
-      # data for era5
-      if("era5"%in%observations){
-        era5.ts.mean <- read.csv(paste("data/ts.era5.mean.", ecoprov, ".csv", sep=""))
-        x.era5 <- unique(era5.ts.mean[,1])
-        y.era5 <- era5.ts.mean[,which(names(era5.ts.mean)==variable)]
-        baseline.era5 <- mean(y.era5[which(x.era5%in%1981:2010)]) # for ERA5, because it has different bias prior to 1979
-        bias.era5 <- baseline.obs.1981 - baseline.era5
-        recent.era5 <- mean(y.era5[which(x.era5%in%2013:2022)], na.rm=T)
-      }
-      
-      # data for era5land
-      if("era5land"%in%observations){
-        era5land.ts.mean <- read.csv(paste("data/ts.era5land.mean.", ecoprov, ".csv", sep=""))
-        x.era5land <- unique(era5land.ts.mean[,1])
-        y.era5land <- era5land.ts.mean[,which(names(era5land.ts.mean)==variable)]
-        baseline.era5land <- mean(y.era5land[which(x.era5land%in%1981:2010)]) # for ERA5, because it has different bias prior to 1979
-        bias.era5land <- baseline.obs.1981 - baseline.era5land
-        recent.era5land <- mean(y.era5land[which(x.era5land%in%2013:2022)], na.rm=T)
-      }
-      
-      # data for pcic
-      if("pcic"%in%observations){
-        pcic.ts.mean <- read.csv(paste("data/ts.pcic.mean.", ecoprov, ".csv", sep=""))
-        x.pcic <- unique(pcic.ts.mean[,1])
-        y.pcic <- if(element=="PPT") pcic.ts.mean[,which(names(pcic.ts.mean)==variable)]*mean(y.climatena[which(x.climatena%in%1981:2010)]) + mean(y.climatena[which(x.climatena%in%1981:2010)]) else pcic.ts.mean[,which(names(pcic.ts.mean)==variable)] + mean(y.climatena[which(x.climatena%in%1981:2010)])  # apply faron's anomalies to the 1981-2010 absolute value of climatena time series. 
-        baseline.pcic <- mean(y.pcic[which(x.pcic%in%1961:1990)])
-        y.pcic <- if(element=="PPT") y.pcic*(baseline.obs/baseline.pcic) else y.pcic+(baseline.obs-baseline.pcic)   # bias correct to 1961-1990 period
-        recent.pcic <- mean(y.pcic[which(x.pcic%in%2012:2021)], na.rm=T)
-      }
-      
-      # # data for cru/gpcc
-      # if("cru"%in%observations){
-      #   cru.ts.mean <- read.csv(paste("data/ts.cru.mean.", ecoprov, ".csv", sep=""))
-      #   x.cru <- unique(cru.ts.mean[,1])
-      #   y.cru <- cru.ts.mean[,which(names(cru.ts.mean)==variable)]
-      #   baseline.cru <- mean(y.cru[which(x.cru%in%1961:1990)])
-      #   bias.cru <- baseline.obs - baseline.cru
-      #   recent.cru <- mean(y.cru[which(x.cru%in%2014:2023)], na.rm=T)
+      # TODO add in other observational time series once they are available in climr
+      # # data for era5
+      # if("era5"%in%observations){
+      #   era5.ts.mean <- read.csv(paste("data/ts.era5.mean.", ecoprov, ".csv", sep=""))
+      #   x.era5 <- unique(era5.ts.mean[,1])
+      #   y.era5 <- era5.ts.mean[,which(names(era5.ts.mean)==variable)]
+      #   baseline.era5 <- mean(y.era5[which(x.era5%in%1981:2010)]) # for ERA5, because it has different bias prior to 1979
+      #   bias.era5 <- baseline.obs.1981 - baseline.era5
+      #   recent.era5 <- mean(y.era5[which(x.era5%in%2013:2022)], na.rm=T)
       # }
-      
-      # data for GISTEMP
-      if("giss"%in%observations){
-        giss.ts.mean <- read.csv(paste("data/ts.giss.mean.", ecoprov, ".csv", sep=""))
-        x.giss <- unique(giss.ts.mean[,1])
-        y.giss <- giss.ts.mean[,which(names(giss.ts.mean)==variable)]
-        baseline.giss <- mean(y.giss[which(x.giss%in%1961:1990)])
-        bias.giss <- baseline.obs - baseline.giss
-        recent.giss <- mean(y.giss[which(x.giss%in%2013:2022)], na.rm=T)
-      }
-      
-      
+      # 
+      # # data for era5land
+      # if("era5land"%in%observations){
+      #   era5land.ts.mean <- read.csv(paste("data/ts.era5land.mean.", ecoprov, ".csv", sep=""))
+      #   x.era5land <- unique(era5land.ts.mean[,1])
+      #   y.era5land <- era5land.ts.mean[,which(names(era5land.ts.mean)==variable)]
+      #   baseline.era5land <- mean(y.era5land[which(x.era5land%in%1981:2010)]) # for ERA5, because it has different bias prior to 1979
+      #   bias.era5land <- baseline.obs.1981 - baseline.era5land
+      #   recent.era5land <- mean(y.era5land[which(x.era5land%in%2013:2022)], na.rm=T)
+      # }
+      # 
+      # # data for pcic
+      # if("pcic"%in%observations){
+      #   pcic.ts.mean <- read.csv(paste("data/ts.pcic.mean.", ecoprov, ".csv", sep=""))
+      #   x.pcic <- unique(pcic.ts.mean[,1])
+      #   y.pcic <- if(element=="PPT") pcic.ts.mean[,which(names(pcic.ts.mean)==variable)]*mean(y.climatena[which(x.climatena%in%1981:2010)]) + mean(y.climatena[which(x.climatena%in%1981:2010)]) else pcic.ts.mean[,which(names(pcic.ts.mean)==variable)] + mean(y.climatena[which(x.climatena%in%1981:2010)])  # apply faron's anomalies to the 1981-2010 absolute value of climatena time series. 
+      #   baseline.pcic <- mean(y.pcic[which(x.pcic%in%1961:1990)])
+      #   y.pcic <- if(element=="PPT") y.pcic*(baseline.obs/baseline.pcic) else y.pcic+(baseline.obs-baseline.pcic)   # bias correct to 1961-1990 period
+      #   recent.pcic <- mean(y.pcic[which(x.pcic%in%2012:2021)], na.rm=T)
+      # }
+      # 
+      # # # data for cru/gpcc
+      # # if("cru"%in%observations){
+      # #   cru.ts.mean <- read.csv(paste("data/ts.cru.mean.", ecoprov, ".csv", sep=""))
+      # #   x.cru <- unique(cru.ts.mean[,1])
+      # #   y.cru <- cru.ts.mean[,which(names(cru.ts.mean)==variable)]
+      # #   baseline.cru <- mean(y.cru[which(x.cru%in%1961:1990)])
+      # #   bias.cru <- baseline.obs - baseline.cru
+      # #   recent.cru <- mean(y.cru[which(x.cru%in%2014:2023)], na.rm=T)
+      # # }
+      # 
+      # # data for GISTEMP
+      # if("giss"%in%observations){
+      #   giss.ts.mean <- read.csv(paste("data/ts.giss.mean.", ecoprov, ".csv", sep=""))
+      #   x.giss <- unique(giss.ts.mean[,1])
+      #   y.giss <- giss.ts.mean[,which(names(giss.ts.mean)==variable)]
+      #   baseline.giss <- mean(y.giss[which(x.giss%in%1961:1990)])
+      #   bias.giss <- baseline.obs - baseline.giss
+      #   recent.giss <- mean(y.giss[which(x.giss%in%2013:2022)], na.rm=T)
+      # }
       
       # add in PCIC observations
       pcic.color <- "blue"
@@ -445,33 +444,32 @@ plot_timeSeries <- function(
         # lines(c(2013,2022), rep(recent.giss, 2), lty=2, col=giss.color)
       }
       
-      #legend
-      a <- if("pcic"%in%observations) 1 else NA
-      b <- if("climatena"%in%observations) 2 else NA
-      c <- if("era5"%in%observations) 3 else NA
-      d <- if("era5land"%in%observations) 4 else NA
-      e <- if("giss"%in%observations) 5 else NA
-      f <- if(length(gcms.ts>0)) 6 else NA
-      s <- !is.na(c(a,b,c,d,e,f))
-      legend.GCM <- if(mode=="Ensemble") paste("Simulated (", length(gcms.ts), " GCMs)", sep="")  else paste("Simulated (", gcms.ts, ")", sep="")
-      legend("topleft", title = "", legend=c("Observed (PCIC)", "Observed (climatena)", "ERA5 reanalysis", "ERA5-land reanalysis", "Observed (GISTEMP)", legend.GCM)[s], bty="n",
-             lty=c(1,1,1,1,1,1)[s], 
-             col=c(pcic.color, obs.color, era5.color, era5land.color, giss.color, "gray")[s], 
-             lwd=c(3,1.5,2,2,2,2)[s], 
-             pch=c(NA,NA,NA,NA,NA,NA)[s], 
-             pt.bg = c(NA, NA,NA,NA,NA,NA)[s], 
-             pt.cex=c(NA,NA,NA,NA,NA,NA)[s])
-      
-      s <- rev(which(scenarios[-1]%in%scenarios.selected))
-      legend("top", title = "Scenarios", legend=c("Historical", scenario.names[-1][s]), bty="n",
-             lty=c(NA,NA,NA,NA,NA)[c(1,s+1)], col=scenario.colScheme[c(1,s+1)], lwd=c(NA,NA,NA,NA,NA)[c(1,s+1)], pch=c(22,22,22,22,22)[c(1,s+1)], pt.bg = alpha(scenario.colScheme[c(1,s+1)], 0.35), pt.cex=c(2,2,2,2,2)[c(1,s+1)])
-      
-      mtext(ecoprov.names[which(ecoprovs==ecoprov)], side=1, line=-1.5, adj=0.95, font=2, cex=1.4)
-      
-      mtext(paste(" Created using https://bcgov-env.shinyapps.io/cmip6-BC\n", "Contact: Colin Mahony colin.mahony@gov.bc.ca"), side=1, line=-1.35, adj=0.0, font=1, cex=1.1, col="gray")
-      
       print(num)
     }
+
+    #legend
+    a <- if("pcic"%in%observations) 1 else NA
+    b <- if("climatena"%in%observations) 2 else NA
+    c <- if("era5"%in%observations) 3 else NA
+    d <- if("era5land"%in%observations) 4 else NA
+    e <- if("giss"%in%observations) 5 else NA
+    f <- if(length(gcms.ts>0)) 6 else NA
+    s <- !is.na(c(a,b,c,d,e,f))
+    legend.GCM <- if(mode=="Ensemble") paste("Simulated (", length(gcms.ts), " GCMs)", sep="")  else paste("Simulated (", gcms.ts, ")", sep="")
+    legend("topleft", title = "", legend=c("Observed (PCIC)", "Observed (climatena)", "ERA5 reanalysis", "ERA5-land reanalysis", "Observed (GISTEMP)", legend.GCM)[s], bty="n",
+           lty=c(1,1,1,1,1,1)[s], 
+           col=c(pcic.color, obs.color, era5.color, era5land.color, giss.color, "gray")[s], 
+           lwd=c(3,1.5,2,2,2,2)[s], 
+           pch=c(NA,NA,NA,NA,NA,NA)[s], 
+           pt.bg = c(NA, NA,NA,NA,NA,NA)[s], 
+           pt.cex=c(NA,NA,NA,NA,NA,NA)[s])
+    
+    s <- rev(which(scenarios[-1]%in%scenarios.selected))
+    legend("top", title = "Scenarios", legend=c("Historical", scenario.names[-1][s]), bty="n",
+           lty=c(NA,NA,NA,NA,NA)[c(1,s+1)], col=scenario.colScheme[c(1,s+1)], lwd=c(NA,NA,NA,NA,NA)[c(1,s+1)], pch=c(22,22,22,22,22)[c(1,s+1)], pt.bg = alpha(scenario.colScheme[c(1,s+1)], 0.35), pt.cex=c(2,2,2,2,2)[c(1,s+1)])
+    
+    mtext(paste(" Created using climr (https://bcgov.github.io/climr/)"), side=1, line=-1.35, adj=0.0, font=1, cex=1.1, col="gray")
+    
     box()
     
       }
