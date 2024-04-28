@@ -45,11 +45,38 @@
 #'
 #' @export
 
+
+
+# Temporary variable definitions
+library(climr)
+library(data.table)
+library(stinepack)
+library(scales)
+xyz = my_points
+observations = c("climateNA")
+variable1 = "Tmax_sm"
+variable2 = "Tmin_sm"
+gcms.ts = list_gcm()[c(1,4,5,7,10,11,12)]
+ssps = list_ssp()[1:3]
+showrange = T 
+yfit = T
+cex = 1
+showmean = T
+compile = T
+simplify = T
+refline = T
+yearlines = T
+mode = "Ensemble"
+interactive = FALSE
+cache = TRUE
+  
+
+
 plot_timeSeries <- function(
     xyz,
     observations = c("climateNA"),
     variable1 = "Tmax_sm",
-    variable2 = NULL,
+    variable2 = "Tmin_sm",
     gcms.ts = list_gcm()[c(1,4,5,7,10,11,12)],
     ssps = list_ssp()[1:3],
     showrange = T, 
@@ -63,10 +90,14 @@ plot_timeSeries <- function(
     mode = "Ensemble",
     interactive = FALSE,
     cache = TRUE) {
-  if (!requireNamespace("stinepack", quietly = TRUE)) {
+  if (!requireNamespace("scales", quietly = TRUE)) {
+    stop("package scales must be installed to use this function")
+  } else  
+    if (!requireNamespace("stinepack", quietly = TRUE)) {
     stop("package stinepack must be installed to use this function")
   } else {
-    data("variables", envir = environment())
+    # data("variables", envir = environment()) #TODO temporary until we can resolve the error in the devl branch
+    variables <- fread("data-raw/derivedVariables/Variables_climatena.csv") #TODO temporary until we can resolve the error in the devl branch
     
     # Scenario definitions
     scenarios.selected <- c("historical", ssps)
@@ -85,13 +116,14 @@ plot_timeSeries <- function(
     # ensemble statistics definitions
     ensstats <- c("ensmin", "ensmax", "ensmean")
     
-    # generate the climate data
+    # generate the climate data (TODO we will have to move this outside the function because it takes too long)
     data <- climr_downscale(xyz, 
                             gcm_models = list_gcm(),
                             ssp = list_ssp(),
                             max_run = 10,
+                            # historic_ts_dataset = "climate_na", #TODO uncomment this once we fix the error in the devl branch. 
                             historic_ts = 1902:2015,
-                            gcm_hist_years = 1901:2014, 
+                            gcm_hist_years = 1900:2014, 
                             gcm_ts_years = 2015:2100, 
                             vars = list_variables()
     )
@@ -99,21 +131,30 @@ plot_timeSeries <- function(
     ## Assemble the data that will be used in the plot (for setting the ylim)
     alldata <- data[, if(is.null(variable2)) get(variable1) else c(get(variable1), get(variable2))] # a vector of all potential data on the plot for setting the ylim (y axis range)
     visibledata <- data[GCM%in%c(NA, gcms.ts) & SSP%in%c(NA, ssps), (if(is.null(variable2)) get(variable1) else c(get(variable1), get(variable2)))] # a vector of all visible data on the plot for setting the ylim (y axis range)
-
-      # components of the variable (note this will not work for monthly variables until we change the variable naming convention to underscore delimitated (e.g., Tave_01 instead of the current Tave01))
+    
+    # components of the variable (note this will not work for monthly variables until we change the variable naming convention to underscore delimitated (e.g., Tave_01 instead of the current Tave01))
+    nums <- if(is.null(variable2)) 1 else 1:2 #nums is the set of variable numbers (this is used later on as well)
+    for(num in nums){ 
       variable <- get(paste("variable",num,sep=""))
       variable.components <- unlist(strsplit(variable, "_"))
-      yeartime <- if(length(variable.components)==1) NA else variable.components[length(variable.components)] #do by length because some elements have an underscore in them
-      element <- if(length(grep("DD_0|DD_18", variable))==1) paste(variable.components[1:2], collapse="_") else variable.components[1]
-      
-
-          # PLOT
-    par(mfrow=c(1,1), mar=c(3,3,0.1,3), mgp=c(1.75, 0.25, 0), cex=1.5*cex)
-    if(element1==element2){
-      ylab <- element.names.units[[which(elements==element1)]]
-    } else {
-      ylab <- if("PPT"%in%c(element1, element2)) bquote(Precipitation~"("*mm*")"~or~Mean ~ temperature ~ "(" * degree * C * ")") else element.names.units[[1]]
+      assign(paste0("yeartime", num), if(length(variable.components)==1) NA else variable.components[length(variable.components)]) #do by length because some elements have an underscore in them
+      assign(paste0("element", num), if(length(grep("DD_0|DD_18", variable))==1) paste(variable.components[1:2], collapse="_") else variable.components[1])
     }
+    
+    # PLOT
+    par(mfrow=c(1,1), mar=c(3,3,0.1,3), mgp=c(1.75, 0.25, 0), cex=1.5*cex)
+    # y axis title. 
+    if(is.null(variable2)){ #if there is no second variable
+      ylab <- variables[Code==variable1, "Variable"]
+    } else 
+      if(element1==element2){ #if both variables have the same element
+        ylab <- variables[Code==variable1, "Element"]
+      } else 
+        if(yeartime1==yeartime2){ #if both variables have the same element
+          ylab <- paste(yeartime.names[which(yeartimes==yeartime1)], variables[Code==variable1, "Element"], "or", variables[Code==variable2, "Element"])
+        } else { #if variables1 and 2 have different elements and yeartimes
+          ylab <- paste(yeartime.names[which(yeartimes==yeartime1)], variables[Code==variable1, "Element"], "or", variables[Code==variable2, "Element"])
+        }
     plot(0, col="white", xlim=c(1900, 2100), ylim=range(if(yfit==T) visibledata else alldata, na.rm = T), xaxs="i", xaxt="n", tck=0, xlab="", ylab=ylab)
     axis(1, at=seq(1850,2100,25), labels = seq(1850,2100,25), tck=0)
     
@@ -123,88 +164,35 @@ plot_timeSeries <- function(
       element <- get(paste("element",num,sep=""))
       variable <- get(paste("variable",num,sep=""))
       
-      # data for observations
-      x.climatebc <- unique(obs.ts.mean[,1])
-      y.climatebc <- obs.ts.mean[,which(names(obs.ts.mean)==variable)]
-      baseline.obs <- mean(y.climatebc[which(x.climatebc%in%1961:1990)])
-      baseline.obs.1981 <- mean(y.climatebc[which(x.climatebc%in%1981:2010)]) # for ERA5, because it has different bias prior to 1979
-      recent.climatebc <- mean(y.climatebc[which(x.climatebc%in%2013:2022)])
-      
-      # data for era5
-      if("era5"%in%observations){
-        era5.ts.mean <- read.csv(paste("data/ts.era5.mean.", ecoprov, ".csv", sep=""))
-        x.era5 <- unique(era5.ts.mean[,1])
-        y.era5 <- era5.ts.mean[,which(names(era5.ts.mean)==variable)]
-        baseline.era5 <- mean(y.era5[which(x.era5%in%1981:2010)]) # for ERA5, because it has different bias prior to 1979
-        bias.era5 <- baseline.obs.1981 - baseline.era5
-        recent.era5 <- mean(y.era5[which(x.era5%in%2013:2022)], na.rm=T)
-      }
-      
-      # data for era5land
-      if("era5land"%in%observations){
-        era5land.ts.mean <- read.csv(paste("data/ts.era5land.mean.", ecoprov, ".csv", sep=""))
-        x.era5land <- unique(era5land.ts.mean[,1])
-        y.era5land <- era5land.ts.mean[,which(names(era5land.ts.mean)==variable)]
-        baseline.era5land <- mean(y.era5land[which(x.era5land%in%1981:2010)]) # for ERA5, because it has different bias prior to 1979
-        bias.era5land <- baseline.obs.1981 - baseline.era5land
-        recent.era5land <- mean(y.era5land[which(x.era5land%in%2013:2022)], na.rm=T)
-      }
-      
-      # data for pcic
-      if("pcic"%in%observations){
-        pcic.ts.mean <- read.csv(paste("data/ts.pcic.mean.", ecoprov, ".csv", sep=""))
-        x.pcic <- unique(pcic.ts.mean[,1])
-        y.pcic <- if(element=="PPT") pcic.ts.mean[,which(names(pcic.ts.mean)==variable)]*mean(y.climatebc[which(x.climatebc%in%1981:2010)]) + mean(y.climatebc[which(x.climatebc%in%1981:2010)]) else pcic.ts.mean[,which(names(pcic.ts.mean)==variable)] + mean(y.climatebc[which(x.climatebc%in%1981:2010)])  # apply faron's anomalies to the 1981-2010 absolute value of climatebc time series. 
-        baseline.pcic <- mean(y.pcic[which(x.pcic%in%1961:1990)])
-        y.pcic <- if(element=="PPT") y.pcic*(baseline.obs/baseline.pcic) else y.pcic+(baseline.obs-baseline.pcic)   # bias correct to 1961-1990 period
-        recent.pcic <- mean(y.pcic[which(x.pcic%in%2012:2021)], na.rm=T)
-      }
-      
-      # # data for cru/gpcc
-      # if("cru"%in%observations){
-      #   cru.ts.mean <- read.csv(paste("data/ts.cru.mean.", ecoprov, ".csv", sep=""))
-      #   x.cru <- unique(cru.ts.mean[,1])
-      #   y.cru <- cru.ts.mean[,which(names(cru.ts.mean)==variable)]
-      #   baseline.cru <- mean(y.cru[which(x.cru%in%1961:1990)])
-      #   bias.cru <- baseline.obs - baseline.cru
-      #   recent.cru <- mean(y.cru[which(x.cru%in%2014:2023)], na.rm=T)
-      # }
-      
-      # data for GISTEMP
-      if("giss"%in%observations){
-        giss.ts.mean <- read.csv(paste("data/ts.giss.mean.", ecoprov, ".csv", sep=""))
-        x.giss <- unique(giss.ts.mean[,1])
-        y.giss <- giss.ts.mean[,which(names(giss.ts.mean)==variable)]
-        baseline.giss <- mean(y.giss[which(x.giss%in%1961:1990)])
-        bias.giss <- baseline.obs - baseline.giss
-        recent.giss <- mean(y.giss[which(x.giss%in%2013:2022)], na.rm=T)
-      }
-      
 
       # time series for selected ensemble
       if(compile==T) gcms.ts <- "compile" #this prevents the plotting of individual GCM projections and plots a single envelope for the ensemble as a whole. 
       gcm <- gcms.ts[1]
       for(gcm in gcms.ts){
         # scenario <- scenarios.selected[1]
-        for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])]){
-          
-          for(ensstat in ensstats){
-            temp <- get(paste(ensstat, scenario, num, sep="."))
-            x <- temp[,1]
-            temp <- temp[,which(names(temp)==gcm)]
-            assign(ensstat, temp)
-            assign(paste("x", scenario, sep="."), x)
-            assign(paste(ensstat, scenario, sep="."), temp)
-          }
-          
-          print(scenario)
-        }
+        temp.historical <- data[GCM==gcm & is.na(SSP) & RUN!="ensembleMean", c("PERIOD", variable), with=F]
+        x.historical <- as.numeric(temp.historical[, .(min = min(get(variable))), by = PERIOD][["PERIOD"]])
+        ensmin.historical <- temp.historical[, .(min = min(get(variable))), by = PERIOD][["min"]]
+        ensmax.historical <- temp.historical[, .(max = max(get(variable))), by = PERIOD][["max"]]
+        ensmean.historical <- temp.historical[, .(mean = mean(get(variable))), by = PERIOD][["mean"]]
         
+        for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])][-1]){
+            temp <- data[GCM==gcm & SSP==scenario & RUN!="ensembleMean", c("PERIOD", variable), with=F]
+            x.temp <- as.numeric(temp[, .(min = min(get(variable))), by = PERIOD][["PERIOD"]])
+            ensmin.temp <- temp[, .(min = min(get(variable))), by = PERIOD][["min"]]
+            ensmax.temp <- temp[, .(max = max(get(variable))), by = PERIOD][["max"]]
+            ensmean.temp <- temp[, .(mean = mean(get(variable))), by = PERIOD][["mean"]]
+            assign(paste("x", scenario, sep="."), c(x.historical[length(x.historical)], x.temp)) # add last year of historical runs. this is necessary to get a seamless transition from the historical polygon to the future polygon. 
+            assign(paste("ensmin", scenario, sep="."), c(ensmin.historical[length(ensmin.historical)], ensmin.temp)) # add last year of historical runs. this is necessary to get a seamless transition from the historical polygon to the future polygon. 
+            assign(paste("ensmax", scenario, sep="."), c(ensmax.historical[length(ensmax.historical)], ensmax.temp)) # add last year of historical runs. this is necessary to get a seamless transition from the historical polygon to the future polygon. 
+            assign(paste("ensmean", scenario, sep="."), c(ensmean.historical[length(ensmean.historical)], ensmean.temp)) # add last year of historical runs. this is necessary to get a seamless transition from the historical polygon to the future polygon. 
+        }
+
         if(showrange==T) {
           if(simplify==F){
             for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])]){
               x <- get(paste("x", scenario, sep="."))
-              polygon(c(x, rev(x)), c(get(paste("ensmin", scenario, sep=".")), rev(get(paste("ensmax", scenario, sep=".")))), col=alpha(scenario.colScheme[which(scenarios==scenario)], if(gcm=="ensemble") 0.35 else 0.35), border=scenario.colScheme[which(scenarios==scenario)])
+              polygon(c(x, rev(x)), c(get(paste("ensmin", scenario, sep=".")), rev(get(paste("ensmax", scenario, sep=".")))), col=alpha(scenario.colScheme [which(scenarios==scenario)], if(gcm=="ensemble") 0.35 else 0.35), border=scenario.colScheme[which(scenarios==scenario)])
             }
           } else {
             scenarios.select <- scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])][-1]
@@ -225,8 +213,8 @@ plot_timeSeries <- function(
                 y.ensmax2 <- c(ensmax.historical, get(paste("ensmax", scenario, sep="."))[-1])
                 s.ensmin2 <- smooth.spline(x5,y.ensmin2, df=8) 
                 s.ensmax2 <- smooth.spline(x5,y.ensmax2, df=8) 
-                knots.hist <- c(1, 20, 40, 80, 100, 120, 140, 165)
-                knots.proj <- c(190, 210, 230, 250, length(x5))
+                knots.hist <- c(1, 20, 40, 80, 100, 114)
+                knots.proj <- c(140, 160, 180, 200)
                 s.ensmin3 <- stinterp(x5[c(knots.hist, knots.proj)],c(s.ensmin$y[knots.hist], s.ensmin2$y[knots.proj]), x5)
                 s.ensmax3 <- stinterp(x5[c(knots.hist, knots.proj)],c(s.ensmax$y[knots.hist], s.ensmax2$y[knots.proj]), x5)
                 polygon(c(s.ensmin3$x[subset.proj], rev(s.ensmax3$x[subset.proj])), c(s.ensmin3$y[subset.proj], rev(s.ensmax3$y[subset.proj])), col=alpha(scenario.colScheme[which(scenarios==scenario)], if(gcm=="ensemble") 0.35 else 0.35), border=NA)
@@ -236,7 +224,7 @@ plot_timeSeries <- function(
         }
         
         if(refline==T){
-          ref.temp <- mean(ensmean.historical[111:140])
+          ref.temp <- mean(ensmean.historical[which(x.historical%in%1961:1990)])
           lines(1961:1990, rep(ref.temp, 30), lwd=2)
           lines(c(1990,2100), rep(ref.temp, 2), lty=2)
         }
@@ -265,7 +253,7 @@ plot_timeSeries <- function(
             # text of warming value
             if(scenario != "historical"){
               par(xpd=T)
-              baseline <- mean(ensmean.historical[111:140])
+              baseline <- mean(ensmean.historical[which(x.historical%in%1961:1990)])
               projected <- s4$y[length(s4$y)]
               if(element=="PPT"){
                 change <- round(projected/baseline-1,2)
@@ -292,11 +280,70 @@ plot_timeSeries <- function(
       if(element1==element2){
         label <- yeartime.names[which(yeartimes==yeartime)]
       } else {
-        label <- paste(yeartime.names[which(yeartimes==yeartime)], get(paste("element", num, sep="")))
+        label <- paste(yeartime.names[which(yeartimes==yeartime)], element)
       }
-      temp <- get(paste("ensmax.historical", num, sep="."))
-      text(1925,mean(temp$compile[60:80]), label, col="black", pos=3, font=2, cex=1)
+      temp <- get("ensmax.historical")
+      text(1925,mean(temp[10:40]), label, col="black", pos=3, font=2, cex=1)
       # }
+      
+      # data for observations
+      x.climatena <- data[is.na(GCM) & PERIOD%in% 1901-2100]
+      y.climatena <- obs.ts.mean[,which(names(obs.ts.mean)==variable)]
+      baseline.obs <- mean(y.climatena[which(x.climatena%in%1961:1990)])
+      baseline.obs.1981 <- mean(y.climatena[which(x.climatena%in%1981:2010)]) # for ERA5, because it has different bias prior to 1979
+      recent.climatena <- mean(y.climatena[which(x.climatena%in%2013:2022)])
+      
+      # data for era5
+      if("era5"%in%observations){
+        era5.ts.mean <- read.csv(paste("data/ts.era5.mean.", ecoprov, ".csv", sep=""))
+        x.era5 <- unique(era5.ts.mean[,1])
+        y.era5 <- era5.ts.mean[,which(names(era5.ts.mean)==variable)]
+        baseline.era5 <- mean(y.era5[which(x.era5%in%1981:2010)]) # for ERA5, because it has different bias prior to 1979
+        bias.era5 <- baseline.obs.1981 - baseline.era5
+        recent.era5 <- mean(y.era5[which(x.era5%in%2013:2022)], na.rm=T)
+      }
+      
+      # data for era5land
+      if("era5land"%in%observations){
+        era5land.ts.mean <- read.csv(paste("data/ts.era5land.mean.", ecoprov, ".csv", sep=""))
+        x.era5land <- unique(era5land.ts.mean[,1])
+        y.era5land <- era5land.ts.mean[,which(names(era5land.ts.mean)==variable)]
+        baseline.era5land <- mean(y.era5land[which(x.era5land%in%1981:2010)]) # for ERA5, because it has different bias prior to 1979
+        bias.era5land <- baseline.obs.1981 - baseline.era5land
+        recent.era5land <- mean(y.era5land[which(x.era5land%in%2013:2022)], na.rm=T)
+      }
+      
+      # data for pcic
+      if("pcic"%in%observations){
+        pcic.ts.mean <- read.csv(paste("data/ts.pcic.mean.", ecoprov, ".csv", sep=""))
+        x.pcic <- unique(pcic.ts.mean[,1])
+        y.pcic <- if(element=="PPT") pcic.ts.mean[,which(names(pcic.ts.mean)==variable)]*mean(y.climatena[which(x.climatena%in%1981:2010)]) + mean(y.climatena[which(x.climatena%in%1981:2010)]) else pcic.ts.mean[,which(names(pcic.ts.mean)==variable)] + mean(y.climatena[which(x.climatena%in%1981:2010)])  # apply faron's anomalies to the 1981-2010 absolute value of climatena time series. 
+        baseline.pcic <- mean(y.pcic[which(x.pcic%in%1961:1990)])
+        y.pcic <- if(element=="PPT") y.pcic*(baseline.obs/baseline.pcic) else y.pcic+(baseline.obs-baseline.pcic)   # bias correct to 1961-1990 period
+        recent.pcic <- mean(y.pcic[which(x.pcic%in%2012:2021)], na.rm=T)
+      }
+      
+      # # data for cru/gpcc
+      # if("cru"%in%observations){
+      #   cru.ts.mean <- read.csv(paste("data/ts.cru.mean.", ecoprov, ".csv", sep=""))
+      #   x.cru <- unique(cru.ts.mean[,1])
+      #   y.cru <- cru.ts.mean[,which(names(cru.ts.mean)==variable)]
+      #   baseline.cru <- mean(y.cru[which(x.cru%in%1961:1990)])
+      #   bias.cru <- baseline.obs - baseline.cru
+      #   recent.cru <- mean(y.cru[which(x.cru%in%2014:2023)], na.rm=T)
+      # }
+      
+      # data for GISTEMP
+      if("giss"%in%observations){
+        giss.ts.mean <- read.csv(paste("data/ts.giss.mean.", ecoprov, ".csv", sep=""))
+        x.giss <- unique(giss.ts.mean[,1])
+        y.giss <- giss.ts.mean[,which(names(giss.ts.mean)==variable)]
+        baseline.giss <- mean(y.giss[which(x.giss%in%1961:1990)])
+        bias.giss <- baseline.obs - baseline.giss
+        recent.giss <- mean(y.giss[which(x.giss%in%2013:2022)], na.rm=T)
+      }
+      
+      
       
       # add in PCIC observations
       pcic.color <- "blue"
@@ -318,26 +365,26 @@ plot_timeSeries <- function(
         # lines(c(2012,2021), rep(recent.pcic, 2), lty=2, col=pcic.color)
       }
       
-      # add in ClimateBC observations
+      # add in climatena observations
       obs.color <- "black"
-      if("climatebc"%in%observations){
-        end <- max(which(!is.na(y.climatebc)))
-        lines(x.climatebc[which(x.climatebc<1951)], y.climatebc[which(x.climatebc<1951)], lwd=1.5, lty=3, col=obs.color)
-        lines(x.climatebc[which(x.climatebc>1949)], y.climatebc[which(x.climatebc>1949)], lwd=1.5, col=obs.color)
-        points(x.climatebc[end], y.climatebc[end], pch=16, cex=1, col=obs.color)
-        text(x.climatebc[end], y.climatebc[end], x.climatebc[end], pos= 4, offset = 0.25, col=obs.color, cex=1)
+      if("climatena"%in%observations){
+        end <- max(which(!is.na(y.climatena)))
+        lines(x.climatena[which(x.climatena<1951)], y.climatena[which(x.climatena<1951)], lwd=1.5, lty=3, col=obs.color)
+        lines(x.climatena[which(x.climatena>1949)], y.climatena[which(x.climatena>1949)], lwd=1.5, col=obs.color)
+        points(x.climatena[end], y.climatena[end], pch=16, cex=1, col=obs.color)
+        text(x.climatena[end], y.climatena[end], x.climatena[end], pos= 4, offset = 0.25, col=obs.color, cex=1)
         # if(!("pcic"%in%observations)){
         if(element=="PPT"){
-          change <- round(recent.climatebc/baseline.obs-1,2)
-          # text(2022,recent.climatebc, if(change>0) paste("+",change*100,"%", sep="") else paste(change*100,"%", sep=""), col=obs.color, pos=4, font=2, cex=1)
+          change <- round(recent.climatena/baseline.obs-1,2)
+          # text(2022,recent.climatena, if(change>0) paste("+",change*100,"%", sep="") else paste(change*100,"%", sep=""), col=obs.color, pos=4, font=2, cex=1)
         } else {
-          change <- round(recent.climatebc-baseline.obs,1)
-          # text(2022,recent.climatebc, if(change>0) paste("+",change,"C", sep="") else paste(change,"C", sep=""), col=obs.color, pos=4, font=2, cex=1)
+          change <- round(recent.climatena-baseline.obs,1)
+          # text(2022,recent.climatena, if(change>0) paste("+",change,"C", sep="") else paste(change,"C", sep=""), col=obs.color, pos=4, font=2, cex=1)
         }
         # }
         # lines(1961:1990, rep(baseline.obs, 30), lwd=1, col=obs.color)
         # lines(c(1990,2021), rep(baseline.obs, 2), lty=2, col=obs.color)
-        # lines(c(2013,2022), rep(recent.climatebc, 2), lty=2, col=obs.color)
+        # lines(c(2013,2022), rep(recent.climatena, 2), lty=2, col=obs.color)
       }
       
       # add in era5 observations
@@ -400,14 +447,14 @@ plot_timeSeries <- function(
       
       #legend
       a <- if("pcic"%in%observations) 1 else NA
-      b <- if("climatebc"%in%observations) 2 else NA
+      b <- if("climatena"%in%observations) 2 else NA
       c <- if("era5"%in%observations) 3 else NA
       d <- if("era5land"%in%observations) 4 else NA
       e <- if("giss"%in%observations) 5 else NA
       f <- if(length(gcms.ts>0)) 6 else NA
       s <- !is.na(c(a,b,c,d,e,f))
       legend.GCM <- if(mode=="Ensemble") paste("Simulated (", length(gcms.ts), " GCMs)", sep="")  else paste("Simulated (", gcms.ts, ")", sep="")
-      legend("topleft", title = "", legend=c("Observed (PCIC)", "Observed (ClimateBC)", "ERA5 reanalysis", "ERA5-land reanalysis", "Observed (GISTEMP)", legend.GCM)[s], bty="n",
+      legend("topleft", title = "", legend=c("Observed (PCIC)", "Observed (climatena)", "ERA5 reanalysis", "ERA5-land reanalysis", "Observed (GISTEMP)", legend.GCM)[s], bty="n",
              lty=c(1,1,1,1,1,1)[s], 
              col=c(pcic.color, obs.color, era5.color, era5land.color, giss.color, "gray")[s], 
              lwd=c(3,1.5,2,2,2,2)[s], 
