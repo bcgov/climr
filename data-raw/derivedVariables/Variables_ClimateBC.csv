@@ -246,7 +246,3 @@ CMI09,September Climatic Moisture Index,September,Monthly,Raw,Climatic Moisture 
 CMI10,October Climatic Moisture Index,October,Monthly,Raw,Climatic Moisture Index
 CMI11,November Climatic Moisture Index,November,Monthly,Raw,Climatic Moisture Index
 CMI12,December Climatic Moisture Index,December,Monthly,Raw,Climatic Moisture Index
-CMI_at,Autumn Climatic Moisture Index,Autumn,Seasonal,Raw,Climatic Moisture Index
-CMI_sm,Summer Climatic Moisture Index,Summer,Seasonal,Raw,Climatic Moisture Index
-CMI_sp,Spring Climatic Moisture Index,Spring,Seasonal,Raw,Climatic Moisture Index
-CMI_wt,Winter Climatic Moisture Index,Winter,Seasonal,Raw,Climatic Moisture Index
