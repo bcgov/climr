@@ -56,7 +56,7 @@ xyz = my_points
 observations = c("climatena") 
 variable1 = "Tmax_sm"
 variable2 = "Tmin_sm"
-gcms.ts = list_gcm()[c(1)]
+gcms.ts = list_gcm()[c(1,4,5,7,10,11,12)]
 ssps = list_ssp()[1:3]
 showrange = T 
 yfit = T
@@ -164,20 +164,18 @@ plot_timeSeries <- function(
       element <- get(paste("element",num,sep=""))
       variable <- get(paste("variable",num,sep=""))
       
-
-      # time series for selected ensemble
-      if(compile==T) gcms.ts <- "compile" #this prevents the plotting of individual GCM projections and plots a single envelope for the ensemble as a whole. 
-      gcm <- gcms.ts[1]
-      for(gcm in gcms.ts){
+      # function for plotting time series for gcm or compiled ensemble
+      # gcm <- gcms.ts[1]
+      plot.ensemble <- function(data) {
         # scenario <- scenarios.selected[1]
-        temp.historical <- data[GCM==gcm & is.na(SSP) & RUN!="ensembleMean", c("PERIOD", variable), with=F]
+        temp.historical <- temp.data[is.na(SSP) & RUN!="ensembleMean", c("PERIOD", variable), with=F]
         x.historical <- as.numeric(temp.historical[, .(min = min(get(variable))), by = PERIOD][["PERIOD"]])
         ensmin.historical <- temp.historical[, .(min = min(get(variable))), by = PERIOD][["min"]]
         ensmax.historical <- temp.historical[, .(max = max(get(variable))), by = PERIOD][["max"]]
         ensmean.historical <- temp.historical[, .(mean = mean(get(variable))), by = PERIOD][["mean"]]
         
         for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])][-1]){
-            temp <- data[GCM==gcm & SSP==scenario & RUN!="ensembleMean", c("PERIOD", variable), with=F]
+            temp <- temp.data[SSP==scenario & RUN!="ensembleMean", c("PERIOD", variable), with=F]
             x.temp <- as.numeric(temp[, .(min = min(get(variable))), by = PERIOD][["PERIOD"]])
             ensmin.temp <- temp[, .(min = min(get(variable))), by = PERIOD][["min"]]
             ensmax.temp <- temp[, .(max = max(get(variable))), by = PERIOD][["max"]]
@@ -264,8 +262,28 @@ plot_timeSeries <- function(
               }
               par(xpd=F)
             }
+            
+            # Text to identify the time of year
+            if(element1==element2){
+              label <- yeartime.names[which(yeartimes==yeartime)]
+            } else {
+              label <- paste(yeartime.names[which(yeartimes==yeartime)], element)
+            }
+            temp <- get("ensmax.historical")
+            text(1925,mean(temp[10:40]), label, col="black", pos=3, font=2, cex=1)
+            
           }
         }
+      }
+      
+      if(compile==T){ #this plots a single envelope for the ensemble as a whole
+        temp.data <- data[GCM%in%gcms.ts, c("PERIOD", "SSP", "RUN", variable), with=F]
+        plot.ensemble(temp.data)
+        
+      } else for(gcm in gcms.ts){ #this plots of individual GCM ensembles. 
+        temp.data <- data[GCM==gcm, c("PERIOD", "SSP", "RUN", variable), with=F]
+        plot.ensemble(temp.data)
+        
         print(gcm)
       }
       
@@ -276,15 +294,7 @@ plot_timeSeries <- function(
         }
       }
       
-      # Text to identify the time of year
-      if(element1==element2){
-        label <- yeartime.names[which(yeartimes==yeartime)]
-      } else {
-        label <- paste(yeartime.names[which(yeartimes==yeartime)], element)
-      }
-      temp <- get("ensmax.historical")
-      text(1925,mean(temp[10:40]), label, col="black", pos=3, font=2, cex=1)
-      # }
+
       
       # data for observations
       x.climatena <- as.numeric(data[is.na(GCM) & PERIOD%in%1900:2100, "PERIOD"][[1]])
