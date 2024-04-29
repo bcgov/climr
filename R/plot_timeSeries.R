@@ -53,11 +53,11 @@ library(data.table)
 library(stinepack)
 library(scales)
 xyz = my_points
-obs.datasets = c("climate_na") 
-variable1 = "Tmax_sm"
+obs.datasets = c("cru_gpcc") 
+variable1 = "Tmin_sm"
 variable2 = NULL
 gcms.ts = list_gcm()[c(1,4,5,7,10,11,12)]
-ssps = list_ssp()[1:3]
+ssps = list_ssp()[1:4]
 showrange = T 
 yfit = T
 cex = 1
@@ -65,8 +65,10 @@ showmean = T
 compile = T
 simplify = T
 refline = T
-yearlines = T
+label.endyear = F
+yearlines = F
 mode = "Ensemble"
+legend_pos = "topleft"
 interactive = FALSE
 cache = TRUE
   
@@ -84,7 +86,7 @@ data <- climr_downscale(xyz,
 
 plot_timeSeries <- function(
     xyz,
-    obs.datasets = c("climate_na"), #TODO we will have to resolve the inconsistencies with the dataset naming convention in climr (ideally changing the climr naming)
+    obs.datasets = c("cru_gpcc"), #TODO we will have to resolve the inconsistencies with the dataset naming convention in climr (ideally changing the climr naming)
     variable1 = "Tmax_sm",
     variable2 = NULL,
     gcms.ts = list_gcm()[c(1,4,5,7,10,11,12)],
@@ -99,6 +101,7 @@ plot_timeSeries <- function(
     label.endyear = T, 
     yearlines = T,
     mode = "Ensemble",
+    legend_pos = "topleft",
     interactive = FALSE,
     cache = TRUE) {
   if (!requireNamespace("scales", quietly = TRUE)) {
@@ -169,18 +172,18 @@ plot_timeSeries <- function(
       
       plot.ensemble <- function(x) {
         # scenario <- scenarios.selected[1]
-        temp.historical <- x[is.na(SSP) & RUN!="ensembleMean", c("PERIOD", variable), with=F]
+        temp.historical <- x[is.na(SSP), c("PERIOD", "RUN", variable), with=F]
         x.historical <- as.numeric(temp.historical[, .(min = min(get(variable))), by = PERIOD][["PERIOD"]])
-        ensmin.historical <- temp.historical[, .(min = min(get(variable))), by = PERIOD][["min"]]
-        ensmax.historical <- temp.historical[, .(max = max(get(variable))), by = PERIOD][["max"]]
-        ensmean.historical <- temp.historical[, .(mean = mean(get(variable))), by = PERIOD][["mean"]]
+        ensmin.historical <- temp.historical[RUN!="ensembleMean", .(min = min(get(variable), na.rm=T)), by = PERIOD][["min"]]
+        ensmax.historical <- temp.historical[RUN!="ensembleMean", .(max = max(get(variable), na.rm=T)), by = PERIOD][["max"]]
+        ensmean.historical <- temp.historical[RUN=="ensembleMean", .(mean = mean(get(variable), na.rm=T)), by = PERIOD][["mean"]] #calculate mean using the single-model ensembleMean, to ensure that the mean isn't biased towards models with more runs
         
         for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])][-1]){
-            temp <- x[SSP==scenario & RUN!="ensembleMean", c("PERIOD", variable), with=F]
+            temp <- x[SSP==scenario, c("PERIOD", "RUN", variable), with=F]
             x.temp <- as.numeric(temp[, .(min = min(get(variable))), by = PERIOD][["PERIOD"]])
-            ensmin.temp <- temp[, .(min = min(get(variable))), by = PERIOD][["min"]]
-            ensmax.temp <- temp[, .(max = max(get(variable))), by = PERIOD][["max"]]
-            ensmean.temp <- temp[, .(mean = mean(get(variable))), by = PERIOD][["mean"]]
+            ensmin.temp <- temp[RUN!="ensembleMean", .(min = min(get(variable), na.rm=T)), by = PERIOD][["min"]]
+            ensmax.temp <- temp[RUN!="ensembleMean", .(max = max(get(variable), na.rm=T)), by = PERIOD][["max"]]
+            ensmean.temp <- temp[RUN=="ensembleMean", .(mean = mean(get(variable), na.rm=T)), by = PERIOD][["mean"]] #calculate mean using the single-model ensembleMean, to ensure that the mean isn't biased towards models with more runs
             assign(paste("x", scenario, sep="."), c(x.historical[length(x.historical)], x.temp)) # add last year of historical runs. this is necessary to get a seamless transition from the historical polygon to the future polygon. 
             assign(paste("ensmin", scenario, sep="."), c(ensmin.historical[length(ensmin.historical)], ensmin.temp)) # add last year of historical runs. this is necessary to get a seamless transition from the historical polygon to the future polygon. 
             assign(paste("ensmax", scenario, sep="."), c(ensmax.historical[length(ensmax.historical)], ensmax.temp)) # add last year of historical runs. this is necessary to get a seamless transition from the historical polygon to the future polygon. 
@@ -190,8 +193,8 @@ plot_timeSeries <- function(
         if(showrange==T) {
           if(simplify==F){
             for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])]){
-              x <- get(paste("x", scenario, sep="."))
-              polygon(c(x, rev(x)), c(get(paste("ensmin", scenario, sep=".")), rev(get(paste("ensmax", scenario, sep=".")))), col=alpha(scenario.colScheme [which(scenarios==scenario)], if(gcm=="ensemble") 0.35 else 0.35), border=scenario.colScheme[which(scenarios==scenario)])
+              x3 <- get(paste("x", scenario, sep="."))
+              polygon(c(x3, rev(x3)), c(get(paste("ensmin", scenario, sep=".")), rev(get(paste("ensmax", scenario, sep=".")))), col=alpha(scenario.colScheme [which(scenarios==scenario)], 0.35), border=scenario.colScheme[which(scenarios==scenario)])
             }
           } else {
             scenarios.select <- scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])][-1]
@@ -204,8 +207,8 @@ plot_timeSeries <- function(
                 s.ensmax <- smooth.spline(x4,y.ensmax, df=8) 
                 subset.hist <- which(x4%in%x.historical)
                 subset.proj <- which(x4%in%get(paste("x", scenario, sep=".")))
-                polygon(c(s.ensmin$x[subset.hist], rev(s.ensmax$x[subset.hist])), c(s.ensmin$y[subset.hist], rev(s.ensmax$y[subset.hist])), col=alpha(scenario.colScheme[which(scenarios=="historical")], if(gcm=="ensemble") 0.35 else 0.35), border=NA)
-                polygon(c(s.ensmin$x[subset.proj], rev(s.ensmax$x[subset.proj])), c(s.ensmin$y[subset.proj], rev(s.ensmax$y[subset.proj])), col=alpha(scenario.colScheme[which(scenarios==scenario)], if(gcm=="ensemble") 0.35 else 0.35), border=NA)
+                polygon(c(s.ensmin$x[subset.hist], rev(s.ensmax$x[subset.hist])), c(s.ensmin$y[subset.hist], rev(s.ensmax$y[subset.hist])), col=alpha(scenario.colScheme[which(scenarios=="historical")], 0.35), border=NA)
+                polygon(c(s.ensmin$x[subset.proj], rev(s.ensmax$x[subset.proj])), c(s.ensmin$y[subset.proj], rev(s.ensmax$y[subset.proj])), col=alpha(scenario.colScheme[which(scenarios==scenario)], 0.35), border=NA)
               } else { # this second routine uses interpolation splines so that the starting point for all scenarios is the same
                 x5 <- c(x.historical, get(paste("x", scenario, sep="."))[-1])
                 y.ensmin2 <- c(ensmin.historical, get(paste("ensmin", scenario, sep="."))[-1])
@@ -216,7 +219,7 @@ plot_timeSeries <- function(
                 knots.proj <- which(x5%in%c(seq(2030, 2090, 20), 2100))
                 s.ensmin3 <- stinterp(x5[c(knots.hist, knots.proj)],c(s.ensmin$y[knots.hist], s.ensmin2$y[knots.proj]), x5)
                 s.ensmax3 <- stinterp(x5[c(knots.hist, knots.proj)],c(s.ensmax$y[knots.hist], s.ensmax2$y[knots.proj]), x5)
-                polygon(c(s.ensmin3$x[subset.proj], rev(s.ensmax3$x[subset.proj])), c(s.ensmin3$y[subset.proj], rev(s.ensmax3$y[subset.proj])), col=alpha(scenario.colScheme[which(scenarios==scenario)], if(gcm=="ensemble") 0.35 else 0.35), border=NA)
+                polygon(c(s.ensmin3$x[subset.proj], rev(s.ensmax3$x[subset.proj])), c(s.ensmin3$y[subset.proj], rev(s.ensmax3$y[subset.proj])), col=alpha(scenario.colScheme[which(scenarios==scenario)], 0.35), border=NA)
               }
             }
           }
@@ -265,14 +268,15 @@ plot_timeSeries <- function(
             }
             
             # Text to identify the time of year
-            if(element1==element2){
+            if(!is.null(variable2)){ #if there is no second variable
+              if(element1==element2){
               label <- yeartime.names[which(yeartimes==yeartime)]
             } else {
               label <- paste(yeartime.names[which(yeartimes==yeartime)], element)
             }
             temp <- get("ensmax.historical")
             text(1925,mean(temp[10:40]), label, col="black", pos=3, font=2, cex=1)
-            
+            }
           }
         }
       }
@@ -289,7 +293,7 @@ plot_timeSeries <- function(
       }
       
       # overlay the 5-year lines on top of all polygons
-      if(yearlines==T){
+      if(yearlines){
         for(n in seq(1905, 2095, 5)){
           lines(c(n, n), c(-9999, 9999), col="grey", lty=2)
         }
@@ -317,16 +321,16 @@ plot_timeSeries <- function(
     }
 
     #legend
-    a <- if("cru_gpcc"%in%obs.datasets) 1 else NA
-    b <- if("climate_na"%in%obs.datasets) 2 else NA
+    a <- if("climate_na"%in%obs.datasets) 1 else NA
+    b <- if("cru_gpcc"%in%obs.datasets) 2 else NA
     c <- if("era5"%in%obs.datasets) 3 else NA
     d <- if(length(gcms.ts>0)) 4 else NA
     s <- !is.na(c(a,b,c,d))
     legend.GCM <- if(mode=="Ensemble") paste("Simulated (", length(gcms.ts), " GCMs)", sep="")  else paste("Simulated (", gcms.ts, ")", sep="")
-    legend(legend_pos, title = "", legend=c("Observed (CRU/GPCC)", "Observed (ClimateNA)", "Observed (ERA5)", legend.GCM)[s], bty="n",
+    legend(legend_pos, title = "", legend=c("Observed (ClimateNA)", "Observed (CRU/GPCC)", "Observed (ERA5)", legend.GCM)[s], bty="n",
            lty=c(1,1,1,1)[s], 
            col=c(obs.colors, "gray")[s], 
-           lwd=c(3,1.5,2,2)[s], 
+           lwd=c(4,4,4,2)[s], 
            pch=c(NA,NA,NA,NA)[s], 
            pt.bg = c(NA, NA,NA,NA)[s], 
            pt.cex=c(NA,NA,NA,NA)[s])
