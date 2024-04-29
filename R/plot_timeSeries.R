@@ -55,7 +55,7 @@ library(scales)
 xyz = my_points
 observations = c("climatena") 
 variable1 = "Tmax_sm"
-variable2 = "Tmin_sm"
+variable2 = NULL
 gcms.ts = list_gcm()[c(1,4,5,7,10,11,12)]
 ssps = list_ssp()[1:3]
 showrange = T 
@@ -70,13 +70,23 @@ mode = "Ensemble"
 interactive = FALSE
 cache = TRUE
   
-
+# generate the climate data (TODO we will have to move this outside the function because it takes too long)
+data <- climr_downscale(xyz, 
+                        gcm_models = list_gcm(),
+                        ssp = list_ssp(),
+                        max_run = 10,
+                        # historic_ts_dataset = "climate_na", #TODO uncomment this once we fix the error in the devl branch. 
+                        historic_ts = 1902:2015,
+                        gcm_hist_years = 1850:2014, 
+                        gcm_ts_years = 2015:2100, 
+                        vars = list_variables()
+)
 
 plot_timeSeries <- function(
     xyz,
     observations = c("climatena"), #TODO we will have to resolve the inconsistencies with the dataset naming convention in climr (ideally changing the climr naming)
     variable1 = "Tmax_sm",
-    variable2 = "Tmin_sm",
+    variable2 = NULL,
     gcms.ts = list_gcm()[c(1,4,5,7,10,11,12)],
     ssps = list_ssp()[1:3],
     showrange = T, 
@@ -116,18 +126,6 @@ plot_timeSeries <- function(
     # ensemble statistics definitions
     ensstats <- c("ensmin", "ensmax", "ensmean")
     
-    # generate the climate data (TODO we will have to move this outside the function because it takes too long)
-    data <- climr_downscale(xyz, 
-                            gcm_models = list_gcm(),
-                            ssp = list_ssp(),
-                            max_run = 10,
-                            # historic_ts_dataset = "climate_na", #TODO uncomment this once we fix the error in the devl branch. 
-                            historic_ts = 1902:2015,
-                            gcm_hist_years = 1900:2014, 
-                            gcm_ts_years = 2015:2100, 
-                            vars = list_variables()
-    )
-    
     ## Assemble the data that will be used in the plot (for setting the ylim)
     alldata <- data[, if(is.null(variable2)) get(variable1) else c(get(variable1), get(variable2))] # a vector of all potential data on the plot for setting the ylim (y axis range)
     visibledata <- data[GCM%in%c(NA, gcms.ts) & SSP%in%c(NA, ssps), (if(is.null(variable2)) get(variable1) else c(get(variable1), get(variable2)))] # a vector of all visible data on the plot for setting the ylim (y axis range)
@@ -166,16 +164,18 @@ plot_timeSeries <- function(
       
       # function for plotting time series for gcm or compiled ensemble
       # gcm <- gcms.ts[1]
-      plot.ensemble <- function(data) {
+      # x <- data[GCM%in%gcms.ts, c("PERIOD", "SSP", "RUN", variable), with=F] # for testing only
+      
+      plot.ensemble <- function(x) {
         # scenario <- scenarios.selected[1]
-        temp.historical <- temp.data[is.na(SSP) & RUN!="ensembleMean", c("PERIOD", variable), with=F]
+        temp.historical <- x[is.na(SSP) & RUN!="ensembleMean", c("PERIOD", variable), with=F]
         x.historical <- as.numeric(temp.historical[, .(min = min(get(variable))), by = PERIOD][["PERIOD"]])
         ensmin.historical <- temp.historical[, .(min = min(get(variable))), by = PERIOD][["min"]]
         ensmax.historical <- temp.historical[, .(max = max(get(variable))), by = PERIOD][["max"]]
         ensmean.historical <- temp.historical[, .(mean = mean(get(variable))), by = PERIOD][["mean"]]
         
         for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])][-1]){
-            temp <- temp.data[SSP==scenario & RUN!="ensembleMean", c("PERIOD", variable), with=F]
+            temp <- x[SSP==scenario & RUN!="ensembleMean", c("PERIOD", variable), with=F]
             x.temp <- as.numeric(temp[, .(min = min(get(variable))), by = PERIOD][["PERIOD"]])
             ensmin.temp <- temp[, .(min = min(get(variable))), by = PERIOD][["min"]]
             ensmax.temp <- temp[, .(max = max(get(variable))), by = PERIOD][["max"]]
@@ -195,7 +195,7 @@ plot_timeSeries <- function(
           } else {
             scenarios.select <- scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])][-1]
             for(scenario in scenarios.select){
-              if(scenario==scenarios.select[1]){ # need to run spline through the historical/projected transition
+              if(scenario==scenarios.select[1]){ # we need to run spline through the historical/projected transition
                 x4 <- c(x.historical, get(paste("x", scenario, sep="."))[-1])
                 y.ensmin <- c(ensmin.historical, get(paste("ensmin", scenario, sep="."))[-1])
                 y.ensmax <- c(ensmax.historical, get(paste("ensmax", scenario, sep="."))[-1])
@@ -211,8 +211,8 @@ plot_timeSeries <- function(
                 y.ensmax2 <- c(ensmax.historical, get(paste("ensmax", scenario, sep="."))[-1])
                 s.ensmin2 <- smooth.spline(x5,y.ensmin2, df=8) 
                 s.ensmax2 <- smooth.spline(x5,y.ensmax2, df=8) 
-                knots.hist <- c(1, 20, 40, 80, 100, 114)
-                knots.proj <- c(140, 160, 180, 200)
+                knots.hist <- which(x5%in%c(seq(1860, 2000, 20), 2014))
+                knots.proj <- which(x5%in%c(seq(2030, 2090, 20), 2100))
                 s.ensmin3 <- stinterp(x5[c(knots.hist, knots.proj)],c(s.ensmin$y[knots.hist], s.ensmin2$y[knots.proj]), x5)
                 s.ensmax3 <- stinterp(x5[c(knots.hist, knots.proj)],c(s.ensmax$y[knots.hist], s.ensmax2$y[knots.proj]), x5)
                 polygon(c(s.ensmin3$x[subset.proj], rev(s.ensmax3$x[subset.proj])), c(s.ensmin3$y[subset.proj], rev(s.ensmax3$y[subset.proj])), col=alpha(scenario.colScheme[which(scenarios==scenario)], if(gcm=="ensemble") 0.35 else 0.35), border=NA)
