@@ -2,11 +2,11 @@
 #'
 #' @description
 #' Time series plots of 20th and 21st century climate change for user-selected locations and climate variables.
-#' The purposes of the plot are to
+#' The purposes of the plot are to:
 #' \enumerate{
 #'   \item view differences in interannual variability and climate change trends among global climate models (GCMs),
-#'   \item view the differences between multiple simulations of each model, and
-#'   \item compare simulated and observed climate change from 1901 to present.
+#'   \item view the differences between multiple simulations of each model,
+#'   \item compare simulated and observed climate change from 1901 to present, and
 #'   \item compare time series of two different variables.
 #' }
 #' All global climate model anomalies are bias-corrected to the 1961-1990 reference period normals.
@@ -17,7 +17,7 @@
 #' to make multiple calls to `plot_timeSeries` without needing to generate the inputs each time. 
 #' 
 #' Some combinations of `variable2` and `variable2` are not compatible or meaningful. 
-#' Examples of meaningful combinations are winter vs summer temperatures or minimum vs. 
+#' Examples of meaningful combinations are winter vs summer values of the same climate variable or minimum vs. 
 #' maximum temperatures. 
 #'
 #' @param X. A `data.table` produced using the function `climr::plot_timeSeries_input()`. This 
@@ -27,6 +27,9 @@
 #' @param variable1 character. A climate variable. options are `list_variables()`.
 #' @param variable2 character. A second climate variable to plot in combination with `variable1`. 
 #' options are `list_variables()`.
+#' @param historic_ts_dataset character. The observational time series dataset specified in the 
+#' `climr::plot_timeSeries_input()` call used to create the `X` input table. Defaults to `"climate_na"`.
+#' This parameter is only used for specifying the correct dataset in the plot legend. 
 #' @param showrange logical. Plot a shaded region indicating the minimum and maximum of the 
 #' selected ensemble of GCM simulations for each selected scenario. 
 #' @param yfit logical. Set the range of the y axis to the range of the visible data. If `FALSE` 
@@ -42,8 +45,8 @@
 #' @param label.endyear logical. Add a label of the final year of the observational time series. 
 #' @param yearmarkers logical. Add white points to the observational time series as a visual aid. 
 #' @param yearlines logical. Add vertical lines on every fifth year as a visual reference
-#' @param legend_pos character. Position of the legend. Options are `c("bottomright",
-#'   "bottom", "bottomleft", "left", "topleft", "top", "topright", "right", "center")`.
+#' @param legend_pos character. Position of the legend. Viable options are `c("bottomright",
+#'   "bottomleft", "topleft", and "topright")`.
 #'
 #' @return NULL. Draws a plot in the active graphics device.
 #'
