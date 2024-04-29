@@ -28,7 +28,7 @@
 #' @importFrom graphics axis legend lines par points text title
 #'
 #' @examples
-#' # data frame of arbitrary points on Vancouver Island
+#' # data frame of arbitrary points
 #' my_points <- data.frame(lon = -127.7300, lat = 55.34114, elev = 711, id = 1)
 #'
 #' # draw the plot
@@ -297,9 +297,9 @@ plot_timeSeries <- function(
       
       # add in observations
       obs.colors <- c("black", "blue", "red")
-      obs.datasets <- c("climate_na", "cru_gpcc", "era5")
+      obs.options <- c("climate_na", "cru_gpcc", "era5")
       for(obs.dataset in obs.datasets){ #TODO update this code block once i know how the datasets are identified in the climr output
-        obs.color <- obs.colors[which(obs.datasets==obs.dataset)]
+        obs.color <- obs.colors[which(obs.options==obs.dataset)]
         x.obs <- as.numeric(data[is.na(GCM) & PERIOD%in%1900:2100, "PERIOD"][[1]])
         y.obs <- data[is.na(GCM) & PERIOD%in%1900:2100, get(variable)]
         recent.obs <- mean(y.obs[which(x.obs%in%2014:2023)], na.rm=T)
@@ -320,10 +320,10 @@ plot_timeSeries <- function(
     a <- if("cru_gpcc"%in%obs.datasets) 1 else NA
     b <- if("climate_na"%in%obs.datasets) 2 else NA
     c <- if("era5"%in%obs.datasets) 3 else NA
-    d <- if(length(gcms.ts>0)) 6 else NA
+    d <- if(length(gcms.ts>0)) 4 else NA
     s <- !is.na(c(a,b,c,d))
     legend.GCM <- if(mode=="Ensemble") paste("Simulated (", length(gcms.ts), " GCMs)", sep="")  else paste("Simulated (", gcms.ts, ")", sep="")
-    legend("topleft", title = "", legend=c("Observed (CRU/GPCC)", "Observed (ClimateNA)", "Observed (ERA5)", legend.GCM)[s], bty="n",
+    legend(legend_pos, title = "", legend=c("Observed (CRU/GPCC)", "Observed (ClimateNA)", "Observed (ERA5)", legend.GCM)[s], bty="n",
            lty=c(1,1,1,1)[s], 
            col=c(obs.colors, "gray")[s], 
            lwd=c(3,1.5,2,2)[s], 
@@ -332,7 +332,7 @@ plot_timeSeries <- function(
            pt.cex=c(NA,NA,NA,NA)[s])
     
     s <- rev(which(scenarios[-1]%in%scenarios.selected))
-    legend("top", title = "Scenarios", legend=c("Historical", scenario.names[-1][s]), bty="n",
+    legend(c("top", "bottom")[if(length(grep("top", legend_pos))==1) 1 else 2], title = "Scenarios", legend=c("Historical", scenario.names[-1][s]), bty="n",
            lty=c(NA,NA,NA,NA,NA)[c(1,s+1)], col=scenario.colScheme[c(1,s+1)], lwd=c(NA,NA,NA,NA,NA)[c(1,s+1)], pch=c(22,22,22,22,22)[c(1,s+1)], pt.bg = alpha(scenario.colScheme[c(1,s+1)], 0.35), pt.cex=c(2,2,2,2,2)[c(1,s+1)])
     
     mtext(paste(" Created using climr (https://bcgov.github.io/climr/)"), side=1, line=-1.35, adj=0.0, font=1, cex=1.1, col="gray")
