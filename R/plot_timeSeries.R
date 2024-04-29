@@ -53,7 +53,7 @@ library(data.table)
 library(stinepack)
 library(scales)
 xyz = my_points
-observations = c("climatena") 
+obs.datasets = c("climate_na") 
 variable1 = "Tmax_sm"
 variable2 = NULL
 gcms.ts = list_gcm()[c(1,4,5,7,10,11,12)]
@@ -75,7 +75,7 @@ data <- climr_downscale(xyz,
                         gcm_models = list_gcm(),
                         ssp = list_ssp(),
                         max_run = 10,
-                        # historic_ts_dataset = "climate_na", #TODO uncomment this once we fix the error in the devl branch. 
+                        historic_ts_dataset = "climate_na", #TODO uncomment this once we fix the error in the devl branch.
                         historic_ts = 1902:2015,
                         gcm_hist_years = 1850:2014, 
                         gcm_ts_years = 2015:2100, 
@@ -84,7 +84,7 @@ data <- climr_downscale(xyz,
 
 plot_timeSeries <- function(
     xyz,
-    observations = c("climatena"), #TODO we will have to resolve the inconsistencies with the dataset naming convention in climr (ideally changing the climr naming)
+    obs.datasets = c("climate_na"), #TODO we will have to resolve the inconsistencies with the dataset naming convention in climr (ideally changing the climr naming)
     variable1 = "Tmax_sm",
     variable2 = NULL,
     gcms.ts = list_gcm()[c(1,4,5,7,10,11,12)],
@@ -96,6 +96,7 @@ plot_timeSeries <- function(
     compile = T,
     simplify = T,
     refline = T,
+    label.endyear = T, 
     yearlines = T,
     mode = "Ensemble",
     interactive = FALSE,
@@ -107,7 +108,7 @@ plot_timeSeries <- function(
     stop("package stinepack must be installed to use this function")
   } else {
     # data("variables", envir = environment()) #TODO temporary until we can resolve the error in the devl branch
-    variables <- fread("data-raw/derivedVariables/Variables_climatena.csv") #TODO temporary until we can resolve the error in the devl branch
+    variables <- fread("data-raw/derivedVariables/Variables_climateBC.csv") #TODO temporary until we can resolve the error in the devl branch
     
     # Scenario definitions
     scenarios.selected <- c("historical", ssps)
@@ -294,103 +295,37 @@ plot_timeSeries <- function(
         }
       }
       
-      # data for observations
-      x.climatena <- as.numeric(data[is.na(GCM) & PERIOD%in%1900:2100, "PERIOD"][[1]])
-      y.climatena <- data[is.na(GCM) & PERIOD%in%1900:2100, get(variable)]
-      baseline.obs <- mean(y.climatena[which(x.climatena%in%1961:1990)])
-      recent.climatena <- mean(y.climatena[which(x.climatena%in%2013:2022)])
-
-      # TODO add in other observational time series once they are available in climr
-      # data for cru/gpcc
-      if("cru"%in%observations){
-        cru.ts.mean <- read.csv(paste("data/ts.cru.mean.", ecoprov, ".csv", sep=""))
-        x.cru <- unique(cru.ts.mean[,1])
-        y.cru <- cru.ts.mean[,which(names(cru.ts.mean)==variable)]
-        recent.cru <- mean(y.cru[which(x.cru%in%2014:2023)], na.rm=T)
-      }  
-      
-      # data for era5
-      if("era5"%in%observations){
-        era5.ts.mean <- read.csv(paste("data/ts.era5.mean.", ecoprov, ".csv", sep=""))
-        x.era5 <- unique(era5.ts.mean[,1])
-        y.era5 <- era5.ts.mean[,which(names(era5.ts.mean)==variable)]
-        recent.era5 <- mean(y.era5[which(x.era5%in%2013:2022)], na.rm=T)
-      }
-
-      # add in cru/gpcc observations
-      cru.color <- "blue"
-      if("cru"%in%observations){
-        end <- max(which(!is.na(y.cru)))
-        lines(x.cru[which(x.cru<1951)], y.cru[which(x.cru<1951)], lwd=3, lty=3, col=cru.color)
-        lines(x.cru[which(x.cru>1949)], y.cru[which(x.cru>1949)], lwd=3, col=cru.color)
-        points(x.cru[end], y.cru[end], pch=16, cex=1, col=cru.color)
-        text(x.cru[end], y.cru[end], x.cru[end], pos= 4, offset = 0.25, col=cru.color, cex=1)
-        if(element=="PPT"){
-          change <- round(recent.cru/baseline.obs-1,2)
-          # text(2021,recent.cru, if(change>0) paste("+",change*100,"%", sep="") else paste(change*100,"%", sep=""), col=cru.color, pos=4, font=2, cex=1)
-        } else {
-          change <- round(recent.cru-baseline.obs,1)
-          # text(2021,recent.cru, if(change>0) paste("+",change,"C", sep="") else paste(change,"C", sep=""), col=cru.color, pos=4, font=2, cex=1)
+      # add in observations
+      obs.colors <- c("black", "blue", "red")
+      obs.datasets <- c("climate_na", "cru_gpcc", "era5")
+      for(obs.dataset in obs.datasets){ #TODO update this code block once i know how the datasets are identified in the climr output
+        obs.color <- obs.colors[which(obs.datasets==obs.dataset)]
+        x.obs <- as.numeric(data[is.na(GCM) & PERIOD%in%1900:2100, "PERIOD"][[1]])
+        y.obs <- data[is.na(GCM) & PERIOD%in%1900:2100, get(variable)]
+        recent.obs <- mean(y.obs[which(x.obs%in%2014:2023)], na.rm=T)
+        end <- max(which(!is.na(y.obs)))
+        lines(x.obs[which(x.obs<1951)], y.obs[which(x.obs<1951)], lwd=3, lty=3, col=obs.color)
+        lines(x.obs[which(x.obs>1949)], y.obs[which(x.obs>1949)], lwd=4, col=obs.color)
+        points(x.obs[which(x.obs>1949)], y.obs[which(x.obs>1949)], pch=21, bg="white", cex=0.4)
+        points(x.obs[which(x.obs>1949)[seq(1,999,5)]], y.obs[which(x.obs>1949)[seq(1,999,5)]], pch=21, bg="white", cex=0.7)
+        if(label.endyear){
+          points(x.obs[end], y.obs[end], pch=16, cex=1, col=obs.color)
+          text(x.obs[end], y.obs[end], x.obs[end], pos= 4, offset = 0.25, col=obs.color, cex=1)
         }
-        lines(1961:1990, rep(baseline.obs, 30), lwd=1, col=cru.color)
-        # lines(c(1990,2021), rep(baseline.obs, 2), lty=2, col=cru.color)
-        # lines(c(2012,2021), rep(recent.cru, 2), lty=2, col=cru.color)
       }
-      
-      # add in climatena observations
-      obs.color <- "black"
-      if("climatena"%in%observations){
-        end <- max(which(!is.na(y.climatena)))
-        lines(x.climatena[which(x.climatena<1951)], y.climatena[which(x.climatena<1951)], lwd=1.5, lty=3, col=obs.color)
-        lines(x.climatena[which(x.climatena>1949)], y.climatena[which(x.climatena>1949)], lwd=1.5, col=obs.color)
-        points(x.climatena[end], y.climatena[end], pch=16, cex=1, col=obs.color)
-        text(x.climatena[end], y.climatena[end], x.climatena[end], pos= 4, offset = 0.25, col=obs.color, cex=1)
-        # if(!("cru"%in%observations)){
-        if(element=="PPT"){
-          change <- round(recent.climatena/baseline.obs-1,2)
-          # text(2022,recent.climatena, if(change>0) paste("+",change*100,"%", sep="") else paste(change*100,"%", sep=""), col=obs.color, pos=4, font=2, cex=1)
-        } else {
-          change <- round(recent.climatena-baseline.obs,1)
-          # text(2022,recent.climatena, if(change>0) paste("+",change,"C", sep="") else paste(change,"C", sep=""), col=obs.color, pos=4, font=2, cex=1)
-        }
-        # }
-        # lines(1961:1990, rep(baseline.obs, 30), lwd=1, col=obs.color)
-        # lines(c(1990,2021), rep(baseline.obs, 2), lty=2, col=obs.color)
-        # lines(c(2013,2022), rep(recent.climatena, 2), lty=2, col=obs.color)
-      }
-      
-      # add in era5 observations
-      era5.color <- "red"
-      if("era5"%in%observations){
-        end <- max(which(!is.na(y.era5)))
-        lines(x.era5, y.era5, col=era5.color, lwd=2)
-        points(x.era5[end], y.era5[end], pch=16, cex=1, col=era5.color)
-        text(x.era5[end], y.era5[end], x.era5[end], pos= 4, offset = 0.25, col=era5.color, cex=1)
-        if(element=="PPT"){
-          change <- round(recent.era5/baseline.obs-1,2)
-          # text(2021,recent.era5, if(change>0) paste("+",change*100,"%", sep="") else paste(change*100,"%", sep=""), col=era5.color, pos=4, font=2, cex=1)
-        } else {
-          change <- round(recent.era5-baseline.obs,1)
-          # text(2021,recent.era5, if(change>0) paste("+",change,"C", sep="") else paste(change,"C", sep=""), col=era5.color, pos=4, font=2, cex=1)
-        }
-        lines(1961:1990, rep(baseline.obs, 30), lwd=1, col=era5.color)
-        # lines(c(1990,2021), rep(baseline.obs, 2), lty=2, col=era5.color)
-        # lines(c(2012,2021), rep(recent.era5, 2), lty=2, col=era5.color)
-      }
-      
       print(num)
     }
 
     #legend
-    a <- if("cru"%in%observations) 1 else NA
-    b <- if("climatena"%in%observations) 2 else NA
-    c <- if("era5"%in%observations) 3 else NA
+    a <- if("cru_gpcc"%in%obs.datasets) 1 else NA
+    b <- if("climate_na"%in%obs.datasets) 2 else NA
+    c <- if("era5"%in%obs.datasets) 3 else NA
     d <- if(length(gcms.ts>0)) 6 else NA
     s <- !is.na(c(a,b,c,d))
     legend.GCM <- if(mode=="Ensemble") paste("Simulated (", length(gcms.ts), " GCMs)", sep="")  else paste("Simulated (", gcms.ts, ")", sep="")
-    legend("topleft", title = "", legend=c("Observed (CRU/GPCC)", "Observed (ClimateNA)", "ERA5 reanalysis", legend.GCM)[s], bty="n",
+    legend("topleft", title = "", legend=c("Observed (CRU/GPCC)", "Observed (ClimateNA)", "Observed (ERA5)", legend.GCM)[s], bty="n",
            lty=c(1,1,1,1)[s], 
-           col=c(cru.color, obs.color, era5.color, "gray")[s], 
+           col=c(obs.colors, "gray")[s], 
            lwd=c(3,1.5,2,2)[s], 
            pch=c(NA,NA,NA,NA)[s], 
            pt.bg = c(NA, NA,NA,NA)[s], 
