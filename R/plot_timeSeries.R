@@ -12,16 +12,38 @@
 #' All global climate model anomalies are bias-corrected to the 1961-1990 reference period normals.
 #'
 #' @details
-#' The input table `xyz` can be a single location or multiple locations. If multiple
-#' locations, the plot provides the mean of the climate values across these locations.
+#' The input table `X` provides climate data for a single location or the average of multiple locations. 
+#' The purpose of conducting the generation of the input table in a separate function is to allow users
+#' to make multiple calls to `plot_timeSeries` without needing to generate the inputs each time. 
 #' 
+#' Some combinations of `variable2` and `variable2` are not compatible or meaningful. 
+#' Examples of meaningful combinations are winter vs summer temperatures or minimum vs. 
+#' maximum temperatures. 
 #'
-#' @template xyz
-#' @param var character. y-axis variable. options are `list_variables()`.
+#' @param X. A `data.table` produced using the function `climr::plot_timeSeries_input()`. This 
+#' table can include more models, scenarios, and variables than are used in individual calls to 
+#' `plot_timeSeries`.
+#' @inheritParams climr_downscale
+#' @param variable1 character. A climate variable. options are `list_variables()`.
+#' @param variable2 character. A second climate variable to plot in combination with `variable1`. 
+#' options are `list_variables()`.
+#' @param showrange logical. Plot a shaded region indicating the minimum and maximum of the 
+#' selected ensemble of GCM simulations for each selected scenario. 
+#' @param yfit logical. Set the range of the y axis to the range of the visible data. If `FALSE` 
+#' the y axis is the range of all values of `variable1` (and `variable2` if applicable) in the 
+#' input table defined by `X`. 
+#' @param showmean logical. Plot the ensemble mean time series. Multi-model ensemble means are 
+#' calculated from the mean of simulations for each model. 
+#' @param compile logical. Compile multiple global climate models into a multi-model ensemble. 
+#' If `FALSE` the single-model ensembles are plotted individually. 
+#' @param simplify logical. Simplify the ensemble range and mean using a smoothing spline. 
+#' @param refline logical. Plot the 1961-1990 reference period mean for the selected variable
+#' and extend this line to the year 2100 as a visual reference. 
+#' @param label.endyear logical. Add a label of the final year of the observational time series. 
+#' @param yearmarkers logical. Add white points to the observational time series as a visual aid. 
+#' @param yearlines logical. Add vertical lines on every fifth year as a visual reference
 #' @param legend_pos character. Position of the legend. Options are `c("bottomright",
 #'   "bottom", "bottomleft", "left", "topleft", "top", "topright", "right", "center")`.
-#' @param interactive logical. If TRUE, an interactive plot is generated using `{plotly}`.
-#'   If FALSE, a plot is generated using base graphics.
 #'
 #' @return NULL. Draws a plot in the active graphics device.
 #'
@@ -66,18 +88,17 @@ compile = T
 simplify = T
 refline = T
 label.endyear = F
+yearmarkers = T
 yearlines = F
-mode = "Ensemble"
 legend_pos = "topleft"
-interactive = FALSE
-cache = TRUE
+
   
 # generate the climate data (TODO we will have to move this outside the function because it takes too long)
 data <- climr_downscale(xyz, 
                         gcm_models = list_gcm(),
                         ssp = list_ssp(),
                         max_run = 10,
-                        historic_ts_dataset = "climate_na", #TODO uncomment this once we fix the error in the devl branch.
+                        historic_ts_dataset = "climate_na", 
                         historic_ts = 1902:2015,
                         gcm_hist_years = 1850:2014, 
                         gcm_ts_years = 2015:2100, 
@@ -86,9 +107,9 @@ data <- climr_downscale(xyz,
 
 plot_timeSeries <- function(
     xyz,
-    obs.datasets = c("cru_gpcc"), #TODO we will have to resolve the inconsistencies with the dataset naming convention in climr (ideally changing the climr naming)
     variable1 = "Tmax_sm",
     variable2 = NULL,
+    historic_ts_dataset = "climate_na",
     gcms.ts = list_gcm()[c(1,4,5,7,10,11,12)],
     ssps = list_ssp()[1:3],
     showrange = T, 
@@ -97,13 +118,11 @@ plot_timeSeries <- function(
     showmean = T,
     compile = T,
     simplify = T,
-    refline = T,
-    label.endyear = T, 
-    yearlines = T,
-    mode = "Ensemble",
-    legend_pos = "topleft",
-    interactive = FALSE,
-    cache = TRUE) {
+    refline = F,
+    label.endyear = F, 
+    yearmarkers = T,
+    yearlines = F,
+    legend_pos = "topleft") {
   if (!requireNamespace("scales", quietly = TRUE)) {
     stop("package scales must be installed to use this function")
   } else  
@@ -144,7 +163,7 @@ plot_timeSeries <- function(
     }
     
     # PLOT
-    par(mfrow=c(1,1), mar=c(3,3,0.1,3), mgp=c(1.75, 0.25, 0), cex=1.5*cex)
+    par(mfrow=c(1,1), mar=c(3,3,0.1,3), mgp=c(1.75, 0.25, 0), cex=cex)
     # y axis title. 
     if(is.null(variable2)){ #if there is no second variable
       ylab <- variables[Code==variable1, "Variable"]
@@ -310,8 +329,10 @@ plot_timeSeries <- function(
         end <- max(which(!is.na(y.obs)))
         lines(x.obs[which(x.obs<1951)], y.obs[which(x.obs<1951)], lwd=3, lty=3, col=obs.color)
         lines(x.obs[which(x.obs>1949)], y.obs[which(x.obs>1949)], lwd=4, col=obs.color)
-        points(x.obs[which(x.obs>1949)], y.obs[which(x.obs>1949)], pch=21, bg="white", cex=0.4)
-        points(x.obs[which(x.obs>1949)[seq(1,999,5)]], y.obs[which(x.obs>1949)[seq(1,999,5)]], pch=21, bg="white", cex=0.7)
+        if(yearmarkers){
+        points(x.obs[which(x.obs>1949)], y.obs[which(x.obs>1949)], pch=21, bg="white", col=obs.color, cex=0.4)
+        points(x.obs[which(x.obs>1949)[seq(1,999,5)]], y.obs[which(x.obs>1949)[seq(1,999,5)]], pch=21, bg="white", col=obs.color, cex=0.7)
+        }
         if(label.endyear){
           points(x.obs[end], y.obs[end], pch=16, cex=1, col=obs.color)
           text(x.obs[end], y.obs[end], x.obs[end], pos= 4, offset = 0.25, col=obs.color, cex=1)
@@ -326,7 +347,7 @@ plot_timeSeries <- function(
     c <- if("era5"%in%obs.datasets) 3 else NA
     d <- if(length(gcms.ts>0)) 4 else NA
     s <- !is.na(c(a,b,c,d))
-    legend.GCM <- if(mode=="Ensemble") paste("Simulated (", length(gcms.ts), " GCMs)", sep="")  else paste("Simulated (", gcms.ts, ")", sep="")
+    legend.GCM <- if(length(gcms.ts)>1) paste("Simulated (", length(gcms.ts), " GCMs)", sep="")  else paste("Simulated (", gcms.ts, ")", sep="")
     legend(legend_pos, title = "", legend=c("Observed (ClimateNA)", "Observed (CRU/GPCC)", "Observed (ERA5)", legend.GCM)[s], bty="n",
            lty=c(1,1,1,1)[s], 
            col=c(obs.colors, "gray")[s], 
@@ -343,5 +364,5 @@ plot_timeSeries <- function(
     
     box()
     
-      }
+    }
 }
