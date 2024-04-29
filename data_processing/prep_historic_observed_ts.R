@@ -3,10 +3,19 @@ library(terra)
 library(data.table)
 library(climr)
 
+rna <- rast("C:\\Users\\kirid\\AppData\\Local/R/cache/R/climr/normal/normal_na/4da15456-9ae2-462c-a375-35913dde8c7d.tif")
+rna_dem <- rna[[73]]
+writeRaster(rna_dem, 'noram_dem.asc',NAflag=-9999,overwrite=TRUE)
+
+temp <- readLines('noram_dem.asc')
+
+write.table(temp,'noram_dem2.asc', row.names=F,col.names=F,quote=F)
+
 ppt <- rast("../Common_Files/TimeSeries_gridded_monthly/GPCC/precip.comb.v2020to2019-v2020monitorafter.total.nc")
 plot(ppt$precip_1)
 
-minLon <- -179.0625 
+bbna <- c(83.125,	18.545,	-51.5625,	-175.2875)
+
 maxLon <- -51.5625
 minLat <- 14.375
 maxLat <- 83.125
