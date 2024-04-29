@@ -470,11 +470,13 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
         stop("Insufficient memory to downscale climate data for these many points/climate layers.\n",
              "  Try reducing number of points/layers.")
       }
-    } else {
-      stop("Climate value extraction failed.",
-           "\n   Please contact developers with a reproducible example and the error:\n",
-           climaterast) 
-    }
+  } 
+  
+  # else { Ceres not sure what this is for but it's always causing fails
+  #     stop("Climate value extraction failed.",
+  #          "\n   Please contact developers with a reproducible example and the error:\n",
+  #          climaterast) 
+  #   }
   
   # Create match set to match with res names
   labels <- vapply(

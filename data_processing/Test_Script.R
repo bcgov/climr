@@ -2,6 +2,30 @@ library(data.table)
 library(terra)
 library(climr)
 
+
+dat <- fread("../climatena/Perioddat/Year_1905.ann")
+idx <- fread("../climatena/Perioddat/cru_index.dat")
+na <- fread('../climatena/prismdat/prismLR.dat')
+plot(na)
+
+my_points <- data.frame(
+  lon = c(-123.4404, -123.5064, -124.2317),
+  lat = c(48.52631, 48.46807, 49.21999),
+  elev = c(52, 103, 357),
+  id = LETTERS[1:3]
+)
+
+## climr query for the data.frame
+ds_out <- climr_downscale(
+  xyz = my_points, 
+  which_normal = "auto",
+  gcm_models = c("GFDL-ESM4", "EC-Earth3"), # specify two global climate models
+  ssp = c("ssp370", "ssp245"), # specify two greenhouse gas concentration scenarios
+  gcm_period = c("2001_2020", "2041_2060"), # specify two 20-year periods
+  max_run = 3, # specify 3 individual runs for each model
+  vars = c("PPT", "CMD", "CMI")
+)
+
 library(rworldmap)
 library(climr)
 library(pool)
@@ -12,12 +36,34 @@ library(climr)
 points_downscale_ref <- readRDS("tests/testthat/data/points_downscale_ref.rds")
 pt <- points_downscale_ref
 
-test1 <- climr_downscale(pt, which_normal = "auto", 
-                         historic_ts = 1960:2022,
+test_cru <- climr_downscale(pt, which_normal = "auto", 
+                         historic_ts = 1950:2022,
                          historic_ts_dataset = "cru_gpcc",
-                         vars = c("Tmax07","Tmin01","PPT10")
+                         return_normal = FALSE,
+                         vars = paste0("Tmin", sprintf("%02d", 1:12))
 )
 
+test_climna <- climr_downscale(pt, which_normal = "auto", 
+                            historic_ts = 1950:2015,
+                            historic_ts_dataset = "climate_na",
+                            return_normal = FALSE,
+                            vars = paste0("Tmin", sprintf("%02d", 1:12))
+)
+
+test_cru[,dataset := "cru_gpcc"]
+test_climna[,dataset := "climna"]
+hist_all <- rbind(test_cru,test_climna)
+
+hist <- melt(hist_all, id.vars = c("id","PERIOD","dataset"))
+hist <- hist[id == 2,]
+hist[,month := gsub("[^0-9.-]","",variable)]
+hist[,date := as.Date(paste0(PERIOD,"-",month,"-01"))]
+
+library(ggplot2)
+ggplot(hist, aes(x = date, y = value, col = dataset)) +
+  geom_line() +
+  facet_wrap(~variable) +
+  ylab("Tmin")
 
 projected <- climr_downscale(pt, 
                              gcm_models = list_gcm()[3],
