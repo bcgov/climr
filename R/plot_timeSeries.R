@@ -43,6 +43,8 @@
 #' @param simplify logical. Simplify the ensemble range and mean using a smoothing spline. 
 #' @param refline logical. Plot the 1961-1990 reference period mean for the selected variable
 #' and extend this line to the year 2100 as a visual reference. 
+#' @param refline.obs logical. Plot the 1961-1990 reference period mean for the observational data. 
+#' This should be the same as the reference line for the GCM time series.  
 #' @param label.endyear logical. Add a label of the final year of the observational time series. 
 #' @param endlabel character. Add a label to the end of each simulated time series. Options 
 #' are "change", to indicate the change in year 2100 relative to the 1961-1990 baseline, or "model"
@@ -64,16 +66,7 @@
 #' my_data <- plot_timeSeries_input(my_points)
 #'
 #' # use the input to create a plot
-#' plot_timeSeries(my_data, variable1 = "Tmin_sm")
-#'
-#' # export plot to a temporary directory
-#' figDir <- tempdir()
-#' png(
-#'   filename = file.path(figDir, "plot_test.png"), type = "cairo", units = "in",
-#'   width = 6, height = 5, pointsize = 10, res = 300
-#' )
-#' plot_timeSeries(my_points, variable1 = "Tmin_sm")
-#' dev.off()
+#' plot_timeSeries(my_data)
 #'
 #' # compare mean daily minimum and maximum temperatures
 #' plot_timeSeries(my_data, variable1 = "Tmin_sm", variable2 = "Tmax_sm")
@@ -84,11 +77,22 @@
 #' # compare global climate models
 #' plot_timeSeries(my_data, variable1 = "Tmin_sm", gcms.ts = list_gcm()[c(13,7)], ssp = list_ssp()[2], compile = F, simplify = F, endlabel = "model", mar=c(3,3,0.1,6), showObserved = F)
 #'
+#' # export plot to a temporary directory
+#' figDir <- tempdir()
+#' png(
+#'   filename = file.path(figDir, "plot_test.png"), type = "cairo", units = "in",
+#'   width = 6, height = 5, pointsize = 10, res = 300
+#' )
+#' plot_timeSeries(my_points, variable1 = "Tmin_sm")
+#' dev.off()
+#'
+#' plot_timeSeries(my_data, variable1 = "PAS")
+#'
 #' @export
 
 plot_timeSeries <- function(
     xyz,
-    variable1 = "Tmax_sm",
+    variable1 = "Tmin_sm",
     variable2 = NULL,
     showObserved = T,
     historic_ts_dataset = "climate_na",
@@ -101,7 +105,8 @@ plot_timeSeries <- function(
     showmean = T,
     compile = T,
     simplify = T,
-    refline = F,
+    refline = T,
+    refline.obs = T,
     label.endyear = F, 
     endlabel = "change", 
     yearmarkers = T,
@@ -318,6 +323,7 @@ plot_timeSeries <- function(
             x.obs <- as.numeric(data[is.na(GCM) & PERIOD%in%1900:2100, "PERIOD"][[1]])
             y.obs <- data[is.na(GCM) & PERIOD%in%1900:2100, get(variable)]
             recent.obs <- mean(y.obs[which(x.obs%in%2014:2023)], na.rm=T)
+            baseline.obs <- mean(y.obs[which(x.obs%in%1961:1990)], na.rm=T)
             end <- max(which(!is.na(y.obs)))
             lines(x.obs[which(x.obs<1951)], y.obs[which(x.obs<1951)], lwd=3, lty=3, col=obs.color)
             lines(x.obs[which(x.obs>1949)], y.obs[which(x.obs>1949)], lwd=4, col=obs.color)
@@ -328,6 +334,10 @@ plot_timeSeries <- function(
             if(label.endyear){
               points(x.obs[end], y.obs[end], pch=16, cex=1, col=obs.color)
               text(x.obs[end], y.obs[end], x.obs[end], pos= 4, offset = 0.25, col=obs.color, cex=1,)
+            }
+            if(refline.obs){
+              lines(1961:1990, rep(baseline.obs, 30), lwd=1, col=obs.color)
+              lines(c(1990,2100), rep(baseline.obs, 2), lty=2, col=obs.color)
             }
           }
         }
