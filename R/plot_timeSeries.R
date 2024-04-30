@@ -1,4 +1,4 @@
-#' Time series climate change plots
+#' Time series plots of climate change
 #'
 #' @description
 #' Time series plots of 20th and 21st century climate change for user-selected locations and climate variables.
@@ -86,8 +86,6 @@
 #' plot_timeSeries(my_points, variable1 = "Tmin_sm")
 #' dev.off()
 #'
-#' plot_timeSeries(my_data, variable1 = "PAS")
-#'
 #' @export
 
 plot_timeSeries <- function(
@@ -101,7 +99,7 @@ plot_timeSeries <- function(
     showrange = T, 
     yfit = T,
     cex = 1,
-    mar=c(3,3,0.1,3), 
+    mar=c(3,3,0.1,4), 
     showmean = T,
     compile = T,
     simplify = T,
@@ -165,7 +163,7 @@ plot_timeSeries <- function(
           } else { #if variables1 and 2 have different elements and yeartimes
             ylab <- paste(yeartime.names[which(yeartimes==yeartime1)], variables[Code==variable1, "Element"], "or", variables[Code==variable2, "Element"])
           }
-      plot(0, col="white", xlim=c(1900, 2100), ylim=range(if(yfit==T) visibledata else alldata, na.rm = T), xaxs="i", xaxt="n", tck=0, xlab="", ylab=ylab)
+      plot(0, col="white", xlim=c(1900, 2100), ylim=range(if(yfit) visibledata else alldata, na.rm = T), xaxs="i", xaxt="n", tck=0, xlab="", ylab=ylab)
       axis(1, at=seq(1850,2100,25), labels = seq(1850,2100,25), tck=0)
       
       num <- 1
@@ -267,16 +265,22 @@ plot_timeSeries <- function(
                   baseline <- mean(ensmean.historical[which(x.historical%in%1961:1990)])
                   projected <- s4$y[length(s4$y)]
                   if(endlabel=="change"){
-                    if(element=="PPT"){
+                    if(element%in%c("PPT", "PAS", "CMD", "MAP", "MSP", "DD_18", "DD18", "DD_0", "DD5", "Eref")){
                       change <- round(projected/baseline-1,2)
-                      if(is.na(change)==F) text(2098,projected, if(change>0) paste("+",change*100,"%", sep="") else paste(change*100,"%", sep=""), col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=2, cex=1)
+                      if(is.na(change)==F) text(2099,projected, if(change>0) paste("+",change*100,"%", sep="") else paste(change*100,"%", sep=""), col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=2, cex=1)
+                    } else if(element%in%c("Tave", "Tmin", "Tmax", "MCMT", "MWMT", "EXT", "EMT")){
+                      change <- round(projected-baseline,1)
+                      if(is.na(change)==F) text(2099,projected, if(change>0) bquote("+" * .(change) * degree * C) else bquote(.(change) * degree * C), col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=2, cex=1)
+                    } else if(element%in%c("RH")){
+                      change <- round(projected-baseline,1)
+                      if(is.na(change)==F) text(2099,projected, if(change>0) paste("+",change,"%", sep="") else paste(change,"%", sep=""), col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=2, cex=1)
                     } else {
                       change <- round(projected-baseline,1)
-                      if(is.na(change)==F) text(2098,projected, if(change>0) bquote("+" * .(change) * degree * C) else bquote(.(change) * degree * C), col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=2, cex=1)
+                      if(is.na(change)==F) text(2099,projected, if(change>0) paste("+",change, sep="") else paste(change, sep=""), col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=2, cex=1)
                     }
                   }
                   if(endlabel=="model"){
-                    text(2098,projected, if(compile==T) "ensemble" else gcm, col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=1, cex=1)
+                    text(2099,projected, if(compile==T) "ensemble" else gcm, col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=1, cex=1)
                   }
                   par(xpd=F)
                 }
