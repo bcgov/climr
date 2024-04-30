@@ -51,8 +51,8 @@
 #' to indicate the global climate model. 
 #' @param yearmarkers logical. Add white points to the observational time series as a visual aid. 
 #' @param yearlines logical. Add vertical lines on every fifth year as a visual reference
-#' @param legend_pos character. Position of the legend. Viable options are `c("bottomright",
-#'   "bottomleft", "topleft", and "topright")`.
+#' @param legend_pos character. Position of the legend. Viable options are c("bottomright",
+#'   "bottomleft", "topleft", and "topright").
 #'
 #' @return NULL. Draws a plot in the active graphics device.
 #'
