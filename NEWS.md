@@ -1,3 +1,11 @@
+# `climr` 0.0.5
+## Bug Fixes
+
+## Enhancements
+* Added `plot_timeSeries()` and `plot_timeSeries_input()` functions to generate plots of 20th and 21st century climate change for user-selected locations and climate variables.
+* Added a 1901-2022 observational time series of for the combined Climatic Research Unit TS dataset (for Temperature) and Global Precipitation Climatology Centre dataset (for precipitation). 
+* Extended the ClimateNA observational time series to 1901-2022. 
+
 # `climr` 0.0.4
 ## Bug Fixes
 * Updated future timeseries data to include full 2015-2100 period and added missing models (built some cool bash scrips using `parallel` to quickly to `raster2pgsql` conversion for large numbers of files). 
