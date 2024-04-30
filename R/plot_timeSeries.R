@@ -14,22 +14,22 @@
 #' @details
 #' The input table `X` provides climate data for a single location or the average of multiple locations. 
 #' The purpose of conducting the generation of the input table in a separate function is to allow users
-#' to make multiple calls to `plot_timeSeries` without needing to generate the inputs each time. 
+#' to make multiple calls to [`plot_timeSeries()`] without needing to generate the inputs each time. 
 #' 
 #' Some combinations of `variable2` and `variable2` are not compatible or meaningful. 
 #' Examples of meaningful combinations are winter vs summer values of the same climate variable or minimum vs. 
 #' maximum temperatures. 
 #'
-#' @param X  A `data.table` object produced using the function `climr::plot_timeSeries_input()`. This 
+#' @param X  A `data.table` object produced using the function [`plot_timeSeries_input()`]. This 
 #' table can include more models, scenarios, and variables than are used in individual calls to 
-#' `plot_timeSeries`.
+#' [`plot_timeSeries()`].
 #' @inheritParams climr_downscale
-#' @param variable1 character. A climate variable. options are `list_variables()`.
+#' @param variable1 character. A climate variable. options are [`list_variables()`].
 #' @param variable2 character. A second climate variable to plot in combination with `variable1`. 
-#' options are `list_variables()`.
+#' options are [`list_variables()`].
 #' @param showObserved logical. Plot a time series of observed climate.  
 #' @param historic_ts_dataset character. The observational time series dataset specified in the 
-#' `climr::plot_timeSeries_input()` call used to create the `X` input table. Defaults to `"climate_na"`.
+#' [`plot_timeSeries_input()`] call used to create the `X` input table. Defaults to "climate_na".
 #' This parameter is only used for specifying the correct dataset in the plot legend. 
 #' @param showrange logical. Plot a shaded region indicating the minimum and maximum of the 
 #' selected ensemble of GCM simulations for each selected scenario. 
@@ -56,8 +56,6 @@
 #'
 #' @return NULL. Draws a plot in the active graphics device.
 #'
-#' @importFrom graphics axis legend lines par points text title
-#'
 #' @examples
 #' # data frame of arbitrary points
 #' my_points <- data.frame(lon = c(-127.7300,-127.7500), lat = c(55.34114, 55.25), elev = c(711, 500), id = 1:2)
@@ -75,7 +73,7 @@
 #' plot_timeSeries(my_data, variable1 = "Tmax_sm", variable2 = "Tmax_wt")
 #'
 #' # compare global climate models
-#' plot_timeSeries(my_data, variable1 = "Tmin_sm", gcms.ts = list_gcm()[c(13,7)], ssp = list_ssp()[2], compile = F, simplify = F, endlabel = "model", mar=c(3,3,0.1,6), showObserved = F)
+#' plot_timeSeries(my_data, variable1 = "Tmin_sm", gcm_models = list_gcm()[c(13,7)], ssp = list_ssp()[2], compile = FALSE, simplify = FALSE, endlabel = "model", mar=c(3,3,0.1,6), showObserved = FALSE)
 #'
 #' # export plot to a temporary directory
 #' figDir <- tempdir()
@@ -92,23 +90,23 @@ plot_timeSeries <- function(
     X,
     variable1 = "Tmin_sm",
     variable2 = NULL,
-    showObserved = T,
+    showObserved = TRUE,
     historic_ts_dataset = "climate_na",
-    gcms.ts = list_gcm()[c(1,4,5,7,10,11,12)], #TODO add GFDL once the data are in climr
+    gcm_models = list_gcm()[c(1,4,5,7,10,11,12)], #TODO add GFDL once the data are in climr
     ssps = list_ssp()[1:3],
-    showrange = T, 
-    yfit = T,
+    showrange = TRUE, 
+    yfit = TRUE,
     cex = 1,
     mar=c(3,3,0.1,4), 
-    showmean = T,
-    compile = T,
-    simplify = T,
-    refline = T,
-    refline.obs = T,
-    label.endyear = F, 
+    showmean = TRUE,
+    compile = TRUE,
+    simplify = TRUE,
+    refline = TRUE,
+    refline.obs = TRUE,
+    label.endyear = FALSE, 
     endlabel = "change", 
-    yearmarkers = T,
-    yearlines = F,
+    yearmarkers = TRUE,
+    yearlines = FALSE,
     legend_pos = "topleft") {
   if (!requireNamespace("scales", quietly = TRUE)) {
     stop("package scales must be installed to use this function")
@@ -127,7 +125,7 @@ plot_timeSeries <- function(
       
       # yeartime definitions
       monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12")
-      seasonmonth.mat <- matrix(monthcodes[c(12, 1:11)],4, byrow=T)
+      seasonmonth.mat <- matrix(monthcodes[c(12, 1:11)],4, byrow=TRUE)
       seasons <- c("wt", "sp", "sm", "at")
       season.names <- c("Winter", "Spring", "Summer", "Autumn")
       yeartimes <- c(seasons, monthcodes)
@@ -138,7 +136,7 @@ plot_timeSeries <- function(
       
       ## Assemble the data that will be used in the plot (for setting the ylim)
       alldata <- data[, if(is.null(variable2)) get(variable1) else c(get(variable1), get(variable2))] # a vector of all potential data on the plot for setting the ylim (y axis range)
-      visibledata <- data[GCM%in%c(NA, gcms.ts) & SSP%in%c(NA, ssps), (if(is.null(variable2)) get(variable1) else c(get(variable1), get(variable2)))] # a vector of all visible data on the plot for setting the ylim (y axis range)
+      visibledata <- data[GCM%in%c(NA, gcm_models) & SSP%in%c(NA, ssps), (if(is.null(variable2)) get(variable1) else c(get(variable1), get(variable2)))] # a vector of all visible data on the plot for setting the ylim (y axis range)
       
       # components of the variable (note this will not work for monthly variables until we change the variable naming convention to underscore delimitated (e.g., Tave_01 instead of the current Tave01))
       nums <- if(is.null(variable2)) 1 else 1:2 #nums is the set of variable numbers (this is used later on as well)
@@ -163,7 +161,7 @@ plot_timeSeries <- function(
           } else { #if variables1 and 2 have different elements and yeartimes
             ylab <- paste(yeartime.names[which(yeartimes==yeartime1)], variables[Code==variable1, "Element"], "or", variables[Code==variable2, "Element"])
           }
-      plot(0, col="white", xlim=c(1900, 2100), ylim=range(if(yfit) visibledata else alldata, na.rm = T), xaxs="i", xaxt="n", tck=0, xlab="", ylab=ylab)
+      plot(0, col="white", xlim=c(1900, 2100), ylim=range(if(yfit) visibledata else alldata, na.rm = TRUE), xaxs="i", xaxt="n", tck=0, xlab="", ylab=ylab)
       axis(1, at=seq(1850,2100,25), labels = seq(1850,2100,25), tck=0)
       
       num <- 1
@@ -173,31 +171,28 @@ plot_timeSeries <- function(
         variable <- get(paste("variable",num,sep=""))
         
         # function for plotting time series for gcm or compiled ensemble
-        # gcm <- gcms.ts[1]
-        # x <- data[GCM%in%gcms.ts, c("PERIOD", "SSP", "RUN", variable), with=F] # for testing only
-        
         plot.ensemble <- function(x) {
           # scenario <- scenarios.selected[1]
-          temp.historical <- x[is.na(SSP), c("PERIOD", "RUN", variable), with=F]
+          temp.historical <- x[is.na(SSP), c("PERIOD", "RUN", variable), with=FALSE]
           x.historical <- as.numeric(temp.historical[, .(min = min(get(variable))), by = PERIOD][["PERIOD"]])
-          ensmin.historical <- temp.historical[RUN!="ensembleMean", .(min = min(get(variable), na.rm=T)), by = PERIOD][["min"]]
-          ensmax.historical <- temp.historical[RUN!="ensembleMean", .(max = max(get(variable), na.rm=T)), by = PERIOD][["max"]]
-          ensmean.historical <- temp.historical[RUN=="ensembleMean", .(mean = mean(get(variable), na.rm=T)), by = PERIOD][["mean"]] #calculate mean using the single-model ensembleMean, to ensure that the mean isn't biased towards models with more runs
+          ensmin.historical <- temp.historical[RUN!="ensembleMean", .(min = min(get(variable), na.rm=TRUE)), by = PERIOD][["min"]]
+          ensmax.historical <- temp.historical[RUN!="ensembleMean", .(max = max(get(variable), na.rm=TRUE)), by = PERIOD][["max"]]
+          ensmean.historical <- temp.historical[RUN=="ensembleMean", .(mean = mean(get(variable), na.rm=TRUE)), by = PERIOD][["mean"]] #calculate mean using the single-model ensembleMean, to ensure that the mean isn't biased towards models with more runs
           
           for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])][-1]){
-            temp <- x[SSP==scenario, c("PERIOD", "RUN", variable), with=F]
+            temp <- x[SSP==scenario, c("PERIOD", "RUN", variable), with=FALSE]
             x.temp <- as.numeric(temp[, .(min = min(get(variable))), by = PERIOD][["PERIOD"]])
-            ensmin.temp <- temp[RUN!="ensembleMean", .(min = min(get(variable), na.rm=T)), by = PERIOD][["min"]]
-            ensmax.temp <- temp[RUN!="ensembleMean", .(max = max(get(variable), na.rm=T)), by = PERIOD][["max"]]
-            ensmean.temp <- temp[RUN=="ensembleMean", .(mean = mean(get(variable), na.rm=T)), by = PERIOD][["mean"]] #calculate mean using the single-model ensembleMean, to ensure that the mean isn't biased towards models with more runs
+            ensmin.temp <- temp[RUN!="ensembleMean", .(min = min(get(variable), na.rm=TRUE)), by = PERIOD][["min"]]
+            ensmax.temp <- temp[RUN!="ensembleMean", .(max = max(get(variable), na.rm=TRUE)), by = PERIOD][["max"]]
+            ensmean.temp <- temp[RUN=="ensembleMean", .(mean = mean(get(variable), na.rm=TRUE)), by = PERIOD][["mean"]] #calculate mean using the single-model ensembleMean, to ensure that the mean isn't biased towards models with more runs
             assign(paste("x", scenario, sep="."), c(x.historical[length(x.historical)], x.temp)) # add last year of historical runs. this is necessary to get a seamless transition from the historical polygon to the future polygon. 
             assign(paste("ensmin", scenario, sep="."), c(ensmin.historical[length(ensmin.historical)], ensmin.temp)) # add last year of historical runs. this is necessary to get a seamless transition from the historical polygon to the future polygon. 
             assign(paste("ensmax", scenario, sep="."), c(ensmax.historical[length(ensmax.historical)], ensmax.temp)) # add last year of historical runs. this is necessary to get a seamless transition from the historical polygon to the future polygon. 
             assign(paste("ensmean", scenario, sep="."), c(ensmean.historical[length(ensmean.historical)], ensmean.temp)) # add last year of historical runs. this is necessary to get a seamless transition from the historical polygon to the future polygon. 
           }
           
-          if(showrange==T) {
-            if(simplify==F){
+          if(showrange) {
+            if(simplify==FALSE){
               for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])]){
                 x3 <- get(paste("x", scenario, sep="."))
                 polygon(c(x3, rev(x3)), c(get(paste("ensmin", scenario, sep=".")), rev(get(paste("ensmax", scenario, sep=".")))), col=alpha(scenario.colScheme [which(scenarios==scenario)], 0.35), border=scenario.colScheme[which(scenarios==scenario)])
@@ -231,16 +226,16 @@ plot_timeSeries <- function(
             }
           }
           
-          if(refline==T){
+          if(refline){
             ref.temp <- mean(ensmean.historical[which(x.historical%in%1961:1990)])
             lines(1961:1990, rep(ref.temp, 30), lwd=2)
             lines(c(1990,2100), rep(ref.temp, 2), lty=2)
           }
           
           # overlay the ensemble mean lines on top of all polygons
-          if(showmean==T){
+          if(showmean){
             for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])]){
-              if(simplify==F) lines(x=get(paste("x", scenario, sep=".")), y=get(paste("ensmean", scenario, sep=".")), col=scenario.colScheme[which(scenarios==scenario)], lwd=2)
+              if(simplify==FALSE) lines(x=get(paste("x", scenario, sep=".")), y=get(paste("ensmean", scenario, sep=".")), col=scenario.colScheme[which(scenarios==scenario)], lwd=2)
               
               # calculate a spline through the time series (used for plotting and the text warming value)
               if(scenario=="historical"){ # need to run spline through the historical/projected transition
@@ -254,35 +249,35 @@ plot_timeSeries <- function(
               subset <- which(x4%in%get(paste("x", scenario, sep=".")))
               
               # plot the spline
-              if(simplify==T){
+              if(simplify){
                 lines(x=s4$x[subset], y=s4$y[subset], col=scenario.colScheme[which(scenarios==scenario)], lwd=2)
               }
               
               # end labels
-              if(is.null(endlabel)==F){
+              if(is.null(endlabel)==FALSE){
                 if(scenario != "historical"){
-                  par(xpd=T)
+                  par(xpd=TRUE)
                   baseline <- mean(ensmean.historical[which(x.historical%in%1961:1990)])
                   projected <- s4$y[length(s4$y)]
                   if(endlabel=="change"){
                     if(element%in%c("PPT", "PAS", "CMD", "MAP", "MSP", "DD_18", "DD18", "DD_0", "DD5", "Eref")){
                       change <- round(projected/baseline-1,2)
-                      if(is.na(change)==F) text(2099,projected, if(change>0) paste("+",change*100,"%", sep="") else paste(change*100,"%", sep=""), col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=2, cex=1)
+                      if(is.na(change)==FALSE) text(2099,projected, if(change>0) paste("+",change*100,"%", sep="") else paste(change*100,"%", sep=""), col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=2, cex=1)
                     } else if(element%in%c("Tave", "Tmin", "Tmax", "MCMT", "MWMT", "EXT", "EMT")){
                       change <- round(projected-baseline,1)
-                      if(is.na(change)==F) text(2099,projected, if(change>0) bquote("+" * .(change) * degree * C) else bquote(.(change) * degree * C), col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=2, cex=1)
+                      if(is.na(change)==FALSE) text(2099,projected, if(change>0) bquote("+" * .(change) * degree * C) else bquote(.(change) * degree * C), col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=2, cex=1)
                     } else if(element%in%c("RH")){
                       change <- round(projected-baseline,1)
-                      if(is.na(change)==F) text(2099,projected, if(change>0) paste("+",change,"%", sep="") else paste(change,"%", sep=""), col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=2, cex=1)
+                      if(is.na(change)==FALSE) text(2099,projected, if(change>0) paste("+",change,"%", sep="") else paste(change,"%", sep=""), col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=2, cex=1)
                     } else {
                       change <- round(projected-baseline,1)
-                      if(is.na(change)==F) text(2099,projected, if(change>0) paste("+",change, sep="") else paste(change, sep=""), col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=2, cex=1)
+                      if(is.na(change)==FALSE) text(2099,projected, if(change>0) paste("+",change, sep="") else paste(change, sep=""), col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=2, cex=1)
                     }
                   }
                   if(endlabel=="model"){
-                    text(2099,projected, if(compile==T) "ensemble" else gcm, col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=1, cex=1)
+                    text(2099,projected, if(compile) "ensemble" else gcm, col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=1, cex=1)
                   }
-                  par(xpd=F)
+                  par(xpd=FALSE)
                 }
               }
               
@@ -300,12 +295,12 @@ plot_timeSeries <- function(
           }
         }
         
-        if(compile==T){ #this plots a single envelope for the ensemble as a whole
-          temp.data <- data[GCM%in%gcms.ts, c("PERIOD", "SSP", "RUN", variable), with=F]
+        if(compile){ #this plots a single envelope for the ensemble as a whole
+          temp.data <- data[GCM%in%gcm_models, c("PERIOD", "SSP", "RUN", variable), with=FALSE]
           plot.ensemble(temp.data)
           
-        } else for(gcm in gcms.ts){ #this plots of individual GCM ensembles. 
-          temp.data <- data[GCM==gcm, c("PERIOD", "SSP", "RUN", variable), with=F]
+        } else for(gcm in gcm_models){ #this plots of individual GCM ensembles. 
+          temp.data <- data[GCM==gcm, c("PERIOD", "SSP", "RUN", variable), with=FALSE]
           plot.ensemble(temp.data)
           
           print(gcm)
@@ -326,8 +321,8 @@ plot_timeSeries <- function(
             obs.color <- obs.colors[which(obs.options==obs.dataset)]
             x.obs <- as.numeric(data[is.na(GCM) & PERIOD%in%1900:2100, "PERIOD"][[1]])
             y.obs <- data[is.na(GCM) & PERIOD%in%1900:2100, get(variable)]
-            recent.obs <- mean(y.obs[which(x.obs%in%2014:2023)], na.rm=T)
-            baseline.obs <- mean(y.obs[which(x.obs%in%1961:1990)], na.rm=T)
+            recent.obs <- mean(y.obs[which(x.obs%in%2014:2023)], na.rm=TRUE)
+            baseline.obs <- mean(y.obs[which(x.obs%in%1961:1990)], na.rm=TRUE)
             end <- max(which(!is.na(y.obs)))
             lines(x.obs[which(x.obs<1951)], y.obs[which(x.obs<1951)], lwd=3, lty=3, col=obs.color)
             lines(x.obs[which(x.obs>1949)], y.obs[which(x.obs>1949)], lwd=4, col=obs.color)
@@ -353,9 +348,9 @@ plot_timeSeries <- function(
         a <- if("climate_na"%in%historic_ts_dataset) 1 else NA
         b <- if("cru_gpcc"%in%historic_ts_dataset) 2 else NA
         c <- if("era5"%in%historic_ts_dataset) 3 else NA
-        d <- if(length(gcms.ts>0)) 4 else NA
+        d <- if(length(gcm_models>0)) 4 else NA
         s <- !is.na(c(a,b,c,d))
-        legend.GCM <- if(length(gcms.ts)>1) paste("Simulated (", length(gcms.ts), " GCMs)", sep="")  else paste("Simulated (", gcms.ts, ")", sep="")
+        legend.GCM <- if(length(gcm_models)>1) paste("Simulated (", length(gcm_models), " GCMs)", sep="")  else paste("Simulated (", gcm_models, ")", sep="")
         legend(legend_pos, title = "", legend=c("Observed (ClimateNA)", "Observed (CRU/GPCC)", "Observed (ERA5)", legend.GCM)[s], bty="n",
                lty=c(1,1,1,1)[s], 
                col=c(obs.colors, "gray")[s], 
