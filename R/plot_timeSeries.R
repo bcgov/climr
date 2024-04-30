@@ -89,7 +89,7 @@
 #' @export
 
 plot_timeSeries <- function(
-    xyz,
+    X,
     variable1 = "Tmin_sm",
     variable2 = NULL,
     showObserved = T,
