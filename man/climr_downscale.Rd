@@ -38,6 +38,11 @@ data, averaged over this period. Options are \code{\link[=list_historic]{list_hi
 series of observed climate data. Default \code{NULL}. See \code{\link[=list_historic_ts]{list_historic_ts()}}
 for available years.}
 
+\item{historic_ts_dataset}{character. The dataset to use for observed time series data. Options
+are \code{"climate_na"} for the ClimateNA gridded time series or \code{"cru_gpcc"} for the combined Climatic
+Research Unit TS dataset (for Temperature) and Global Precipitation Climatology Centre dataset
+(for precipitation). Defaults to \code{NULL}.}
+
 \item{gcm_models}{character. Vector of global climate model names. Options
 are \code{\link[=list_gcm]{list_gcm()}}. Used for gcm periods, gcm timeseries, and historic timeseries.
 Defaults to \code{NULL}.}
