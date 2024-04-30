@@ -1,6 +1,6 @@
 Package: climr
 Title: Downscaling climate data in R
-Version: 0.0.5
+Version: 0.0.4.1
 Date: 29-04-2024
 Authors@R: c(
     person("Kiri","Daust", email = "kiri.daust@gov.bc.ca", role = "aut"),
