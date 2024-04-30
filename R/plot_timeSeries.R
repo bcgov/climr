@@ -322,7 +322,7 @@ plot_timeSeries <- function(
           # add in observations
           obs.colors <- c("black", "blue", "red")
           obs.options <- c("climate_na", "cru_gpcc", "era5")
-          for(obs.dataset in obs.datasets){ #TODO update this code block once i know how the datasets are identified in the climr output
+          for(obs.dataset in historic_ts_dataset){ #TODO update this code block once i know how the datasets are identified in the climr output
             obs.color <- obs.colors[which(obs.options==obs.dataset)]
             x.obs <- as.numeric(data[is.na(GCM) & PERIOD%in%1900:2100, "PERIOD"][[1]])
             y.obs <- data[is.na(GCM) & PERIOD%in%1900:2100, get(variable)]
@@ -350,9 +350,9 @@ plot_timeSeries <- function(
       
       if(showObserved){
         # Sources legend
-        a <- if("climate_na"%in%obs.datasets) 1 else NA
-        b <- if("cru_gpcc"%in%obs.datasets) 2 else NA
-        c <- if("era5"%in%obs.datasets) 3 else NA
+        a <- if("climate_na"%in%historic_ts_dataset) 1 else NA
+        b <- if("cru_gpcc"%in%historic_ts_dataset) 2 else NA
+        c <- if("era5"%in%historic_ts_dataset) 3 else NA
         d <- if(length(gcms.ts>0)) 4 else NA
         s <- !is.na(c(a,b,c,d))
         legend.GCM <- if(length(gcms.ts)>1) paste("Simulated (", length(gcms.ts), " GCMs)", sep="")  else paste("Simulated (", gcms.ts, ")", sep="")
