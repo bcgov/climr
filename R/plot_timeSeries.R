@@ -27,6 +27,7 @@
 #' @param variable1 character. A climate variable. options are `list_variables()`.
 #' @param variable2 character. A second climate variable to plot in combination with `variable1`. 
 #' options are `list_variables()`.
+#' @param showObserved logical. Plot a time series of observed climate.  
 #' @param historic_ts_dataset character. The observational time series dataset specified in the 
 #' `climr::plot_timeSeries_input()` call used to create the `X` input table. Defaults to `"climate_na"`.
 #' This parameter is only used for specifying the correct dataset in the plot legend. 
@@ -54,10 +55,13 @@
 #'
 #' @examples
 #' # data frame of arbitrary points
-#' my_points <- data.frame(lon = -127.7300, lat = 55.34114, elev = 711, id = 1)
+#' my_points <- data.frame(lon = c(-127.7300,-127.7500), lat = c(55.34114, 55.25), elev = c(711, 500), id = 1:2)
 #'
-#' # draw the plot
-#' plot_timeSeries(my_points)
+#' # generate the input data
+#' my_data <- plot_timeSeries_input(my_points)
+#'
+#' # use the input to create a plot
+#' plot_timeSeries(my_data, variable1 = "Tmin_sm")
 #'
 #' # export plot to a temporary directory
 #' figDir <- tempdir()
@@ -65,55 +69,30 @@
 #'   filename = file.path(figDir, "plot_test.png"), type = "cairo", units = "in",
 #'   width = 6, height = 5, pointsize = 10, res = 300
 #' )
-#' plot_timeSeries(my_points)
+#' plot_timeSeries(my_points, variable1 = "Tmin_sm")
 #' dev.off()
 #'
+#' # compare mean daily minimum and maximum temperatures
+#' plot_timeSeries(my_data, variable1 = "Tmin_sm", variable2 = "Tmax_sm")
+#'
+#' # compare summer and winter temperatures
+#' plot_timeSeries(my_data, variable1 = "Tmax_sm", variable2 = "Tmax_wt")
+#'
+#' # compare global climate models
+#' plot_timeSeries(my_data, variable1 = "Tmin_sm", gcms.ts = list_gcm()[c(13,7)], ssp = list_ssp()[2], compile = F, simplify = F, showObserved = T)
+#'
+#'
+#'
+#'
 #' @export
-
-
-
-# Temporary variable definitions
-library(climr)
-library(data.table)
-library(stinepack)
-library(scales)
-xyz = my_points
-obs.datasets = c("cru_gpcc") 
-variable1 = "Tmin_sm"
-variable2 = NULL
-gcms.ts = list_gcm()[c(1,4,5,7,10,11,12)]
-ssps = list_ssp()[1:4]
-showrange = T 
-yfit = T
-cex = 1
-showmean = T
-compile = T
-simplify = T
-refline = T
-label.endyear = F
-yearmarkers = T
-yearlines = F
-legend_pos = "topleft"
-
-  
-# generate the climate data (TODO we will have to move this outside the function because it takes too long)
-data <- climr_downscale(xyz, 
-                        gcm_models = list_gcm(),
-                        ssp = list_ssp(),
-                        max_run = 10,
-                        historic_ts_dataset = "climate_na", 
-                        historic_ts = 1902:2015,
-                        gcm_hist_years = 1850:2014, 
-                        gcm_ts_years = 2015:2100, 
-                        vars = list_variables()
-)
 
 plot_timeSeries <- function(
     xyz,
     variable1 = "Tmax_sm",
     variable2 = NULL,
+    showObserved = T,
     historic_ts_dataset = "climate_na",
-    gcms.ts = list_gcm()[c(1,4,5,7,10,11,12)],
+    gcms.ts = list_gcm()[c(1,4,5,7,10,11,12)], #TODO add GFDL once the data are in climr
     ssps = list_ssp()[1:3],
     showrange = T, 
     yfit = T,
@@ -321,44 +300,49 @@ plot_timeSeries <- function(
         }
       }
       
-      # add in observations
-      obs.colors <- c("black", "blue", "red")
-      obs.options <- c("climate_na", "cru_gpcc", "era5")
-      for(obs.dataset in obs.datasets){ #TODO update this code block once i know how the datasets are identified in the climr output
-        obs.color <- obs.colors[which(obs.options==obs.dataset)]
-        x.obs <- as.numeric(data[is.na(GCM) & PERIOD%in%1900:2100, "PERIOD"][[1]])
-        y.obs <- data[is.na(GCM) & PERIOD%in%1900:2100, get(variable)]
-        recent.obs <- mean(y.obs[which(x.obs%in%2014:2023)], na.rm=T)
-        end <- max(which(!is.na(y.obs)))
-        lines(x.obs[which(x.obs<1951)], y.obs[which(x.obs<1951)], lwd=3, lty=3, col=obs.color)
-        lines(x.obs[which(x.obs>1949)], y.obs[which(x.obs>1949)], lwd=4, col=obs.color)
-        if(yearmarkers){
-        points(x.obs[which(x.obs>1949)], y.obs[which(x.obs>1949)], pch=21, bg="white", col=obs.color, cex=0.4)
-        points(x.obs[which(x.obs>1949)[seq(1,999,5)]], y.obs[which(x.obs>1949)[seq(1,999,5)]], pch=21, bg="white", col=obs.color, cex=0.7)
-        }
-        if(label.endyear){
-          points(x.obs[end], y.obs[end], pch=16, cex=1, col=obs.color)
-          text(x.obs[end], y.obs[end], x.obs[end], pos= 4, offset = 0.25, col=obs.color, cex=1)
+      if(showObserved){
+        # add in observations
+        obs.colors <- c("black", "blue", "red")
+        obs.options <- c("climate_na", "cru_gpcc", "era5")
+        for(obs.dataset in obs.datasets){ #TODO update this code block once i know how the datasets are identified in the climr output
+          obs.color <- obs.colors[which(obs.options==obs.dataset)]
+          x.obs <- as.numeric(data[is.na(GCM) & PERIOD%in%1900:2100, "PERIOD"][[1]])
+          y.obs <- data[is.na(GCM) & PERIOD%in%1900:2100, get(variable)]
+          recent.obs <- mean(y.obs[which(x.obs%in%2014:2023)], na.rm=T)
+          end <- max(which(!is.na(y.obs)))
+          lines(x.obs[which(x.obs<1951)], y.obs[which(x.obs<1951)], lwd=3, lty=3, col=obs.color)
+          lines(x.obs[which(x.obs>1949)], y.obs[which(x.obs>1949)], lwd=4, col=obs.color)
+          if(yearmarkers){
+            points(x.obs[which(x.obs>1949)], y.obs[which(x.obs>1949)], pch=21, bg="white", col=obs.color, cex=0.4)
+            points(x.obs[which(x.obs>1949)[seq(1,999,5)]], y.obs[which(x.obs>1949)[seq(1,999,5)]], pch=21, bg="white", col=obs.color, cex=0.7)
+          }
+          if(label.endyear){
+            points(x.obs[end], y.obs[end], pch=16, cex=1, col=obs.color)
+            text(x.obs[end], y.obs[end], x.obs[end], pos= 4, offset = 0.25, col=obs.color, cex=1)
+          }
         }
       }
       print(num)
     }
 
-    #legend
-    a <- if("climate_na"%in%obs.datasets) 1 else NA
-    b <- if("cru_gpcc"%in%obs.datasets) 2 else NA
-    c <- if("era5"%in%obs.datasets) 3 else NA
-    d <- if(length(gcms.ts>0)) 4 else NA
-    s <- !is.na(c(a,b,c,d))
-    legend.GCM <- if(length(gcms.ts)>1) paste("Simulated (", length(gcms.ts), " GCMs)", sep="")  else paste("Simulated (", gcms.ts, ")", sep="")
-    legend(legend_pos, title = "", legend=c("Observed (ClimateNA)", "Observed (CRU/GPCC)", "Observed (ERA5)", legend.GCM)[s], bty="n",
-           lty=c(1,1,1,1)[s], 
-           col=c(obs.colors, "gray")[s], 
-           lwd=c(4,4,4,2)[s], 
-           pch=c(NA,NA,NA,NA)[s], 
-           pt.bg = c(NA, NA,NA,NA)[s], 
-           pt.cex=c(NA,NA,NA,NA)[s])
+    if(showObserved){
+      # Sources legend
+      a <- if("climate_na"%in%obs.datasets) 1 else NA
+      b <- if("cru_gpcc"%in%obs.datasets) 2 else NA
+      c <- if("era5"%in%obs.datasets) 3 else NA
+      d <- if(length(gcms.ts>0)) 4 else NA
+      s <- !is.na(c(a,b,c,d))
+      legend.GCM <- if(length(gcms.ts)>1) paste("Simulated (", length(gcms.ts), " GCMs)", sep="")  else paste("Simulated (", gcms.ts, ")", sep="")
+      legend(legend_pos, title = "", legend=c("Observed (ClimateNA)", "Observed (CRU/GPCC)", "Observed (ERA5)", legend.GCM)[s], bty="n",
+             lty=c(1,1,1,1)[s], 
+             col=c(obs.colors, "gray")[s], 
+             lwd=c(4,4,4,2)[s], 
+             pch=c(NA,NA,NA,NA)[s], 
+             pt.bg = c(NA, NA,NA,NA)[s], 
+             pt.cex=c(NA,NA,NA,NA)[s])
+    }
     
+    #Scenario legend
     s <- rev(which(scenarios[-1]%in%scenarios.selected))
     legend(c("top", "bottom")[if(length(grep("top", legend_pos))==1) 1 else 2], title = "Scenarios", legend=c("Historical", scenario.names[-1][s]), bty="n",
            lty=c(NA,NA,NA,NA,NA)[c(1,s+1)], col=scenario.colScheme[c(1,s+1)], lwd=c(NA,NA,NA,NA,NA)[c(1,s+1)], pch=c(22,22,22,22,22)[c(1,s+1)], pt.bg = alpha(scenario.colScheme[c(1,s+1)], 0.35), pt.cex=c(2,2,2,2,2)[c(1,s+1)])
