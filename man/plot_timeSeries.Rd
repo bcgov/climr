@@ -5,7 +5,7 @@
 \title{Time series plots of climate change}
 \usage{
 plot_timeSeries(
-  xyz,
+  X,
   variable1 = "Tmin_sm",
   variable2 = NULL,
   showObserved = T,
@@ -29,8 +29,9 @@ plot_timeSeries(
 )
 }
 \arguments{
-\item{xyz}{a \code{data.frame} with the following columns "long", "lat", "elev",
-and a unique "id". Any extra columns will be ignored and not output.}
+\item{X}{A \code{data.table} object produced using the function \code{climr::plot_timeSeries_input()}. This
+table can include more models, scenarios, and variables than are used in individual calls to
+\code{plot_timeSeries}.}
 
 \item{variable1}{character. A climate variable. options are \code{list_variables()}.}
 
@@ -75,10 +76,6 @@ to indicate the global climate model.}
 \item{yearlines}{logical. Add vertical lines on every fifth year as a visual reference}
 
 \item{legend_pos}{character. Position of the legend. Viable options are \verb{c("bottomright", "bottomleft", "topleft", and "topright")}.}
-
-\item{X.}{A \code{data.table} produced using the function \code{climr::plot_timeSeries_input()}. This
-table can include more models, scenarios, and variables than are used in individual calls to
-\code{plot_timeSeries}.}
 }
 \value{
 NULL. Draws a plot in the active graphics device.

@@ -20,7 +20,7 @@
 #' Examples of meaningful combinations are winter vs summer values of the same climate variable or minimum vs. 
 #' maximum temperatures. 
 #'
-#' @param X. A `data.table` produced using the function `climr::plot_timeSeries_input()`. This 
+#' @param X  A `data.table` object produced using the function `climr::plot_timeSeries_input()`. This 
 #' table can include more models, scenarios, and variables than are used in individual calls to 
 #' `plot_timeSeries`.
 #' @inheritParams climr_downscale
