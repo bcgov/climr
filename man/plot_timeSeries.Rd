@@ -8,41 +8,45 @@ plot_timeSeries(
   X,
   variable1 = "Tmin_sm",
   variable2 = NULL,
-  showObserved = T,
+  showObserved = TRUE,
   historic_ts_dataset = "climate_na",
-  gcms.ts = list_gcm()[c(1, 4, 5, 7, 10, 11, 12)],
+  gcm_models = list_gcm()[c(1, 4, 5, 7, 10, 11, 12)],
   ssps = list_ssp()[1:3],
-  showrange = T,
-  yfit = T,
+  showrange = TRUE,
+  yfit = TRUE,
   cex = 1,
   mar = c(3, 3, 0.1, 4),
-  showmean = T,
-  compile = T,
-  simplify = T,
-  refline = T,
-  refline.obs = T,
-  label.endyear = F,
+  showmean = TRUE,
+  compile = TRUE,
+  simplify = TRUE,
+  refline = TRUE,
+  refline.obs = TRUE,
+  label.endyear = FALSE,
   endlabel = "change",
-  yearmarkers = T,
-  yearlines = F,
+  yearmarkers = TRUE,
+  yearlines = FALSE,
   legend_pos = "topleft"
 )
 }
 \arguments{
-\item{X}{A \code{data.table} object produced using the function \code{climr::plot_timeSeries_input()}. This
+\item{X}{A \code{data.table} object produced using the function \code{\link[=plot_timeSeries_input]{plot_timeSeries_input()}}. This
 table can include more models, scenarios, and variables than are used in individual calls to
-\code{plot_timeSeries}.}
+\code{\link[=plot_timeSeries]{plot_timeSeries()}}.}
 
-\item{variable1}{character. A climate variable. options are \code{list_variables()}.}
+\item{variable1}{character. A climate variable. options are \code{\link[=list_variables]{list_variables()}}.}
 
 \item{variable2}{character. A second climate variable to plot in combination with \code{variable1}.
-options are \code{list_variables()}.}
+options are \code{\link[=list_variables]{list_variables()}}.}
 
 \item{showObserved}{logical. Plot a time series of observed climate.}
 
 \item{historic_ts_dataset}{character. The observational time series dataset specified in the
-\code{climr::plot_timeSeries_input()} call used to create the \code{X} input table. Defaults to \code{"climate_na"}.
+\code{\link[=plot_timeSeries_input]{plot_timeSeries_input()}} call used to create the \code{X} input table. Defaults to "climate_na".
 This parameter is only used for specifying the correct dataset in the plot legend.}
+
+\item{gcm_models}{character. Vector of global climate model names. Options
+are \code{\link[=list_gcm]{list_gcm()}}. Used for gcm periods, gcm timeseries, and historic timeseries.
+Defaults to \code{NULL}.}
 
 \item{showrange}{logical. Plot a shaded region indicating the minimum and maximum of the
 selected ensemble of GCM simulations for each selected scenario.}
@@ -75,7 +79,8 @@ to indicate the global climate model.}
 
 \item{yearlines}{logical. Add vertical lines on every fifth year as a visual reference}
 
-\item{legend_pos}{character. Position of the legend. Viable options are \verb{c("bottomright", "bottomleft", "topleft", and "topright")}.}
+\item{legend_pos}{character. Position of the legend. Viable options are c("bottomright",
+"bottomleft", "topleft", and "topright").}
 }
 \value{
 NULL. Draws a plot in the active graphics device.
@@ -94,7 +99,7 @@ All global climate model anomalies are bias-corrected to the 1961-1990 reference
 \details{
 The input table \code{X} provides climate data for a single location or the average of multiple locations.
 The purpose of conducting the generation of the input table in a separate function is to allow users
-to make multiple calls to \code{plot_timeSeries} without needing to generate the inputs each time.
+to make multiple calls to \code{\link[=plot_timeSeries]{plot_timeSeries()}} without needing to generate the inputs each time.
 
 Some combinations of \code{variable2} and \code{variable2} are not compatible or meaningful.
 Examples of meaningful combinations are winter vs summer values of the same climate variable or minimum vs.
@@ -117,7 +122,7 @@ plot_timeSeries(my_data, variable1 = "Tmin_sm", variable2 = "Tmax_sm")
 plot_timeSeries(my_data, variable1 = "Tmax_sm", variable2 = "Tmax_wt")
 
 # compare global climate models
-plot_timeSeries(my_data, variable1 = "Tmin_sm", gcms.ts = list_gcm()[c(13,7)], ssp = list_ssp()[2], compile = F, simplify = F, endlabel = "model", mar=c(3,3,0.1,6), showObserved = F)
+plot_timeSeries(my_data, variable1 = "Tmin_sm", gcm_models = list_gcm()[c(13,7)], ssp = list_ssp()[2], compile = FALSE, simplify = FALSE, endlabel = "model", mar=c(3,3,0.1,6), showObserved = FALSE)
 
 # export plot to a temporary directory
 figDir <- tempdir()

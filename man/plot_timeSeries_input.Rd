@@ -52,9 +52,9 @@ Defaults to \code{NULL}.}
 \code{data.table} of average downscaled climate variables for all locations.
 }
 \description{
-Input data for the \code{plot_timeSeries()} function. Since these inputs are time-consuming to generate,
+Input data for the \code{\link[=plot_timeSeries]{plot_timeSeries()}} function. Since these inputs are time-consuming to generate,
 the purpose of conducting the generation of the input table in a separate function is to allow users
-to make multiple calls to \code{plot_timeSeries()} (e.g., for comparing different climate variables)
+to make multiple calls to \code{\link[=plot_timeSeries]{plot_timeSeries()}} (e.g., for comparing different climate variables)
 without needing to generate the inputs each time.
 }
 \details{
