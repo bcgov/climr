@@ -86,6 +86,29 @@
 #'
 #' @export
 
+X = my_data
+variable1 = "MAP"
+variable2 = NULL
+showObserved = TRUE
+historic_ts_dataset = "climate_na"
+gcm_models = list_gcm()[c(1,4,5,7,10,11,12)] #TODO add GFDL once the data are in climr
+ssps = list_ssp()[1:3]
+showrange = TRUE
+yfit = TRUE
+cex = 1
+mar=c(3,3,0.1,4)
+showmean = TRUE
+compile = TRUE
+simplify = TRUE
+refline = TRUE
+refline.obs = TRUE
+label.endyear = FALSE 
+endlabel = "change"
+yearmarkers = TRUE
+yearlines = FALSE
+legend_pos = "topleft"
+  
+
 plot_timeSeries <- function(
     X,
     variable1 = "Tmin_sm",
@@ -114,7 +137,7 @@ plot_timeSeries <- function(
     if (!requireNamespace("stinepack", quietly = TRUE)) {
       stop("package stinepack must be installed to use this function")
     } else {
-      # data("variables", envir = environment()) #TODO temporary until we can resolve the error in the devl branch
+      #  X("variables", envir = environment()) #TODO temporary until we can resolve the error in the devl branch
       variables <- fread("data-raw/derivedVariables/Variables_climateBC.csv") #TODO temporary until we can resolve the error in the devl branch
       
       # Scenario definitions
@@ -135,8 +158,8 @@ plot_timeSeries <- function(
       ensstats <- c("ensmin", "ensmax", "ensmean")
       
       ## Assemble the data that will be used in the plot (for setting the ylim)
-      alldata <- data[, if(is.null(variable2)) get(variable1) else c(get(variable1), get(variable2))] # a vector of all potential data on the plot for setting the ylim (y axis range)
-      visibledata <- data[GCM%in%c(NA, gcm_models) & SSP%in%c(NA, ssps), (if(is.null(variable2)) get(variable1) else c(get(variable1), get(variable2)))] # a vector of all visible data on the plot for setting the ylim (y axis range)
+      alldata <-  X[, if(is.null(variable2)) get(variable1) else c(get(variable1), get(variable2))] # a vector of all potential data on the plot for setting the ylim (y axis range)
+      visibledata <-  X[GCM%in%c(NA, gcm_models) & SSP%in%c(NA, ssps), (if(is.null(variable2)) get(variable1) else c(get(variable1), get(variable2)))] # a vector of all visible data on the plot for setting the ylim (y axis range)
       
       # components of the variable (note this will not work for monthly variables until we change the variable naming convention to underscore delimitated (e.g., Tave_01 instead of the current Tave01))
       nums <- if(is.null(variable2)) 1 else 1:2 #nums is the set of variable numbers (this is used later on as well)
@@ -296,11 +319,11 @@ plot_timeSeries <- function(
         }
         
         if(compile){ #this plots a single envelope for the ensemble as a whole
-          temp.data <- data[GCM%in%gcm_models, c("PERIOD", "SSP", "RUN", variable), with=FALSE]
+          temp.data <-  X[GCM%in%gcm_models, c("PERIOD", "SSP", "RUN", variable), with=FALSE]
           plot.ensemble(temp.data)
           
         } else for(gcm in gcm_models){ #this plots of individual GCM ensembles. 
-          temp.data <- data[GCM==gcm, c("PERIOD", "SSP", "RUN", variable), with=FALSE]
+          temp.data <-  X[GCM==gcm, c("PERIOD", "SSP", "RUN", variable), with=FALSE]
           plot.ensemble(temp.data)
           
           print(gcm)
@@ -319,8 +342,8 @@ plot_timeSeries <- function(
           obs.options <- c("climate_na", "cru_gpcc", "era5")
           for(obs.dataset in historic_ts_dataset){ #TODO update this code block once i know how the datasets are identified in the climr output
             obs.color <- obs.colors[which(obs.options==obs.dataset)]
-            x.obs <- as.numeric(data[is.na(GCM) & PERIOD%in%1900:2100, "PERIOD"][[1]])
-            y.obs <- data[is.na(GCM) & PERIOD%in%1900:2100, get(variable)]
+            x.obs <- as.numeric( X[is.na(GCM) & PERIOD%in%1900:2100, "PERIOD"][[1]])
+            y.obs <-  X[is.na(GCM) & PERIOD%in%1900:2100, get(variable)]
             recent.obs <- mean(y.obs[which(x.obs%in%2014:2023)], na.rm=TRUE)
             baseline.obs <- mean(y.obs[which(x.obs%in%1961:1990)], na.rm=TRUE)
             end <- max(which(!is.na(y.obs)))
