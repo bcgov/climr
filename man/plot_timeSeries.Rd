@@ -21,6 +21,7 @@ plot_timeSeries(
   simplify = TRUE,
   refline = TRUE,
   refline.obs = TRUE,
+  pal = "scenario",
   label.endyear = FALSE,
   endlabel = "change",
   yearmarkers = TRUE,
@@ -69,10 +70,13 @@ and extend this line to the year 2100 as a visual reference.}
 \item{refline.obs}{logical. Plot the 1961-1990 reference period mean for the observational data.
 This should be the same as the reference line for the GCM time series.}
 
+\item{pal}{character. color palette. Options are "scenario", for use when comparing scenarios,
+and "gcm", for use when comparing GCMs.}
+
 \item{label.endyear}{logical. Add a label of the final year of the observational time series.}
 
 \item{endlabel}{character. Add a label to the end of each simulated time series. Options
-are "change", to indicate the change in year 2100 relative to the 1961-1990 baseline, or "model"
+are "change", to indicate the change in year 2100 relative to the 1961-1990 baseline, or "gcm"
 to indicate the global climate model.}
 
 \item{yearmarkers}{logical. Add white points to the observational time series as a visual aid.}
@@ -122,7 +126,7 @@ plot_timeSeries(my_data, variable1 = "Tmin_sm", variable2 = "Tmax_sm")
 plot_timeSeries(my_data, variable1 = "Tmax_sm", variable2 = "Tmax_wt")
 
 # compare global climate models
-plot_timeSeries(my_data, variable1 = "Tmin_sm", gcm_models = list_gcm()[c(13,7)], ssp = list_ssp()[2], compile = FALSE, simplify = FALSE, endlabel = "model", mar=c(3,3,0.1,6), showObserved = FALSE)
+plot_timeSeries(my_data, gcm_models = list_gcm()[c(7,13)], pal = "gcm", ssp = list_ssp()[2], showmean = FALSE, compile = FALSE, simplify = FALSE, endlabel = "gcm", mar=c(3,3,0.1,6), showObserved = FALSE)
 
 # export plot to a temporary directory
 figDir <- tempdir()
