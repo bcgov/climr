@@ -46,8 +46,10 @@
 #' @param refline.obs logical. Plot the 1961-1990 reference period mean for the observational data. 
 #' This should be the same as the reference line for the GCM time series.  
 #' @param label.endyear logical. Add a label of the final year of the observational time series. 
+#' @param pal character. color palette. Options are "scenario", for use when comparing scenarios, 
+#' and "gcm", for use when comparing GCMs. 
 #' @param endlabel character. Add a label to the end of each simulated time series. Options 
-#' are "change", to indicate the change in year 2100 relative to the 1961-1990 baseline, or "model"
+#' are "change", to indicate the change in year 2100 relative to the 1961-1990 baseline, or "gcm"
 #' to indicate the global climate model. 
 #' @param yearmarkers logical. Add white points to the observational time series as a visual aid. 
 #' @param yearlines logical. Add vertical lines on every fifth year as a visual reference
@@ -73,7 +75,7 @@
 #' plot_timeSeries(my_data, variable1 = "Tmax_sm", variable2 = "Tmax_wt")
 #'
 #' # compare global climate models
-#' plot_timeSeries(my_data, variable1 = "Tmin_sm", gcm_models = list_gcm()[c(13,7)], ssp = list_ssp()[2], compile = FALSE, simplify = FALSE, endlabel = "model", mar=c(3,3,0.1,6), showObserved = FALSE)
+#' plot_timeSeries(my_data, gcm_models = list_gcm()[c(7,13)], pal = "gcm", ssp = list_ssp()[2], showmean = FALSE, compile = FALSE, simplify = FALSE, endlabel = "gcm", mar=c(3,3,0.1,6), showObserved = FALSE)
 #'
 #' # export plot to a temporary directory
 #' figDir <- tempdir()
@@ -85,29 +87,6 @@
 #' dev.off()
 #'
 #' @export
-
-X = my_data
-variable1 = "MAP"
-variable2 = NULL
-showObserved = TRUE
-historic_ts_dataset = "climate_na"
-gcm_models = list_gcm()[c(1,4,5,7,10,11,12)] #TODO add GFDL once the data are in climr
-ssps = list_ssp()[1:3]
-showrange = TRUE
-yfit = TRUE
-cex = 1
-mar=c(3,3,0.1,4)
-showmean = TRUE
-compile = TRUE
-simplify = TRUE
-refline = TRUE
-refline.obs = TRUE
-label.endyear = FALSE 
-endlabel = "change"
-yearmarkers = TRUE
-yearlines = FALSE
-legend_pos = "topleft"
-  
 
 plot_timeSeries <- function(
     X,
@@ -126,6 +105,7 @@ plot_timeSeries <- function(
     simplify = TRUE,
     refline = TRUE,
     refline.obs = TRUE,
+    pal = "scenario",
     label.endyear = FALSE, 
     endlabel = "change", 
     yearmarkers = TRUE,
@@ -144,7 +124,20 @@ plot_timeSeries <- function(
       scenarios.selected <- c("historical", ssps)
       scenarios <- c("historical", list_ssp())
       scenario.names <- c("Historical simulations", "SSP1-2.6", "SSP2-4.5", "SSP3-7.0", "SSP5-8.5")
-      scenario.colScheme <- c("gray60", "dodgerblue4", "seagreen", "darkorange3", "darkred")  # these roughly match the IPCC standard scenario colours. 
+      pal.scenario <- c("gray60", "dodgerblue4", "seagreen", "darkorange3", "darkred")  # these roughly match the IPCC standard scenario colours. 
+      
+      # GCM color palette (from https://mk.bcgsc.ca/colorblind/)
+      pal.gcm <- c("#004949","#009292","#ff6db6","#ffb6db", "#490092","#006ddb","#b66dff","#6db6ff","#b6dbff", "#920000","#924900","#db6d00","#24ff24")
+      
+      # function for specifying the color
+      colSelect <- function(scenario, gcm){
+        if(missing(gcm)){ 
+          col = pal.scenario[which(scenarios==scenario)]
+        } else {
+          col = if(pal=="gcm") pal.gcm[which(list_gcm()==gcm)] else pal.scenario[which(scenarios==scenario)]
+        }
+        return(col)
+      }
       
       # yeartime definitions
       monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12")
@@ -218,11 +211,12 @@ plot_timeSeries <- function(
             if(simplify==FALSE){
               for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])]){
                 x3 <- get(paste("x", scenario, sep="."))
-                polygon(c(x3, rev(x3)), c(get(paste("ensmin", scenario, sep=".")), rev(get(paste("ensmax", scenario, sep=".")))), col=alpha(scenario.colScheme [which(scenarios==scenario)], 0.35), border=scenario.colScheme[which(scenarios==scenario)])
+                polygon(c(x3, rev(x3)), c(get(paste("ensmin", scenario, sep=".")), rev(get(paste("ensmax", scenario, sep=".")))), col=alpha(colSelect(scenario, gcm), 0.35), border=colSelect(scenario, gcm))
               }
             } else {
               scenarios.select <- scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])][-1]
               for(scenario in scenarios.select){
+                
                 if(scenario==scenarios.select[1]){ # we need to run spline through the historical/projected transition
                   x4 <- c(x.historical, get(paste("x", scenario, sep="."))[-1])
                   y.ensmin <- c(ensmin.historical, get(paste("ensmin", scenario, sep="."))[-1])
@@ -231,8 +225,8 @@ plot_timeSeries <- function(
                   s.ensmax <- smooth.spline(x4,y.ensmax, df=8) 
                   subset.hist <- which(x4%in%x.historical)
                   subset.proj <- which(x4%in%get(paste("x", scenario, sep=".")))
-                  polygon(c(s.ensmin$x[subset.hist], rev(s.ensmax$x[subset.hist])), c(s.ensmin$y[subset.hist], rev(s.ensmax$y[subset.hist])), col=alpha(scenario.colScheme[which(scenarios=="historical")], 0.35), border=NA)
-                  polygon(c(s.ensmin$x[subset.proj], rev(s.ensmax$x[subset.proj])), c(s.ensmin$y[subset.proj], rev(s.ensmax$y[subset.proj])), col=alpha(scenario.colScheme[which(scenarios==scenario)], 0.35), border=NA)
+                  polygon(c(s.ensmin$x[subset.hist], rev(s.ensmax$x[subset.hist])), c(s.ensmin$y[subset.hist], rev(s.ensmax$y[subset.hist])), col=alpha(if(pal=="gcm") colSelect(scenario, gcm) else pal.scenario[which(scenarios=="historical")], 0.35), border=NA)
+                  polygon(c(s.ensmin$x[subset.proj], rev(s.ensmax$x[subset.proj])), c(s.ensmin$y[subset.proj], rev(s.ensmax$y[subset.proj])), col=alpha(colSelect(scenario, gcm), 0.35), border=NA)
                 } else { # this second routine uses interpolation splines so that the starting point for all scenarios is the same
                   x5 <- c(x.historical, get(paste("x", scenario, sep="."))[-1])
                   y.ensmin2 <- c(ensmin.historical, get(paste("ensmin", scenario, sep="."))[-1])
@@ -243,7 +237,7 @@ plot_timeSeries <- function(
                   knots.proj <- which(x5%in%c(seq(2030, 2090, 20), 2100))
                   s.ensmin3 <- stinterp(x5[c(knots.hist, knots.proj)],c(s.ensmin$y[knots.hist], s.ensmin2$y[knots.proj]), x5)
                   s.ensmax3 <- stinterp(x5[c(knots.hist, knots.proj)],c(s.ensmax$y[knots.hist], s.ensmax2$y[knots.proj]), x5)
-                  polygon(c(s.ensmin3$x[subset.proj], rev(s.ensmax3$x[subset.proj])), c(s.ensmin3$y[subset.proj], rev(s.ensmax3$y[subset.proj])), col=alpha(scenario.colScheme[which(scenarios==scenario)], 0.35), border=NA)
+                  polygon(c(s.ensmin3$x[subset.proj], rev(s.ensmax3$x[subset.proj])), c(s.ensmin3$y[subset.proj], rev(s.ensmax3$y[subset.proj])), col=alpha(colSelect(scenario, gcm), 0.35), border=NA)
                 }
               }
             }
@@ -256,65 +250,64 @@ plot_timeSeries <- function(
           }
           
           # overlay the ensemble mean lines on top of all polygons
-          if(showmean){
-            for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])]){
-              if(simplify==FALSE) lines(x=get(paste("x", scenario, sep=".")), y=get(paste("ensmean", scenario, sep=".")), col=scenario.colScheme[which(scenarios==scenario)], lwd=2)
-              
-              # calculate a spline through the time series (used for plotting and the text warming value)
-              if(scenario=="historical"){ # need to run spline through the historical/projected transition
-                x4 <- c(x.historical, get(paste("x", scenarios.selected[2], sep=".")))
-                y4 <- c(ensmean.historical, get(paste("ensmean", scenarios.selected[2], sep=".")))
-              } else {
-                x4 <- c(x.historical, get(paste("x", scenario, sep=".")))
-                y4 <- c(ensmean.historical, get(paste("ensmean", scenario, sep=".")))
-              }
-              s4 <- smooth.spline(x4,y4, df=10) 
-              subset <- which(x4%in%get(paste("x", scenario, sep=".")))
-              
-              # plot the spline
+          for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])]){
+            
+            # calculate a spline through the time series (used for plotting and the text warming value)
+            if(scenario=="historical"){ # need to run spline through the historical/projected transition
+              x4 <- c(x.historical, get(paste("x", scenarios.selected[2], sep=".")))
+              y4 <- c(ensmean.historical, get(paste("ensmean", scenarios.selected[2], sep=".")))
+            } else {
+              x4 <- c(x.historical, get(paste("x", scenario, sep=".")))
+              y4 <- c(ensmean.historical, get(paste("ensmean", scenario, sep=".")))
+            }
+            s4 <- smooth.spline(x4,y4, df=10) 
+            subset <- which(x4%in%get(paste("x", scenario, sep=".")))
+            
+            # plot the ensemble mean
+            if(showmean){
               if(simplify){
-                lines(x=s4$x[subset], y=s4$y[subset], col=scenario.colScheme[which(scenarios==scenario)], lwd=2)
-              }
-              
-              # end labels
-              if(is.null(endlabel)==FALSE){
-                if(scenario != "historical"){
-                  par(xpd=TRUE)
-                  baseline <- mean(ensmean.historical[which(x.historical%in%1961:1990)])
-                  projected <- s4$y[length(s4$y)]
-                  if(endlabel=="change"){
-                    if(element%in%c("PPT", "PAS", "CMD", "MAP", "MSP", "DD_18", "DD18", "DD_0", "DD5", "Eref")){
-                      change <- round(projected/baseline-1,2)
-                      if(is.na(change)==FALSE) text(2099,projected, if(change>0) paste("+",change*100,"%", sep="") else paste(change*100,"%", sep=""), col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=2, cex=1)
-                    } else if(element%in%c("Tave", "Tmin", "Tmax", "MCMT", "MWMT", "EXT", "EMT")){
-                      change <- round(projected-baseline,1)
-                      if(is.na(change)==FALSE) text(2099,projected, if(change>0) bquote("+" * .(change) * degree * C) else bquote(.(change) * degree * C), col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=2, cex=1)
-                    } else if(element%in%c("RH")){
-                      change <- round(projected-baseline,1)
-                      if(is.na(change)==FALSE) text(2099,projected, if(change>0) paste("+",change,"%", sep="") else paste(change,"%", sep=""), col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=2, cex=1)
-                    } else {
-                      change <- round(projected-baseline,1)
-                      if(is.na(change)==FALSE) text(2099,projected, if(change>0) paste("+",change, sep="") else paste(change, sep=""), col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=2, cex=1)
-                    }
+                lines(x=s4$x[subset], y=s4$y[subset], col=colSelect(scenario, gcm), lwd=2)
+              } else lines(x=get(paste("x", scenario, sep=".")), y=get(paste("ensmean", scenario, sep=".")), col=colSelect(scenario, gcm), lwd=2)
+            }
+            
+            # end labels
+            if(is.null(endlabel)==FALSE){
+              if(scenario != "historical"){
+                par(xpd=TRUE)
+                baseline <- mean(ensmean.historical[which(x.historical%in%1961:1990)])
+                projected <- s4$y[length(s4$y)]
+                if(endlabel=="change"){
+                  if(element%in%c("PPT", "PAS", "CMD", "MAP", "MSP", "DD_18", "DD18", "DD_0", "DD5", "Eref")){
+                    change <- round(projected/baseline-1,2)
+                    if(is.na(change)==FALSE) text(2099,projected, if(change>0) paste("+",change*100,"%", sep="") else paste(change*100,"%", sep=""), col=colSelect(scenario, gcm), pos=4, font=2, cex=1)
+                  } else if(element%in%c("Tave", "Tmin", "Tmax", "MCMT", "MWMT", "EXT", "EMT")){
+                    change <- round(projected-baseline,1)
+                    if(is.na(change)==FALSE) text(2099,projected, if(change>0) bquote("+" * .(change) * degree * C) else bquote(.(change) * degree * C), col=colSelect(scenario, gcm), pos=4, font=2, cex=1)
+                  } else if(element%in%c("RH")){
+                    change <- round(projected-baseline,1)
+                    if(is.na(change)==FALSE) text(2099,projected, if(change>0) paste("+",change,"%", sep="") else paste(change,"%", sep=""), col=colSelect(scenario, gcm), pos=4, font=2, cex=1)
+                  } else {
+                    change <- round(projected-baseline,1)
+                    if(is.na(change)==FALSE) text(2099,projected, if(change>0) paste("+",change, sep="") else paste(change, sep=""), col=colSelect(scenario, gcm), pos=4, font=2, cex=1)
                   }
-                  if(endlabel=="model"){
-                    text(2099,projected, if(compile) "ensemble" else gcm, col=scenario.colScheme[which(scenarios==scenario)], pos=4, font=1, cex=1)
-                  }
-                  par(xpd=FALSE)
                 }
-              }
-              
-              # Text to identify the time of year
-              if(!is.null(variable2)){ #if there is no second variable
-                if(element1==element2){
-                  label <- yeartime.names[which(yeartimes==yeartime)]
-                } else {
-                  label <- paste(yeartime.names[which(yeartimes==yeartime)], element)
+                if(endlabel=="gcm"){
+                  text(2099,projected, if(compile) "ensemble" else gcm, col=colSelect(scenario, gcm), pos=4, font=1, cex=1)
                 }
-                temp <- get("ensmax.historical")
-                text(1925,mean(temp[10:40]), label, col="black", pos=3, font=2, cex=1)
+                par(xpd=FALSE)
               }
             }
+          }
+          
+          # Text to identify the time of year
+          if(!is.null(variable2)){ #if there is no second variable
+            if(element1==element2){
+              label <- yeartime.names[which(yeartimes==yeartime)]
+            } else {
+              label <- paste(yeartime.names[which(yeartimes==yeartime)], element)
+            }
+            temp <- get("ensmax.historical")
+            text(1925,mean(temp[10:40]), label, col="black", pos=3, font=2, cex=1)
           }
         }
         
@@ -384,9 +377,15 @@ plot_timeSeries <- function(
       }
       
       #Scenario legend
-      s <- rev(which(scenarios[-1]%in%scenarios.selected))
-      legend(c("top", "bottom")[if(length(grep("top", legend_pos))==1) 1 else 2], title = "Scenarios", legend=c("Historical", scenario.names[-1][s]), bty="n",
-             lty=c(NA,NA,NA,NA,NA)[c(1,s+1)], col=scenario.colScheme[c(1,s+1)], lwd=c(NA,NA,NA,NA,NA)[c(1,s+1)], pch=c(22,22,22,22,22)[c(1,s+1)], pt.bg = alpha(scenario.colScheme[c(1,s+1)], 0.35), pt.cex=c(2,2,2,2,2)[c(1,s+1)])
+      if(pal=="gcm"){
+        s <- which(list_gcm()%in%gcm_models)
+        legend(c("top", "bottom")[if(length(grep("top", legend_pos))==1) 1 else 2], title = "GCMs", legend=gcm_models, bty="n",
+               col=pal.gcm[s], pch=22, pt.bg = alpha(pal.gcm[s], 0.35), pt.cex=2)
+      } else {
+        s <- rev(which(scenarios[-1]%in%scenarios.selected))
+        legend(c("top", "bottom")[if(length(grep("top", legend_pos))==1) 1 else 2], title = "Scenarios", legend=c("Historical", scenario.names[-1][s]), bty="n",
+               lty=c(NA,NA,NA,NA,NA)[c(1,s+1)], col=pal.scenario[c(1,s+1)], lwd=c(NA,NA,NA,NA,NA)[c(1,s+1)], pch=c(22,22,22,22,22)[c(1,s+1)], pt.bg = alpha(pal.scenario[c(1,s+1)], 0.35), pt.cex=c(2,2,2,2,2)[c(1,s+1)])
+      }
       
       mtext(paste(" Created using climr (https://bcgov.github.io/climr/)"), side=1, line=-1.35, adj=0.0, font=1, cex=1.1, col="gray")
       
