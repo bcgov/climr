@@ -9,7 +9,7 @@ plot_timeSeries(
   variable1 = "Tmin_sm",
   variable2 = NULL,
   showObserved = TRUE,
-  historic_ts_dataset = "cru.gpcc",
+  historic_ts_dataset = "climatena",
   gcm_models = list_gcm()[c(1, 4, 5, 7, 10, 11, 12)],
   ssps = list_ssp()[1:3],
   showrange = TRUE,
@@ -123,6 +123,9 @@ my_data <- plot_timeSeries_input(my_points)
 
 # use the input to create a plot
 plot_timeSeries(my_data, variable1 = "Tmin_sm")
+
+# compare observational time series
+plot_timeSeries(my_data, variable1 = "Tmin_sm", historic_ts_dataset = c("cru.gpcc", "climatena"))
 
 # compare mean daily minimum and maximum temperatures
 plot_timeSeries(my_data, variable1 = "Tmin_sm", variable2 = "Tmax_sm")

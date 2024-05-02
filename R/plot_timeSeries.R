@@ -71,6 +71,9 @@
 #' # use the input to create a plot
 #' plot_timeSeries(my_data, variable1 = "Tmin_sm")
 #'
+#' # compare observational time series
+#' plot_timeSeries(my_data, variable1 = "Tmin_sm", historic_ts_dataset = c("cru.gpcc", "climatena"))
+#' 
 #' # compare mean daily minimum and maximum temperatures
 #' plot_timeSeries(my_data, variable1 = "Tmin_sm", variable2 = "Tmax_sm")
 #'
@@ -91,6 +94,7 @@
 #' dev.off()
 #'
 #' @importFrom scales alpha
+#' @importFrom stinepack stinterp
 #'
 #' @export
 
@@ -99,7 +103,7 @@ plot_timeSeries <- function(
     variable1 = "Tmin_sm",
     variable2 = NULL,
     showObserved = TRUE,
-    historic_ts_dataset = "cru.gpcc",
+    historic_ts_dataset = "climatena",
     gcm_models = list_gcm()[c(1,4,5,7,10,11,12)], #TODO add GFDL once the data are in climr
     ssps = list_ssp()[1:3],
     showrange = TRUE, 
@@ -119,6 +123,8 @@ plot_timeSeries <- function(
     legend_pos = "topleft") {
   if (!requireNamespace("scales", quietly = TRUE)) {
     stop("package scales must be installed to use this function")
+  } else   if (!requireNamespace("stinepack", quietly = TRUE)) {
+    stop("package stinepack must be installed to use this function")
   } else {
       data("variables", envir = environment()) 
 
@@ -337,11 +343,11 @@ plot_timeSeries <- function(
         if(showObserved){
           # add in observations
           obs.colors <- c("black", "blue", "red")
-          obs.options <- c("climate_na", "cru_gpcc", "era5")
+          obs.options <- c("climatena", "cru.gpcc", "era5")
           for(obs.dataset in historic_ts_dataset){ #TODO update this code block once i know how the datasets are identified in the climr output
             obs.color <- obs.colors[which(obs.options==obs.dataset)]
-            x.obs <- as.numeric( X[is.na(GCM) & PERIOD%in%1900:2100, "PERIOD"][[1]])
-            y.obs <-  X[is.na(GCM) & PERIOD%in%1900:2100, get(variable)]
+            x.obs <- as.numeric(X[DATASET==obs.dataset & PERIOD%in%1900:2100, "PERIOD"][[1]])
+            y.obs <-  X[DATASET==obs.dataset & PERIOD%in%1900:2100, get(variable)]
             recent.obs <- mean(y.obs[which(x.obs%in%2014:2023)], na.rm=TRUE)
             baseline.obs <- mean(y.obs[which(x.obs%in%1961:1990)], na.rm=TRUE)
             end <- max(which(!is.na(y.obs)))
@@ -366,8 +372,8 @@ plot_timeSeries <- function(
       
       if(showObserved){
         # Sources legend
-        a <- if("climate_na"%in%historic_ts_dataset) 1 else NA
-        b <- if("cru_gpcc"%in%historic_ts_dataset) 2 else NA
+        a <- if("climatena"%in%historic_ts_dataset) 1 else NA
+        b <- if("cru.gpcc"%in%historic_ts_dataset) 2 else NA
         c <- if("era5"%in%historic_ts_dataset) 3 else NA
         d <- if(length(gcm_models>0)) 4 else NA
         s <- !is.na(c(a,b,c,d))
