@@ -32,7 +32,7 @@ plot_timeSeries_input <- function(
     gcm_models = list_gcm(),
     ssp = list_ssp(),
     max_run = 10,
-    historic_ts_dataset = "cru_gpcc", 
+    historic_ts_dataset = "cru.gpcc", 
     historic_ts = 1901:2022,
     gcm_hist_years = 1850:2014, 
     gcm_ts_years = 2015:2100, 
