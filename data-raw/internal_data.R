@@ -53,6 +53,9 @@ dbnames_hist <- data.table(
              "hist_ukesm1-0-ll")
 )
 
+dbnames_hist_obs <- data.table(dataset = c("cru.gpcc", "climate.na"),
+                               dbname = c("historic_cru_gpcc","historic_ts"))
+
 dbnames_ts <- structure(list(
   GCM = c(
     "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5",
@@ -66,6 +69,6 @@ dbnames_ts <- structure(list(
   )
 ), class = "data.frame", row.names = c(NA, -12L))
 
-usethis::use_data(param, dbnames, dbnames_hist, dbnames_ts,
+usethis::use_data(param, dbnames, dbnames_hist, dbnames_ts, dbnames_hist_obs,
   overwrite = TRUE, internal = TRUE
 )
