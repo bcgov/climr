@@ -32,7 +32,7 @@ plot_timeSeries_input <- function(
     gcm_models = list_gcm(),
     ssp = list_ssp(),
     max_run = 10,
-    historic_ts_dataset = "cru.gpcc", 
+    historic_ts_dataset = c("cru.gpcc", "climatena"), 
     historic_ts = 1901:2022,
     gcm_hist_years = 1850:2014, 
     gcm_ts_years = 2015:2100, 
@@ -48,7 +48,7 @@ plot_timeSeries_input <- function(
                           gcm_ts_years = gcm_ts_years, 
                           vars = vars
   )
-  data.agg <- data[, lapply(.SD, mean), by = .(GCM, SSP, RUN, PERIOD), .SDcols = -c("id", "GCM", "SSP", "RUN", "PERIOD")]
+  data.agg <- data[, lapply(.SD, mean), by = .(GCM, SSP, RUN, PERIOD, DATASET), .SDcols = -c("id", "GCM", "SSP", "RUN", "PERIOD", "DATASET")]
   return(data.agg)
 }
 
