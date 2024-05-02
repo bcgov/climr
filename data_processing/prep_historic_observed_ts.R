@@ -3,7 +3,7 @@ library(terra)
 library(data.table)
 library(climr)
 
-rna <- rast("C:\\Users\\kirid\\AppData\\Local/R/cache/R/climr/normal/normal_na/4da15456-9ae2-462c-a375-35913dde8c7d.tif")
+normal <- rast("C:\\Users\\kirid\\AppData\\Local/R/cache/R/climr/normal/normal_na/4da15456-9ae2-462c-a375-35913dde8c7d.tif")
 rna_dem <- rna[[73]]
 writeRaster(rna_dem, 'noram_dem.asc',NAflag=-9999,overwrite=TRUE)
 
@@ -16,11 +16,7 @@ plot(ppt$precip_1)
 
 bbna <- c(83.125,	18.545,	-51.5625,	-175.2875)
 
-maxLon <- -51.5625
-minLat <- 14.375
-maxLat <- 83.125
 monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09","10","11","12")
-bbna <- c(maxLat, minLat, maxLon, minLon)
 con <- data_connect()
 normal <- normal_input(con, bbox = bbna, "normal_na")
 template <- historic_input(con, bbox = bbna, period = "2001_2020")
@@ -30,12 +26,16 @@ ppt <- project(ppt, template)
 
 ppt_tm <- time(ppt)
 ppt <- crop(ppt, template)
-ppt_nrm <- ppt[[ppt_tm > as.Date("1960-12-01") & ppt_tm < as.Date("1990-01-01")]]
+ppt_nrm <- ppt[[ppt_tm >= as.Date("1961-01-01") & ppt_tm <= as.Date("1990-01-01")]]
 nrm <- tapp(ppt_nrm, index = "months", fun = mean)
-ppt_delta <- ppt/nrm
-plot(nrm)
-plot(ppt)
-ppt_delta <- ppt_delta[[ppt_tm >= as.Date("1901-01-01") & ppt_tm <= as.Date("2022-12-31")]]
+ppt_srt <- ppt[[ppt_tm >= as.Date("1901-01-01") & ppt_tm <= as.Date("2022-12-31")]]
+ppt_delta <- ppt_srt/nrm
+
+delta_nrm <- ppt_delta[[time(ppt_delta) >= as.Date("1961-01-01") & time(ppt_delta) <= as.Date("1990-01-01")]]
+avg2 <- tapp(delta_nrm, index = "months", fun = mean)
+
+plot(avg2)
+plot(ppt_delta[[1460]])
 
 tm <- time(ppt_delta)
 yr <- year(tm)
@@ -51,14 +51,19 @@ plot(tmin[[1]])
 tmin <- crop(tmin,template)
 plot(tmin[[1]])
 tmin_tm <- time(tmin)
-tmin_nrm <- tmin[[tmin_tm > as.Date("1960-12-01") & tmin_tm < as.Date("1990-01-01")]]
+tmin_nrm <- tmin[[(tmin_tm > as.Date("1961-01-01")) & (tmin_tm < as.Date("1990-01-01"))]]
 nrm <- tapp(tmin_nrm, index = "months", fun = mean)
 plot(nrm[[7]])
+plot(normal[[31]])
+tmin <- tmin[[tmin_tm > as.Date("1901-01-01") & tmin_tm < as.Date("2022-12-31")]]
 tmin_delta <- tmin - nrm
-plot(tmin_delta[[19]])
+
+##test
+delta_nrm <- tmin_delta[[(tmin_tm > as.Date("1961-01-01")) & (tmin_tm < as.Date("1990-01-01"))]]
+avg2 <- tapp(delta_nrm, index = "months", fun = mean)
+
 tmin_delta <- resample(tmin_delta, ppt_delta)
 plot(tmin_delta[[18]])
-tmin_delta <- tmin_delta[[tmin_tm > as.Date("1901-01-01")]]
 
 tm <- time(tmin_delta)
 yr <- year(tm)
@@ -74,14 +79,19 @@ plot(tmin[[1]])
 tmin <- crop(tmin,template)
 plot(tmin[[7]])
 tmin_tm <- time(tmin)
-tmin_nrm <- tmin[[tmin_tm > as.Date("1960-12-01") & tmin_tm < as.Date("1990-01-01")]]
+tmin_nrm <- tmin[[tmin_tm >= as.Date("1960-01-01") & tmin_tm <= as.Date("1990-01-01")]]
 nrm <- tapp(tmin_nrm, index = "months", fun = mean)
 plot(nrm[[7]])
+tmin <- tmin[[tmin_tm > as.Date("1901-01-01") & tmin_tm < as.Date("2022-12-31")]]
 tmax_delta <- tmin - nrm
 plot(tmax_delta[[19]])
 tmax_delta <- resample(tmax_delta, ppt_delta)
-plot(tmax_delta[[12]])
-tmax_delta <- tmax_delta[[tmin_tm > as.Date("1901-01-01")]]
+plot(tmin_delta[[12]])
+
+delta_nrm <- tmax_delta[[(time(tmax_delta) > as.Date("1961-01-01")) & (time(tmax_delta) < as.Date("1990-01-01"))]]
+avg2 <- tapp(delta_nrm, index = "months", fun = mean)
+
+#tmax_delta <- tmax_delta[[tmin_tm > as.Date("1901-01-01")]]
 
 tm <- time(tmax_delta)
 yr <- year(tm)
@@ -90,8 +100,12 @@ nms <- paste0("Tmax",monthcodes[mn],"_",yr)
 names(tmax_delta) <- nms
 
 gpcc_all <- c(ppt_delta, tmin_delta, tmax_delta)
-writeRaster(gpcc_all,"../Common_Files/cru_gpcc_anom.tif", gdal="COMPRESS=NONE")
+writeRaster(gpcc_all,"../Common_Files/cru_gpcc_anom.tif", gdal="COMPRESS=NONE", overwrite = TRUE)
 
+##check
+delta_nrm <- ppt_delta[[(time(ppt_delta) > as.Date("1961-01-01")) & (time(ppt_delta) < as.Date("1990-01-01"))]]
+avg2 <- tapp(delta_nrm, index = "months", fun = mean)
+plot(avg2)
 
 ##metadata
 nms <- names(gpcc_all)

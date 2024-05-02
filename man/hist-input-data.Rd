@@ -9,7 +9,7 @@ historic_input(dbCon, bbox = NULL, period = list_historic(), cache = TRUE)
 
 historic_input_ts(
   dbCon,
-  dataset = c("cru_gpcc", "climate_na"),
+  dataset = c("cru.gpcc", "climatena"),
   bbox = NULL,
   years = 2010:2022,
   cache = TRUE
@@ -25,7 +25,7 @@ Can be obtained from \code{\link[=list_historic]{list_historic()}}. Default to "
 
 \item{cache}{logical. Specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 
-\item{dataset}{Character. Which observational dataset to use? Current options are "climate_na" and "cru_gpcc"}
+\item{dataset}{Character. Which observational dataset to use? Current options are "climatena" and "cru.gpcc"}
 
 \item{years}{numeric. Years to retrieve historic anomalies for. Defaults to \code{2010:2022}.
 See \code{\link[=list_historic_ts]{list_historic_ts()}} for available years.}

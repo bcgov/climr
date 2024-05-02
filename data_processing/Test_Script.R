@@ -26,19 +26,19 @@ ds_out <- climr_downscale(
   vars = c("PPT", "CMD", "CMI")
 )
 
-library(rworldmap)
-library(climr)
-library(pool)
-data("countriesCoarse")
 
 library(climr)
 
 points_downscale_ref <- readRDS("tests/testthat/data/points_downscale_ref.rds")
 pt <- points_downscale_ref
 
+dbcon <- data_connect()
+bbox <- get_bb(pt)
+hist <- historic_input_ts(dbcon, dataset = c("cru.gpcc","climate.na"), bbox = bbox, years = 1950:2015)
+
 test_cru <- climr_downscale(pt, which_normal = "auto", 
                          historic_ts = 1950:2022,
-                         historic_ts_dataset = "cru_gpcc",
+                         historic_ts_dataset = c("climatena","cru.gpcc"),
                          return_normal = FALSE,
                          vars = paste0("Tmin", sprintf("%02d", 1:12))
 )
@@ -64,6 +64,8 @@ ggplot(hist, aes(x = date, y = value, col = dataset)) +
   geom_line() +
   facet_wrap(~variable) +
   ylab("Tmin")
+ggsave("Historic_TS_plots.png", width = 8, height = 9)
+
 
 projected <- climr_downscale(pt, 
                              gcm_models = list_gcm()[3],

@@ -711,11 +711,11 @@ append_clim_vars <- function(dt, vars) {
   }
 
   # Remove unwanted variables
-  j_out <- names(dt)[!names(dt) %in% c("id", "GCM", "SSP", "RUN", "PERIOD", vars)]
+  j_out <- names(dt)[!names(dt) %in% c("id","DATASET", "GCM", "SSP", "RUN", "PERIOD", vars)]
   if (length(j_out)) {
     set(dt, j = j_out, value = NULL)
   }
 
   # Reorder to match vars
-  setcolorder(dt, c(names(dt)[names(dt) %in% c("id", "GCM", "SSP", "RUN", "PERIOD")], vars))
+  setcolorder(dt, c(names(dt)[names(dt) %in% c("id","DATASET", "GCM", "SSP", "RUN", "PERIOD")], vars))
 }
