@@ -309,23 +309,15 @@ climr_downscale <- function(xyz, which_normal = "auto",
   }
   
   if (!is.null(historic_ts)) {
-    if(is.null(historic_ts_dataset)){
-      stop("'historic_ts_dataset' must be specified.")
-    }
-    if(historic_ts_dataset == "cru_gpcc"){
       if (!all(historic_ts %in% 1901:2022)) {
         stop("'historic_ts' must be in 1901:2022")
       }
-    }else if(historic_ts_dataset == "climate_na"){
-      if (!all(historic_ts %in% 1902:2015)) {
-        stop("'historic_ts' must be in 1902:2015")
-      }
-    }else{
-      stop("historic_ts_dataset must be either 'cru_gpcc' or 'climate_na'")
-    }
   }
   
   if(!is.null(historic_ts_dataset)){
+    if(any(!historic_ts_dataset %in% c("cru.gpcc","climate.na"))){
+      stop("historic_ts_dataset must be cru.gpcc, climate.na, or both")
+    }
     if(is.null(historic_ts)){
       stop("'historic_ts' must be specified")
     }
