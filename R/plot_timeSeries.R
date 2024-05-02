@@ -16,7 +16,7 @@
 #' The purpose of conducting the generation of the input table in a separate function is to allow users
 #' to make multiple calls to [`plot_timeSeries()`] without needing to generate the inputs each time. 
 #' 
-#' Some combinations of `variable2` and `variable2` are not compatible or meaningful. 
+#' Some combinations of `variable1` and `variable2` are not compatible or meaningful. 
 #' Examples of meaningful combinations are winter vs summer values of the same climate variable or minimum vs. 
 #' maximum temperatures. 
 #'
@@ -29,13 +29,16 @@
 #' options are [`list_variables()`].
 #' @param showObserved logical. Plot a time series of observed climate.  
 #' @param historic_ts_dataset character. The observational time series dataset specified in the 
-#' [`plot_timeSeries_input()`] call used to create the `X` input table. Defaults to "climate_na".
+#' [`plot_timeSeries_input()`] call used to create the `X` input table. Defaults to "cru.gpcc".
 #' This parameter is only used for specifying the correct dataset in the plot legend. 
 #' @param showrange logical. Plot a shaded region indicating the minimum and maximum of the 
 #' selected ensemble of GCM simulations for each selected scenario. 
 #' @param yfit logical. Set the range of the y axis to the range of the visible data. If `FALSE` 
 #' the y axis is the range of all values of `variable1` (and `variable2` if applicable) in the 
 #' input table defined by `X`. 
+#' @param cex Numeric. The magnification factor for text size. Default is 1.
+#' @param mar A numerical vector of length 4, giving the margin sizes in number of lines of text: c(bottom, left, 
+#' top, right). The default is c(3,3,0.1,4).
 #' @param showmean logical. Plot the ensemble mean time series. Multi-model ensemble means are 
 #' calculated from the mean of simulations for each model. 
 #' @param compile logical. Compile multiple global climate models into a multi-model ensemble. 
@@ -45,9 +48,9 @@
 #' and extend this line to the year 2100 as a visual reference. 
 #' @param refline.obs logical. Plot the 1961-1990 reference period mean for the observational data. 
 #' This should be the same as the reference line for the GCM time series.  
-#' @param label.endyear logical. Add a label of the final year of the observational time series. 
 #' @param pal character. color palette. Options are "scenario", for use when comparing scenarios, 
 #' and "gcm", for use when comparing GCMs. 
+#' @param label.endyear logical. Add a label of the final year of the observational time series. 
 #' @param endlabel character. Add a label to the end of each simulated time series. Options 
 #' are "change", to indicate the change in year 2100 relative to the 1961-1990 baseline, or "gcm"
 #' to indicate the global climate model. 
@@ -87,6 +90,9 @@
 #' title("Historical and projected summer night-time warming in the Bulkley Valley, BC")
 #' dev.off()
 #'
+#' @importFrom scales alpha
+#' @importFrom stinepack smooth.spline
+#'
 #' @export
 
 plot_timeSeries <- function(
@@ -94,7 +100,7 @@ plot_timeSeries <- function(
     variable1 = "Tmin_sm",
     variable2 = NULL,
     showObserved = TRUE,
-    historic_ts_dataset = "climate_na",
+    historic_ts_dataset = "cru.gpcc",
     gcm_models = list_gcm()[c(1,4,5,7,10,11,12)], #TODO add GFDL once the data are in climr
     ssps = list_ssp()[1:3],
     showrange = TRUE, 
@@ -118,9 +124,8 @@ plot_timeSeries <- function(
     if (!requireNamespace("stinepack", quietly = TRUE)) {
       stop("package stinepack must be installed to use this function")
     } else {
-      #  X("variables", envir = environment()) #TODO temporary until we can resolve the error in the devl branch
-      variables <- fread("data-raw/derivedVariables/Variables_climateBC.csv") #TODO temporary until we can resolve the error in the devl branch
-      
+      data("variables", envir = environment()) 
+
       # Scenario definitions
       scenarios.selected <- c("historical", ssps)
       scenarios <- c("historical", list_ssp())
