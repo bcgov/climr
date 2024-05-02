@@ -9,7 +9,7 @@ plot_timeSeries(
   variable1 = "Tmin_sm",
   variable2 = NULL,
   showObserved = TRUE,
-  historic_ts_dataset = "climate_na",
+  historic_ts_dataset = "cru.gpcc",
   gcm_models = list_gcm()[c(1, 4, 5, 7, 10, 11, 12)],
   ssps = list_ssp()[1:3],
   showrange = TRUE,
@@ -19,7 +19,7 @@ plot_timeSeries(
   showmean = TRUE,
   compile = TRUE,
   simplify = TRUE,
-  refline = TRUE,
+  refline = FALSE,
   refline.obs = TRUE,
   pal = "scenario",
   label.endyear = FALSE,
@@ -42,7 +42,7 @@ options are \code{\link[=list_variables]{list_variables()}}.}
 \item{showObserved}{logical. Plot a time series of observed climate.}
 
 \item{historic_ts_dataset}{character. The observational time series dataset specified in the
-\code{\link[=plot_timeSeries_input]{plot_timeSeries_input()}} call used to create the \code{X} input table. Defaults to "climate_na".
+\code{\link[=plot_timeSeries_input]{plot_timeSeries_input()}} call used to create the \code{X} input table. Defaults to "cru.gpcc".
 This parameter is only used for specifying the correct dataset in the plot legend.}
 
 \item{gcm_models}{character. Vector of global climate model names. Options
@@ -55,6 +55,11 @@ selected ensemble of GCM simulations for each selected scenario.}
 \item{yfit}{logical. Set the range of the y axis to the range of the visible data. If \code{FALSE}
 the y axis is the range of all values of \code{variable1} (and \code{variable2} if applicable) in the
 input table defined by \code{X}.}
+
+\item{cex}{Numeric. The magnification factor for text size. Default is 1.}
+
+\item{mar}{A numerical vector of length 4, giving the margin sizes in number of lines of text: c(bottom, left,
+top, right). The default is c(3,3,0.1,4).}
 
 \item{showmean}{logical. Plot the ensemble mean time series. Multi-model ensemble means are
 calculated from the mean of simulations for each model.}
@@ -105,7 +110,7 @@ The input table \code{X} provides climate data for a single location or the aver
 The purpose of conducting the generation of the input table in a separate function is to allow users
 to make multiple calls to \code{\link[=plot_timeSeries]{plot_timeSeries()}} without needing to generate the inputs each time.
 
-Some combinations of \code{variable2} and \code{variable2} are not compatible or meaningful.
+Some combinations of \code{variable1} and \code{variable2} are not compatible or meaningful.
 Examples of meaningful combinations are winter vs summer values of the same climate variable or minimum vs.
 maximum temperatures.
 }
@@ -117,24 +122,25 @@ my_points <- data.frame(lon = c(-127.7300,-127.7500), lat = c(55.34114, 55.25), 
 my_data <- plot_timeSeries_input(my_points)
 
 # use the input to create a plot
-plot_timeSeries(my_data)
+plot_timeSeries(my_data, variable1 = "Tmin_sm")
 
 # compare mean daily minimum and maximum temperatures
 plot_timeSeries(my_data, variable1 = "Tmin_sm", variable2 = "Tmax_sm")
 
-# compare summer and winter temperatures
-plot_timeSeries(my_data, variable1 = "Tmax_sm", variable2 = "Tmax_wt")
+# compare summer and winter temperatures (without simplifying the ensemble range)
+plot_timeSeries(my_data, variable1 = "Tmax_sm", variable2 = "Tmax_wt", simplify = FALSE)
 
 # compare global climate models
 plot_timeSeries(my_data, gcm_models = list_gcm()[c(7,13)], pal = "gcm", ssp = list_ssp()[2], showmean = FALSE, compile = FALSE, simplify = FALSE, endlabel = "gcm", mar=c(3,3,0.1,6), showObserved = FALSE)
 
-# export plot to a temporary directory
+# export plot to a temporary directory, including a title
 figDir <- tempdir()
 png(
   filename = file.path(figDir, "plot_test.png"), type = "cairo", units = "in",
   width = 6, height = 5, pointsize = 10, res = 300
 )
-plot_timeSeries(my_points, variable1 = "Tmin_sm")
+plot_timeSeries(my_data, variable1 = "Tmin_sm", mar=c(3,3,2,4))
+title("Historical and projected summer night-time warming in the Bulkley Valley, BC")
 dev.off()
 
 }

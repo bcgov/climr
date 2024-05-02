@@ -91,7 +91,6 @@
 #' dev.off()
 #'
 #' @importFrom scales alpha
-#' @importFrom stinepack smooth.spline
 #'
 #' @export
 
@@ -120,10 +119,7 @@ plot_timeSeries <- function(
     legend_pos = "topleft") {
   if (!requireNamespace("scales", quietly = TRUE)) {
     stop("package scales must be installed to use this function")
-  } else  
-    if (!requireNamespace("stinepack", quietly = TRUE)) {
-      stop("package stinepack must be installed to use this function")
-    } else {
+  } else {
       data("variables", envir = environment()) 
 
       # Scenario definitions
