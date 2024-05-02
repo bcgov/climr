@@ -39,7 +39,7 @@ series of observed climate data. Default \code{NULL}. See \code{\link[=list_hist
 for available years.}
 
 \item{historic_ts_dataset}{character. The dataset to use for observed time series data. Options
-are \code{"climate_na"} for the ClimateNA gridded time series or \code{"cru_gpcc"} for the combined Climatic
+are \code{"climatena"} for the ClimateNA gridded time series or \code{"cru.gpcc"} for the combined Climatic
 Research Unit TS dataset (for Temperature) and Global Precipitation Climatology Centre dataset
 (for precipitation). Defaults to \code{NULL}.}
 
