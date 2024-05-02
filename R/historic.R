@@ -123,7 +123,7 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 #' `historic_input_ts` produces anomalies of historic observed climate for a given **time series**.
 #'
 #' @template dbCon
-#' @param dataset Character. Which observational dataset to use? Current options are "climate_na" and "cru_gpcc"
+#' @param dataset Character. Which observational dataset to use? Current options are "climatena" and "cru.gpcc"
 #' @template bbox
 #' @template cache
 #' @param years numeric. Years to retrieve historic anomalies for. Defaults to `2010:2022`.
@@ -141,106 +141,115 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 #' @importFrom uuid UUIDgenerate
 #' @rdname hist-input-data
 #' @export
-historic_input_ts <- function(dbCon, dataset = c("cru_gpcc", "climate_na"), bbox = NULL, years = 2010:2022, cache = TRUE) {
+historic_input_ts <- function(dbCon, dataset = c("cru.gpcc", "climatena"), bbox = NULL, years = 2010:2022, cache = TRUE) {
   ## checks
   if (!is.null(bbox)) {
     .check_bb(bbox)
   }
   
-  if(dataset == "climate_na"){
-    dbcode <- "historic_ts"
-  }else{
-    dbcode <- "historic_cru_gpcc"
-  }
-  ts_name <- dataset
+  res <- sapply(dataset, process_one_historicts,
+                years = years,
+                dbnames = dbnames_hist_obs, bbox = bbox, dbCon = dbCon,
+                cache = cache, USE.NAMES = TRUE, simplify = FALSE
+  )
+  res <- res[!sapply(res, is.null)] ##remove NULL
+  attr(res, "builder") <- "climr"
+  
+  # Return a list of SpatRasters, one element for each model
+  return(res)
 
-  ## check cached
-  needDownload <- TRUE
+  # hist_rast <- list(hist_rast)
+  # attr(hist_rast, "builder") <- "climr"
+  # names(hist_rast) <- paste(years[1], tail(years, 1), sep = ":")
+  # return(hist_rast)
+}
 
-  cPath <- file.path(cache_path(), "historic_ts", ts_name)
-
-  if (dir.exists(cPath)) {
-    bnds <- try(fread(file.path(cPath, "meta_area.csv")), silent = TRUE)
-
-    if (is(bnds, "try-error")) {
-      ## try to get the data again
-      message(
-        "Metadata file no longer exists or is unreadable.",
-        " Downloading the data again"
-      )
-    } else {
-      needDownload <- FALSE
-    }
-  }
-
-
-  if (!needDownload) {
-    setorder(bnds, -numlay)
-
-    spat_match <- lapply(1:nrow(bnds), FUN = \(x){
-      if (is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]
-    })
-    spat_match <- spat_match[!sapply(spat_match, is.null)]
-    if (length(spat_match) > 0) {
-      periods <- fread(file.path(cPath, "meta_period.csv"))
-      isin <- FALSE
-      for (oldid in spat_match) {
-        if (all(years %in% periods[uid == oldid, period])) {
-          isin <- TRUE
-          break
-        }
+process_one_historicts <- function(dataset, years, dbCon, bbox, dbnames = dbnames_hist_obs, cache) {
+  if(dataset %in% dbnames$dataset){
+    ts_name <- dataset
+    dbcode <- dbnames$dbname[dbnames$dataset == dataset]
+    
+    ## check cached
+    needDownload <- TRUE
+    
+    cPath <- file.path(cache_path(), "historic_ts", ts_name)
+    
+    if (dir.exists(cPath)) {
+      bnds <- try(fread(file.path(cPath, "meta_area.csv")), silent = TRUE)
+      
+      if (is(bnds, "try-error")) {
+        ## try to get the data again
+        message(
+          "Metadata file no longer exists or is unreadable.",
+          " Downloading the data again"
+        )
+      } else {
+        needDownload <- FALSE
       }
-
-      if (isin) {
-        message("Retrieving from cache...")
-        hist_rast <- rast(file.path(cPath, paste0(oldid, ".tif")))
-        hist_rast <- hist_rast[[grep(paste(years, collapse = "|"), names(hist_rast))]]
-        hist_rast <- list(hist_rast)
-        attr(hist_rast, "builder") <- "climr"
-        names(hist_rast) <- paste(years[1], tail(years, 1), sep = ":")
+    }
+    
+    if (!needDownload) {
+      setorder(bnds, -numlay)
+      
+      spat_match <- lapply(1:nrow(bnds), FUN = \(x){
+        if (is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]
+      })
+      spat_match <- spat_match[!sapply(spat_match, is.null)]
+      if (length(spat_match) > 0) {
+        periods <- fread(file.path(cPath, "meta_period.csv"))
+        isin <- FALSE
+        for (oldid in spat_match) {
+          if (all(years %in% periods[uid == oldid, period])) {
+            isin <- TRUE
+            break
+          }
+        }
+        
+        if (isin) {
+          message("Retrieving from cache...")
+          hist_rast <- rast(file.path(cPath, paste0(oldid, ".tif")))
+          hist_rast <- hist_rast[[grep(paste(years, collapse = "|"), names(hist_rast))]]
+          return(hist_rast)
+          # hist_rast <- list(hist_rast)
+          # attr(hist_rast, "builder") <- "climr"
+          # names(hist_rast) <- paste(years[1], tail(years, 1), sep = ":")
+        } else {
+          message("Not fully cached :( Will download more")
+          needDownload <- TRUE
+        }
       } else {
         message("Not fully cached :( Will download more")
         needDownload <- TRUE
       }
-    } else {
-      message("Not fully cached :( Will download more")
-      needDownload <- TRUE
+    }
+    
+    if (needDownload) {
+      q <- paste0("select fullnm, laynum from ",dbcode,"_layers where period in ('", paste(years, collapse = "','"), "')")
+      # print(q)
+      layerinfo <- dbGetQuery(dbCon, q)
+      message("Downloading historic anomalies")
+      hist_rast <- pgGetTerra(dbCon, dbcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
+      names(hist_rast) <- paste0(ts_name,"_",layerinfo$fullnm)
+      
+      if (cache) {
+        message("Caching data...")
+        uid <- UUIDgenerate()
+        dir.create(cPath, recursive = TRUE, showWarnings = FALSE)
+        
+        writeRaster(hist_rast, file.path(cPath, paste0(uid, ".tif")))
+        rastext <- ext(hist_rast)
+        t1 <- data.table(
+          uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1],
+          numlay = nlyr(hist_rast)
+        )
+        t2 <- data.table(uid = rep(uid, length(years)), period = years)
+        fwrite(t1, file = file.path(cPath, "meta_area.csv"), append = TRUE)
+        fwrite(t2, file = file.path(cPath, "meta_period.csv"), append = TRUE)
+      }
+      return(hist_rast)
     }
   }
-
-  if (needDownload) {
-    q <- paste0("select fullnm, laynum from ",dbcode,"_layers where period in ('", paste(years, collapse = "','"), "')")
-    # print(q)
-    layerinfo <- dbGetQuery(dbCon, q)
-    message("Downloading historic anomalies")
-    hist_rast <- pgGetTerra(dbCon, dbcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
-    names(hist_rast) <- layerinfo$fullnm
-
-    if (cache) {
-      message("Caching data...")
-      uid <- UUIDgenerate()
-      dir.create(cPath, recursive = TRUE, showWarnings = FALSE)
-
-      writeRaster(hist_rast, file.path(cPath, paste0(uid, ".tif")))
-      rastext <- ext(hist_rast)
-      t1 <- data.table(
-        uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1],
-        numlay = nlyr(hist_rast)
-      )
-      t2 <- data.table(uid = rep(uid, length(years)), period = years)
-      fwrite(t1, file = file.path(cPath, "meta_area.csv"), append = TRUE)
-      fwrite(t2, file = file.path(cPath, "meta_period.csv"), append = TRUE)
-    }
-
-    hist_rast <- list(hist_rast)
-    attr(hist_rast, "builder") <- "climr"
-    names(hist_rast) <- paste(years[1], tail(years, 1), sep = ":")
-  }
-
-  return(hist_rast)
 }
-
-
 
 
 

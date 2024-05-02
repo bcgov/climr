@@ -340,7 +340,7 @@ downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist,
   if (!is.null(historic_ts)) {
     # print(historic)
     res_hist_ts <- rbindlist(
-      lapply(historic_ts, process_one_climaterast, res = res, xyz = xyz, timeseries = TRUE, type = "historic"),
+      lapply(historic_ts, process_one_climaterast, res = res, xyz = xyz, timeseries = TRUE, type = "historic_ts"),
       use.names = TRUE
     )
   } else {
@@ -437,7 +437,7 @@ threaded_downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist, historic, hi
 #' @noRd
 #' @importFrom stats as.formula
 process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
-                                    type = c("gcm", "gcm_hist", "historic")) {
+                                    type = c("gcm", "gcm_hist", "historic", "historic_ts")) {
   type <- match.arg(type)
 
   # Store names for later use
@@ -479,20 +479,26 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
   #   }
   
   # Create match set to match with res names
-  labels <- vapply(
-    strsplit(nm, "_"),
-    function(x) {
-      paste0(x[2:3], collapse = "")
-    },
-    character(1)
-  )
-
-  if (type == "historic") {
+  
+  if(type == "historic_ts"){
+    labels <- vapply(
+      strsplit(nm, "_"),
+      \(x){x[2]},
+      character(1)
+    )
+  }else{
+    labels <- vapply(
+      strsplit(nm, "_"),
+      function(x) {
+        paste0(x[2:3], collapse = "")
+      },
+      character(1)
+    )
+  }
+  
+  if (type %in% c("historic")) {
     ## Create match set to match with res names
     labels <- nm
-    if (timeseries) {
-      labels <- gsub("_.*", "", labels)
-    }
   }
 
   # Add matching column to climaterast
@@ -514,9 +520,9 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
   }
 
   setDT(ref_dt)
-  if (type == "historic") {
+  if (type %in% c("historic","historic_ts")) {
     if (timeseries) {
-      setnames(ref_dt, c("VAR", "PERIOD"))
+      setnames(ref_dt, c("DATASET", "VAR", "PERIOD"))
       set(ref_dt, j = "variable", value = nm)
     } else {
       setnames(ref_dt, c("VAR"))
@@ -554,7 +560,8 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
   form <- switch(type,
     gcm = quote(id + GCM + SSP + RUN + PERIOD + lat + elev ~ VAR + MONTH),
     gcm_hist = quote(id + GCM + RUN + PERIOD + lat + elev ~ VAR + MONTH),
-    historic = quote(id + PERIOD + lat + elev ~ VAR)
+    historic = quote(id + PERIOD + lat + elev ~ VAR),
+    historic_ts = quote(id + DATASET + PERIOD + lat + elev ~ VAR)
   )
 
   climaterast <- dcast(
