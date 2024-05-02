@@ -158,21 +158,24 @@ plot_timeSeries <- function(
       nums <- if(is.null(variable2)) 1 else 1:2 #nums is the set of variable numbers (this is used later on as well)
       for(num in nums){ 
         variable <- get(paste("variable",num,sep=""))
-        variable.components <- unlist(strsplit(variable, "_"))
-        assign(paste0("yeartime", num), if(length(variable.components)==1) NA else variable.components[length(variable.components)]) #do by length because some elements have an underscore in them
-        assign(paste0("element", num), if(length(grep("DD_0|DD_18", variable))==1) paste(variable.components[1:2], collapse="_") else variable.components[1])
+        # # Code for parsing element and yeartime from variable name. TODO activate when the variable naming conventions are applied. 
+        # variable.components <- unlist(strsplit(variable, "_"))
+        # assign(paste0("yeartime", num), if(length(variable.components)==1) NA else variable.components[length(variable.components)]) #do by length because some elements have an underscore in them
+        # assign(paste0("element", num), if(length(grep("DD_0|DD_18", variable))==1) paste(variable.components[1:2], collapse="_") else variable.components[1])
+        assign(paste0("yeartime", num), as.character(variables[Code == variable, "Code_Time"]) )
+        assign(paste0("element", num), as.character(variables[Code == variable, "Code_Element"]) )
       }
       
       # PLOT
       par(mfrow=c(1,1), mar=mar, mgp=c(1.75, 0.25, 0), cex=cex)
       # y axis title. 
       if(is.null(variable2)){ #if there is no second variable
-        ylab <- variables[Code==variable1, "Variable"]
+        ylab <- paste(yeartime.names[which(yeartimes==yeartime1)], variables[Code==variable1, "Element"])
       } else 
         if(element1==element2){ #if both variables have the same element
           ylab <- variables[Code==variable1, "Element"]
         } else 
-          if(yeartime1==yeartime2){ #if both variables have the same element
+          if(yeartime1==yeartime2){ #if both variables have the same yeartime
             ylab <- paste(yeartime.names[which(yeartimes==yeartime1)], variables[Code==variable1, "Element"], "or", variables[Code==variable2, "Element"])
           } else { #if variables1 and 2 have different elements and yeartimes
             ylab <- paste(yeartime.names[which(yeartimes==yeartime1)], variables[Code==variable1, "Element"], "or", variables[Code==variable2, "Element"])
