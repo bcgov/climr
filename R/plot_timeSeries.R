@@ -28,9 +28,6 @@
 #' @param variable2 character. A second climate variable to plot in combination with `variable1`. 
 #' options are [`list_variables()`].
 #' @param showObserved logical. Plot a time series of observed climate.  
-#' @param historic_ts_dataset character. The observational time series dataset specified in the 
-#' [`plot_timeSeries_input()`] call used to create the `X` input table. Defaults to "cru.gpcc".
-#' This parameter is only used for specifying the correct dataset in the plot legend. 
 #' @param showrange logical. Plot a shaded region indicating the minimum and maximum of the 
 #' selected ensemble of GCM simulations for each selected scenario. 
 #' @param yfit logical. Set the range of the y axis to the range of the visible data. If `FALSE` 

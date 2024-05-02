@@ -41,9 +41,10 @@ options are \code{\link[=list_variables]{list_variables()}}.}
 
 \item{showObserved}{logical. Plot a time series of observed climate.}
 
-\item{historic_ts_dataset}{character. The observational time series dataset specified in the
-\code{\link[=plot_timeSeries_input]{plot_timeSeries_input()}} call used to create the \code{X} input table. Defaults to "cru.gpcc".
-This parameter is only used for specifying the correct dataset in the plot legend.}
+\item{historic_ts_dataset}{character. The dataset to use for observed time series data. Options
+are \code{"climatena"} for the ClimateNA gridded time series or \code{"cru.gpcc"} for the combined Climatic
+Research Unit TS dataset (for Temperature) and Global Precipitation Climatology Centre dataset
+(for precipitation). Defaults to \code{NULL}.}
 
 \item{gcm_models}{character. Vector of global climate model names. Options
 are \code{\link[=list_gcm]{list_gcm()}}. Used for gcm periods, gcm timeseries, and historic timeseries.
