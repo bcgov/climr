@@ -66,24 +66,25 @@
 #' my_data <- plot_timeSeries_input(my_points)
 #'
 #' # use the input to create a plot
-#' plot_timeSeries(my_data)
+#' plot_timeSeries(my_data, variable1 = "Tmin_sm")
 #'
 #' # compare mean daily minimum and maximum temperatures
 #' plot_timeSeries(my_data, variable1 = "Tmin_sm", variable2 = "Tmax_sm")
 #'
-#' # compare summer and winter temperatures
-#' plot_timeSeries(my_data, variable1 = "Tmax_sm", variable2 = "Tmax_wt")
+#' # compare summer and winter temperatures (without simplifying the ensemble range)
+#' plot_timeSeries(my_data, variable1 = "Tmax_sm", variable2 = "Tmax_wt", simplify = FALSE)
 #'
 #' # compare global climate models
 #' plot_timeSeries(my_data, gcm_models = list_gcm()[c(7,13)], pal = "gcm", ssp = list_ssp()[2], showmean = FALSE, compile = FALSE, simplify = FALSE, endlabel = "gcm", mar=c(3,3,0.1,6), showObserved = FALSE)
 #'
-#' # export plot to a temporary directory
+#' # export plot to a temporary directory, including a title
 #' figDir <- tempdir()
 #' png(
 #'   filename = file.path(figDir, "plot_test.png"), type = "cairo", units = "in",
 #'   width = 6, height = 5, pointsize = 10, res = 300
 #' )
-#' plot_timeSeries(my_points, variable1 = "Tmin_sm")
+#' plot_timeSeries(my_data, variable1 = "Tmin_sm", mar=c(3,3,2,4))
+#' title("Historical and projected summer night-time warming in the Bulkley Valley, BC")
 #' dev.off()
 #'
 #' @export
@@ -103,7 +104,7 @@ plot_timeSeries <- function(
     showmean = TRUE,
     compile = TRUE,
     simplify = TRUE,
-    refline = TRUE,
+    refline = FALSE,
     refline.obs = TRUE,
     pal = "scenario",
     label.endyear = FALSE, 
@@ -390,7 +391,7 @@ plot_timeSeries <- function(
                lty=c(NA,NA,NA,NA,NA)[c(1,s+1)], col=pal.scenario[c(1,s+1)], lwd=c(NA,NA,NA,NA,NA)[c(1,s+1)], pch=c(22,22,22,22,22)[c(1,s+1)], pt.bg = alpha(pal.scenario[c(1,s+1)], 0.35), pt.cex=c(2,2,2,2,2)[c(1,s+1)])
       }
       
-      mtext(paste(" Created using climr (https://bcgov.github.io/climr/)"), side=1, line=-1.35, adj=0.0, font=1, cex=1.1, col="gray")
+      # mtext(paste(" Created using climr (https://bcgov.github.io/climr/)"), side=1, line=1.5, adj=0.0, font=1, cex=1.1, col="gray")
       
       box()
       
