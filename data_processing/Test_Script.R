@@ -37,8 +37,8 @@ bbox <- get_bb(pt)
 hist <- historic_input_ts(dbcon, dataset = c("cru.gpcc","climate.na"), bbox = bbox, years = 1950:2015)
 
 test_cru <- climr_downscale(pt, which_normal = "auto", 
-                         historic_ts = 1950:2015,
-                         historic_ts_dataset = c("cru.gpcc","climate.na"),
+                         historic_ts = 1950:2022,
+                         historic_ts_dataset = c("climatena","cru.gpcc"),
                          return_normal = FALSE,
                          vars = paste0("Tmin", sprintf("%02d", 1:12))
 )

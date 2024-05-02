@@ -53,7 +53,7 @@ dbnames_hist <- data.table(
              "hist_ukesm1-0-ll")
 )
 
-dbnames_hist_obs <- data.table(dataset = c("cru.gpcc", "climate.na"),
+dbnames_hist_obs <- data.table(dataset = c("cru.gpcc", "climatena"),
                                dbname = c("historic_cru_gpcc","historic_ts"))
 
 dbnames_ts <- structure(list(

@@ -36,6 +36,7 @@
 #' @param historic_ts integer. Vector of years to obtain individual years or time
 #'   series of observed climate data. Default `NULL`. See [`list_historic_ts()`]
 #'  for available years.
+#' @param historic_ts_dataset Character. Vector of names of observational datasets to use. Current options are `cru.gpcc` and `climatena`.
 #' @param gcm_models character. Vector of global climate model names. Options
 #'   are [`list_gcm()`]. Used for gcm periods, gcm timeseries, and historic timeseries.
 #'   Defaults to `NULL`.
@@ -315,8 +316,8 @@ climr_downscale <- function(xyz, which_normal = "auto",
   }
   
   if(!is.null(historic_ts_dataset)){
-    if(any(!historic_ts_dataset %in% c("cru.gpcc","climate.na"))){
-      stop("historic_ts_dataset must be cru.gpcc, climate.na, or both")
+    if(any(!historic_ts_dataset %in% c("cru.gpcc","climatena"))){
+      stop("historic_ts_dataset must be cru.gpcc, climatena, or both")
     }
     if(is.null(historic_ts)){
       stop("'historic_ts' must be specified")

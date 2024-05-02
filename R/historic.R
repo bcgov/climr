@@ -123,7 +123,7 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 #' `historic_input_ts` produces anomalies of historic observed climate for a given **time series**.
 #'
 #' @template dbCon
-#' @param dataset Character. Which observational dataset to use? Current options are "climate.na" and "cru.gpcc"
+#' @param dataset Character. Which observational dataset to use? Current options are "climatena" and "cru.gpcc"
 #' @template bbox
 #' @template cache
 #' @param years numeric. Years to retrieve historic anomalies for. Defaults to `2010:2022`.
@@ -141,7 +141,7 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 #' @importFrom uuid UUIDgenerate
 #' @rdname hist-input-data
 #' @export
-historic_input_ts <- function(dbCon, dataset = c("cru.gpcc", "climate.na"), bbox = NULL, years = 2010:2022, cache = TRUE) {
+historic_input_ts <- function(dbCon, dataset = c("cru.gpcc", "climatena"), bbox = NULL, years = 2010:2022, cache = TRUE) {
   ## checks
   if (!is.null(bbox)) {
     .check_bb(bbox)

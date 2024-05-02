@@ -38,6 +38,8 @@ data, averaged over this period. Options are \code{\link[=list_historic]{list_hi
 series of observed climate data. Default \code{NULL}. See \code{\link[=list_historic_ts]{list_historic_ts()}}
 for available years.}
 
+\item{historic_ts_dataset}{Character. Vector of names of observational datasets to use. Current options are \code{cru.gpcc} and \code{climatena}.}
+
 \item{gcm_models}{character. Vector of global climate model names. Options
 are \code{\link[=list_gcm]{list_gcm()}}. Used for gcm periods, gcm timeseries, and historic timeseries.
 Defaults to \code{NULL}.}
