@@ -36,7 +36,10 @@
 #' @param historic_ts integer. Vector of years to obtain individual years or time
 #'   series of observed climate data. Default `NULL`. See [`list_historic_ts()`]
 #'  for available years.
-#' @param historic_ts_dataset Character. Vector of names of observational datasets to use. Current options are `cru.gpcc` and `climatena`.
+#' @param historic_ts_dataset character. The dataset to use for observed time series data. Options
+#'   are `"climatena"` for the ClimateNA gridded time series or `"cru.gpcc"` for the combined Climatic 
+#'   Research Unit TS dataset (for Temperature) and Global Precipitation Climatology Centre dataset 
+#'   (for precipitation). Defaults to `NULL`.
 #' @param gcm_models character. Vector of global climate model names. Options
 #'   are [`list_gcm()`]. Used for gcm periods, gcm timeseries, and historic timeseries.
 #'   Defaults to `NULL`.
