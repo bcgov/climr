@@ -34,6 +34,7 @@ Imports:
     RPostgres,
     terra,
     sf,
+    stinepack,
     uuid
 Suggests: 
     ggplot2,
@@ -42,7 +43,6 @@ Suggests:
     plotly,
     rmarkdown,
     remotes,
-    stinepack,
     testthat (>= 3.0.0),
     utils,
     withr
