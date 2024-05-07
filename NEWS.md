@@ -1,5 +1,9 @@
 # `climr` 0.0.5
+## User Actions Required
+* to implement the out-of-bounds bug fix, users will need to discard their cached reference normals by running the following line of code: cache_clear("normal") 
+
 ## Bug Fixes
+* fixed an out-of-bounds error that affected user queries close to the coastline. 
 
 ## Enhancements
 * Added `plot_timeSeries()` and `plot_timeSeries_input()` functions to generate plots of 20th and 21st century climate change for user-selected locations and climate variables.
