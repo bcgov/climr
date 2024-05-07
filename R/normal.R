@@ -108,7 +108,7 @@ normal_input <- function(dbCon, bbox, normal = "normal_na", cache = TRUE) {
       dir.create(cPath, recursive = TRUE, showWarnings = FALSE)
       writeRaster(res, file.path(cPath, paste0(uid, ".tif")))
       rastext <- ext(res)
-      temp <- data.table(uid = uid, ymax = rastext[4] + 0.1, ymin = rastext[3] - 0.1, xmax = rastext[2] + 0.1, xmin = rastext[1] - 0.1)
+      temp <- data.table(uid = uid, ymax = rastext[4], ymin = rastext[3], xmax = rastext[2], xmin = rastext[1])
       fwrite(temp, file = file.path(cPath, "meta_data.csv"), append = TRUE)
     }
   }
