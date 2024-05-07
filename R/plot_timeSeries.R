@@ -288,7 +288,7 @@ plot_timeSeries <- function(
                   if(element%in%c("PPT", "PAS", "CMD", "MAP", "MSP", "DD_18", "DD18", "DD_0", "DD5", "Eref")){
                     change <- round(projected/baseline-1,2)
                     if(is.na(change)==FALSE) text(2099,projected, if(change>0) paste("+",change*100,"%", sep="") else paste(change*100,"%", sep=""), col=colSelect(scenario, gcm), pos=4, font=2, cex=1)
-                  } else if(element%in%c("Tave", "Tmin", "Tmax", "MCMT", "MWMT", "EXT", "EMT")){
+                  } else if(element%in%c("Tave", "Tmin", "Tmax", "MCMT", "MWMT", "EXT", "EMT", "MAT")){
                     change <- round(projected-baseline,1)
                     if(is.na(change)==FALSE) text(2099,projected, if(change>0) bquote("+" * .(change) * degree * C) else bquote(.(change) * degree * C), col=colSelect(scenario, gcm), pos=4, font=2, cex=1)
                   } else if(element%in%c("RH")){
