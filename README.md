@@ -62,8 +62,7 @@ to work with `climr` using spatial inputs and outputs, such as raster and vector
 
 ## Methods
 
-For an overview of downscaling methods used in `climr` see `vignette("lapse_rates")`
-and `vignette("methods_downscaling")`
+For an overview of downscaling methods used in `climr` see `vignette("methods_downscaling")`
 
 ## Known issues
 
