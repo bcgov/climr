@@ -32,7 +32,7 @@ The ClimateNA mosaics are accessed from [AdaptWest](https://adaptwest.databasin.
 Historical observational time series are obtained from [ClimateNA](https://climatena.ca/) (Wang et al. 2016).
 
 CMIP6 global climate model simulations were downloaded from the [Earth System Grid Federation](https://aims2.llnl.gov/search/cmip6). The majority of these downloads were conducted by Tongli Wang, Associate Professor at the UBC Department of Forest and Conservation Sciences.
-The 13 global climate models selected for `climr`, and best practices for ensemble analysis, are described in Mahony (2022).
+The 13 global climate models selected for `climr`, and best practices for ensemble analysis, are described in Mahony et al. (2022) and summarized in Mahony (2022). 
 
 ## Installation
 
@@ -87,6 +87,8 @@ See the License for the specific language governing permissions and limitations 
 We acknowledge the World Climate Research Programme, which, through its Working Group on Coupled Modelling, coordinated and promoted CMIP6. We thank the climate modeling groups for producing and making available their model output, the Earth System Grid Federation (ESGF) for archiving the data and providing access, and the multiple funding agencies who support CMIP6 and ESGF. 
 
 ### References
+
+Mahony, C.R., T. Wang, A. Hamann, and A.J. Cannon. 2022. [A global climate model ensemble for downscaled monthly climate normals over North America](https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.7566). International Journal of Climatology. 42:5871-5891. [doi.org/10.1002/joc.7566](https://doi.org/10.1002/joc.7566)
 
 Mahony, Colin. 2022. “Rationale for the ClimateBC/NA 8-Model Ensemble Mean.” [http://climatena.ca/downloads/ClimateNA_8ModelRationale_Mahony_07May2022.pdf](http://climatena.ca/downloads/ClimateNA_8ModelRationale_Mahony_07May2022.pdf).
 
