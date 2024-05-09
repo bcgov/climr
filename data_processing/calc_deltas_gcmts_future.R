@@ -16,7 +16,7 @@ temp <- rast("../Common_Files/colin_climatology/composite_WNA_1961_1990_Pr01.tif
 gcms <- list.dirs(in_dir, full.names = FALSE, recursive = FALSE)
 na_ext <- ext(c(-179.4375, -52.3125, 13.455323687013, 82.9744960699135))
 na_ext <- ext(temp)
-gcm_nm <- gcms[5]
+gcm_nm <- gcms[6]
 for(gcm_nm in gcms[-c(1:5)]) {
   ###gcm time series
   cat(gcm_nm)
@@ -26,9 +26,9 @@ for(gcm_nm in gcms[-c(1:5)]) {
   r_tmin <- rast(mod.files[grep("tasmin.tif",mod.files)])
   r_tmax <- rast(mod.files[grep("tasmax.tif",mod.files)])
   
-  r_ppt <- crop(rast(mod.files[grep("pr.tif",mod.files)]),na_ext)
-  r_tmin <- crop(rast(mod.files[grep("tasmin.tif",mod.files)]),na_ext)
-  r_tmax <- crop(rast(mod.files[grep("tasmax.tif",mod.files)]),na_ext)
+  # r_ppt <- crop(rast(mod.files[grep("pr.tif",mod.files)]),na_ext)
+  # r_tmin <- crop(rast(mod.files[grep("tasmin.tif",mod.files)]),na_ext)
+  # r_tmax <- crop(rast(mod.files[grep("tasmax.tif",mod.files)]),na_ext)
   
 
   plot(r_ppt[[1]])
