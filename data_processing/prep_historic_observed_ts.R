@@ -128,18 +128,37 @@ dbExecute(conn, "drop table historic_cru_layers")
 # plot(test/nrm[[7]])
 # plot(ppt_delta[[ppt_tm == as.Date("1900-07-01")]])
 
-files <- list.files("C:/DataFiles/wna_normal/Year_1902MP", full.names = T)
+
+###climate NA
+files <- list.files("noram_dem2/", full.names = T, recursive = T)
+files <- files[!grepl("Rad|Tave",files)]
 dat <- rast(files)
 plot(dat)
 
-normal <- rast("C:/Users/kdaust/AppData/Local/R/cache/R/climr/inputs_pkg/normal/Normal_1961_1990MP/Normal_1961_1990MP.wlrdem.tif")
-test <- dat - normal$Tmax07
-plot(test)
-
-template <- rast("C:/Users/kdaust/AppData/Local/R/cache/R/climr/inputs_pkg/historic/Historic_2001_2020/2001_2020.tif")
-
 yr <- 1902
-years <- 1902:2022
+years <- 1902:2023
+
+ref.years <- 1961:1990
+
+rlist <- list()
+for(yr in years){
+  cat(".")
+  f_yr <- files[grep(yr, files)]
+  r <- rast(f_yr)
+  tms <- as.Date(paste0(yr,"-",gsub("\\D", "", names(r)),"-","01"))
+  time(r) <- tms
+  names(r) <- paste0(names(r),yr)
+  if(yr == years[1]){
+    r_all <- r
+  }else{
+    add(r_all) <- r
+  }
+}
+
+curr_r <- r_all[[grep("PPT", names(r_all))]]
+r_nrm <- curr_r[[time(curr_r) >= as.Date("1961-01-01") & time(curr_r) <= as.Date("1990-01-01")]]
+nrm <- tapp(r_nrm, index = "months", fun = mean)
+delta <- curr_r/nrm
 
 for(yr in years) {
   cat(yr,"...\n")
