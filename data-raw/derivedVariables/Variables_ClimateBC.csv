@@ -194,23 +194,23 @@ RH10,October relative humidity,October,Monthly,Raw,relative humidity (%),RH,10
 RH11,November relative humidity,November,Monthly,Raw,relative humidity (%),RH,11
 RH12,December relative humidity,December,Monthly,Raw,relative humidity (%),RH,12
 SHM,Summer heat:moisture index ((MWMT)/(MSP/1000)),Annual,Annual,Log,Summer heat:moisture index ((MWMT)/(MSP/1000)),SHM,
-Tave,Mean temperature (deg. C),Any,Annual,Raw,Mean temperature (deg. C),Tave,at
-Tave_at,Autumn mean temperature (deg. C),Autumn,Seasonal,Raw,Mean temperature (deg. C),Tave,sm
-Tave_sm,Summer mean temperature (deg. C),Summer,Seasonal,Raw,Mean temperature (deg. C),Tave,sp
-Tave_sp,Spring mean temperature (deg. C),Spring,Seasonal,Raw,Mean temperature (deg. C),Tave,wt
-Tave_wt,Winter mean temperature (deg. C),Winter,Seasonal,Raw,Mean temperature (deg. C),Tave,01
-Tave01,January mean temperature (deg. C),January,Monthly,Raw,Mean temperature (deg. C),Tave,02
-Tave02,February mean temperature (deg. C),February,Monthly,Raw,Mean temperature (deg. C),Tave,03
-Tave03,March mean temperature (deg. C),March,Monthly,Raw,Mean temperature (deg. C),Tave,04
-Tave04,April mean temperature (deg. C),April,Monthly,Raw,Mean temperature (deg. C),Tave,05
-Tave05,May mean temperature (deg. C),May,Monthly,Raw,Mean temperature (deg. C),Tave,06
-Tave06,June mean temperature (deg. C),June,Monthly,Raw,Mean temperature (deg. C),Tave,07
-Tave07,July mean temperature (deg. C),July,Monthly,Raw,Mean temperature (deg. C),Tave,08
-Tave08,August mean temperature (deg. C),August,Monthly,Raw,Mean temperature (deg. C),Tave,09
-Tave09,September mean temperature (deg. C),September,Monthly,Raw,Mean temperature (deg. C),Tave,10
-Tave10,October mean temperature (deg. C),October,Monthly,Raw,Mean temperature (deg. C),Tave,11
-Tave11,November mean temperature (deg. C),November,Monthly,Raw,Mean temperature (deg. C),Tave,12
-Tave12,December mean temperature (deg. C),December,Monthly,Raw,Mean temperature (deg. C),Tave,
+Tave,Mean temperature (deg. C),Any,Annual,Raw,Mean temperature (deg. C),Tave,
+Tave_at,Autumn mean temperature (deg. C),Autumn,Seasonal,Raw,Mean temperature (deg. C),Tave,at
+Tave_sm,Summer mean temperature (deg. C),Summer,Seasonal,Raw,Mean temperature (deg. C),Tave,sm
+Tave_sp,Spring mean temperature (deg. C),Spring,Seasonal,Raw,Mean temperature (deg. C),Tave,sp
+Tave_wt,Winter mean temperature (deg. C),Winter,Seasonal,Raw,Mean temperature (deg. C),Tave,wt
+Tave01,January mean temperature (deg. C),January,Monthly,Raw,Mean temperature (deg. C),Tave,01
+Tave02,February mean temperature (deg. C),February,Monthly,Raw,Mean temperature (deg. C),Tave,02
+Tave03,March mean temperature (deg. C),March,Monthly,Raw,Mean temperature (deg. C),Tave,03
+Tave04,April mean temperature (deg. C),April,Monthly,Raw,Mean temperature (deg. C),Tave,04
+Tave05,May mean temperature (deg. C),May,Monthly,Raw,Mean temperature (deg. C),Tave,05
+Tave06,June mean temperature (deg. C),June,Monthly,Raw,Mean temperature (deg. C),Tave,06
+Tave07,July mean temperature (deg. C),July,Monthly,Raw,Mean temperature (deg. C),Tave,07
+Tave08,August mean temperature (deg. C),August,Monthly,Raw,Mean temperature (deg. C),Tave,08
+Tave09,September mean temperature (deg. C),September,Monthly,Raw,Mean temperature (deg. C),Tave,09
+Tave10,October mean temperature (deg. C),October,Monthly,Raw,Mean temperature (deg. C),Tave,10
+Tave11,November mean temperature (deg. C),November,Monthly,Raw,Mean temperature (deg. C),Tave,11
+Tave12,December mean temperature (deg. C),December,Monthly,Raw,Mean temperature (deg. C),Tave,12
 TD,"Temperature difference between MWMT and MCMT, or continentality (deg. C)",Annual,Annual,Raw,"Temperature difference between MWMT and MCMT, or continentality (deg. C)",TD,
 Tmax,Mean daily maximum temperature (deg. C),Any,Annual,Raw,Mean daily maximum temperature (deg. C),Tmax,
 Tmax_at,Autumn mean daily maximum temperature (deg. C),Autumn,Seasonal,Raw,Mean daily maximum temperature (deg. C),Tmax,at
