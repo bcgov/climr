@@ -1,248 +1,248 @@
-Code,Variable,Time,Category,Scale,Element,Code_Element,Code_Time
-AHM,Annual heat:moisture index (MAT+10)/(MAP/1000)),Annual,Annual,Log,Annual heat:moisture index,AHM,
-bFFP,The Julian date on which FFP begins,Annual,Annual,Raw,Start of frost-free period (day of year),bFFP,
-CMD,Hargreaves climatic moisture deficit,Annual,Annual,Log,Hargreaves climatic moisture deficit,CMD,
-CMD_at,Autumn Hargreaves climatic moisture deficit,Autumn,Seasonal,Log,Hargreaves climatic moisture deficit,CMD,at
-CMD_sm,Summer Hargreaves climatic moisture deficit,Summer,Seasonal,Log,Hargreaves climatic moisture deficit,CMD,sm
-CMD_sp,Spring Hargreaves climatic moisture deficit,Spring,Seasonal,Log,Hargreaves climatic moisture deficit,CMD,sp
-CMD_wt,Winter Hargreaves climatic moisture deficit,Winter,Seasonal,Log,Hargreaves climatic moisture deficit,CMD,wt
-CMD01,January Hargreaves climatic moisture deficit,January,Monthly,Log,Hargreaves climatic moisture deficit,CMD,01
-CMD02,February Hargreaves climatic moisture deficit,February,Monthly,Log,Hargreaves climatic moisture deficit,CMD,02
-CMD03,March Hargreaves climatic moisture deficit,March,Monthly,Log,Hargreaves climatic moisture deficit,CMD,03
-CMD04,April Hargreaves climatic moisture deficit,April,Monthly,Log,Hargreaves climatic moisture deficit,CMD,04
-CMD05,May Hargreaves climatic moisture deficit,May,Monthly,Log,Hargreaves climatic moisture deficit,CMD,05
-CMD06,June Hargreaves climatic moisture deficit,June,Monthly,Log,Hargreaves climatic moisture deficit,CMD,06
-CMD07,July Hargreaves climatic moisture deficit,July,Monthly,Log,Hargreaves climatic moisture deficit,CMD,07
-CMD08,August Hargreaves climatic moisture deficit,August,Monthly,Log,Hargreaves climatic moisture deficit,CMD,08
-CMD09,September Hargreaves climatic moisture deficit,September,Monthly,Log,Hargreaves climatic moisture deficit,CMD,09
-CMD10,October Hargreaves climatic moisture deficit,October,Monthly,Log,Hargreaves climatic moisture deficit,CMD,10
-CMD11,November Hargreaves climatic moisture deficit,November,Monthly,Log,Hargreaves climatic moisture deficit,CMD,11
-CMD12,December Hargreaves climatic moisture deficit,December,Monthly,Log,Hargreaves climatic moisture deficit,CMD,12
-CMI,Climatic Moisture Index,Annual,Annual,Raw,Climatic Moisture Index,CMI,
-CMI01,January Climatic Moisture Index,January,Monthly,Raw,Climatic Moisture Index,CMI,01
-CMI02,February Climatic Moisture Index,February,Monthly,Raw,Climatic Moisture Index,CMI,02
-CMI03,March Climatic Moisture Index,March,Monthly,Raw,Climatic Moisture Index,CMI,03
-CMI04,April Climatic Moisture Index,April,Monthly,Raw,Climatic Moisture Index,CMI,04
-CMI05,May Climatic Moisture Index,May,Monthly,Raw,Climatic Moisture Index,CMI,05
-CMI06,June Climatic Moisture Index,June,Monthly,Raw,Climatic Moisture Index,CMI,06
-CMI07,July Climatic Moisture Index,July,Monthly,Raw,Climatic Moisture Index,CMI,07
-CMI08,August Climatic Moisture Index,August,Monthly,Raw,Climatic Moisture Index,CMI,08
-CMI09,September Climatic Moisture Index,September,Monthly,Raw,Climatic Moisture Index,CMI,09
-CMI10,October Climatic Moisture Index,October,Monthly,Raw,Climatic Moisture Index,CMI,10
-CMI11,November Climatic Moisture Index,November,Monthly,Raw,Climatic Moisture Index,CMI,11
-CMI12,December Climatic Moisture Index,December,Monthly,Raw,Climatic Moisture Index,CMI,12
-DD_0,Degree-days below 0deg. C (chilling degree-days),Annual,Annual,Log,Degree-days below 0C,DD_0,
-DD_0_01,January degree-days below 0deg. C (chilling degree-days),January,Monthly,Log,Degree-days below 0C,DD_0,01
-DD_0_02,February degree-days below 0deg. C (chilling degree-days),February,Monthly,Log,Degree-days below 0C,DD_0,02
-DD_0_03,March degree-days below 0deg. C (chilling degree-days),March,Monthly,Log,Degree-days below 0C,DD_0,03
-DD_0_04,April degree-days below 0deg. C (chilling degree-days),April,Monthly,Log,Degree-days below 0C,DD_0,04
-DD_0_05,May degree-days below 0deg. C (chilling degree-days),May,Monthly,Log,Degree-days below 0C,DD_0,05
-DD_0_06,June degree-days below 0deg. C (chilling degree-days),June,Monthly,Log,Degree-days below 0C,DD_0,06
-DD_0_07,July degree-days below 0deg. C (chilling degree-days),July,Monthly,Log,Degree-days below 0C,DD_0,07
-DD_0_08,August degree-days below 0deg. C (chilling degree-days),August,Monthly,Log,Degree-days below 0C,DD_0,08
-DD_0_09,September degree-days below 0deg. C (chilling degree-days),September,Monthly,Log,Degree-days below 0C,DD_0,09
-DD_0_10,October degree-days below 0deg. C (chilling degree-days),October,Monthly,Log,Degree-days below 0C,DD_0,10
-DD_0_11,November degree-days below 0deg. C (chilling degree-days),November,Monthly,Log,Degree-days below 0C,DD_0,11
-DD_0_12,December degree-days below 0deg. C (chilling degree-days),December,Monthly,Log,Degree-days below 0C,DD_0,12
-DD_0_at,Autumn degree-days below 0deg. C (chilling degree-days),Autumn,Seasonal,Log,Degree-days below 0C,DD_0,at
-DD_0_sm,Summer degree-days below 0deg. C (chilling degree-days),Summer,Seasonal,Log,Degree-days below 0C,DD_0,sm
-DD_0_sp,Spring degree-days below 0deg. C (chilling degree-days),Spring,Seasonal,Log,Degree-days below 0C,DD_0,sp
-DD_0_wt,Winter degree-days below 0deg. C (chilling degree-days),Winter,Seasonal,Log,Degree-days below 0C,DD_0,wt
-DD_18,Degree-days below 18deg. C (heating degree-days),Annual,Annual,Log,Degree-days below 18C,DD_18,
-DD_18_01,January degree-days below 18deg. C (heating degree-days),January,Monthly,Log,Degree-days below 18C,DD_18,01
-DD_18_02,February degree-days below 18deg. C (heating degree-days),February,Monthly,Log,Degree-days below 18C,DD_18,02
-DD_18_03,March degree-days below 18deg. C (heating degree-days),March,Monthly,Log,Degree-days below 18C,DD_18,03
-DD_18_04,April degree-days below 18deg. C (heating degree-days),April,Monthly,Log,Degree-days below 18C,DD_18,04
-DD_18_05,May degree-days below 18deg. C (heating degree-days),May,Monthly,Log,Degree-days below 18C,DD_18,05
-DD_18_06,June degree-days below 18deg. C (heating degree-days),June,Monthly,Log,Degree-days below 18C,DD_18,06
-DD_18_07,July degree-days below 18deg. C (heating degree-days),July,Monthly,Log,Degree-days below 18C,DD_18,07
-DD_18_08,August degree-days below 18deg. C (heating degree-days),August,Monthly,Log,Degree-days below 18C,DD_18,08
-DD_18_09,September degree-days below 18deg. C (heating degree-days),September,Monthly,Log,Degree-days below 18C,DD_18,09
-DD_18_10,October degree-days below 18deg. C (heating degree-days),October,Monthly,Log,Degree-days below 18C,DD_18,10
-DD_18_11,November degree-days below 18deg. C (heating degree-days),November,Monthly,Log,Degree-days below 18C,DD_18,11
-DD_18_12,December degree-days below 18deg. C (heating degree-days),December,Monthly,Log,Degree-days below 18C,DD_18,12
-DD_18_at,Autumn degree-days below 18deg. C (heating degree-days),Autumn,Seasonal,Log,Degree-days below 18C,DD_18,at
-DD_18_sm,Summer degree-days below 18deg. C (heating degree-days),Summer,Seasonal,Log,Degree-days below 18C,DD_18,sm
-DD_18_sp,Spring degree-days below 18deg. C (heating degree-days),Spring,Seasonal,Log,Degree-days below 18C,DD_18,sp
-DD_18_wt,Winter degree-days below 18deg. C (heating degree-days),Winter,Seasonal,Log,Degree-days below 18C,DD_18,wt
-DD18,Degree-days above 18deg. C (cooling degree-days),Annual,Annual,Log,Degree-days above 18C,DD18,
-DD18_01,January degree-days above 18deg. C (cooling degree-days),January,Monthly,Log,Degree-days above 18C,DD18,01
-DD18_02,February degree-days above 18deg. C (cooling degree-days),February,Monthly,Log,Degree-days above 18C,DD18,02
-DD18_03,March degree-days above 18deg. C (cooling degree-days),March,Monthly,Log,Degree-days above 18C,DD18,03
-DD18_04,April degree-days above 18deg. C (cooling degree-days),April,Monthly,Log,Degree-days above 18C,DD18,04
-DD18_05,May degree-days above 18deg. C (cooling degree-days),May,Monthly,Log,Degree-days above 18C,DD18,05
-DD18_06,June degree-days above 18deg. C (cooling degree-days),June,Monthly,Log,Degree-days above 18C,DD18,06
-DD18_07,July degree-days above 18deg. C (cooling degree-days),July,Monthly,Log,Degree-days above 18C,DD18,07
-DD18_08,August degree-days above 18deg. C (cooling degree-days),August,Monthly,Log,Degree-days above 18C,DD18,08
-DD18_09,September degree-days above 18deg. C (cooling degree-days),September,Monthly,Log,Degree-days above 18C,DD18,09
-DD18_10,October degree-days above 18deg. C (cooling degree-days),October,Monthly,Log,Degree-days above 18C,DD18,10
-DD18_11,November degree-days above 18deg. C (cooling degree-days),November,Monthly,Log,Degree-days above 18C,DD18,11
-DD18_12,December degree-days above 18deg. C (cooling degree-days),December,Monthly,Log,Degree-days above 18C,DD18,12
-DD18_at,Autumn degree-days above 18deg. C (cooling degree-days),Autumn,Seasonal,Log,Degree-days above 18C,DD18,at
-DD18_sm,Summer degree-days above 18deg. C (cooling degree-days),Summer,Seasonal,Log,Degree-days above 18C,DD18,sm
-DD18_sp,Spring degree-days above 18deg. C (cooling degree-days),Spring,Seasonal,Log,Degree-days above 18C,DD18,sp
-DD18_wt,Winter degree-days above 18deg. C (cooling degree-days),Winter,Seasonal,Log,Degree-days above 18C,DD18,wt
-DD5,"Degree-days above 5deg. C, growing degree-days",Annual,Annual,Log,Degree-days above 5C,DD5,
-DD5_01,"January degree-days above 5deg. C, growing degree-days",January,Monthly,Log,Degree-days above 5C,DD5,01
-DD5_02,"February degree-days above 5deg. C, growing degree-days",February,Monthly,Log,Degree-days above 5C,DD5,02
-DD5_03,"March degree-days above 5deg. C, growing degree-days",March,Monthly,Log,Degree-days above 5C,DD5,03
-DD5_04,"April degree-days above 5deg. C, growing degree-days",April,Monthly,Log,Degree-days above 5C,DD5,04
-DD5_05,"May degree-days above 5deg. C, growing degree-days",May,Monthly,Log,Degree-days above 5C,DD5,05
-DD5_06,"June degree-days above 5deg. C, growing degree-days",June,Monthly,Log,Degree-days above 5C,DD5,06
-DD5_07,"July degree-days above 5deg. C, growing degree-days",July,Monthly,Log,Degree-days above 5C,DD5,07
-DD5_08,"August degree-days above 5deg. C, growing degree-days",August,Monthly,Log,Degree-days above 5C,DD5,08
-DD5_09,"September degree-days above 5deg. C, growing degree-days",September,Monthly,Log,Degree-days above 5C,DD5,09
-DD5_10,"October degree-days above 5deg. C, growing degree-days",October,Monthly,Log,Degree-days above 5C,DD5,10
-DD5_11,"November degree-days above 5deg. C, growing degree-days",November,Monthly,Log,Degree-days above 5C,DD5,11
-DD5_12,"December degree-days above 5deg. C, growing degree-days",December,Monthly,Log,Degree-days above 5C,DD5,12
-DD5_at,"Autumn degree-days above 5deg. C, growing degree-days",Autumn,Seasonal,Log,Degree-days above 5C,DD5,at
-DD5_sm,"Summer degree-days above 5deg. C, growing degree-days",Summer,Seasonal,Log,Degree-days above 5C,DD5,sm
-DD5_sp,"Spring degree-days above 5deg. C, growing degree-days",Spring,Seasonal,Log,Degree-days above 5C,DD5,sp
-DD5_wt,"Winter degree-days above 5deg. C, growing degree-days",Winter,Seasonal,Log,Degree-days above 5C,DD5,wt
-eFFP,The Julian date on which FFP ends (days),Annual,Annual,Raw,End of frost-free period (day of year),eFFP,
-EMT,Extreme minimum temperature over 30 years,Annual,Annual,Raw,Extreme minimum temperature over 30 years,EMT,
-Eref,Hargreaves reference evaporation,Annual,Annual,Log,Hargreaves reference evaporation (mm),Eref,
-Eref_at,Autumn Hargreaves reference evaporation,Autumn,Seasonal,Log,Hargreaves reference evaporation (mm),Eref,at
-Eref_sm,Summer Hargreaves reference evaporation,Summer,Seasonal,Log,Hargreaves reference evaporation (mm),Eref,sm
-Eref_sp,Spring Hargreaves reference evaporation,Spring,Seasonal,Log,Hargreaves reference evaporation (mm),Eref,sp
-Eref_wt,Winter Hargreaves reference evaporation,Winter,Seasonal,Log,Hargreaves reference evaporation (mm),Eref,wt
-Eref01,January Hargreaves reference evaporation,January,Monthly,Log,Hargreaves reference evaporation (mm),Eref,01
-Eref02,February Hargreaves reference evaporation,February,Monthly,Log,Hargreaves reference evaporation (mm),Eref,02
-Eref03,March Hargreaves reference evaporation,March,Monthly,Log,Hargreaves reference evaporation (mm),Eref,03
-Eref04,April Hargreaves reference evaporation,April,Monthly,Log,Hargreaves reference evaporation (mm),Eref,04
-Eref05,May Hargreaves reference evaporation,May,Monthly,Log,Hargreaves reference evaporation (mm),Eref,05
-Eref06,June Hargreaves reference evaporation,June,Monthly,Log,Hargreaves reference evaporation (mm),Eref,06
-Eref07,July Hargreaves reference evaporation,July,Monthly,Log,Hargreaves reference evaporation (mm),Eref,07
-Eref08,August Hargreaves reference evaporation,August,Monthly,Log,Hargreaves reference evaporation (mm),Eref,08
-Eref09,September Hargreaves reference evaporation,September,Monthly,Log,Hargreaves reference evaporation (mm),Eref,09
-Eref10,October Hargreaves reference evaporation,October,Monthly,Log,Hargreaves reference evaporation (mm),Eref,10
-Eref11,November Hargreaves reference evaporation,November,Monthly,Log,Hargreaves reference evaporation (mm),Eref,11
-Eref12,December Hargreaves reference evaporation,December,Monthly,Log,Hargreaves reference evaporation (mm),Eref,12
-EXT,Extreme maximum temperature over 30 years,Annual,Annual,Log,Extreme maximum temperature over 30 years,EXT,
-FFP,Frost-free period,Annual,Annual,Raw,Frost-free period (days),FFP,
-MAP,Annual precipitation,Annual,Annual,Log,Annual precipitation (mm),MAP,
-MAT,Mean annual temperature (deg. C),Annual,Annual,Raw,Mean annual temperature (deg. C),MAT,
-MCMT,Mean coldest month temperature (deg. C),Annual,Annual,Raw,Mean coldest month temperature (deg. C),MCMT,
-MSP,Growing season (May to September) precipitation,Annual,Annual,Log,Growing season (May to September) precipitation,MSP,
-MWMT,Mean warmest month temperature (deg. C),Annual,Annual,Raw,Mean warmest month temperature (deg. C),MWMT,
-NFFD,Number of frost-free days,Annual,Annual,Raw,Number of frost-free days,NFFD,
-NFFD_at,Autumn number of frost-free days,Autumn,Seasonal,Raw,Number of frost-free days,NFFD,at
-NFFD_sm,Summer number of frost-free days,Summer,Seasonal,Raw,Number of frost-free days,NFFD,sm
-NFFD_sp,Spring number of frost-free days,Spring,Seasonal,Raw,Number of frost-free days,NFFD,sp
-NFFD_wt,Winter number of frost-free days,Winter,Seasonal,Raw,Number of frost-free days,NFFD,wt
-NFFD01,January number of frost-free days,January,Monthly,Raw,Number of frost-free days,NFFD,01
-NFFD02,February number of frost-free days,February,Monthly,Raw,Number of frost-free days,NFFD,02
-NFFD03,March number of frost-free days,March,Monthly,Raw,Number of frost-free days,NFFD,03
-NFFD04,April number of frost-free days,April,Monthly,Raw,Number of frost-free days,NFFD,04
-NFFD05,May number of frost-free days,May,Monthly,Raw,Number of frost-free days,NFFD,05
-NFFD06,June number of frost-free days,June,Monthly,Raw,Number of frost-free days,NFFD,06
-NFFD07,July number of frost-free days,July,Monthly,Raw,Number of frost-free days,NFFD,07
-NFFD08,August number of frost-free days,August,Monthly,Raw,Number of frost-free days,NFFD,08
-NFFD09,September number of frost-free days,September,Monthly,Raw,Number of frost-free days,NFFD,09
-NFFD10,October number of frost-free days,October,Monthly,Raw,Number of frost-free days,NFFD,10
-NFFD11,November number of frost-free days,November,Monthly,Raw,Number of frost-free days,NFFD,11
-NFFD12,December number of frost-free days,December,Monthly,Raw,Number of frost-free days,NFFD,12
-PAS,Precipitation as snow,Annual,Annual,Log,Precipitation as snow (mm),PAS,
-PAS_at,Autumn precipitation as snow,Autumn,Seasonal,Log,Precipitation as snow (mm),PAS,at
-PAS_sm,Summer precipitation as snow,Summer,Seasonal,Log,Precipitation as snow (mm),PAS,sm
-PAS_sp,Spring precipitation as snow,Spring,Seasonal,Log,Precipitation as snow (mm),PAS,sp
-PAS_wt,Winter precipitation as snow,Winter,Seasonal,Log,Precipitation as snow (mm),PAS,wt
-PAS01,January precipitation as snow,January,Monthly,Log,Precipitation as snow (mm),PAS,01
-PAS02,February precipitation as snow,February,Monthly,Log,Precipitation as snow (mm),PAS,02
-PAS03,March precipitation as snow,March,Monthly,Log,Precipitation as snow (mm),PAS,03
-PAS04,April precipitation as snow,April,Monthly,Log,Precipitation as snow (mm),PAS,04
-PAS05,May precipitation as snow,May,Monthly,Log,Precipitation as snow (mm),PAS,05
-PAS06,June precipitation as snow,June,Monthly,Log,Precipitation as snow (mm),PAS,06
-PAS07,July precipitation as snow,July,Monthly,Log,Precipitation as snow (mm),PAS,07
-PAS08,August precipitation as snow,August,Monthly,Log,Precipitation as snow (mm),PAS,08
-PAS09,September precipitation as snow,September,Monthly,Log,Precipitation as snow (mm),PAS,09
-PAS10,October precipitation as snow,October,Monthly,Log,Precipitation as snow (mm),PAS,10
-PAS11,November precipitation as snow,November,Monthly,Log,Precipitation as snow (mm),PAS,11
-PAS12,December precipitation as snow,December,Monthly,Log,Precipitation as snow (mm),PAS,12
-PPT,Precipitation,Any,Annual,Log,Precipitation (mm),PPT,
-PPT_at,Autumn precipitation,Autumn,Seasonal,Log,Precipitation (mm),PPT,at
-PPT_sm,Summer precipitation,Summer,Seasonal,Log,Precipitation (mm),PPT,sm
-PPT_sp,Spring precipitation,Spring,Seasonal,Log,Precipitation (mm),PPT,sp
-PPT_wt,Winter precipitation,Winter,Seasonal,Log,Precipitation (mm),PPT,wt
-PPT01,January precipitation,January,Monthly,Log,Precipitation (mm),PPT,01
-PPT02,February precipitation,February,Monthly,Log,Precipitation (mm),PPT,02
-PPT03,March precipitation,March,Monthly,Log,Precipitation (mm),PPT,03
-PPT04,April precipitation,April,Monthly,Log,Precipitation (mm),PPT,04
-PPT05,May precipitation,May,Monthly,Log,Precipitation (mm),PPT,05
-PPT06,June precipitation,June,Monthly,Log,Precipitation (mm),PPT,06
-PPT07,July precipitation,July,Monthly,Log,Precipitation (mm),PPT,07
-PPT08,August precipitation,August,Monthly,Log,Precipitation (mm),PPT,08
-PPT09,September precipitation,September,Monthly,Log,Precipitation (mm),PPT,09
-PPT10,October precipitation,October,Monthly,Log,Precipitation (mm),PPT,10
-PPT11,November precipitation,November,Monthly,Log,Precipitation (mm),PPT,11
-PPT12,December precipitation,December,Monthly,Log,Precipitation (mm),PPT,12
-RH,relative humidity,Any,Annual,Raw,relative humidity (%),RH,
-RH_at,Autumn relative humidity,Autumn,Seasonal,Raw,relative humidity (%),RH,at
-RH_sm,Summer relative humidity,Summer,Seasonal,Raw,relative humidity (%),RH,sm
-RH_sp,Spring relative humidity,Spring,Seasonal,Raw,relative humidity (%),RH,sp
-RH_wt,Winter relative humidity,Winter,Seasonal,Raw,relative humidity (%),RH,wt
-RH01,January relative humidity,January,Monthly,Raw,relative humidity (%),RH,01
-RH02,February relative humidity,February,Monthly,Raw,relative humidity (%),RH,02
-RH03,March relative humidity,March,Monthly,Raw,relative humidity (%),RH,03
-RH04,April relative humidity,April,Monthly,Raw,relative humidity (%),RH,04
-RH05,May relative humidity,May,Monthly,Raw,relative humidity (%),RH,05
-RH06,June relative humidity,June,Monthly,Raw,relative humidity (%),RH,06
-RH07,July relative humidity,July,Monthly,Raw,relative humidity (%),RH,07
-RH08,August relative humidity,August,Monthly,Raw,relative humidity (%),RH,08
-RH09,September relative humidity,September,Monthly,Raw,relative humidity (%),RH,09
-RH10,October relative humidity,October,Monthly,Raw,relative humidity (%),RH,10
-RH11,November relative humidity,November,Monthly,Raw,relative humidity (%),RH,11
-RH12,December relative humidity,December,Monthly,Raw,relative humidity (%),RH,12
-SHM,Summer heat:moisture index ((MWMT)/(MSP/1000)),Annual,Annual,Log,Summer heat:moisture index ((MWMT)/(MSP/1000)),SHM,
-Tave,Mean temperature (deg. C),Any,Annual,Raw,Mean temperature (deg. C),Tave,
-Tave_at,Autumn mean temperature (deg. C),Autumn,Seasonal,Raw,Mean temperature (deg. C),Tave,at
-Tave_sm,Summer mean temperature (deg. C),Summer,Seasonal,Raw,Mean temperature (deg. C),Tave,sm
-Tave_sp,Spring mean temperature (deg. C),Spring,Seasonal,Raw,Mean temperature (deg. C),Tave,sp
-Tave_wt,Winter mean temperature (deg. C),Winter,Seasonal,Raw,Mean temperature (deg. C),Tave,wt
-Tave01,January mean temperature (deg. C),January,Monthly,Raw,Mean temperature (deg. C),Tave,01
-Tave02,February mean temperature (deg. C),February,Monthly,Raw,Mean temperature (deg. C),Tave,02
-Tave03,March mean temperature (deg. C),March,Monthly,Raw,Mean temperature (deg. C),Tave,03
-Tave04,April mean temperature (deg. C),April,Monthly,Raw,Mean temperature (deg. C),Tave,04
-Tave05,May mean temperature (deg. C),May,Monthly,Raw,Mean temperature (deg. C),Tave,05
-Tave06,June mean temperature (deg. C),June,Monthly,Raw,Mean temperature (deg. C),Tave,06
-Tave07,July mean temperature (deg. C),July,Monthly,Raw,Mean temperature (deg. C),Tave,07
-Tave08,August mean temperature (deg. C),August,Monthly,Raw,Mean temperature (deg. C),Tave,08
-Tave09,September mean temperature (deg. C),September,Monthly,Raw,Mean temperature (deg. C),Tave,09
-Tave10,October mean temperature (deg. C),October,Monthly,Raw,Mean temperature (deg. C),Tave,10
-Tave11,November mean temperature (deg. C),November,Monthly,Raw,Mean temperature (deg. C),Tave,11
-Tave12,December mean temperature (deg. C),December,Monthly,Raw,Mean temperature (deg. C),Tave,12
-TD,"Temperature difference between MWMT and MCMT, or continentality (deg. C)",Annual,Annual,Raw,"Temperature difference between MWMT and MCMT, or continentality (deg. C)",TD,
-Tmax,Mean daily maximum temperature (deg. C),Any,Annual,Raw,Mean daily maximum temperature (deg. C),Tmax,
-Tmax_at,Autumn mean daily maximum temperature (deg. C),Autumn,Seasonal,Raw,Mean daily maximum temperature (deg. C),Tmax,at
-Tmax_sm,Summer mean daily maximum temperature (deg. C),Summer,Seasonal,Raw,Mean daily maximum temperature (deg. C),Tmax,sm
-Tmax_sp,Spring mean daily maximum temperature (deg. C),Spring,Seasonal,Raw,Mean daily maximum temperature (deg. C),Tmax,sp
-Tmax_wt,Winter mean daily maximum temperature (deg. C),Winter,Seasonal,Raw,Mean daily maximum temperature (deg. C),Tmax,wt
-Tmax01,January mean daily maximum temperature (deg. C),January,Monthly,Raw,Mean daily maximum temperature (deg. C),Tmax,01
-Tmax02,February mean daily maximum temperature (deg. C),February,Monthly,Raw,Mean daily maximum temperature (deg. C),Tmax,02
-Tmax03,March mean daily maximum temperature (deg. C),March,Monthly,Raw,Mean daily maximum temperature (deg. C),Tmax,03
-Tmax04,April mean daily maximum temperature (deg. C),April,Monthly,Raw,Mean daily maximum temperature (deg. C),Tmax,04
-Tmax05,May mean daily maximum temperature (deg. C),May,Monthly,Raw,Mean daily maximum temperature (deg. C),Tmax,05
-Tmax06,June mean daily maximum temperature (deg. C),June,Monthly,Raw,Mean daily maximum temperature (deg. C),Tmax,06
-Tmax07,July mean daily maximum temperature (deg. C),July,Monthly,Raw,Mean daily maximum temperature (deg. C),Tmax,07
-Tmax08,August mean daily maximum temperature (deg. C),August,Monthly,Raw,Mean daily maximum temperature (deg. C),Tmax,08
-Tmax09,September mean daily maximum temperature (deg. C),September,Monthly,Raw,Mean daily maximum temperature (deg. C),Tmax,09
-Tmax10,October mean daily maximum temperature (deg. C),October,Monthly,Raw,Mean daily maximum temperature (deg. C),Tmax,10
-Tmax11,November mean daily maximum temperature (deg. C),November,Monthly,Raw,Mean daily maximum temperature (deg. C),Tmax,11
-Tmax12,December mean daily maximum temperature (deg. C),December,Monthly,Raw,Mean daily maximum temperature (deg. C),Tmax,12
-Tmin,Mean daily minimum temperature (deg. C),Any,Annual,Raw,Mean daily minimum temperature (deg. C),Tmin,
-Tmin_at,Autumn mean daily minimum temperature (deg. C),Autumn,Seasonal,Raw,Mean daily minimum temperature (deg. C),Tmin,at
-Tmin_sm,Summer mean daily minimum temperature (deg. C),Summer,Seasonal,Raw,Mean daily minimum temperature (deg. C),Tmin,sm
-Tmin_sp,Spring mean daily minimum temperature (deg. C),Spring,Seasonal,Raw,Mean daily minimum temperature (deg. C),Tmin,sp
-Tmin_wt,Winter mean daily minimum temperature (deg. C),Winter,Seasonal,Raw,Mean daily minimum temperature (deg. C),Tmin,wt
-Tmin01,January mean daily minimum temperature (deg. C),January,Monthly,Raw,Mean daily minimum temperature (deg. C),Tmin,01
-Tmin02,February mean daily minimum temperature (deg. C),February,Monthly,Raw,Mean daily minimum temperature (deg. C),Tmin,02
-Tmin03,March mean daily minimum temperature (deg. C),March,Monthly,Raw,Mean daily minimum temperature (deg. C),Tmin,03
-Tmin04,April mean daily minimum temperature (deg. C),April,Monthly,Raw,Mean daily minimum temperature (deg. C),Tmin,04
-Tmin05,May mean daily minimum temperature (deg. C),May,Monthly,Raw,Mean daily minimum temperature (deg. C),Tmin,05
-Tmin06,June mean daily minimum temperature (deg. C),June,Monthly,Raw,Mean daily minimum temperature (deg. C),Tmin,06
-Tmin07,July mean daily minimum temperature (deg. C),July,Monthly,Raw,Mean daily minimum temperature (deg. C),Tmin,07
-Tmin08,August mean daily minimum temperature (deg. C),August,Monthly,Raw,Mean daily minimum temperature (deg. C),Tmin,08
-Tmin09,September mean daily minimum temperature (deg. C),September,Monthly,Raw,Mean daily minimum temperature (deg. C),Tmin,09
-Tmin10,October mean daily minimum temperature (deg. C),October,Monthly,Raw,Mean daily minimum temperature (deg. C),Tmin,10
-Tmin11,November mean daily minimum temperature (deg. C),November,Monthly,Raw,Mean daily minimum temperature (deg. C),Tmin,11
-Tmin12,December mean daily minimum temperature (deg. C),December,Monthly,Raw,Mean daily minimum temperature (deg. C),Tmin,12
+Code,Variable,Time,Category,Type,Unit,Element,Code_Element,Code_Time,Code_ClimateNA
+AHM,Annual heat:moisture index,Annual,Annual,ratio,,Annual heat:moisture index,AHM,,AHM
+bFFP,Beginning of the frost-free period,Annual,Annual,interval,day of year,Beginning of the frost-free period,bFFP,,bFFP
+CMD,Hargreaves climatic moisture deficit,Annual,Annual,ratio,mm,Hargreaves climatic moisture deficit,CMD,,CMD
+CMD_at,Autumn Hargreaves climatic moisture deficit,Autumn,Seasonal,ratio,mm,Hargreaves climatic moisture deficit,CMD,at,CMD_at
+CMD_sm,Summer Hargreaves climatic moisture deficit,Summer,Seasonal,ratio,mm,Hargreaves climatic moisture deficit,CMD,sm,CMD_sm
+CMD_sp,Spring Hargreaves climatic moisture deficit,Spring,Seasonal,ratio,mm,Hargreaves climatic moisture deficit,CMD,sp,CMD_sp
+CMD_wt,Winter Hargreaves climatic moisture deficit,Winter,Seasonal,ratio,mm,Hargreaves climatic moisture deficit,CMD,wt,CMD_wt
+CMD_01,January Hargreaves climatic moisture deficit,January,Monthly,ratio,mm,Hargreaves climatic moisture deficit,CMD,01,CMD01
+CMD_02,February Hargreaves climatic moisture deficit,February,Monthly,ratio,mm,Hargreaves climatic moisture deficit,CMD,02,CMD02
+CMD_03,March Hargreaves climatic moisture deficit,March,Monthly,ratio,mm,Hargreaves climatic moisture deficit,CMD,03,CMD03
+CMD_04,April Hargreaves climatic moisture deficit,April,Monthly,ratio,mm,Hargreaves climatic moisture deficit,CMD,04,CMD04
+CMD_05,May Hargreaves climatic moisture deficit,May,Monthly,ratio,mm,Hargreaves climatic moisture deficit,CMD,05,CMD05
+CMD_06,June Hargreaves climatic moisture deficit,June,Monthly,ratio,mm,Hargreaves climatic moisture deficit,CMD,06,CMD06
+CMD_07,July Hargreaves climatic moisture deficit,July,Monthly,ratio,mm,Hargreaves climatic moisture deficit,CMD,07,CMD07
+CMD_08,August Hargreaves climatic moisture deficit,August,Monthly,ratio,mm,Hargreaves climatic moisture deficit,CMD,08,CMD08
+CMD_09,September Hargreaves climatic moisture deficit,September,Monthly,ratio,mm,Hargreaves climatic moisture deficit,CMD,09,CMD09
+CMD_10,October Hargreaves climatic moisture deficit,October,Monthly,ratio,mm,Hargreaves climatic moisture deficit,CMD,10,CMD10
+CMD_11,November Hargreaves climatic moisture deficit,November,Monthly,ratio,mm,Hargreaves climatic moisture deficit,CMD,11,CMD11
+CMD_12,December Hargreaves climatic moisture deficit,December,Monthly,ratio,mm,Hargreaves climatic moisture deficit,CMD,12,CMD12
+CMI,Climatic Moisture Index,Annual,Annual,interval,mm,Climatic Moisture Index,CMI,,CMI
+CMI_01,January Climatic Moisture Index,January,Monthly,interval,mm,Climatic Moisture Index,CMI,01,CMI01
+CMI_02,February Climatic Moisture Index,February,Monthly,interval,mm,Climatic Moisture Index,CMI,02,CMI02
+CMI_03,March Climatic Moisture Index,March,Monthly,interval,mm,Climatic Moisture Index,CMI,03,CMI03
+CMI_04,April Climatic Moisture Index,April,Monthly,interval,mm,Climatic Moisture Index,CMI,04,CMI04
+CMI_05,May Climatic Moisture Index,May,Monthly,interval,mm,Climatic Moisture Index,CMI,05,CMI05
+CMI_06,June Climatic Moisture Index,June,Monthly,interval,mm,Climatic Moisture Index,CMI,06,CMI06
+CMI_07,July Climatic Moisture Index,July,Monthly,interval,mm,Climatic Moisture Index,CMI,07,CMI07
+CMI_08,August Climatic Moisture Index,August,Monthly,interval,mm,Climatic Moisture Index,CMI,08,CMI08
+CMI_09,September Climatic Moisture Index,September,Monthly,interval,mm,Climatic Moisture Index,CMI,09,CMI09
+CMI_10,October Climatic Moisture Index,October,Monthly,interval,mm,Climatic Moisture Index,CMI,10,CMI10
+CMI_11,November Climatic Moisture Index,November,Monthly,interval,mm,Climatic Moisture Index,CMI,11,CMI11
+CMI_12,December Climatic Moisture Index,December,Monthly,interval,mm,Climatic Moisture Index,CMI,12,CMI12
+DDsub0,Degree-days below 0C,Annual,Annual,ratio,,Degree-days below 0C,DDsub0,,DD_0
+DDsub0_01,January degree-days below 0C,January,Monthly,ratio,,degree-days below 0C,DDsub0,01,DD_0_01
+DDsub0_02,February degree-days below 0C,February,Monthly,ratio,,degree-days below 0C,DDsub0,02,DD_0_02
+DDsub0_03,March degree-days below 0C,March,Monthly,ratio,,degree-days below 0C,DDsub0,03,DD_0_03
+DDsub0_04,April degree-days below 0C,April,Monthly,ratio,,degree-days below 0C,DDsub0,04,DD_0_04
+DDsub0_05,May degree-days below 0C,May,Monthly,ratio,,degree-days below 0C,DDsub0,05,DD_0_05
+DDsub0_06,June degree-days below 0C,June,Monthly,ratio,,degree-days below 0C,DDsub0,06,DD_0_06
+DDsub0_07,July degree-days below 0C,July,Monthly,ratio,,degree-days below 0C,DDsub0,07,DD_0_07
+DDsub0_08,August degree-days below 0C,August,Monthly,ratio,,degree-days below 0C,DDsub0,08,DD_0_08
+DDsub0_09,September degree-days below 0C,September,Monthly,ratio,,degree-days below 0C,DDsub0,09,DD_0_09
+DDsub0_10,October degree-days below 0C,October,Monthly,ratio,,degree-days below 0C,DDsub0,10,DD_0_10
+DDsub0_11,November degree-days below 0C,November,Monthly,ratio,,degree-days below 0C,DDsub0,11,DD_0_11
+DDsub0_12,December degree-days below 0C,December,Monthly,ratio,,degree-days below 0C,DDsub0,12,DD_0_12
+DDsub0_at,Autumn degree-days below 0C,Autumn,Seasonal,ratio,,degree-days below 0C,DDsub0,at,DD_0_at
+DDsub0_sm,Summer degree-days below 0C,Summer,Seasonal,ratio,,degree-days below 0C,DDsub0,sm,DD_0_sm
+DDsub0_sp,Spring degree-days below 0C,Spring,Seasonal,ratio,,degree-days below 0C,DDsub0,sp,DD_0_sp
+DDsub0_wt,Winter degree-days below 0C,Winter,Seasonal,ratio,,degree-days below 0C,DDsub0,wt,DD_0_wt
+DDsub18,Degree-days below 18C,Annual,Annual,ratio,,Degree-days below 18C,DDsub18,,DD_18
+DDsub18_01,January degree-days below 18C,January,Monthly,ratio,,degree-days below 18C,DDsub18,01,DD_18_01
+DDsub18_02,February degree-days below 18C,February,Monthly,ratio,,degree-days below 18C,DDsub18,02,DD_18_02
+DDsub18_03,March degree-days below 18C,March,Monthly,ratio,,degree-days below 18C,DDsub18,03,DD_18_03
+DDsub18_04,April degree-days below 18C,April,Monthly,ratio,,degree-days below 18C,DDsub18,04,DD_18_04
+DDsub18_05,May degree-days below 18C,May,Monthly,ratio,,degree-days below 18C,DDsub18,05,DD_18_05
+DDsub18_06,June degree-days below 18C,June,Monthly,ratio,,degree-days below 18C,DDsub18,06,DD_18_06
+DDsub18_07,July degree-days below 18C,July,Monthly,ratio,,degree-days below 18C,DDsub18,07,DD_18_07
+DDsub18_08,August degree-days below 18C,August,Monthly,ratio,,degree-days below 18C,DDsub18,08,DD_18_08
+DDsub18_09,September degree-days below 18C,September,Monthly,ratio,,degree-days below 18C,DDsub18,09,DD_18_09
+DDsub18_10,October degree-days below 18C,October,Monthly,ratio,,degree-days below 18C,DDsub18,10,DD_18_10
+DDsub18_11,November degree-days below 18C,November,Monthly,ratio,,degree-days below 18C,DDsub18,11,DD_18_11
+DDsub18_12,December degree-days below 18C,December,Monthly,ratio,,degree-days below 18C,DDsub18,12,DD_18_12
+DDsub18_at,Autumn degree-days below 18C,Autumn,Seasonal,ratio,,degree-days below 18C,DDsub18,at,DD_18_at
+DDsub18_sm,Summer degree-days below 18C,Summer,Seasonal,ratio,,degree-days below 18C,DDsub18,sm,DD_18_sm
+DDsub18_sp,Spring degree-days below 18C,Spring,Seasonal,ratio,,degree-days below 18C,DDsub18,sp,DD_18_sp
+DDsub18_wt,Winter degree-days below 18C,Winter,Seasonal,ratio,,degree-days below 18C,DDsub18,wt,DD_18_wt
+DD18,Degree-days above 18C,Annual,Annual,ratio,,Degree-days above 18C,DD18,,DD18
+DD18_01,January degree-days above 18C,January,Monthly,ratio,,degree-days above 18C,DD18,01,DD18_01
+DD18_02,February degree-days above 18C,February,Monthly,ratio,,degree-days above 18C,DD18,02,DD18_02
+DD18_03,March degree-days above 18C,March,Monthly,ratio,,degree-days above 18C,DD18,03,DD18_03
+DD18_04,April degree-days above 18C,April,Monthly,ratio,,degree-days above 18C,DD18,04,DD18_04
+DD18_05,May degree-days above 18C,May,Monthly,ratio,,degree-days above 18C,DD18,05,DD18_05
+DD18_06,June degree-days above 18C,June,Monthly,ratio,,degree-days above 18C,DD18,06,DD18_06
+DD18_07,July degree-days above 18C,July,Monthly,ratio,,degree-days above 18C,DD18,07,DD18_07
+DD18_08,August degree-days above 18C,August,Monthly,ratio,,degree-days above 18C,DD18,08,DD18_08
+DD18_09,September degree-days above 18C,September,Monthly,ratio,,degree-days above 18C,DD18,09,DD18_09
+DD18_10,October degree-days above 18C,October,Monthly,ratio,,degree-days above 18C,DD18,10,DD18_10
+DD18_11,November degree-days above 18C,November,Monthly,ratio,,degree-days above 18C,DD18,11,DD18_11
+DD18_12,December degree-days above 18C,December,Monthly,ratio,,degree-days above 18C,DD18,12,DD18_12
+DD18_at,Autumn degree-days above 18C,Autumn,Seasonal,ratio,,degree-days above 18C,DD18,at,DD18_at
+DD18_sm,Summer degree-days above 18C,Summer,Seasonal,ratio,,degree-days above 18C,DD18,sm,DD18_sm
+DD18_sp,Spring degree-days above 18C,Spring,Seasonal,ratio,,degree-days above 18C,DD18,sp,DD18_sp
+DD18_wt,Winter degree-days above 18C,Winter,Seasonal,ratio,,degree-days above 18C,DD18,wt,DD18_wt
+DD5,Degree-days above 5C,Annual,Annual,ratio,,Degree-days above 5C,DD5,,DD5
+DD5_01,January degree-days above 5C,January,Monthly,ratio,,degree-days above 5C,DD5,01,DD5_01
+DD5_02,February degree-days above 5C,February,Monthly,ratio,,degree-days above 5C,DD5,02,DD5_02
+DD5_03,March degree-days above 5C,March,Monthly,ratio,,degree-days above 5C,DD5,03,DD5_03
+DD5_04,April degree-days above 5C,April,Monthly,ratio,,degree-days above 5C,DD5,04,DD5_04
+DD5_05,May degree-days above 5C,May,Monthly,ratio,,degree-days above 5C,DD5,05,DD5_05
+DD5_06,June degree-days above 5C,June,Monthly,ratio,,degree-days above 5C,DD5,06,DD5_06
+DD5_07,July degree-days above 5C,July,Monthly,ratio,,degree-days above 5C,DD5,07,DD5_07
+DD5_08,August degree-days above 5C,August,Monthly,ratio,,degree-days above 5C,DD5,08,DD5_08
+DD5_09,September degree-days above 5C,September,Monthly,ratio,,degree-days above 5C,DD5,09,DD5_09
+DD5_10,October degree-days above 5C,October,Monthly,ratio,,degree-days above 5C,DD5,10,DD5_10
+DD5_11,November degree-days above 5C,November,Monthly,ratio,,degree-days above 5C,DD5,11,DD5_11
+DD5_12,December degree-days above 5C,December,Monthly,ratio,,degree-days above 5C,DD5,12,DD5_12
+DD5_at,Autumn degree-days above 5C,Autumn,Seasonal,ratio,,degree-days above 5C,DD5,at,DD5_at
+DD5_sm,Summer degree-days above 5C,Summer,Seasonal,ratio,,degree-days above 5C,DD5,sm,DD5_sm
+DD5_sp,Spring degree-days above 5C,Spring,Seasonal,ratio,,degree-days above 5C,DD5,sp,DD5_sp
+DD5_wt,Winter degree-days above 5C,Winter,Seasonal,ratio,,degree-days above 5C,DD5,wt,DD5_wt
+eFFP,End of the frost-free period,Annual,Annual,interval,day of year,End of the frost-free period,eFFP,,eFFP
+EMT,Extreme minimum temperature over 30 years,Annual,Annual,interval,deg. C,Extreme minimum temperature over 30 years,EMT,,EMT
+Eref,Hargreaves reference evaporation,Annual,Annual,ratio,mm,Hargreaves reference evaporation,Eref,,Eref
+Eref_at,Autumn Hargreaves reference evaporation,Autumn,Seasonal,ratio,mm,Hargreaves reference evaporation,Eref,at,Eref_at
+Eref_sm,Summer Hargreaves reference evaporation,Summer,Seasonal,ratio,mm,Hargreaves reference evaporation,Eref,sm,Eref_sm
+Eref_sp,Spring Hargreaves reference evaporation,Spring,Seasonal,ratio,mm,Hargreaves reference evaporation,Eref,sp,Eref_sp
+Eref_wt,Winter Hargreaves reference evaporation,Winter,Seasonal,ratio,mm,Hargreaves reference evaporation,Eref,wt,Eref_wt
+Eref_01,January Hargreaves reference evaporation,January,Monthly,ratio,mm,Hargreaves reference evaporation,Eref,01,Eref01
+Eref_02,February Hargreaves reference evaporation,February,Monthly,ratio,mm,Hargreaves reference evaporation,Eref,02,Eref02
+Eref_03,March Hargreaves reference evaporation,March,Monthly,ratio,mm,Hargreaves reference evaporation,Eref,03,Eref03
+Eref_04,April Hargreaves reference evaporation,April,Monthly,ratio,mm,Hargreaves reference evaporation,Eref,04,Eref04
+Eref_05,May Hargreaves reference evaporation,May,Monthly,ratio,mm,Hargreaves reference evaporation,Eref,05,Eref05
+Eref_06,June Hargreaves reference evaporation,June,Monthly,ratio,mm,Hargreaves reference evaporation,Eref,06,Eref06
+Eref_07,July Hargreaves reference evaporation,July,Monthly,ratio,mm,Hargreaves reference evaporation,Eref,07,Eref07
+Eref_08,August Hargreaves reference evaporation,August,Monthly,ratio,mm,Hargreaves reference evaporation,Eref,08,Eref08
+Eref_09,September Hargreaves reference evaporation,September,Monthly,ratio,mm,Hargreaves reference evaporation,Eref,09,Eref09
+Eref_10,October Hargreaves reference evaporation,October,Monthly,ratio,mm,Hargreaves reference evaporation,Eref,10,Eref10
+Eref_11,November Hargreaves reference evaporation,November,Monthly,ratio,mm,Hargreaves reference evaporation,Eref,11,Eref11
+Eref_12,December Hargreaves reference evaporation,December,Monthly,ratio,mm,Hargreaves reference evaporation,Eref,12,Eref12
+EXT,Extreme maximum temperature over 30 years,Annual,Annual,ratio,deg. C,Extreme maximum temperature over 30 years,EXT,,EXT
+FFP,Frost-free period,Annual,Annual,interval,days,Frost-free period,FFP,,FFP
+MAP,Annual precipitation,Annual,Annual,ratio,mm,Annual precipitation,MAP,,MAP
+MAT,Mean annual temperature,Annual,Annual,interval,deg. C,Mean annual temperature,MAT,,MAT
+MCMT,Mean coldest month temperature,Annual,Annual,interval,deg. C,Mean coldest month temperature,MCMT,,MCMT
+MSP,Growing season (May to September) precipitation,Annual,Annual,ratio,mm,Growing season (May to September) precipitation,MSP,,MSP
+MWMT,Mean warmest month temperature,Annual,Annual,interval,deg. C,Mean warmest month temperature,MWMT,,MWMT
+NFFD,Number of frost-free days,Annual,Annual,interval,,Number of frost-free days,NFFD,,NFFD
+NFFD_at,Autumn number of frost-free days,Autumn,Seasonal,interval,,number of frost-free days,NFFD,at,NFFD_at
+NFFD_sm,Summer number of frost-free days,Summer,Seasonal,interval,,number of frost-free days,NFFD,sm,NFFD_sm
+NFFD_sp,Spring number of frost-free days,Spring,Seasonal,interval,,number of frost-free days,NFFD,sp,NFFD_sp
+NFFD_wt,Winter number of frost-free days,Winter,Seasonal,interval,,number of frost-free days,NFFD,wt,NFFD_wt
+NFFD_01,January number of frost-free days,January,Monthly,interval,,number of frost-free days,NFFD,01,NFFD01
+NFFD_02,February number of frost-free days,February,Monthly,interval,,number of frost-free days,NFFD,02,NFFD02
+NFFD_03,March number of frost-free days,March,Monthly,interval,,number of frost-free days,NFFD,03,NFFD03
+NFFD_04,April number of frost-free days,April,Monthly,interval,,number of frost-free days,NFFD,04,NFFD04
+NFFD_05,May number of frost-free days,May,Monthly,interval,,number of frost-free days,NFFD,05,NFFD05
+NFFD_06,June number of frost-free days,June,Monthly,interval,,number of frost-free days,NFFD,06,NFFD06
+NFFD_07,July number of frost-free days,July,Monthly,interval,,number of frost-free days,NFFD,07,NFFD07
+NFFD_08,August number of frost-free days,August,Monthly,interval,,number of frost-free days,NFFD,08,NFFD08
+NFFD_09,September number of frost-free days,September,Monthly,interval,,number of frost-free days,NFFD,09,NFFD09
+NFFD_10,October number of frost-free days,October,Monthly,interval,,number of frost-free days,NFFD,10,NFFD10
+NFFD_11,November number of frost-free days,November,Monthly,interval,,number of frost-free days,NFFD,11,NFFD11
+NFFD_12,December number of frost-free days,December,Monthly,interval,,number of frost-free days,NFFD,12,NFFD12
+PAS,Precipitation as snow,Annual,Annual,ratio,mm,Precipitation as snow,PAS,,PAS
+PAS_at,Autumn precipitation as snow,Autumn,Seasonal,ratio,mm,precipitation as snow,PAS,at,PAS_at
+PAS_sm,Summer precipitation as snow,Summer,Seasonal,ratio,mm,precipitation as snow,PAS,sm,PAS_sm
+PAS_sp,Spring precipitation as snow,Spring,Seasonal,ratio,mm,precipitation as snow,PAS,sp,PAS_sp
+PAS_wt,Winter precipitation as snow,Winter,Seasonal,ratio,mm,precipitation as snow,PAS,wt,PAS_wt
+PAS_01,January precipitation as snow,January,Monthly,ratio,mm,precipitation as snow,PAS,01,PAS01
+PAS_02,February precipitation as snow,February,Monthly,ratio,mm,precipitation as snow,PAS,02,PAS02
+PAS_03,March precipitation as snow,March,Monthly,ratio,mm,precipitation as snow,PAS,03,PAS03
+PAS_04,April precipitation as snow,April,Monthly,ratio,mm,precipitation as snow,PAS,04,PAS04
+PAS_05,May precipitation as snow,May,Monthly,ratio,mm,precipitation as snow,PAS,05,PAS05
+PAS_06,June precipitation as snow,June,Monthly,ratio,mm,precipitation as snow,PAS,06,PAS06
+PAS_07,July precipitation as snow,July,Monthly,ratio,mm,precipitation as snow,PAS,07,PAS07
+PAS_08,August precipitation as snow,August,Monthly,ratio,mm,precipitation as snow,PAS,08,PAS08
+PAS_09,September precipitation as snow,September,Monthly,ratio,mm,precipitation as snow,PAS,09,PAS09
+PAS_10,October precipitation as snow,October,Monthly,ratio,mm,precipitation as snow,PAS,10,PAS10
+PAS_11,November precipitation as snow,November,Monthly,ratio,mm,precipitation as snow,PAS,11,PAS11
+PAS_12,December precipitation as snow,December,Monthly,ratio,mm,precipitation as snow,PAS,12,PAS12
+PPT,Precipitation,Any,Annual,ratio,mm,Precipitation,PPT,,PPT
+PPT_at,Autumn precipitation,Autumn,Seasonal,ratio,mm,precipitation,PPT,at,PPT_at
+PPT_sm,Summer precipitation,Summer,Seasonal,ratio,mm,precipitation,PPT,sm,PPT_sm
+PPT_sp,Spring precipitation,Spring,Seasonal,ratio,mm,precipitation,PPT,sp,PPT_sp
+PPT_wt,Winter precipitation,Winter,Seasonal,ratio,mm,precipitation,PPT,wt,PPT_wt
+PPT_01,January precipitation,January,Monthly,ratio,mm,precipitation,PPT,01,PPT01
+PPT_02,February precipitation,February,Monthly,ratio,mm,precipitation,PPT,02,PPT02
+PPT_03,March precipitation,March,Monthly,ratio,mm,precipitation,PPT,03,PPT03
+PPT_04,April precipitation,April,Monthly,ratio,mm,precipitation,PPT,04,PPT04
+PPT_05,May precipitation,May,Monthly,ratio,mm,precipitation,PPT,05,PPT05
+PPT_06,June precipitation,June,Monthly,ratio,mm,precipitation,PPT,06,PPT06
+PPT_07,July precipitation,July,Monthly,ratio,mm,precipitation,PPT,07,PPT07
+PPT_08,August precipitation,August,Monthly,ratio,mm,precipitation,PPT,08,PPT08
+PPT_09,September precipitation,September,Monthly,ratio,mm,precipitation,PPT,09,PPT09
+PPT_10,October precipitation,October,Monthly,ratio,mm,precipitation,PPT,10,PPT10
+PPT_11,November precipitation,November,Monthly,ratio,mm,precipitation,PPT,11,PPT11
+PPT_12,December precipitation,December,Monthly,ratio,mm,precipitation,PPT,12,PPT12
+RH,Relative humidity,Any,Annual,interval,%,Relative humidity,RH,,RH
+RH_at,Autumn relative humidity,Autumn,Seasonal,interval,%,relative humidity,RH,at,RH_at
+RH_sm,Summer relative humidity,Summer,Seasonal,interval,%,relative humidity,RH,sm,RH_sm
+RH_sp,Spring relative humidity,Spring,Seasonal,interval,%,relative humidity,RH,sp,RH_sp
+RH_wt,Winter relative humidity,Winter,Seasonal,interval,%,relative humidity,RH,wt,RH_wt
+RH_01,January relative humidity,January,Monthly,interval,%,relative humidity,RH,01,RH01
+RH_02,February relative humidity,February,Monthly,interval,%,relative humidity,RH,02,RH02
+RH_03,March relative humidity,March,Monthly,interval,%,relative humidity,RH,03,RH03
+RH_04,April relative humidity,April,Monthly,interval,%,relative humidity,RH,04,RH04
+RH_05,May relative humidity,May,Monthly,interval,%,relative humidity,RH,05,RH05
+RH_06,June relative humidity,June,Monthly,interval,%,relative humidity,RH,06,RH06
+RH_07,July relative humidity,July,Monthly,interval,%,relative humidity,RH,07,RH07
+RH_08,August relative humidity,August,Monthly,interval,%,relative humidity,RH,08,RH08
+RH_09,September relative humidity,September,Monthly,interval,%,relative humidity,RH,09,RH09
+RH_10,October relative humidity,October,Monthly,interval,%,relative humidity,RH,10,RH10
+RH_11,November relative humidity,November,Monthly,interval,%,relative humidity,RH,11,RH11
+RH_12,December relative humidity,December,Monthly,interval,%,relative humidity,RH,12,RH12
+SHM,Summer heat:moisture index,Annual,Annual,ratio,,Summer heat:moisture index,SHM,,SHM
+Tave,Mean temperature,Any,Annual,interval,deg. C,Mean temperature,Tave,,Tave
+Tave_at,Autumn mean temperature,Autumn,Seasonal,interval,deg. C,mean temperature,Tave,at,Tave_at
+Tave_sm,Summer mean temperature,Summer,Seasonal,interval,deg. C,mean temperature,Tave,sm,Tave_sm
+Tave_sp,Spring mean temperature,Spring,Seasonal,interval,deg. C,mean temperature,Tave,sp,Tave_sp
+Tave_wt,Winter mean temperature,Winter,Seasonal,interval,deg. C,mean temperature,Tave,wt,Tave_wt
+Tave_01,January mean temperature,January,Monthly,interval,deg. C,mean temperature,Tave,01,Tave01
+Tave_02,February mean temperature,February,Monthly,interval,deg. C,mean temperature,Tave,02,Tave02
+Tave_03,March mean temperature,March,Monthly,interval,deg. C,mean temperature,Tave,03,Tave03
+Tave_04,April mean temperature,April,Monthly,interval,deg. C,mean temperature,Tave,04,Tave04
+Tave_05,May mean temperature,May,Monthly,interval,deg. C,mean temperature,Tave,05,Tave05
+Tave_06,June mean temperature,June,Monthly,interval,deg. C,mean temperature,Tave,06,Tave06
+Tave_07,July mean temperature,July,Monthly,interval,deg. C,mean temperature,Tave,07,Tave07
+Tave_08,August mean temperature,August,Monthly,interval,deg. C,mean temperature,Tave,08,Tave08
+Tave_09,September mean temperature,September,Monthly,interval,deg. C,mean temperature,Tave,09,Tave09
+Tave_10,October mean temperature,October,Monthly,interval,deg. C,mean temperature,Tave,10,Tave10
+Tave_11,November mean temperature,November,Monthly,interval,deg. C,mean temperature,Tave,11,Tave11
+Tave_12,December mean temperature,December,Monthly,interval,deg. C,mean temperature,Tave,12,Tave12
+TD,Continentality (MWMT-MCMT),Annual,Annual,interval,deg. C,Continentality (MWMT-MCMT),TD,,TD
+Tmax,Mean daily maximum temperature,Any,Annual,interval,deg. C,Mean daily maximum temperature,Tmax,,Tmax
+Tmax_at,Autumn mean daily maximum temperature,Autumn,Seasonal,interval,deg. C,mean daily maximum temperature,Tmax,at,Tmax_at
+Tmax_sm,Summer mean daily maximum temperature,Summer,Seasonal,interval,deg. C,mean daily maximum temperature,Tmax,sm,Tmax_sm
+Tmax_sp,Spring mean daily maximum temperature,Spring,Seasonal,interval,deg. C,mean daily maximum temperature,Tmax,sp,Tmax_sp
+Tmax_wt,Winter mean daily maximum temperature,Winter,Seasonal,interval,deg. C,mean daily maximum temperature,Tmax,wt,Tmax_wt
+Tmax_01,January mean daily maximum temperature,January,Monthly,interval,deg. C,mean daily maximum temperature,Tmax,01,Tmax01
+Tmax_02,February mean daily maximum temperature,February,Monthly,interval,deg. C,mean daily maximum temperature,Tmax,02,Tmax02
+Tmax_03,March mean daily maximum temperature,March,Monthly,interval,deg. C,mean daily maximum temperature,Tmax,03,Tmax03
+Tmax_04,April mean daily maximum temperature,April,Monthly,interval,deg. C,mean daily maximum temperature,Tmax,04,Tmax04
+Tmax_05,May mean daily maximum temperature,May,Monthly,interval,deg. C,mean daily maximum temperature,Tmax,05,Tmax05
+Tmax_06,June mean daily maximum temperature,June,Monthly,interval,deg. C,mean daily maximum temperature,Tmax,06,Tmax06
+Tmax_07,July mean daily maximum temperature,July,Monthly,interval,deg. C,mean daily maximum temperature,Tmax,07,Tmax07
+Tmax_08,August mean daily maximum temperature,August,Monthly,interval,deg. C,mean daily maximum temperature,Tmax,08,Tmax08
+Tmax_09,September mean daily maximum temperature,September,Monthly,interval,deg. C,mean daily maximum temperature,Tmax,09,Tmax09
+Tmax_10,October mean daily maximum temperature,October,Monthly,interval,deg. C,mean daily maximum temperature,Tmax,10,Tmax10
+Tmax_11,November mean daily maximum temperature,November,Monthly,interval,deg. C,mean daily maximum temperature,Tmax,11,Tmax11
+Tmax_12,December mean daily maximum temperature,December,Monthly,interval,deg. C,mean daily maximum temperature,Tmax,12,Tmax12
+Tmin,Mean daily minimum temperature,Any,Annual,interval,deg. C,Mean daily minimum temperature,Tmin,,Tmin
+Tmin_at,Autumn mean daily minimum temperature,Autumn,Seasonal,interval,deg. C,mean daily minimum temperature,Tmin,at,Tmin_at
+Tmin_sm,Summer mean daily minimum temperature,Summer,Seasonal,interval,deg. C,mean daily minimum temperature,Tmin,sm,Tmin_sm
+Tmin_sp,Spring mean daily minimum temperature,Spring,Seasonal,interval,deg. C,mean daily minimum temperature,Tmin,sp,Tmin_sp
+Tmin_wt,Winter mean daily minimum temperature,Winter,Seasonal,interval,deg. C,mean daily minimum temperature,Tmin,wt,Tmin_wt
+Tmin_01,January mean daily minimum temperature,January,Monthly,interval,deg. C,mean daily minimum temperature,Tmin,01,Tmin01
+Tmin_02,February mean daily minimum temperature,February,Monthly,interval,deg. C,mean daily minimum temperature,Tmin,02,Tmin02
+Tmin_03,March mean daily minimum temperature,March,Monthly,interval,deg. C,mean daily minimum temperature,Tmin,03,Tmin03
+Tmin_04,April mean daily minimum temperature,April,Monthly,interval,deg. C,mean daily minimum temperature,Tmin,04,Tmin04
+Tmin_05,May mean daily minimum temperature,May,Monthly,interval,deg. C,mean daily minimum temperature,Tmin,05,Tmin05
+Tmin_06,June mean daily minimum temperature,June,Monthly,interval,deg. C,mean daily minimum temperature,Tmin,06,Tmin06
+Tmin_07,July mean daily minimum temperature,July,Monthly,interval,deg. C,mean daily minimum temperature,Tmin,07,Tmin07
+Tmin_08,August mean daily minimum temperature,August,Monthly,interval,deg. C,mean daily minimum temperature,Tmin,08,Tmin08
+Tmin_09,September mean daily minimum temperature,September,Monthly,interval,deg. C,mean daily minimum temperature,Tmin,09,Tmin09
+Tmin_10,October mean daily minimum temperature,October,Monthly,interval,deg. C,mean daily minimum temperature,Tmin,10,Tmin10
+Tmin_11,November mean daily minimum temperature,November,Monthly,interval,deg. C,mean daily minimum temperature,Tmin,11,Tmin11
+Tmin_12,December mean daily minimum temperature,December,Monthly,interval,deg. C,mean daily minimum temperature,Tmin,12,Tmin12
