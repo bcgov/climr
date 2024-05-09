@@ -7,7 +7,7 @@
 
 ## Bug Fixes
 * fixed an out-of-bounds error that affected user queries close to the coastline. 
-* Added missing future 1850-2100 time series for the GFDL-ESM4 climate model.  
+* Added missing future 2015-2100 time series for the GFDL-ESM4 climate model.  
 
 ## Enhancements
 * Added `plot_timeSeries()` and `plot_timeSeries_input()` functions to generate plots of 20th and 21st century climate change for user-selected locations and climate variables.
