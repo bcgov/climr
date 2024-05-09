@@ -7,11 +7,12 @@
 
 ## Bug Fixes
 * fixed an out-of-bounds error that affected user queries close to the coastline. 
+* Added missing future 1850-2100 time series for the GFDL-ESM4 climate model.  
 
 ## Enhancements
 * Added `plot_timeSeries()` and `plot_timeSeries_input()` functions to generate plots of 20th and 21st century climate change for user-selected locations and climate variables.
 * Added a 1901-2022 observational time series of for the combined Climatic Research Unit TS dataset (for Temperature) and Global Precipitation Climatology Centre dataset (for precipitation). 
-* Extended the ClimateNA observational time series to 1901-2022. 
+* Extended the ClimateNA observational time series to 1901-2023. 
 
 # `climr` 0.0.4
 ## Bug Fixes
