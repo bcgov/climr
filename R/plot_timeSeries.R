@@ -281,7 +281,7 @@ plot_timeSeries <- function(
                 baseline <- mean(ensmean.historical[which(x.historical%in%1961:1990)])
                 projected <- s4$y[length(s4$y)]
                 if(endlabel=="change"){
-                  if(element%in%c("PPT", "PAS", "CMD", "MAP", "MSP", "DD_18", "DD18", "DD_0", "DD5", "Eref")){
+                  if(element%in%c("PPT", "PAS", "CMD", "MAP", "MSP", "DDsub18", "DD18", "DDsub0", "DD5", "Eref")){
                     change <- round(projected/baseline-1,2)
                     if(is.na(change)==FALSE) text(2099,projected, if(change>0) paste("+",change*100,"%", sep="") else paste(change*100,"%", sep=""), col=colSelect(scenario, gcm), pos=4, font=2, cex=1)
                   } else if(element%in%c("Tave", "Tmin", "Tmax", "MCMT", "MWMT", "EXT", "EMT", "MAT")){

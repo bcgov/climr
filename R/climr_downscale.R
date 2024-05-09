@@ -94,7 +94,7 @@
 #' )
 #'
 #' ## historic observational time series
-#' vars <- c("PPT", "CMD", "Tave07")
+#' vars <- c("PPT", "CMD", "Tave_07")
 #' climate_norms_hist <- climr_downscale(
 #'   xyz = in_xyz, which_normal = "auto",
 #'   return_normal = TRUE,
@@ -183,10 +183,10 @@ climr_downscale <- function(xyz, which_normal = "auto",
     # message("Normals not specified, using highest resolution available for each point")
     bc_outline <- rast(system.file("extdata", "wna_outline.tif", package = "climr"))
     pnts <- extract(bc_outline, xyz[, .(lon, lat)], method = "simple")
-    bc_ids <- xyz[["id"]][!is.na(pnts$PPT01)]
+    bc_ids <- xyz[["id"]][!is.na(pnts$PPT_01)]
     if (length(bc_ids) >= 1) {
       xyz_save <- xyz
-      xyz <- xyz[!is.na(pnts$PPT01), ]
+      xyz <- xyz[!is.na(pnts$PPT_01), ]
       thebb_bc <- get_bb(xyz)
       message("for BC...")
       normal <- normal_input(dbCon = dbCon, normal = "normal_composite", bbox = thebb_bc, cache = cache)
