@@ -113,80 +113,80 @@ append_clim_vars <- function(dt, vars) {
     "Tave_12" = function() {
       set(dt, j = "Tave_12", value = (v("Tmax_12") + v("Tmin_12")) / 2)
     },
-    "PET01" = function() {
-      set(dt, j = "PET01", value = calc_PET(v("Tave_01"), v("Tmin_01"), v("Tmax_01"), v("elev")))
+    "PET_01" = function() {
+      set(dt, j = "PET_01", value = calc_PET(v("Tave_01"), v("Tmin_01"), v("Tmax_01"), v("elev")))
     },
-    "PET02" = function() {
-      set(dt, j = "PET02", value = calc_PET(v("Tave_02"), v("Tmin_02"), v("Tmax_02"), v("elev")))
+    "PET_02" = function() {
+      set(dt, j = "PET_02", value = calc_PET(v("Tave_02"), v("Tmin_02"), v("Tmax_02"), v("elev")))
     },
-    "PET03" = function() {
-      set(dt, j = "PET03", value = calc_PET(v("Tave_03"), v("Tmin_03"), v("Tmax_03"), v("elev")))
+    "PET_03" = function() {
+      set(dt, j = "PET_03", value = calc_PET(v("Tave_03"), v("Tmin_03"), v("Tmax_03"), v("elev")))
     },
-    "PET04" = function() {
-      set(dt, j = "PET04", value = calc_PET(v("Tave_04"), v("Tmin_04"), v("Tmax_04"), v("elev")))
+    "PET_04" = function() {
+      set(dt, j = "PET_04", value = calc_PET(v("Tave_04"), v("Tmin_04"), v("Tmax_04"), v("elev")))
     },
-    "PET05" = function() {
-      set(dt, j = "PET05", value = calc_PET(v("Tave_05"), v("Tmin_05"), v("Tmax_05"), v("elev")))
+    "PET_05" = function() {
+      set(dt, j = "PET_05", value = calc_PET(v("Tave_05"), v("Tmin_05"), v("Tmax_05"), v("elev")))
     },
-    "PET06" = function() {
-      set(dt, j = "PET06", value = calc_PET(v("Tave_06"), v("Tmin_06"), v("Tmax_06"), v("elev")))
+    "PET_06" = function() {
+      set(dt, j = "PET_06", value = calc_PET(v("Tave_06"), v("Tmin_06"), v("Tmax_06"), v("elev")))
     },
-    "PET07" = function() {
-      set(dt, j = "PET07", value = calc_PET(v("Tave_07"), v("Tmin_07"), v("Tmax_07"), v("elev")))
+    "PET_07" = function() {
+      set(dt, j = "PET_07", value = calc_PET(v("Tave_07"), v("Tmin_07"), v("Tmax_07"), v("elev")))
     },
-    "PET08" = function() {
-      set(dt, j = "PET08", value = calc_PET(v("Tave_08"), v("Tmin_08"), v("Tmax_08"), v("elev")))
+    "PET_08" = function() {
+      set(dt, j = "PET_08", value = calc_PET(v("Tave_08"), v("Tmin_08"), v("Tmax_08"), v("elev")))
     },
-    "PET09" = function() {
-      set(dt, j = "PET09", value = calc_PET(v("Tave_09"), v("Tmin_09"), v("Tmax_09"), v("elev")))
+    "PET_09" = function() {
+      set(dt, j = "PET_09", value = calc_PET(v("Tave_09"), v("Tmin_09"), v("Tmax_09"), v("elev")))
     },
-    "PET10" = function() {
-      set(dt, j = "PET10", value = calc_PET(v("Tave_10"), v("Tmin_10"), v("Tmax_10"), v("elev")))
+    "PET_10" = function() {
+      set(dt, j = "PET_10", value = calc_PET(v("Tave_10"), v("Tmin_10"), v("Tmax_10"), v("elev")))
     },
-    "PET11" = function() {
-      set(dt, j = "PET11", value = calc_PET(v("Tave_11"), v("Tmin_11"), v("Tmax_11"), v("elev")))
+    "PET_11" = function() {
+      set(dt, j = "PET_11", value = calc_PET(v("Tave_11"), v("Tmin_11"), v("Tmax_11"), v("elev")))
     },
-    "PET12" = function() {
-      set(dt, j = "PET12", value = calc_PET(v("Tave_12"), v("Tmin_12"), v("Tmax_12"), v("elev")))
+    "PET_12" = function() {
+      set(dt, j = "PET_12", value = calc_PET(v("Tave_12"), v("Tmin_12"), v("Tmax_12"), v("elev")))
     },
     "CMI" = function() {
-      set(dt, j = "CMI", value = v("PPT") - (v("PET01") + v("PET02") + v("PET03") + v("PET04") + v("PET05") + v("PET06") + v("PET07") + v("PET08") + v("PET09") + v("PET10") + v("PET11") + v("PET12")))
+      set(dt, j = "CMI", value = v("PPT") - (v("PET_01") + v("PET_02") + v("PET_03") + v("PET_04") + v("PET_05") + v("PET_06") + v("PET_07") + v("PET_08") + v("PET_09") + v("PET_10") + v("PET_11") + v("PET_12")))
     },
     "CMI_01" = function() {
-      set(dt, j = "CMI_01", value = v("PPT_01") - v("PET01"))
+      set(dt, j = "CMI_01", value = v("PPT_01") - v("PET_01"))
     },
     "CMI_02" = function() {
-      set(dt, j = "CMI_02", value = v("PPT_02") - v("PET02"))
+      set(dt, j = "CMI_02", value = v("PPT_02") - v("PET_02"))
     },
     "CMI_03" = function() {
-      set(dt, j = "CMI_03", value = v("PPT_03") - v("PET03"))
+      set(dt, j = "CMI_03", value = v("PPT_03") - v("PET_03"))
     },
     "CMI_04" = function() {
-      set(dt, j = "CMI_04", value = v("PPT_04") - v("PET04"))
+      set(dt, j = "CMI_04", value = v("PPT_04") - v("PET_04"))
     },
     "CMI_05" = function() {
-      set(dt, j = "CMI_05", value = v("PPT_05") - v("PET05"))
+      set(dt, j = "CMI_05", value = v("PPT_05") - v("PET_05"))
     },
     "CMI_06" = function() {
-      set(dt, j = "CMI_06", value = v("PPT_06") - v("PET06"))
+      set(dt, j = "CMI_06", value = v("PPT_06") - v("PET_06"))
     },
     "CMI_07" = function() {
-      set(dt, j = "CMI_07", value = v("PPT_07") - v("PET07"))
+      set(dt, j = "CMI_07", value = v("PPT_07") - v("PET_07"))
     },
     "CMI_08" = function() {
-      set(dt, j = "CMI_08", value = v("PPT_08") - v("PET08"))
+      set(dt, j = "CMI_08", value = v("PPT_08") - v("PET_08"))
     },
     "CMI_09" = function() {
-      set(dt, j = "CMI_09", value = v("PPT_09") - v("PET09"))
+      set(dt, j = "CMI_09", value = v("PPT_09") - v("PET_09"))
     },
     "CMI_10" = function() {
-      set(dt, j = "CMI_10", value = v("PPT_10") - v("PET10"))
+      set(dt, j = "CMI_10", value = v("PPT_10") - v("PET_10"))
     },
     "CMI_11" = function() {
-      set(dt, j = "CMI_11", value = v("PPT_11") - v("PET11"))
+      set(dt, j = "CMI_11", value = v("PPT_11") - v("PET_11"))
     },
     "CMI_12" = function() {
-      set(dt, j = "CMI_12", value = v("PPT_12") - v("PET12"))
+      set(dt, j = "CMI_12", value = v("PPT_12") - v("PET_12"))
     },
     "NFFD_01" = function() {
       set(dt, j = "NFFD_01", value = calc_NFFD(1, v("Tmin_01")))
