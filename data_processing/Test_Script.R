@@ -2,6 +2,20 @@ library(data.table)
 library(terra)
 library(climr)
 
+pts <- data.frame(lon = c(-124.11, -125.11), lat = rep(48.82, 2), elev = rep(25,2), id = 1:2)
+
+bbox <- get_bb(pts[2,])
+dbcon <- data_connect()
+test <- normal_input(dbcon, bbox)
+plot(test[[8]])
+
+projected <- climr_downscale(pts[2,], 
+                                                          gcm_models = list_gcm()[c(4)],
+                                                           ssp = list_ssp()[c(1,2)],
+                                                           max_run = 3,
+                                                           gcm_hist_years = 1851:2014,
+                                                           gcm_ts_years = 2015:2100
+                              )
 
 dat <- fread("../climatena/Perioddat/Year_1905.ann")
 idx <- fread("../climatena/Perioddat/cru_index.dat")
@@ -19,22 +33,39 @@ my_points <- data.frame(
 ds_out <- climr_downscale(
   xyz = my_points, 
   which_normal = "auto",
-  gcm_models = c("GFDL-ESM4", "EC-Earth3"), # specify two global climate models
+  gcm_models = c("GFDL-ESM4"), # specify two global climate models
   ssp = c("ssp370", "ssp245"), # specify two greenhouse gas concentration scenarios
-  gcm_period = c("2001_2020", "2041_2060"), # specify two 20-year periods
+  #gcm_period = c("2001_2020", "2041_2060"), # specify two 20-year periods
+  gcm_ts_years = 2024:2050,
   max_run = 3, # specify 3 individual runs for each model
   vars = c("PPT", "CMD", "CMI")
 )
 
 
 library(climr)
+library(terra)
+library(data.table)
 
 points_downscale_ref <- readRDS("tests/testthat/data/points_downscale_ref.rds")
 pt <- points_downscale_ref
 
 dbcon <- data_connect()
 bbox <- get_bb(pt)
-hist <- historic_input_ts(dbcon, dataset = c("cru.gpcc","climate.na"), bbox = bbox, years = 1950:2015)
+hist <- historic_input_ts(dbcon, dataset = c("cru.gpcc","climatena"), bbox = bbox, years = 1950:2015)
+
+t1 <- hist[[1]]
+t2 <- values(t1, mat = TRUE)
+t2 <- data.table(t2)
+t2[,cellid := 1:nrow(t2)]
+t3 <- melt(t2, id.vars = "cellid")
+t3[,c("dataset","var","year") := tstrsplit(variable,"_")]
+t3 <- t3[,.(dataset,var,year,value)]
+
+dbWriteTable(conn, "test_hist", t3, row.names = F)
+dat <- dbGetQuery(conn, "select * from test_array;")
+
+my_data <- plot_timeSeries_input(pt,gcm_models = list_gcm()[1:2], historic_ts_dataset = c("cru.gpcc","climatena"), vars = list_variables("Monthly"))
+plot_timeSeries(my_data, variable1 = "CMI08", ssps = list_ssp(),historic_ts_dataset = c("cru.gpcc","climatena"), gcm_models = list_gcm()[1:2])
 
 test_cru <- climr_downscale(pt, which_normal = "auto", 
                          historic_ts = 1950:2022,
