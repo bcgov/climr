@@ -18,19 +18,19 @@ CMD_09,September Hargreaves climatic moisture deficit,CMD,Hargreaves climatic mo
 CMD_10,October Hargreaves climatic moisture deficit,CMD,Hargreaves climatic moisture deficit,10,October,Monthly,ratio,mm,CMD10
 CMD_11,November Hargreaves climatic moisture deficit,CMD,Hargreaves climatic moisture deficit,11,November,Monthly,ratio,mm,CMD11
 CMD_12,December Hargreaves climatic moisture deficit,CMD,Hargreaves climatic moisture deficit,12,December,Monthly,ratio,mm,CMD12
-CMI,Climatic Moisture Index,CMI,Climatic Moisture Index,,Annual,Annual,interval,mm,CMI
-CMI_01,January Climatic Moisture Index,CMI,Climatic Moisture Index,01,January,Monthly,interval,mm,CMI01
-CMI_02,February Climatic Moisture Index,CMI,Climatic Moisture Index,02,February,Monthly,interval,mm,CMI02
-CMI_03,March Climatic Moisture Index,CMI,Climatic Moisture Index,03,March,Monthly,interval,mm,CMI03
-CMI_04,April Climatic Moisture Index,CMI,Climatic Moisture Index,04,April,Monthly,interval,mm,CMI04
-CMI_05,May Climatic Moisture Index,CMI,Climatic Moisture Index,05,May,Monthly,interval,mm,CMI05
-CMI_06,June Climatic Moisture Index,CMI,Climatic Moisture Index,06,June,Monthly,interval,mm,CMI06
-CMI_07,July Climatic Moisture Index,CMI,Climatic Moisture Index,07,July,Monthly,interval,mm,CMI07
-CMI_08,August Climatic Moisture Index,CMI,Climatic Moisture Index,08,August,Monthly,interval,mm,CMI08
-CMI_09,September Climatic Moisture Index,CMI,Climatic Moisture Index,09,September,Monthly,interval,mm,CMI09
-CMI_10,October Climatic Moisture Index,CMI,Climatic Moisture Index,10,October,Monthly,interval,mm,CMI10
-CMI_11,November Climatic Moisture Index,CMI,Climatic Moisture Index,11,November,Monthly,interval,mm,CMI11
-CMI_12,December Climatic Moisture Index,CMI,Climatic Moisture Index,12,December,Monthly,interval,mm,CMI12
+CMI,Climatic Moisture Index,CMI,Climatic Moisture Index,,Annual,Annual,interval,cm,CMI
+CMI_01,January Climatic Moisture Index,CMI,Climatic Moisture Index,01,January,Monthly,interval,cm,CMI01
+CMI_02,February Climatic Moisture Index,CMI,Climatic Moisture Index,02,February,Monthly,interval,cm,CMI02
+CMI_03,March Climatic Moisture Index,CMI,Climatic Moisture Index,03,March,Monthly,interval,cm,CMI03
+CMI_04,April Climatic Moisture Index,CMI,Climatic Moisture Index,04,April,Monthly,interval,cm,CMI04
+CMI_05,May Climatic Moisture Index,CMI,Climatic Moisture Index,05,May,Monthly,interval,cm,CMI05
+CMI_06,June Climatic Moisture Index,CMI,Climatic Moisture Index,06,June,Monthly,interval,cm,CMI06
+CMI_07,July Climatic Moisture Index,CMI,Climatic Moisture Index,07,July,Monthly,interval,cm,CMI07
+CMI_08,August Climatic Moisture Index,CMI,Climatic Moisture Index,08,August,Monthly,interval,cm,CMI08
+CMI_09,September Climatic Moisture Index,CMI,Climatic Moisture Index,09,September,Monthly,interval,cm,CMI09
+CMI_10,October Climatic Moisture Index,CMI,Climatic Moisture Index,10,October,Monthly,interval,cm,CMI10
+CMI_11,November Climatic Moisture Index,CMI,Climatic Moisture Index,11,November,Monthly,interval,cm,CMI11
+CMI_12,December Climatic Moisture Index,CMI,Climatic Moisture Index,12,December,Monthly,interval,cm,CMI12
 DDsub0,Degree-days below 0C,DDsub0,Degree-days below 0C,,Annual,Annual,ratio,,DD_0
 DDsub0_01,January degree-days below 0C,DDsub0,degree-days below 0C,01,January,Monthly,ratio,,DD_0_01
 DDsub0_02,February degree-days below 0C,DDsub0,degree-days below 0C,02,February,Monthly,ratio,,DD_0_02
