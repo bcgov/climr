@@ -30,7 +30,7 @@ calc_RH <- function(tmmin, tmmax) {
 #' @importFrom data.table fifelse
 #' @noRd
 calc_PET <- function(tave, tmmin, tmmax, alt) {
-  D <- 0.5 * (.calc_SVP(tmmax) - .calc_SVP(tmmin)) - .calc_SVP(tmmin - 2.5)
+  D <- 0.5 * (.calc_SVP(tmmax) + .calc_SVP(tmmin)) - .calc_SVP(tmmin - 2.5)
   pet <- fifelse(
     tave > 10, 93 * D * exp(alt / 9300),
     fifelse(tave > -5, (6.2 * tave + 31) * D * exp(alt / 9300), 0)
@@ -53,6 +53,8 @@ calc_SVP <- function(t) {
 }
 
 #' internal utility function
+#' Magnus-Tetens empirical formula for saturation vapour pressure, with units of degrees C and kPa
+#' obtained from: https://andrewsforest.oregonstate.edu/sites/default/files/lter/data/studies/ms01/dewpt_vpd_calculations.pdf
 #' @template t
 #' @noRd
 .calc_SVP <- function(t) {
