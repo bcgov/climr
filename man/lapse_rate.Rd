@@ -4,10 +4,10 @@
 \alias{lapse_rate}
 \title{Calculation of gridded lapse rates}
 \usage{
-lapse_rate(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize = TRUE)
+lapse_rate(reference, dem, NA_replace = TRUE, nthread = 1L, rasterize = TRUE)
 }
 \arguments{
-\item{normal}{a \code{SpatRaster} stack. climate rasters to compute lapse rates for. Build with this package functions.}
+\item{reference}{a \code{SpatRaster} stack. climate rasters to compute lapse rates for. Build with this package functions.}
 
 \item{dem}{\code{SpatRaster}. A digital elevation model raster. Only needed if \code{normal}
 is a \code{SpatRaster}. Defaults to \code{NULL}.}
@@ -16,7 +16,7 @@ is a \code{SpatRaster}. Defaults to \code{NULL}.}
 
 \item{nthread}{integer. Number of parallel threads to use to compute lapse rates.}
 
-\item{rasterize}{logical. Return an object of the same class category as normal with the same extent?
+\item{rasterize}{logical. Return an object of the same class category as reference with the same extent?
 Default to \code{TRUE}.}
 }
 \value{

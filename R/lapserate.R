@@ -171,11 +171,11 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 #' These gridded lapse rates are used in [`downscale()`] and [`climr_downscale()`] for elevation adjustment of climate values during downscaling to user-specified locations.
 #' The method is illustrated in the vignette `vignette("lapse_rates")`
 #'
-#' @param normal a `SpatRaster` stack. climate rasters to compute lapse rates for. Build with this package functions.
+#' @param reference a `SpatRaster` stack. climate rasters to compute lapse rates for. Build with this package functions.
 #' @template dem
 #' @param NA_replace logical. Should NA lapse rate results be replaced by zeros. Default to TRUE.
 #' @param nthread integer. Number of parallel threads to use to compute lapse rates.
-#' @param rasterize logical. Return an object of the same class category as normal with the same extent?
+#' @param rasterize logical. Return an object of the same class category as reference with the same extent?
 #'    Default to `TRUE`.
 #'
 #' @details Formulas \cr
@@ -189,12 +189,12 @@ deltas <- function(mat, nr, nc, NA_replace = TRUE) {
 #'
 #' @importFrom terra as.list as.matrix ext nlyr compareGeom resample rast crs crs<-
 #' @export
-lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize = TRUE) {
-  # Transform normal to list, capture names before
-  normal_names <- names(normal)
+lapse_rate <- function(reference, dem, NA_replace = TRUE, nthread = 1L, rasterize = TRUE) {
+  # Transform reference to list, capture names before
+  normal_names <- names(reference)
 
   # Validation
-  if (nlyr(normal) != 36L || !all(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3))) %in% names(normal))) {
+  if (nlyr(reference) != 36L || !all(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3))) %in% names(reference))) {
     stop(
       "Normal raster does not have the required 36 layers. Required layers are ",
       paste(sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))), collapse = ", "),
@@ -207,12 +207,12 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
     )
   }
   # Matching geometries check
-  if (!compareGeom(normal, dem)) {
+  if (!compareGeom(reference, dem)) {
     warning("Normal and Digital elevation model rasters have different extents. They must be the same. Resampling dem to match.")
-    dem <- resample(dem, normal, method = "bilinear")
+    dem <- resample(dem, reference, method = "bilinear")
   }
 
-  # Compute everything related to the dem and independant of normal
+  # Compute everything related to the dem and independant of reference
   n_r <- nrow(dem)
   n_c <- ncol(dem)
   x_i <- shush(as.matrix(dem, wide = TRUE))
@@ -249,7 +249,7 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
 
     res <- parallel::parLapply(
       cl = cl,
-      X = shush(lapply(as.list(normal), as.matrix, wide = TRUE)),
+      X = shush(lapply(as.list(reference), as.matrix, wide = TRUE)),
       fun = lapse_rate_redux,
       x_i = x_i,
       n_r = n_r,
@@ -261,7 +261,7 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
   } else {
     # Use regular lapply
     res <- lapply(
-      X = shush(lapply(as.list(normal), as.matrix, wide = TRUE)),
+      X = shush(lapply(as.list(reference), as.matrix, wide = TRUE)),
       FUN = lapse_rate_redux,
       x_i = x_i,
       n_r = n_r,
@@ -279,14 +279,14 @@ lapse_rate <- function(normal, dem, NA_replace = TRUE, nthread = 1L, rasterize =
         lapply(
           res,
           rast,
-          extent = ext(normal)
+          extent = ext(reference)
         )
       )
     )
-    crs(res) <- crs(normal)
+    crs(res) <- crs(reference)
   }
 
-  # Set names of lapse rates to match normal
+  # Set names of lapse rates to match reference
   names(res) <- normal_names
 
   return(res)
@@ -306,7 +306,7 @@ NArep <- function(x) {
 
 #' TODO: add documentation here
 
-#' For the lapse rate, x is the elevation, and y is the normal
+#' For the lapse rate, x is the elevation, and y is the reference
 #'
 #' @param y_i TODO
 #' @param x_i TODO
