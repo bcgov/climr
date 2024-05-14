@@ -123,7 +123,7 @@ dd_param_above_18 <- read.csv(file = "data-raw/derivedVariables/optimizedParamet
 
 dd <- function(m, tm) {
   # ***********************************************
-  # Question, I think it should be dd < 5 (not > 5)
+  # NOTE the error in this function (it should be tm > 5, not <)
   # ***********************************************
   dd_param <- ""
 
