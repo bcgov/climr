@@ -1,37 +1,37 @@
 #' Change-factor downscaling of user-supplied climate data
 #'
 #' @description
-#' `downscale()` is the engine for [`climr_downscale()`].
+#' `downscale_core()` is the engine for [`downscale()`].
 #' It takes user-supplied high- and low-resolution rasters as input and downscales to user-specified point locations.
-#' While less user-friendly than [`climr_downscale()`], `downscale()` is more flexible in that users can supply their own raster inputs. For example, a user could supply their own high-resolution climate map, instead of what is available in climr, as the input to `normal`.
+#' While less user-friendly than [`downscale()`], `downscale_core()` is more flexible in that users can supply their own raster inputs. For example, a user could supply their own high-resolution climate map, instead of what is available in climr, as the input to `refmap`.
 #'
 #' @details
-#' We recommend [`climr_downscale()`] for most purposes.
+#' We recommend [`downscale()`] for most purposes.
 #'
 #' @template xyz
-#' @param normal `SpatRaster`. Outputs from [`normal_input()`]. The high-resolution
+#' @param refmap `SpatRaster`. Outputs from [`input_refmap()`]. The high-resolution
 #'   climate maps for use as the downscaling baseline.
-#' @param gcm `list` of `SpatRasters`. Outputs from [`gcm_input()`]. Global
-#'   climate model data for 20-year normal periods to be downscaled. Default to `NULL`.
-#' @param historic `list` of `SpatRasters`. Outputs from [`historic_input()`].
-#'   Observed climate data for 20-year normal periods to be downscaled. Default to `NULL`.
-#' @param gcm_ts `list` of `SpatRasters`. Outputs from [`gcm_ts_input()`].
-#'   Global climate model time series for ssp-rcp scenarios to be downscaled. Default to `NULL`.
-#' @param gcm_hist `list` of `SpatRasters`. Outputs from [`gcm_hist_input()`].
+#' @param gcms `list` of `SpatRasters`. Outputs from [`input_gcms()`]. Global
+#'   climate model data for 20-year reference periods to be downscaled. Default to `NULL`.
+#' @param obs `list` of `SpatRasters`. Outputs from [`input_obs()`].
+#'   Observed climate data for 20-year reference periods to be downscaled. Default to `NULL`.
+#' @param gcm_ssp_ts `list` of `SpatRasters`. Outputs from [`input_gcm_ssp()`].
+#'   Global climate model time series for ssps-rcp scenarios to be downscaled. Default to `NULL`.
+#' @param gcm_hist_ts `list` of `SpatRasters`. Outputs from [`input_gcm_hist()`].
 #'   Global climate model time series for historical scenario to be downscaled. Default to `NULL`.
-#' @param historic_ts `list` of `SpatRasters`. Outputs from [`historic_input_ts()`].
+#' @param obs_ts `list` of `SpatRasters`. Outputs from [`input_obs_ts()`].
 #'   Observed climate time series to be downscaled. Default to `NULL`.
-#' @param return_normal logical. Return downscaled normal period (1961-1990)? Default `TRUE`.
+#' @param return_refperiod logical. Return downscaled reference period (1961-1990)? Default `TRUE`.
 #' @param vars character. A vector of climate variables to compute. Supported variables
-#'   can be obtained with [`list_variables()`]. Definitions can be found in this package
+#'   can be obtained with [`list_vars()`]. Definitions can be found in this package
 #'  `variables` dataset. Default to monthly PPT, Tmax, Tmin.
 #' @param ppt_lr logical. Apply elevation adjustment to precipitation. Default to FALSE.
 #' @param nthread integer. Number of parallel threads to use to do computations. Default to 1L.
 #' @param out_spatial logical. Should a SpatVector be returned instead of a
 #'   `data.frame`.
 #' @param plot character. If `out_spatial` is TRUE, the name of a variable to plot.
-#'   If the variable exists in `normal`, then its normal values will also be plotted. 
-#'   Otherwise, normal January total precipitation (PPT01) values will be plotted.
+#'   If the variable exists in `reference`, then its reference values will also be plotted. 
+#'   Otherwise, reference January total precipitation (PPT01) values will be plotted.
 #'   Defaults to no plotting (NULL).
 #'
 #' @import data.table
@@ -39,12 +39,12 @@
 #' @importFrom grDevices hcl.colors palette
 #' @importFrom stats complete.cases
 #'
-#' @return A `data.table` or SpatVector with downscaled climate variables. If `gcm` is NULL,
-#'   this is just the downscaled `normal` at point locations. If `gcm` is provided,
+#' @return A `data.table` or SpatVector with downscaled climate variables. If `gcms` is NULL,
+#'   this is just the downscaled `reference` at point locations. If `gcms` is provided,
 #'   this returns a downscaled dataset for each point location, general circulation
 #'   model (GCM), shared socioeconomic pathway (SSP), run and period.
 #'
-#' @seealso [`gcm_input()`], [`historic_input()`], [`list_variables()`]
+#' @seealso [`input_gcms()`], [`input_obs()`], [`list_vars()`]
 #'
 #' @export
 #' @examples
@@ -54,27 +54,27 @@
 #'
 #' ## get bounding box based on input points
 #' thebb <- get_bb(xyz)
-#' normal <- normal_input(dbCon = dbCon, bbox = thebb, cache = TRUE)
+#' reference <- input_refmap(dbCon = dbCon, bbox = thebb, cache = TRUE)
 #'
 #' ## pick one GCM, one SSP and one period from the list of available options
-#' gcm <- gcm_input(dbCon, thebb, gcm = list_gcm()[3], list_ssp()[1], list_gcm_period()[2])
+#' gcms <- input_gcms(dbCon, thebb, gcms = list_gcms()[3], list_ssps()[1], list_gcm_periods()[2])
 #'
 #' ## notice coarseness of the data
-#' terra::plot(gcm[[1]])
+#' terra::plot(gcms[[1]])
 #'
-#' downscale(xyz, normal, gcm)
-#' historic <- historic_input(dbCon, thebb)
-#' terra::plot(historic[[1]])
+#' downscale(xyz, reference, gcms)
+#' obs <- input_obs(dbCon, thebb)
+#' terra::plot(obs[[1]])
 #'
-#' downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)
-downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL,
-                      gcm_hist = NULL, historic_ts = NULL, return_normal = TRUE,
+#' downscale_core(xyz, reference, gcms = NULL, obs = obs, ppt_lr = FALSE)
+downscale_core <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NULL,
+                      gcm_hist_ts = NULL, obs_ts = NULL, return_refperiod = TRUE,
                       vars = sort(sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))),
                       ppt_lr = FALSE, nthread = 1L, out_spatial = FALSE, plot = NULL) {
   ## checks
   .checkDwnsclArgs(
-    xyz, normal, gcm, historic, gcm_ts, gcm_hist,
-    historic_ts, return_normal, out_spatial, plot, vars
+    xyz, refmap, gcms, obs, gcm_ssp_ts, gcm_hist_ts,
+    obs_ts, return_refperiod, out_spatial, plot, vars
   )
 
   expectedCols <- c("lon", "lat", "elev", "id")
@@ -117,12 +117,12 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL,
     # Parallel processing and recombine
 
     ## pack rasters for parallelisation
-    normal <- packRasters(normal)
-    gcm <- packRasters(gcm)
-    gcm_ts <- packRasters(gcm_ts)
-    gcm_hist <- packRasters(gcm_hist)
-    historic <- packRasters(historic)
-    historic_ts <- packRasters(historic_ts)
+    refmap <- packRasters(refmap)
+    gcms <- packRasters(gcms)
+    gcm_ssp_ts <- packRasters(gcm_ssp_ts)
+    gcm_hist_ts <- packRasters(gcm_hist_ts)
+    obs <- packRasters(obs)
+    obs_ts <- packRasters(obs_ts)
 
     ## workaround to export function to nodes
     unpackRasters <- unpackRasters
@@ -135,13 +135,13 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL,
         fun = threaded_downscale_,
         # lapply(xyz,  ## testing
         # FUN = threaded_downscale_,
-        normal = normal,
-        gcm = gcm,
-        gcm_ts = gcm_ts,
-        gcm_hist = gcm_hist,
-        historic = historic,
-        historic_ts = historic_ts,
-        return_normal = return_normal,
+        refmap = refmap,
+        gcms = gcms,
+        gcm_ssp_ts = gcm_ssp_ts,
+        gcm_hist_ts = gcm_hist_ts,
+        obs = obs,
+        obs_ts = obs_ts,
+        return_refperiod = return_refperiod,
         vars = vars,
         ppt_lr = ppt_lr
       ),
@@ -151,13 +151,13 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL,
     # Downscale without parallel processing
     res <- downscale_(
       xyz,
-      normal,
-      gcm,
-      gcm_ts,
-      gcm_hist,
-      historic,
-      historic_ts,
-      return_normal,
+      refmap,
+      gcms,
+      gcm_ssp_ts,
+      gcm_hist_ts,
+      obs,
+      obs_ts,
+      return_refperiod,
       vars, ppt_lr
     )
   }
@@ -167,14 +167,14 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL,
   if (out_spatial) {
     res <- as.data.table(xyz)[res, on = "id"]
 
-    res <- vect(res, geom = c("lon", "lat"), crs = crs(normal, proj = TRUE))
+    res <- vect(res, geom = c("lon", "lat"), crs = crs(refmap, proj = TRUE))
 
     if (!is.null(plot)) {
       if (!plot %in% vars) {
         stop("The variable you wish to plot was not downscaled. Please pass a variable listed in 'vars'")
       }
       ## make a mask of the normals data "extent"
-      msk <- normal[[1]]
+      msk <- refmap[[1]]
       msk[!is.na(msk[])] <- 1
       msk <- as.polygons(msk)
 
@@ -221,22 +221,22 @@ downscale <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL,
 #' @import data.table
 #' @importFrom terra crop ext xres yres extract
 #' @noRd
-downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist,
-                       historic, historic_ts, return_normal,
+downscale_ <- function(xyz, refmap, gcms, gcm_ssp_ts, gcm_hist_ts,
+                       obs, obs_ts, return_refperiod,
                        vars, ppt_lr = FALSE) {
   # print(xyz)
-  # Define normal extent
+  # Define reference extent
   ex <- ext(
     c(
-      min(xyz[["lon"]]) - xres(normal) * 2,
-      max(xyz[["lon"]]) + xres(normal) * 2,
-      min(xyz[["lat"]]) - yres(normal) * 2,
-      max(xyz[["lat"]]) + yres(normal) * 2
+      min(xyz[["lon"]]) - xres(refmap) * 2,
+      max(xyz[["lon"]]) + xres(refmap) * 2,
+      min(xyz[["lat"]]) - yres(refmap) * 2,
+      max(xyz[["lat"]]) + yres(refmap) * 2
     )
   )
 
-  # crop normal raster (while also loading it to memory)
-  normal <- crop(normal, ex, snap = "out")
+  # crop refmap raster (while also loading it to memory)
+  refmap <- crop(refmap, ex, snap = "out")
 
   # Normal value extraction
   # possible garbage output :
@@ -248,18 +248,18 @@ downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist,
   # stack before extracting
   res <-
     extract(
-      x = normal,
+      x = refmap,
       y = xyz[, .(lon, lat)],
       method = "bilinear"
     )
 
-  # Compute elevation differences between provided points elevation and normal
-  # Dem at position 74 (ID column + 36 normal layers + 36 lapse rate layers + 1 dem layer)
+  # Compute elevation differences between provided points elevation and reference
+  # Dem at position 74 (ID column + 36 reference layers + 36 lapse rate layers + 1 dem layer)
   elev_delta <- xyz[["elev"]] - res[, "dem2_WNA"]
   # print(elev_delta)
   # print(res)
   # Compute individual point lapse rate adjustments
-  # Lapse rate position 38:73 (ID column + 36 normal layers + 36 lapse rate layers)
+  # Lapse rate position 38:73 (ID column + 36 reference layers + 36 lapse rate layers)
   lrCols <- grep("^lr_", names(res), value = TRUE)
   lr <- elev_delta * res[, lrCols] ## do we need anything other than the lapse rate?
 
@@ -301,53 +301,53 @@ downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist,
   res <- as.data.table(res)
 
   # Process one GCM stacked layers
-  if (!is.null(gcm)) {
-    # Process each gcm and rbind resulting tables
+  if (!is.null(gcms)) {
+    # Process each gcms and rbind resulting tables
     res_gcm <- rbindlist(
-      lapply(gcm, process_one_climaterast, res = res, xyz = xyz, type = "gcm"),
+      lapply(gcms, process_one_climaterast, res = res, xyz = xyz, type = "gcms"),
       use.names = TRUE
     )
   } else {
     res_gcm <- NULL
   }
-  if (!is.null(gcm_ts)) {
-    # Process each gcm and rbind resulting tables
+  if (!is.null(gcm_ssp_ts)) {
+    # Process each gcms and rbind resulting tables
     res_gcmts <- rbindlist(
-      lapply(gcm_ts, process_one_climaterast, res = res, xyz = xyz, timeseries = TRUE, type = "gcm"),
+      lapply(gcm_ssp_ts, process_one_climaterast, res = res, xyz = xyz, timeseries = TRUE, type = "gcms"),
       use.names = TRUE
     )
   } else {
     res_gcmts <- NULL
   }
-  if (!is.null(gcm_hist)) {
-    # Process each gcm and rbind resulting tables
+  if (!is.null(gcm_hist_ts)) {
+    # Process each gcms and rbind resulting tables
     res_gcm_hist <- rbindlist(
-      lapply(gcm_hist, process_one_climaterast, res = res, xyz = xyz, type = "gcm_hist"),
+      lapply(gcm_hist_ts, process_one_climaterast, res = res, xyz = xyz, type = "gcm_hist_ts"),
       use.names = TRUE
     )
   } else {
     res_gcm_hist <- NULL
   }
-  if (!is.null(historic)) {
-    # print(historic)
+  if (!is.null(obs)) {
+    # print(obs)
     res_hist <- rbindlist(
-      lapply(historic, process_one_climaterast, res = res, xyz = xyz, type = "historic"),
+      lapply(obs, process_one_climaterast, res = res, xyz = xyz, type = "obs"),
       use.names = TRUE
     )
   } else {
     res_hist <- NULL
   }
-  if (!is.null(historic_ts)) {
-    # print(historic)
+  if (!is.null(obs_ts)) {
+    # print(obs)
     res_hist_ts <- rbindlist(
-      lapply(historic_ts, process_one_climaterast, res = res, xyz = xyz, timeseries = TRUE, type = "historic_ts"),
+      lapply(obs_ts, process_one_climaterast, res = res, xyz = xyz, timeseries = TRUE, type = "obs_ts"),
       use.names = TRUE
     )
   } else {
     res_hist_ts <- NULL
   }
 
-  if (return_normal) {
+  if (return_refperiod) {
     nm <- names(res)[-1]
     labels <- nm
     normal_ <- res
@@ -401,14 +401,14 @@ downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist,
 #' @importFrom data.table getDTthreads setDTthreads
 #' @importFrom terra rast
 #' @noRd
-threaded_downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist, historic, historic_ts, ...) {
+threaded_downscale_ <- function(xyz, refmap, gcms, gcm_ssp_ts, gcm_hist_ts, obs, obs_ts, ...) {
   ## unpack rasters
-  normal <- unpackRasters(normal)
-  gcm <- unpackRasters(gcm)
-  gcm_ts <- unpackRasters(gcm_ts)
-  gcm_hist <- unpackRasters(gcm_hist)
-  historic <- unpackRasters(historic)
-  historic_ts <- unpackRasters(historic_ts)
+  refmap <- unpackRasters(refmap)
+  gcms <- unpackRasters(gcms)
+  gcm_ssp_ts <- unpackRasters(gcm_ssp_ts)
+  gcm_hist_ts <- unpackRasters(gcm_hist_ts)
+  obs <- unpackRasters(obs)
+  obs_ts <- unpackRasters(obs_ts)
 
   # Set DT threads to 1 in parallel to avoid overloading CPU
   # Not needed for forking, not taking any chances
@@ -418,9 +418,9 @@ threaded_downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist, historic, hi
 
   # Downscale
   res <- downscale_(
-    xyz = xyz, normal = normal, gcm = gcm,
-    gcm_ts = gcm_ts, gcm_hist = gcm_hist,
-    historic = historic, historic_ts = historic_ts, ...
+    xyz = xyz, refmap = refmap, gcms = gcms,
+    gcm_ssp_ts = gcm_ssp_ts, gcm_hist_ts = gcm_hist_ts,
+    obs = obs, obs_ts = obs_ts, ...
   )
   return(res)
 }
@@ -437,13 +437,13 @@ threaded_downscale_ <- function(xyz, normal, gcm, gcm_ts, gcm_hist, historic, hi
 #' @noRd
 #' @importFrom stats as.formula
 process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
-                                    type = c("gcm", "gcm_hist", "historic", "historic_ts")) {
+                                    type = c("gcms", "gcm_hist_ts", "obs", "obs_ts")) {
   type <- match.arg(type)
 
   # Store names for later use
   nm <- names(climaterast)
 
-  # Define gcm extent. res*2 To make sure we capture surrounding
+  # Define gcms extent. res*2 To make sure we capture surrounding
   # cells for bilinear interpolation.
   ex <- ext(
     c(
@@ -453,7 +453,7 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
       max(xyz[["lat"]]) + yres(climaterast) * 2
     )
   )
-  # Extract gcm bilinear interpolations
+  # Extract gcms bilinear interpolations
   # Cropping will reduce the size of data to load in memory
 
   climaterast <- crop(climaterast, ex, snap = "out")
@@ -480,7 +480,7 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
   
   # Create match set to match with res names
   
-  if(type == "historic_ts"){
+  if(type == "obs_ts"){
     labels <- vapply(
       strsplit(nm, "_"),
       \(x){x[2]},
@@ -496,7 +496,7 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
     )
   }
   
-  if (type %in% c("historic")) {
+  if (type %in% c("obs")) {
     ## Create match set to match with res names
     labels <- nm
   }
@@ -514,13 +514,13 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
   ref_dt <- tstrsplit(nm, "_")
 
   # Recombine PERIOD into one field
-  if (!timeseries & type == "gcm") {
+  if (!timeseries & type == "gcms") {
     ref_dt[[6]] <- paste(ref_dt[[6]], ref_dt[[7]], sep = "_")
     ref_dt[7] <- NULL
   }
 
   setDT(ref_dt)
-  if (type %in% c("historic","historic_ts")) {
+  if (type %in% c("obs","obs_ts")) {
     if (timeseries) {
       setnames(ref_dt, c("DATASET", "VAR", "PERIOD"))
       set(ref_dt, j = "variable", value = nm)
@@ -532,10 +532,10 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
   }
 
   # Transform ref_dt to data.table for remerging
-  if (type %in% c("gcm", "gcm_hist")) {
+  if (type %in% c("gcms", "gcm_hist_ts")) {
     switch(type,
-      gcm = setnames(ref_dt, c("GCM", "VAR", "MONTH", "SSP", "RUN", "PERIOD")),
-      gcm_hist = setnames(ref_dt, c("GCM", "VAR", "MONTH", "RUN", "PERIOD"))
+      gcms = setnames(ref_dt, c("GCM", "VAR", "MONTH", "SSP", "RUN", "PERIOD")),
+      gcm_hist_ts = setnames(ref_dt, c("GCM", "VAR", "MONTH", "RUN", "PERIOD"))
     )
     set(ref_dt, j = "variable", value = nm)
     set(ref_dt, j = "GCM", value = gsub(".", "-", ref_dt[["GCM"]], fixed = TRUE))
@@ -558,10 +558,10 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
 
   # Finally, dcast back to final form to get original 36 columns
   form <- switch(type,
-    gcm = quote(id + GCM + SSP + RUN + PERIOD + lat + elev ~ VAR + MONTH),
-    gcm_hist = quote(id + GCM + RUN + PERIOD + lat + elev ~ VAR + MONTH),
-    historic = quote(id + PERIOD + lat + elev ~ VAR),
-    historic_ts = quote(id + DATASET + PERIOD + lat + elev ~ VAR)
+    gcms = quote(id + GCM + SSP + RUN + PERIOD + lat + elev ~ VAR + MONTH),
+    gcm_hist_ts = quote(id + GCM + RUN + PERIOD + lat + elev ~ VAR + MONTH),
+    obs = quote(id + PERIOD + lat + elev ~ VAR),
+    obs_ts = quote(id + DATASET + PERIOD + lat + elev ~ VAR)
   )
 
   climaterast <- dcast(
@@ -686,81 +686,81 @@ unpackRasters <- function(ras) {
 }
 
 
-#' Check `downscale` arguments
+#' Check `downscale_core` arguments
 #'
-#' @inheritParams downscale
+#' @inheritParams downscale_core
 #'
 #' @return NULL
 #' @noRd
-.checkDwnsclArgs <- function(xyz, normal, gcm = NULL, historic = NULL, gcm_ts = NULL, gcm_hist = NULL,
-                             historic_ts = NULL, return_normal = FALSE,
-                             out_spatial = FALSE, plot = NULL, vars = list_variables()) {
-  vars <- match.arg(vars, list_variables(), several.ok = TRUE)
+.checkDwnsclArgs <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NULL, gcm_hist_ts = NULL,
+                             obs_ts = NULL, return_refperiod = FALSE,
+                             out_spatial = FALSE, plot = NULL, vars = list_vars()) {
+  vars <- match.arg(vars, list_vars(), several.ok = TRUE)
   
-  if (!return_normal %in% c(TRUE, FALSE)) {
-    stop("'return_normal' must be TRUE or FALSE")
+  if (!return_refperiod %in% c(TRUE, FALSE)) {
+    stop("'return_refperiod' must be TRUE or FALSE")
   }
   if (!out_spatial %in% c(TRUE, FALSE)) {
     stop("'out_spatial' must be TRUE or FALSE")
   }
   
   plot <- if (!is.null(plot)) {
-    match.arg(plot,list_variables())
+    match.arg(plot,list_vars())
   }
   
-  if (!isTRUE(attr(normal, "builder") == "climr")) {
+  if (!isTRUE(attr(refmap, "builder") == "climr")) {
     stop(
-      "Please use `normal_input` function to create `normal`.",
-      " See `?normal_input` for details."
+      "Please use `input_refmap` function to create `refmap`.",
+      " See `?input_refmap` for details."
     )
   }
 
-  # Make sure gcm was built using gcm_input
-  if (!is.null(gcm) && !isTRUE(attr(gcm, "builder") == "climr")) {
+  # Make sure gcms was built using input_gcms
+  if (!is.null(gcms) && !isTRUE(attr(gcms, "builder") == "climr")) {
     stop(
-      "Please use `gcm_input` function to create `gcm`.",
-      " See `?gcm_input` for details."
+      "Please use `input_gcms` function to create `gcms`.",
+      " See `?input_gcms` for details."
     )
   }
 
-  # Make sure gcm_ts was built using gcm_ts_input
-  if (!is.null(gcm_ts) && !isTRUE(attr(gcm_ts, "builder") == "climr")) {
+  # Make sure gcm_ssp_ts was built using input_gcm_ssp
+  if (!is.null(gcm_ssp_ts) && !isTRUE(attr(gcm_ssp_ts, "builder") == "climr")) {
     stop(
-      "Please use `gcm_ts_input` function to create `gcm_ts`.",
-      " See `?gcm_ts_input` for details."
+      "Please use `input_gcm_ssp` function to create `gcm_ssp_ts`.",
+      " See `?input_gcm_ssp` for details."
     )
   }
 
-  # Make sure gcm_hist was built using gcm_hist_input
-  if (!is.null(gcm_hist) && !isTRUE(attr(gcm_hist, "builder") == "climr")) {
+  # Make sure gcm_hist_ts was built using input_gcm_hist
+  if (!is.null(gcm_hist_ts) && !isTRUE(attr(gcm_hist_ts, "builder") == "climr")) {
     stop(
-      "Please use `gcm_hist_input` function to create `gcm_hist`.",
-      " See `?gcm_hist_input` for details."
+      "Please use `input_gcm_hist` function to create `gcm_hist_ts`.",
+      " See `?input_gcm_hist` for details."
     )
   }
 
-  # Make sure historic was built using historic_input
-  if (!is.null(historic) && !isTRUE(attr(historic, "builder") == "climr")) {
+  # Make sure obs was built using input_obs
+  if (!is.null(obs) && !isTRUE(attr(obs, "builder") == "climr")) {
     stop(
-      "Please use `historic_input` function to create `historic`.",
-      " See `?historic_input` for details."
+      "Please use `input_obs` function to create `obs`.",
+      " See `?input_obs` for details."
     )
   }
 
-  # Make sure historic_ts was built using historic_input_ts
-  if (!is.null(historic_ts) && !isTRUE(attr(historic_ts, "builder") == "climr")) {
+  # Make sure obs_ts was built using input_obs_ts
+  if (!is.null(obs_ts) && !isTRUE(attr(obs_ts, "builder") == "climr")) {
     stop(
-      "Please use `historic_input_ts` function to create `historic_ts`.",
-      " See `?historic_input_ts` for details."
+      "Please use `input_obs_ts` function to create `obs_ts`.",
+      " See `?input_obs_ts` for details."
     )
   }
 
   ## check for "silly" parameter combinations
   if (all(
-    is.null(gcm), is.null(gcm_ts), is.null(gcm_hist),
-    is.null(historic), is.null(historic_ts)
+    is.null(gcms), is.null(gcm_ssp_ts), is.null(gcm_hist_ts),
+    is.null(obs), is.null(obs_ts)
   )) {
-    warning("'gcm', 'gcm_ts', 'gcm_hist', 'historic' and 'historic_ts' are missing. Nothing to downscale.")
+    warning("'gcms', 'gcm_ssp_ts', 'gcm_hist_ts', 'obs' and 'obs_ts' are missing. Nothing to downscale.")
   }
 
   return(invisible(NULL))

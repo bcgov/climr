@@ -10,8 +10,8 @@ plot_timeSeries(
   variable2 = NULL,
   showObserved = TRUE,
   historic_ts_dataset = "climatena",
-  gcm_models = list_gcm()[c(1, 4, 5, 7, 10, 11, 12)],
-  ssps = list_ssp()[1:3],
+  gcms = list_gcms()[c(1, 4, 5, 7, 10, 11, 12)],
+  ssps = list_ssps()[1:3],
   showrange = TRUE,
   yfit = TRUE,
   cex = 1,
@@ -34,21 +34,19 @@ plot_timeSeries(
 table can include more models, scenarios, and variables than are used in individual calls to
 \code{\link[=plot_timeSeries]{plot_timeSeries()}}.}
 
-\item{variable1}{character. A climate variable. options are \code{\link[=list_variables]{list_variables()}}.}
+\item{variable1}{character. A climate variable. options are \code{\link[=list_vars]{list_vars()}}.}
 
 \item{variable2}{character. A second climate variable to plot in combination with \code{variable1}.
-options are \code{\link[=list_variables]{list_variables()}}.}
+options are \code{\link[=list_vars]{list_vars()}}.}
 
 \item{showObserved}{logical. Plot a time series of observed climate.}
 
-\item{historic_ts_dataset}{character. The dataset to use for observed time series data. Options
-are \code{"climatena"} for the ClimateNA gridded time series or \code{"cru.gpcc"} for the combined Climatic
-Research Unit TS dataset (for Temperature) and Global Precipitation Climatology Centre dataset
-(for precipitation). Defaults to \code{NULL}.}
-
-\item{gcm_models}{character. Vector of global climate model names. Options
-are \code{\link[=list_gcm]{list_gcm()}}. Used for gcm periods, gcm timeseries, and historic timeseries.
+\item{gcms}{character. Vector of global climate model names. Options
+are \code{\link[=list_gcms]{list_gcms()}}. Used for gcms periods, gcms timeseries, and obs timeseries.
 Defaults to \code{NULL}.}
+
+\item{ssps}{character. Vector of SSP-RCP scenarios (representative concentration pathways paired with shared socioeconomic pathways).
+Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to all scenarios available.}
 
 \item{showrange}{logical. Plot a shaded region indicating the minimum and maximum of the
 selected ensemble of GCM simulations for each selected scenario.}
@@ -77,12 +75,12 @@ and extend this line to the year 2100 as a visual reference.}
 This should be the same as the reference line for the GCM time series.}
 
 \item{pal}{character. color palette. Options are "scenario", for use when comparing scenarios,
-and "gcm", for use when comparing GCMs.}
+and "gcms", for use when comparing GCMs.}
 
 \item{label.endyear}{logical. Add a label of the final year of the observational time series.}
 
 \item{endlabel}{character. Add a label to the end of each simulated time series. Options
-are "change", to indicate the change in year 2100 relative to the 1961-1990 baseline, or "gcm"
+are "change", to indicate the change in year 2100 relative to the 1961-1990 baseline, or "gcms"
 to indicate the global climate model.}
 
 \item{yearmarkers}{logical. Add white points to the observational time series as a visual aid.}
@@ -135,7 +133,7 @@ plot_timeSeries(my_data, variable1 = "Tmin_sm", variable2 = "Tmax_sm")
 plot_timeSeries(my_data, variable1 = "Tmax_sm", variable2 = "Tmax_wt", simplify = FALSE)
 
 # compare global climate models
-plot_timeSeries(my_data, gcm_models = list_gcm()[c(7,13)], pal = "gcm", ssp = list_ssp()[2], showmean = FALSE, compile = FALSE, simplify = FALSE, endlabel = "gcm", mar=c(3,3,0.1,6), showObserved = FALSE)
+plot_timeSeries(my_data, gcms = list_gcms()[c(7,13)], pal = "gcms", ssps = list_ssps()[2], showmean = FALSE, compile = FALSE, simplify = FALSE, endlabel = "gcms", mar=c(3,3,0.1,6), showObserved = FALSE)
 
 # export plot to a temporary directory, including a title
 figDir <- tempdir()
