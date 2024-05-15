@@ -48,14 +48,35 @@ vars <- paste0("PAS", monthcodes)
 pas.climbc <- climbc[, vars, with = FALSE]
 pas.climr <- climr[, vars, with = FALSE]
 par(mar=c(4,3,0.1,0.1), mgp=c(2,0.25,0))
-plot(0, type="o", xaxt="n", xlab="", ylab="PAS (mm)", xlim = c(1,14), yaxs="i", ylim=c(0,max(pas.climr)), col="white", tck=0)
+plot(0, type="o", xaxt="n", xlab="", ylab="PAS (mm)", xlim = c(1,14), yaxs="i", ylim=c(0,max(pas.climr)*1.05), col="white", tck=0)
 axis(1, at=1:12, labels = vars, las=2, cex=0.7, tck=0)
 legend("bottomright", legend=c("climr", "ClimateBC"), bty="n", lty=c(2,1), col=c(2,1), lwd=c(2,1))
 for(i in 1:2){
   y.climbc <- pas.climbc[i,]
   y.climr <- pas.climr[i,]
-  points(1:12,y.climr, type = "b", pch=1, col=i, lty=2, lwd=2)
+  points(1:12,y.climr, type = "b", pch=i, col=i, lty=2, lwd=2)
   points(1:12,y.climbc, type = "b", pch=i, col=i)
   text(12,y.climr[[12]],locations[i], pos=4)
+}
+
+# comparison of all elements (absolute)
+data(variables)
+elements <- unique(variables[Category=="Monthly", Code_Element])
+for(element in elements){
+# Basic comparison of PAS variables (absolute)
+vars <- if(length(grep("DD", element)) == 1) paste0(element, "_", monthcodes) else paste0(element, monthcodes)
+pas.climbc <- climbc[, vars, with = FALSE]
+pas.climr <- climr[, vars, with = FALSE]
+par(mar=c(4,3,0.1,0.1), mgp=c(2,0.25,0))
+plot(0, type="o", xaxt="n", xlab="", ylab="element", xlim = c(1,14), ylim=range(pas.climr), col="white", tck=0)
+axis(1, at=1:12, labels = vars, las=2, cex=0.7, tck=0)
+legend("bottomright", legend=c("climr", "ClimateBC"), bty="n", lty=c(2,1), col=c(2,1), lwd=c(2,1))
+for(i in 1:2){
+  y.climbc <- pas.climbc[i,]
+  y.climr <- pas.climr[i,]
+  points(1:12,y.climr, type = "b", pch=i, col=i, lty=2, lwd=2)
+  points(1:12,y.climbc, type = "b", pch=i, col=i)
+  text(12,y.climr[[12]],locations[i], pos=4)
+}
 }
 
