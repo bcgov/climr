@@ -13,7 +13,7 @@ NULL
 .onLoad <- function(libname, pkgname) {
   rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
 
-  packageStartupMessage("Downloading and Caching ESM run info :)")
+  packageStartupMessage("Message: climr version 0.1.0 includes an overhaul of the naming conventions for variables, functions, parameters, and options. Call `?climr` for a table specifying the correspondence between old and new names.")
   dbCon <- data_connect()
   on.exit(try(pool::poolClose(dbCon)), add = TRUE)
 
