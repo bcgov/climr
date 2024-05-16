@@ -93,10 +93,10 @@
 #'   Subzone = c("vm1", "vm2", "vs1", rep("mm", 3), "dk", "dc")
 #' )
 #'
-#' ## obs observational time series
-#' vars <- c("PPT", "CMD", "Tave07")
-#' climate_norms_hist <- downscale(
-#'   xyz = in_xyz, which_refmap = "auto",
+#' ## historic observational time series
+#' vars <- c("PPT", "CMD", "Tave_07")
+#' climate_norms_hist <- climr_downscale(
+#'   xyz = in_xyz, which_normal = "auto",
 #'   return_normal = TRUE,
 #'   obs_periods = "2001_2020",
 #'   vars = vars,
@@ -183,10 +183,10 @@ downscale <- function(xyz, which_refmap = "auto",
     # message("Normals not specified, using highest resolution available for each point")
     bc_outline <- rast(system.file("extdata", "wna_outline.tif", package = "climr"))
     pnts <- extract(bc_outline, xyz[, .(lon, lat)], method = "simple")
-    bc_ids <- xyz[["id"]][!is.na(pnts$PPT01)]
+    bc_ids <- xyz[["id"]][!is.na(pnts$PPT_01)]
     if (length(bc_ids) >= 1) {
       xyz_save <- xyz
-      xyz <- xyz[!is.na(pnts$PPT01), ]
+      xyz <- xyz[!is.na(pnts$PPT_01), ]
       thebb_bc <- get_bb(xyz)
       message("for BC...")
       reference <- input_refmap(dbCon = dbCon, reference = "normal_bc", bbox = thebb_bc, cache = cache)

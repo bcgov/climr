@@ -466,7 +466,7 @@ normals <- normal_input(dbCon,
 ```{r, echo = FALSE, out.width = "80%", fig.cap = "Downloaded normals shown with North Vancouver area and the requested bounding box."}
 plotVect <- vect(ext(the_bb[c(4, 3, 2, 1)]), crs = "EPSG:4326")
 
-plot(normals[["Tmax07"]],
+plot(normals[["Tmax_07"]],
   col = hcl.colors(50, "Reds", rev = 1),
   range = c(0, 30), main = "Max temp. July - 1961-1990 normals",
   fun = function() {
@@ -523,14 +523,14 @@ hist_obs_ts <- historic_input_ts(dbCon,
 
 ```{r, echo = FALSE, fig.show = 'hold', fig.cap = "Downloaded historical and future anomalies shown with North Vancouver area and the requested bounding box.", fig.dim = c(12, 5), out.width = "100%"}
 minmax <- range(
-  minmax(hist_obs_ts[[1]][["Tmax07_2001"]]),
-  minmax(hist_obs[[1]][["Tmax07"]]),
+  minmax(hist_obs_ts[[1]][["Tmax_07_2001"]]),
+  minmax(hist_obs[[1]][["Tmax_07"]]),
   minmax(hist_proj[[1]][["EC-Earth3_Tmax_07_ensembleMean_2001"]]),
   minmax(fut_proj[[1]][["EC-Earth3_Tmax_07_ssp245_ensembleMean_2021_2040"]])
 )
 
 par(mfrow = c(1, 4))
-plot(hist_obs_ts[[1]][["Tmax07_2001"]],
+plot(hist_obs_ts[[1]][["Tmax_07_2001"]],
   col = hcl.colors(50, "Reds", rev = 1), type = "continuous",
   mar = c(2, 2, 1, 4), range = minmax,
   main = "Max temp. July\nobserved anomaly 2001",
@@ -539,7 +539,7 @@ plot(hist_obs_ts[[1]][["Tmax07_2001"]],
     polys(plotVect, lty = 2)
   }
 )
-plot(hist_obs[[1]][["Tmax07"]],
+plot(hist_obs[[1]][["Tmax_07"]],
   col = hcl.colors(50, "Reds", rev = 1), type = "continuous",
   mar = c(1, 2, 1, 4), range = minmax,
   main = "Max temp. July\nobserved anomaly 2001-2020",

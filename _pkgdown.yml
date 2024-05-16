@@ -19,7 +19,6 @@ articles:
   desc: "Climate downscaling methods used in `climr`"
   contents:
   - methods_downscaling
-  - lapse_rates
 - title: "Caching"
   contents:
   - caching
@@ -58,6 +57,7 @@ reference:
     Other useful functions
   contents:
   - plot_bivariate
+  - plot_timeSeries
   - get_bb
   - lapse_rate
 - title: "Data"

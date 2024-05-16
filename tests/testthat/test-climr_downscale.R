@@ -22,7 +22,7 @@ test_that("test climr_dowscale basic and spatial", {
     xyz = xyz, which_normal = "auto",
     historic_period = "2001_2020",
     return_normal = TRUE, ## put this to TRUE if you want the 1961-1990 period
-    vars = c("PPT", "CMD", "CMI", "Tave01", "Tave07")
+    vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07")
   ) ## specify desired variablesds_hist <- climr_downscale(xyz = xyz, which_normal = "auto",
 
   test <- length(setdiff(ds_hist$id, xyz$id)) + length(setdiff(xyz$id, ds_hist$id))
@@ -40,7 +40,7 @@ test_that("test climr_dowscale basic and spatial", {
     xyz = xyz, which_normal = "auto",
     historic_period = "2001_2020",
     return_normal = FALSE, ## put this to TRUE if you want the 1961-1990 period
-    vars = c("PPT", "CMD", "CMI", "Tave01", "Tave07")
+    vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07")
   )
   expect_true(all(ds_hist2[, .N, by = id][, N] == 1)) ## should have  only historic period per ID
   test <- as.data.table(xyz)[ds_hist2, on = .(id), nomatch = NA]
@@ -50,7 +50,7 @@ test_that("test climr_dowscale basic and spatial", {
     xyz = xyz, which_normal = "auto",
     historic_period = "2001_2020",
     return_normal = TRUE, ## put this to TRUE if you want the 1961-1990 period
-    vars = c("PPT", "CMD", "CMI", "Tave01", "Tave07"),
+    vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
     out_spatial = TRUE
   )
   expect_true(is(ds_hist_spatial, "SpatVector"))
@@ -61,7 +61,7 @@ test_that("test climr_dowscale basic and spatial", {
     xyz = xyz, which_normal = "auto",
     historic_period = "2001_2020",
     return_normal = FALSE, ## put this to TRUE if you want the 1961-1990 period
-    vars = c("PPT", "CMD", "CMI", "Tave01", "Tave07"),
+    vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
     out_spatial = TRUE
   )
   expect_true(is(ds_hist_spatial2, "SpatVector"))
@@ -74,14 +74,14 @@ test_that("test climr_dowscale basic and spatial", {
     ds_hist_spatial2 <- climr_downscale(
       xyz = xyz, which_normal = "auto",
       historic_period = "2001_2020", return_normal = TRUE,
-      vars = c("PPT", "CMD", "CMI", "Tave01", "Tave07"),
+      vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
       out_spatial = TRUE, plot = "CMD"
     )
 
     ds_hist_spatial2 <- climr_downscale(
       xyz = xyz, which_normal = "auto",
       historic_period = "2001_2020",
-      vars = c("PPT", "CMD", "CMI", "Tave01", "Tave07"),
+      vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
       out_spatial = TRUE, plot = "CMD"
     )
 
@@ -92,7 +92,7 @@ test_that("test climr_dowscale basic and spatial", {
       gcm_period = list_gcm_period()[1],
       ssp = list_ssp()[1], max_run = 0,
       return_normal = TRUE, ## put this to TRUE if you want the 1961-1990 period
-      vars = c("PPT", "CMD", "CMI", "Tave01", "Tave07"),
+      vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
       out_spatial = TRUE, plot = "CMD"
     )
 
@@ -103,7 +103,7 @@ test_that("test climr_dowscale basic and spatial", {
       gcm_period = list_gcm_period()[1:2],
       ssp = list_ssp()[1:2], max_run = 2,
       return_normal = TRUE, ## put this to TRUE if you want the 1961-1990 period
-      vars = c("PPT", "CMD", "CMI", "Tave01", "Tave07"),
+      vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
       out_spatial = TRUE, plot = "CMD"
     )
   }
