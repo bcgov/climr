@@ -196,7 +196,7 @@ downscale <- function(xyz, which_refmap = "auto",
   }
 
   if (!is.null(obs_periods)) {
-    message("Getting obs...")
+    message("Getting obsersved anomalies...")
     obs_periods <- input_obs(dbCon, bbox = thebb, period = obs_periods, cache = cache)
   }
   if (!is.null(obs_years)) {
@@ -207,7 +207,7 @@ downscale <- function(xyz, which_refmap = "auto",
   if (!is.null(gcms)) {
     if (!is.null(gcm_periods)) {
       message("Getting GCMs...")
-      gcms <- input_gcms(dbCon,
+      gcm_ssp_periods <- input_gcms(dbCon,
         bbox = thebb, gcms = gcms,
         ssps = ssps,
         period = gcm_periods,
@@ -215,7 +215,7 @@ downscale <- function(xyz, which_refmap = "auto",
         cache = cache
       )
     } else {
-      gcms <- NULL
+      gcm_ssp_periods <- NULL
     }
     if (!is.null(gcm_ssp_years)) {
       gcm_ssp_ts <- input_gcm_ssp(dbCon,
@@ -239,7 +239,7 @@ downscale <- function(xyz, which_refmap = "auto",
       gcm_hist_ts <- NULL
     }
   } else {
-    gcms <- gcm_ssp_ts <- gcm_hist_ts <- NULL
+    gcm_ssp_periods <- gcm_ssp_ts <- gcm_hist_ts <- NULL
   }
 
   message("Downscaling!!")
@@ -248,7 +248,7 @@ downscale <- function(xyz, which_refmap = "auto",
     refmap = reference,
     obs = obs_periods,
     obs_ts = obs_years,
-    gcms = gcms,
+    gcms = gcm_ssp_periods,
     gcm_ssp_ts = gcm_ssp_ts,
     gcm_hist_ts = gcm_hist_ts,
     ...
@@ -274,7 +274,7 @@ downscale <- function(xyz, which_refmap = "auto",
       reference = reference,
       obs = obs_periods,
       obs_ts = obs_years,
-      gcms = gcms,
+      gcms = gcm_ssp_periods,
       gcm_ssp_ts = gcm_ssp_ts,
       gcm_hist_ts = gcm_hist_ts,
       ...
