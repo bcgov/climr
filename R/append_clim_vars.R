@@ -150,43 +150,43 @@ append_clim_vars <- function(dt, vars) {
       set(dt, j = "PET_12", value = calc_PET(v("Tave_12"), v("Tmin_12"), v("Tmax_12"), v("elev")))
     },
     "CMI" = function() {
-      set(dt, j = "CMI", value = v("PPT") - (v("PET_01") + v("PET_02") + v("PET_03") + v("PET_04") + v("PET_05") + v("PET_06") + v("PET_07") + v("PET_08") + v("PET_09") + v("PET_10") + v("PET_11") + v("PET_12")))
+      set(dt, j = "CMI", value = (v("PPT") - (v("PET_01") + v("PET_02") + v("PET_03") + v("PET_04") + v("PET_05") + v("PET_06") + v("PET_07") + v("PET_08") + v("PET_09") + v("PET_10") + v("PET_11") + v("PET_12")))/ 10)
     },
     "CMI_01" = function() {
-      set(dt, j = "CMI_01", value = v("PPT_01") - v("PET_01"))
+      set(dt, j = "CMI_01", value = (v("PPT_01") - v("PET_01"))/ 10)
     },
     "CMI_02" = function() {
-      set(dt, j = "CMI_02", value = v("PPT_02") - v("PET_02"))
+      set(dt, j = "CMI_02", value = (v("PPT_02") - v("PET_02"))/ 10)
     },
     "CMI_03" = function() {
-      set(dt, j = "CMI_03", value = v("PPT_03") - v("PET_03"))
+      set(dt, j = "CMI_03", value = (v("PPT_03") - v("PET_03"))/ 10)
     },
     "CMI_04" = function() {
-      set(dt, j = "CMI_04", value = v("PPT_04") - v("PET_04"))
+      set(dt, j = "CMI_04", value = (v("PPT_04") - v("PET_04"))/ 10)
     },
     "CMI_05" = function() {
-      set(dt, j = "CMI_05", value = v("PPT_05") - v("PET_05"))
+      set(dt, j = "CMI_05", value = (v("PPT_05") - v("PET_05"))/ 10)
     },
     "CMI_06" = function() {
-      set(dt, j = "CMI_06", value = v("PPT_06") - v("PET_06"))
+      set(dt, j = "CMI_06", value = (v("PPT_06") - v("PET_06"))/ 10)
     },
     "CMI_07" = function() {
-      set(dt, j = "CMI_07", value = v("PPT_07") - v("PET_07"))
+      set(dt, j = "CMI_07", value = (v("PPT_07") - v("PET_07"))/ 10)
     },
     "CMI_08" = function() {
-      set(dt, j = "CMI_08", value = v("PPT_08") - v("PET_08"))
+      set(dt, j = "CMI_08", value = (v("PPT_08") - v("PET_08"))/ 10)
     },
     "CMI_09" = function() {
-      set(dt, j = "CMI_09", value = v("PPT_09") - v("PET_09"))
+      set(dt, j = "CMI_09", value = (v("PPT_09") - v("PET_09"))/ 10)
     },
     "CMI_10" = function() {
-      set(dt, j = "CMI_10", value = v("PPT_10") - v("PET_10"))
+      set(dt, j = "CMI_10", value = (v("PPT_10") - v("PET_10"))/ 10)
     },
     "CMI_11" = function() {
-      set(dt, j = "CMI_11", value = v("PPT_11") - v("PET_11"))
+      set(dt, j = "CMI_11", value = (v("PPT_11") - v("PET_11"))/ 10)
     },
     "CMI_12" = function() {
-      set(dt, j = "CMI_12", value = v("PPT_12") - v("PET_12"))
+      set(dt, j = "CMI_12", value = (v("PPT_12") - v("PET_12"))/ 10)
     },
     "NFFD_01" = function() {
       set(dt, j = "NFFD_01", value = calc_NFFD(1, v("Tmin_01")))
@@ -225,40 +225,40 @@ append_clim_vars <- function(dt, vars) {
       set(dt, j = "NFFD_12", value = calc_NFFD(12, v("Tmin_12")))
     },
     "PAS_01" = function() {
-      set(dt, j = "PAS_01", value = calc_PAS(1, v("Tmin_01"), v("PPT_01")))
+      set(dt, j = "PAS_01", value = calc_PAS(1, v("Tave_01"), v("PPT_01")))
     },
     "PAS_02" = function() {
-      set(dt, j = "PAS_02", value = calc_PAS(2, v("Tmin_02"), v("PPT_02")))
+      set(dt, j = "PAS_02", value = calc_PAS(2, v("Tave_02"), v("PPT_02")))
     },
     "PAS_03" = function() {
-      set(dt, j = "PAS_03", value = calc_PAS(3, v("Tmin_03"), v("PPT_03")))
+      set(dt, j = "PAS_03", value = calc_PAS(3, v("Tave_03"), v("PPT_03")))
     },
     "PAS_04" = function() {
-      set(dt, j = "PAS_04", value = calc_PAS(4, v("Tmin_04"), v("PPT_04")))
+      set(dt, j = "PAS_04", value = calc_PAS(4, v("Tave_04"), v("PPT_04")))
     },
     "PAS_05" = function() {
-      set(dt, j = "PAS_05", value = calc_PAS(5, v("Tmin_05"), v("PPT_05")))
+      set(dt, j = "PAS_05", value = calc_PAS(5, v("Tave_05"), v("PPT_05")))
     },
     "PAS_06" = function() {
-      set(dt, j = "PAS_06", value = calc_PAS(6, v("Tmin_06"), v("PPT_06")))
+      set(dt, j = "PAS_06", value = calc_PAS(6, v("Tave_06"), v("PPT_06")))
     },
     "PAS_07" = function() {
-      set(dt, j = "PAS_07", value = calc_PAS(7, v("Tmin_07"), v("PPT_07")))
+      set(dt, j = "PAS_07", value = calc_PAS(7, v("Tave_07"), v("PPT_07")))
     },
     "PAS_08" = function() {
-      set(dt, j = "PAS_08", value = calc_PAS(8, v("Tmin_08"), v("PPT_08")))
+      set(dt, j = "PAS_08", value = calc_PAS(8, v("Tave_08"), v("PPT_08")))
     },
     "PAS_09" = function() {
-      set(dt, j = "PAS_09", value = calc_PAS(9, v("Tmin_09"), v("PPT_09")))
+      set(dt, j = "PAS_09", value = calc_PAS(9, v("Tave_09"), v("PPT_09")))
     },
     "PAS_10" = function() {
-      set(dt, j = "PAS_10", value = calc_PAS(10, v("Tmin_10"), v("PPT_10")))
+      set(dt, j = "PAS_10", value = calc_PAS(10, v("Tave_10"), v("PPT_10")))
     },
     "PAS_11" = function() {
-      set(dt, j = "PAS_11", value = calc_PAS(11, v("Tmin_11"), v("PPT_11")))
+      set(dt, j = "PAS_11", value = calc_PAS(11, v("Tave_11"), v("PPT_11")))
     },
     "PAS_12" = function() {
-      set(dt, j = "PAS_12", value = calc_PAS(12, v("Tmin_12"), v("PPT_12")))
+      set(dt, j = "PAS_12", value = calc_PAS(12, v("Tave_12"), v("PPT_12")))
     },
     "RH_01" = function() {
       set(dt, j = "RH_01", value = calc_RH(v("Tmin_01"), v("Tmax_01")))
