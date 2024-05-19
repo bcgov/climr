@@ -40,7 +40,7 @@ reference:
   - normal_input
   - gcm_input
   - gcm_ts_input
-  - gcm_hist_input
+  - input_gcm_hist
   - historic_input
   - historic_input_ts
 - title: "Database and caching"

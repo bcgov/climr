@@ -1,9 +1,9 @@
 #' Self-contained change-factor downscaling of observed and simulated climate data
 #'
 #' @description
-#' `climr_downscale()` provides downscaled climate variables for user-specified
+#' `downscale()` provides downscaled climate variables for user-specified
 #'  locations.
-#' `climr_downscale()` adapts a simple change-factor (aka "delta') downscaling
+#' `downscale()` adapts a simple change-factor (aka "delta') downscaling
 #'  approach originally implemented in \href{https://climatena.ca/}{ClimateNA}.
 #'  This approach downscales climate data in three stages:
 #' \enumerate{
@@ -13,48 +13,48 @@
 #' }
 #' See \code{vignette("methods_downscaling")} for a description of the downscaling methodology.
 #'
-#' `climr_downscale()` is a user-friendly wrapper for `downscale()`
+#' `downscale()` is a user-friendly wrapper for `downscale_core()`
 #'
 #' @details
-#' [`downscale()`] parameters can be applied in `climr_downscale()`. For example,
+#' [`downscale_core()`] parameters can be applied in `climr_downscale()`. For example,
 #' setting `ppt_lr = TRUE` in `climr_downscale()` will apply elevation adjustment to precipitation values.
 #'
-#' Although `which_normal = "auto"` is the default, users are cautioned that
+#' Although `which_refmap = "auto"` is the default, users are cautioned that
 #' this can produce artefacts associated with downscaling to different reference
-#' climate maps within and outside the western North American boundary of `normal_composite`.
-#' We recommend that queries spanning this boundary use `which_normal = "normal_na"`.
+#' climate maps within and outside the western North American boundary of `refmap_climr`.
+#' We recommend that queries spanning this boundary use `which_refmap = "refmap_climatena"`.
 #'
 #' @template xyz
-#' @param which_normal character. Which climatological normals map to use as the
+#' @param which_refmap character. Which climatological normals map to use as the
 #'   high-resolution reference climate map for downscaling. Default is "auto",
 #'   which selects, for each query point, the best available climatological
 #'   normals map in declining order of normals_bc, normals_composite, and normals_na.
-#'   Other options are one of [`list_normal()`], which will provide a consistent
+#'   Other options are one of [`list_refmaps()`], which will provide a consistent
 #'   reference map for all points.
-#' @param historic_period character. Which historic period for observed climate
-#'   data, averaged over this period. Options are [`list_historic()`]. Default `NULL`
-#' @param historic_ts integer. Vector of years to obtain individual years or time
-#'   series of observed climate data. Default `NULL`. See [`list_historic_ts()`]
+#' @param obs_periods character. Which obs period for observed climate
+#'   data, averaged over this period. Options are [`list_obs_periods()`]. Default `NULL`
+#' @param obs_years integer. Vector of years to obtain individual years or time
+#'   series of observed climate data. Default `NULL`. See [`list_obs_years()`]
 #'  for available years.
-#' @param historic_ts_dataset character. The dataset to use for observed time series data. Options
+#' @param obs_ts_dataset character. The dataset to use for observed time series data. Options
 #'   are `"climatena"` for the ClimateNA gridded time series or `"cru.gpcc"` for the combined Climatic 
 #'   Research Unit TS dataset (for Temperature) and Global Precipitation Climatology Centre dataset 
 #'   (for precipitation). Defaults to `NULL`.
-#' @param gcm_models character. Vector of global climate model names. Options
-#'   are [`list_gcm()`]. Used for gcm periods, gcm timeseries, and historic timeseries.
+#' @param gcms character. Vector of global climate model names. Options
+#'   are [`list_gcms()`]. Used for gcms periods, gcms timeseries, and obs timeseries.
 #'   Defaults to `NULL`.
-#' @template ssp
-#' @param gcm_period character. 20-year normal periods for GCM simulations.
-#'   Options are [`list_gcm_period()`]. Defaults to `NULL`.
-#' @param gcm_ts_years character. Timeseries years for GCM simulations of future
-#'   scenarios specified by `ssp`. See [`list_gcm_ts()`] for available years.
+#' @template ssps
+#' @param gcm_periods character. 20-year reference periods for GCM simulations.
+#'   Options are [`list_gcm_periods()`]. Defaults to `NULL`.
+#' @param gcm_ssp_years character. Timeseries years for GCM simulations of future
+#'   scenarios specified by `ssps`. See [`list_gcm_ssp_years()`] for available years.
 #'   Defaults to `NULL`.
 #' @param gcm_hist_years character.  Timeseries years for GCM simulations of the
-#'   historical scenario. See [`list_gcm_hist_ts()`] for available years.
+#'   historical scenario. See [`list_gcm_hist_years()`] for available years.
 #'   Defaults to `NULL`.
 #' @template max_run
 #' @param cache logical. Cache data locally? Default `TRUE`
-#' @param ... other arguments passed to [`downscale()`]. Namely: `return_normal`, 
+#' @param ... other arguments passed to [`downscale_core()`]. Namely: `return_normal`, 
 #'   `vars`, `out_spatial` and `plot`
 
 #' @return `data.table` of downscaled climate variables for each location.
@@ -77,8 +77,8 @@
 #'
 #' ## get bounding box based on input points
 #' thebb <- get_bb(xyz)
-#' historic <- historic_input(dbCon, thebb, period = "2001_2020")
-#' plot(historic[[1]][[2]])
+#' obs <- input_obs(dbCon, thebb, period = "2001_2020")
+#' plot(obs[[1]][[2]])
 #'
 #' ## provide or create a lon, lat, elev, and optionally id, dataframe - usually read from csv file
 #' in_xyz <- data.frame(
@@ -98,45 +98,45 @@
 #' climate_norms_hist <- climr_downscale(
 #'   xyz = in_xyz, which_normal = "auto",
 #'   return_normal = TRUE,
-#'   historic_period = "2001_2020",
+#'   obs_periods = "2001_2020",
 #'   vars = vars,
 #'   out_spatial = TRUE, plot = "PPT"
 #' ) ## specify desired variables to plot
 #'
 #' ## as a data.table
-#' climate_norms_hist <- climr_downscale(
-#'   xyz = in_xyz, which_normal = "auto",
+#' climate_norms_hist <- downscale(
+#'   xyz = in_xyz, which_refmap = "auto",
 #'   return_normal = TRUE,
 #'   vars = vars,
 #'   out_spatial = FALSE, plot = "PPT"
 #' ) ## specify desired variables to plot
 #'
 #' ## future projections
-#' climate_norms_fut <- climr_downscale(
-#'   xyz = in_xyz, which_normal = "auto",
-#'   gcm_models = c("ACCESS-ESM1-5"),
-#'   ssp = c("ssp370"),
-#'   gcm_period = c("2021_2040"),
-#'   # gcm_ts_years = 2020:2060,
+#' climate_norms_fut <- downscale(
+#'   xyz = in_xyz, which_refmap = "auto",
+#'   gcms = c("ACCESS-ESM1-5"),
+#'   ssps = c("ssp370"),
+#'   gcm_periods = c("2021_2040"),
+#'   # gcm_ssp_years = 2020:2060,
 #'   max_run = 3, #' we want 3 individual runs for each model
 #'   vars = vars
 #' )
 #'
 #' @export
-climr_downscale <- function(xyz, which_normal = "auto", 
-                            historic_period = NULL, 
-                            historic_ts = NULL,
-                            historic_ts_dataset = NULL,
-                            gcm_models = NULL, ssp = NULL,
-                            gcm_period = NULL, gcm_ts_years = NULL,
+downscale <- function(xyz, which_refmap = "auto", 
+                            obs_periods = NULL, 
+                            obs_years = NULL,
+                            obs_ts_dataset = NULL,
+                            gcms = NULL, ssps = NULL,
+                            gcm_periods = NULL, gcm_ssp_years = NULL,
                             gcm_hist_years = NULL, max_run = 0L,
                             cache = TRUE, ...) {
   message("Welcome to climr!")
 
   ## checks
   .checkClimrDwnsclArgs(
-    xyz, which_normal, historic_period, historic_ts, historic_ts_dataset,
-    gcm_models, ssp, gcm_period, gcm_ts_years,
+    xyz, which_refmap, obs_periods, obs_years, obs_ts_dataset,
+    gcms, ssps, gcm_periods, gcm_ssp_years,
     gcm_hist_years, max_run
   )
 
@@ -173,12 +173,12 @@ climr_downscale <- function(xyz, which_normal = "auto",
   # xyz <- as.data.frame(xyz)
 
   message("Getting normals...")
-  if (which_normal == "normal_na") {
-    normal <- normal_input(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
-  } else if (which_normal == "normal_bc") {
-    normal <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = cache)
-  } else if (which_normal == "normal_composite") {
-    normal <- normal_input(dbCon = dbCon, normal = "normal_composite", bbox = thebb, cache = cache)
+  if (which_refmap == "refmap_climatena") {
+    reference <- input_refmap(dbCon = dbCon, reference = "normal_na", bbox = thebb, cache = cache)
+  } else if (which_refmap == "refmap_prism") {
+    reference <- input_refmap(dbCon = dbCon, reference = "normal_bc", bbox = thebb, cache = cache)
+  } else if (which_refmap == "refmap_climr") {
+    reference <- input_refmap(dbCon = dbCon, reference = "normal_composite", bbox = thebb, cache = cache)
   } else {
     # message("Normals not specified, using highest resolution available for each point")
     bc_outline <- rast(system.file("extdata", "wna_outline.tif", package = "climr"))
@@ -189,72 +189,72 @@ climr_downscale <- function(xyz, which_normal = "auto",
       xyz <- xyz[!is.na(pnts$PPT_01), ]
       thebb_bc <- get_bb(xyz)
       message("for BC...")
-      normal <- normal_input(dbCon = dbCon, normal = "normal_composite", bbox = thebb_bc, cache = cache)
+      reference <- input_refmap(dbCon = dbCon, reference = "normal_bc", bbox = thebb_bc, cache = cache)
     } else {
-      normal <- normal_input(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
+      reference <- input_refmap(dbCon = dbCon, reference = "normal_na", bbox = thebb, cache = cache)
     }
   }
 
-  if (!is.null(historic_period)) {
-    message("Getting historic...")
-    historic_period <- historic_input(dbCon, bbox = thebb, period = historic_period, cache = cache)
+  if (!is.null(obs_periods)) {
+    message("Getting obsersved anomalies...")
+    obs_periods <- input_obs(dbCon, bbox = thebb, period = obs_periods, cache = cache)
   }
-  if (!is.null(historic_ts)) {
-    historic_ts <- historic_input_ts(dbCon, dataset = historic_ts_dataset, 
-                                     bbox = thebb, years = historic_ts, cache = cache)
+  if (!is.null(obs_years)) {
+    obs_years <- input_obs_ts(dbCon, dataset = obs_ts_dataset, 
+                                     bbox = thebb, years = obs_years, cache = cache)
   }
 
-  if (!is.null(gcm_models)) {
-    if (!is.null(gcm_period)) {
+  if (!is.null(gcms)) {
+    if (!is.null(gcm_periods)) {
       message("Getting GCMs...")
-      gcm <- gcm_input(dbCon,
-        bbox = thebb, gcm = gcm_models,
-        ssp = ssp,
-        period = gcm_period,
+      gcm_ssp_periods <- input_gcms(dbCon,
+        bbox = thebb, gcms = gcms,
+        ssps = ssps,
+        period = gcm_periods,
         max_run = max_run,
         cache = cache
       )
     } else {
-      gcm <- NULL
+      gcm_ssp_periods <- NULL
     }
-    if (!is.null(gcm_ts_years)) {
-      gcm_ts <- gcm_ts_input(dbCon,
-        bbox = thebb, gcm = gcm_models,
-        ssp = ssp,
-        years = gcm_ts_years,
+    if (!is.null(gcm_ssp_years)) {
+      gcm_ssp_ts <- input_gcm_ssp(dbCon,
+        bbox = thebb, gcms = gcms,
+        ssps = ssps,
+        years = gcm_ssp_years,
         max_run = max_run,
         cache = cache
       )
     } else {
-      gcm_ts <- NULL
+      gcm_ssp_ts <- NULL
     }
     if (!is.null(gcm_hist_years)) {
-      gcm_hist <- gcm_hist_input(dbCon,
-        bbox = thebb, gcm = gcm_models,
+      gcm_hist_ts <- input_gcm_hist(dbCon,
+        bbox = thebb, gcms = gcms,
         years = gcm_hist_years,
         max_run = max_run,
         cache = cache
       )
     } else {
-      gcm_hist <- NULL
+      gcm_hist_ts <- NULL
     }
   } else {
-    gcm <- gcm_ts <- gcm_hist <- NULL
+    gcm_ssp_periods <- gcm_ssp_ts <- gcm_hist_ts <- NULL
   }
 
   message("Downscaling!!")
-  results <- downscale(
+  results <- downscale_core(
     xyz = xyz,
-    normal = normal,
-    historic = historic_period,
-    historic_ts = historic_ts,
-    gcm = gcm,
-    gcm_ts = gcm_ts,
-    gcm_hist = gcm_hist,
+    refmap = reference,
+    obs = obs_periods,
+    obs_ts = obs_years,
+    gcms = gcm_ssp_periods,
+    gcm_ssp_ts = gcm_ssp_ts,
+    gcm_hist_ts = gcm_hist_ts,
     ...
   )
 
-  if (which_normal != "auto") {
+  if (which_refmap != "auto") {
     if (!is.null(dbCon)) poolClose(dbCon)
     results <- addIDCols(origID, results)
     return(results)
@@ -267,16 +267,16 @@ climr_downscale <- function(xyz, which_normal = "auto",
     na_xyz <- xyz_save[!xyz_save[, 4] %in% bc_ids, ]
     thebb <- get_bb(na_xyz)
     message("Now North America...")
-    normal <- normal_input(dbCon = dbCon, normal = "normal_na", bbox = thebb, cache = cache)
+    reference <- input_refmap(dbCon = dbCon, reference = "refmap_climatena", bbox = thebb, cache = cache)
 
-    results_na <- downscale(
+    results_na <- downscale_core(
       xyz = na_xyz,
-      normal = normal,
-      historic = historic_period,
-      historic_ts = historic_ts,
-      gcm = gcm,
-      gcm_ts = gcm_ts,
-      gcm_hist = gcm_hist,
+      reference = reference,
+      obs = obs_periods,
+      obs_ts = obs_years,
+      gcms = gcm_ssp_periods,
+      gcm_ssp_ts = gcm_ssp_ts,
+      gcm_hist_ts = gcm_hist_ts,
       ...
     )
 
@@ -289,55 +289,55 @@ climr_downscale <- function(xyz, which_normal = "auto",
 }
 
 
-#' Check `climr_downscale` arguments
+#' Check `downscale` arguments
 #'
-#' @inheritParams climr_downscale
+#' @inheritParams downscale
 #'
 #' @return NULL
 #' @noRd
-.checkClimrDwnsclArgs <- function(xyz, which_normal = NULL, historic_period = NULL, historic_ts = NULL,
-                                  historic_ts_dataset = NULL, gcm_models = NULL, ssp = list_ssp(), gcm_period = NULL, gcm_ts_years = NULL,
+.checkClimrDwnsclArgs <- function(xyz, which_refmap = NULL, obs_periods = NULL, obs_years = NULL,
+                                  obs_ts_dataset = NULL, gcms = NULL, ssps = list_ssps(), gcm_periods = NULL, gcm_ssp_years = NULL,
                                   gcm_hist_years = NULL, max_run = 0L) {
-  if(is.null(ssp) & (!is.null(gcm_period) | !is.null(gcm_ts_years))){
-    stop("ssp must be specified")
+  if(is.null(ssps) & (!is.null(gcm_periods) | !is.null(gcm_ssp_years))){
+    stop("ssps must be specified")
   }
   
-  if(!is.null(ssp))  ssp <- match.arg(ssp, list_ssp(), several.ok = TRUE)
+  if(!is.null(ssps))  ssps <- match.arg(ssps, list_ssps(), several.ok = TRUE)
   
-  if (!is.null(which_normal)) {
-    which_normal <- match.arg(which_normal, c("auto", list_normal()))
+  if (!is.null(which_refmap)) {
+    which_refmap <- match.arg(which_refmap, c("auto", list_refmaps()))
   }
   
-  if (!is.null(historic_period)) {
-    historic_period <- match.arg(historic_period, list_historic(), several.ok = TRUE)
+  if (!is.null(obs_periods)) {
+    obs_periods <- match.arg(obs_periods, list_obs_periods(), several.ok = TRUE)
   }
   
-  if (!is.null(historic_ts)) {
-      if (!all(historic_ts %in% 1901:2022)) {
-        stop("'historic_ts' must be in 1901:2022")
+  if (!is.null(obs_years)) {
+      if (!all(obs_years %in% 1901:2022)) {
+        stop("'obs_years' must be in 1901:2022")
       }
   }
   
-  if(!is.null(historic_ts_dataset)){
-    if(any(!historic_ts_dataset %in% c("cru.gpcc","climatena"))){
-      stop("historic_ts_dataset must be cru.gpcc, climatena, or both")
+  if(!is.null(obs_ts_dataset)){
+    if(any(!obs_ts_dataset %in% c("cru.gpcc","climatena"))){
+      stop("obs_ts_dataset must be cru.gpcc, climatena, or both")
     }
-    if(is.null(historic_ts)){
-      stop("'historic_ts' must be specified")
+    if(is.null(obs_years)){
+      stop("'obs_years' must be specified")
     }
   }
   
-  if (!is.null(gcm_models)) {
-    gcm_models <- match.arg(gcm_models, list_gcm(), several.ok = TRUE)
+  if (!is.null(gcms)) {
+    gcms <- match.arg(gcms, list_gcms(), several.ok = TRUE)
   }
   
-  if (!is.null(gcm_period)) {
-    gcm_period <- match.arg(gcm_period, list_gcm_period(), several.ok = TRUE)
+  if (!is.null(gcm_periods)) {
+    gcm_periods <- match.arg(gcm_periods, list_gcm_periods(), several.ok = TRUE)
   }
   
-  if (!is.null(gcm_ts_years)) {
-    if (!all(gcm_ts_years %in% 2015:2100)) {
-      stop("'gcm_ts_years' must be in 2015:2100")
+  if (!is.null(gcm_ssp_years)) {
+    if (!all(gcm_ssp_years %in% 2015:2100)) {
+      stop("'gcm_ssp_years' must be in 2015:2100")
     }
   }
   
@@ -349,19 +349,19 @@ climr_downscale <- function(xyz, which_normal = "auto",
   }
   
   ## check for "silly" parameter combinations
-  if (!is.null(gcm_models) &
-      all(is.null(gcm_hist_years), is.null(gcm_ts_years), is.null(gcm_period), is.null(ssp))) {
-    message("'gcm_models' will be ignored, since 'gcm_hist_years', 'gcm_ts_years', 'gcm_period' and 'ssp' are missing")
+  if (!is.null(gcms) &
+      all(is.null(gcm_hist_years), is.null(gcm_ssp_years), is.null(gcm_periods), is.null(ssps))) {
+    message("'gcms' will be ignored, since 'gcm_hist_years', 'gcm_ssp_years', 'gcm_periods' and 'ssps' are missing")
   }
   
-  if (is.null(gcm_models) &
-      any(!is.null(gcm_hist_years), !is.null(gcm_ts_years), !is.null(gcm_period), !is.null(ssp))) {
-    message("'gcm_models' is missing. 'gcm_hist_years', 'gcm_ts_years', 'gcm_period' and 'ssp' will be ignored")
+  if (is.null(gcms) &
+      any(!is.null(gcm_hist_years), !is.null(gcm_ssp_years), !is.null(gcm_periods), !is.null(ssps))) {
+    message("'gcms' is missing. 'gcm_hist_years', 'gcm_ssp_years', 'gcm_periods' and 'ssps' will be ignored")
   }
   
   if ((!is.null(max_run) | max_run > 0) &
-      is.null(gcm_models)) {
-    message("'gcm_models' is missing. 'max_run' will be ignored")
+      is.null(gcms)) {
+    message("'gcms' is missing. 'max_run' will be ignored")
   }
   return(invisible(NULL))
 }
