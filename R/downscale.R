@@ -352,9 +352,10 @@ downscale_ <- function(xyz, refmap, gcms, gcm_ssp_ts, gcm_hist_ts,
     labels <- nm
     normal_ <- res
     # Reshape (melt / dcast) to obtain final form
-    ref_dt <- tstrsplit(nm, "_")
-    setDT(ref_dt)
-    setnames(ref_dt, c("VAR"))
+    #ref_dt <- tstrsplit(nm, "_")
+    ref_dt <- data.table(VAR = nm)
+    # setDT(ref_dt)
+    # setnames(ref_dt, c("VAR"))
     set(ref_dt, j = "variable", value = nm)
     set(ref_dt, j = "PERIOD", value = "1961_1990")
     setkey(ref_dt, "variable")
@@ -480,21 +481,14 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
   
   # Create match set to match with res names
   
-  if(type == "obs_ts"){
+
     labels <- vapply(
       strsplit(nm, "_"),
-      \(x){x[2]},
-      character(1)
-    )
-  }else{
-    labels <- vapply(
-      strsplit(nm, "_"),
-      function(x) {
-        paste0(x[2:3], collapse = "")
+      \(x) {
+        paste0(x[2:3], collapse = "_")
       },
       character(1)
     )
-  }
   
   if (type %in% c("obs")) {
     ## Create match set to match with res names
@@ -522,10 +516,10 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
   setDT(ref_dt)
   if (type %in% c("obs","obs_ts")) {
     if (timeseries) {
-      setnames(ref_dt, c("DATASET", "VAR", "PERIOD"))
+      setnames(ref_dt, c("DATASET", "VAR", "MONTH", "PERIOD"))
       set(ref_dt, j = "variable", value = nm)
     } else {
-      setnames(ref_dt, c("VAR"))
+      setnames(ref_dt, c("VAR","MONTH"))
       set(ref_dt, j = "variable", value = nm)
       set(ref_dt, j = "PERIOD", value = "2001_2020")
     }
@@ -560,8 +554,8 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
   form <- switch(type,
     gcms = quote(id + GCM + SSP + RUN + PERIOD + lat + elev ~ VAR + MONTH),
     gcm_hist_ts = quote(id + GCM + RUN + PERIOD + lat + elev ~ VAR + MONTH),
-    obs = quote(id + PERIOD + lat + elev ~ VAR),
-    obs_ts = quote(id + DATASET + PERIOD + lat + elev ~ VAR)
+    obs = quote(id + PERIOD + lat + elev ~ VAR + MONTH),
+    obs_ts = quote(id + DATASET + PERIOD + lat + elev ~ VAR + MONTH)
   )
 
   climaterast <- dcast(
@@ -569,7 +563,7 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
     climaterast[ref_dt, ],
     as.formula(form),
     value.var = "value",
-    sep = ""
+    sep = "_"
   )
 
   return(climaterast)

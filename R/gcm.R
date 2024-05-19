@@ -306,11 +306,11 @@ process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run, dbnames = dbna
     
     if (length(spat_match) > 0) {
       periods <- fread(file.path(cPath, "meta_period.csv"))
-      ssps <- fread(file.path(cPath, "meta_ssp.csv"))
+      ssps_cached <- fread(file.path(cPath, "meta_ssp.csv"))
       isin <- FALSE
       for (oldid in spat_match) {
         if (all(period %in% periods[uid == oldid, period]) &
-            all(ssps %in% ssps[uid == oldid, ssps]) &
+            all(ssps %in% ssps_cached[uid == oldid, ssps]) &
             max_run <= bnds[uid == oldid, max_run]) {
           isin <- TRUE
           break
@@ -370,7 +370,7 @@ process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run, dbnames = dbna
   return(gcm_rast)
 }
 
-#' Process one obs time series at a time
+#' Process one gcm historic time series at a time
 #'
 #' @template gcm_nm
 #' @param years numeric. Vector of desired years. Must be in `1851:2015`.
@@ -543,11 +543,11 @@ process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts
       
       if (length(spat_match) > 0) {
         periods <- fread(file.path(cPath, "meta_period.csv"))
-        ssps <- fread(file.path(cPath, "meta_ssp.csv"))
+        ssps_cache <- fread(file.path(cPath, "meta_ssp.csv"))
         isin <- FALSE
         for (oldid in spat_match) { ## see if any have all required variables
           if (all(period %in% periods[uid == oldid, period]) &
-              all(ssps %in% ssps[uid == oldid, ssps]) &
+              all(ssps %in% ssps_cache[uid == oldid, ssps]) &
               max_run <= bnds[uid == oldid, max_run]) {
             isin <- TRUE
             break
