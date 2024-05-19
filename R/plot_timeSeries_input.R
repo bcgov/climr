@@ -11,7 +11,7 @@
 #' If multiple locations are specified, the output is the average of the climate variables for all locations. 
 #'
 #' @template xyz
-#' @inheritParams climr_downscale
+#' @inheritParams downscale
 #'
 #' @return `data.table` of average downscaled climate variables for all locations.
 #'   
@@ -29,21 +29,21 @@
 
 plot_timeSeries_input <- function(
     xyz, 
-    gcm_models = list_gcm(),
-    ssp = list_ssp(),
+    gcms = list_gcms(),
+    ssps = list_ssps(),
     max_run = 10,
     historic_ts_dataset = c("cru.gpcc", "climatena"), 
-    historic_ts = 1901:2022,
+    obs_ts = 1901:2022,
     gcm_hist_years = 1850:2014, 
     gcm_ts_years = 2015:2100, 
-    vars = list_variables()
+    vars = list_vars()
 ) {
   data <- climr_downscale(xyz = xyz, 
-                          gcm_models = gcm_models,
-                          ssp = ssp,
+                          gcms = gcms,
+                          ssps = ssps,
                           max_run = max_run,
                           historic_ts_dataset = historic_ts_dataset, 
-                          historic_ts = historic_ts,
+                          obs_ts = obs_ts,
                           gcm_hist_years = gcm_hist_years, 
                           gcm_ts_years = gcm_ts_years, 
                           vars = vars

@@ -4,13 +4,13 @@
 #'   be used with [`downscale()`].
 #'
 #' @description
-#' `gcm_input` retrieves anomalies for GCM data, given chosen GCMs, SSPs,
+#' `input_gcms` retrieves anomalies for GCM data, given chosen GCMs, SSPs,
 #'  periods and runs.
 #'
 #' @template dbCon
 #' @template bbox
-#' @template gcm
-#' @template ssp
+#' @template gcms
+#' @template ssps
 #' @template period
 #' @template max_run
 #' @template cache
@@ -39,24 +39,24 @@
 #' dbCon <- data_connect()
 #' on.exit(try(pool::poolClose(dbCon)))
 #'
-#' gcm <- gcm_input(dbCon, thebb, list_gcm()[1], list_ssp()[1])
+#' gcms <- input_gcms(dbCon, thebb, list_gcms()[1], list_ssps()[1])
 #'
 #' ## show ensemble means only
-#' lyrs <- grep("ensemble", names(gcm$`ACCESS-ESM1-5`))
+#' lyrs <- grep("ensemble", names(gcms$`ACCESS-ESM1-5`))
 #'
-#' plot(gcm$`ACCESS-ESM1-5`[[lyrs]])
+#' plot(gcms$`ACCESS-ESM1-5`[[lyrs]])
 #'
-#' @rdname gcm-input-data
+#' @rdname gcms-input-data
 #' @export
-gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), period = list_gcm_period(), max_run = 0L, cache = TRUE) {
+input_gcms <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(), period = list_gcm_periods(), max_run = 0L, cache = TRUE) {
   ## checks
   if (!is.null(bbox)) {
     .check_bb(bbox)
   }
   
-  gcm <- match.arg(gcm, list_gcm(), several.ok = TRUE)
-  ssp <- match.arg(ssp, list_ssp(), several.ok = TRUE)
-  period <- match.arg(period, list_gcm_period(), several.ok = TRUE)
+  gcms <- match.arg(gcms, list_gcms(), several.ok = TRUE)
+  ssps <- match.arg(ssps, list_ssps(), several.ok = TRUE)
+  period <- match.arg(period, list_gcm_periods(), several.ok = TRUE)
   
   if (!is(max_run, "numeric")) {
     stop("please pass a numeric value to 'max_runs'")
@@ -67,8 +67,8 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
   }
   
   # Load each file individually + select layers
-  res <- sapply(gcm, process_one_gcm2,
-                ssp = ssp, period = period,
+  res <- sapply(gcms, process_one_gcm2,
+                ssps = ssps, period = period,
                 bbox = bbox, dbnames = dbnames, dbCon = dbCon,
                 max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE
   )
@@ -80,18 +80,18 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 
 
 #' @description
-#' `gcm_hist_input` creates GCM **historic** time series inputs, given chosen GCMs,
+#' `input_gcm_hist` creates GCM **obs** time series inputs, given chosen GCMs,
 #'  years and runs.
 #'
 #' @template dbCon
 #' @template bbox
-#' @template gcm
+#' @template gcms
 #' @param years numeric. Vector of desired years. Default is `1901:1950`.
-#'   See [`list_gcm_hist_ts()`] for available years.
+#'   See [`list_gcm_hist_years()`] for available years.
 #' @template max_run
 #' @template cache
 #'
-#' @seealso [list_gcm_period()], [`list_gcm_period()`]
+#' @seealso [list_gcm_periods()], [`list_gcm_periods()`]
 #'
 #' @return A `list` of `SpatRasters`, each with possibly multiple layers, that can
 #'   be used with [`downscale()`].
@@ -116,7 +116,7 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 #'   dbCon <- data_connect()
 #'   on.exit(try(pool::poolClose(dbCon)))
 #'
-#'   gcm_hist <- gcm_hist_input(dbCon, thebb, list_gcm()[1])
+#'   gcm_hist <- input_gcm_hist(dbCon, thebb, list_gcms()[1])
 #'
 #'   ## show ensemble means only
 #'   lyrs <- grep("ensemble", names(gcm_hist$`ACCESS-ESM1-5`))
@@ -124,9 +124,9 @@ gcm_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(), pe
 #'   plot(gcm_hist$`ACCESS-ESM1-5`[[lyrs]])
 #' }
 #'
-#' @rdname gcm-input-data
+#' @rdname gcms-input-data
 #' @export
-gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(),
+input_gcm_hist <- function(dbCon, bbox = NULL, gcms = list_gcms(),
                            years = 1901:1950, max_run = 0L, cache = TRUE) {
   ## checks
   if (!is.null(bbox)) {
@@ -134,7 +134,7 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(),
   }
   
   # Load each file individually + select layers
-  res <- sapply(gcm, process_one_gcm3,
+  res <- sapply(gcms, process_one_gcm3,
                 years = years,
                 dbCon = dbCon, bbox = bbox, dbnames = dbnames_hist,
                 max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE
@@ -149,19 +149,19 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(),
 
 
 # gcm_nm <- "ACCESS-ESM1-5"
-# ssp <- c("ssp245","ssp370")
+# ssps <- c("ssp245","ssp370")
 # period <- 2020:2050
 
 #' @description
-#' `gcm_ts_input` creates future GCM time series inputs, given chosen GCMs, SSPs,
+#' `input_gcm_ssp` creates future GCM time series inputs, given chosen GCMs, SSPs,
 #'  years and runs.
 #'
 #' @template dbCon
 #' @template bbox
-#' @template gcm
-#' @template ssp
+#' @template gcms
+#' @template ssps
 #' @param years Numeric or character vector in `2020:2100`. Defaults to `2020:2030`.
-#'   See [`list_gcm_ts()`] for available years.
+#'   See [`list_gcm_ssp_years()`] for available years.
 #' @template max_run
 #' @template cache
 #'
@@ -189,16 +189,16 @@ gcm_hist_input <- function(dbCon, bbox = NULL, gcm = list_gcm(),
 #' dbCon <- data_connect()
 #' on.exit(try(pool::poolClose(dbCon)))
 #'
-#' gcm_ts <- gcm_ts_input(dbCon, thebb, list_gcm()[1], list_ssp()[1])
+#' gcm_ts <- input_gcm_ssp(dbCon, thebb, list_gcms()[1], list_ssps()[1])
 #'
 #' ## show ensemble means only
 #' lyrs <- grep("ensemble", names(gcm_ts$`ACCESS-ESM1-5`))
 #'
 #' plot(gcm_ts$`ACCESS-ESM1-5`[[lyrs]])
 #'
-#' @rdname gcm-input-data
+#' @rdname gcms-input-data
 #' @export
-gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(),
+input_gcm_ssp <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(),
                          years = 2020:2030, max_run = 0L, cache = TRUE) {
   ## checks
   if (!is.null(bbox)) {
@@ -207,8 +207,8 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(),
   
   if (nrow(dbnames_ts) < 1) stop("That isn't a valid GCM")
   # Load each file individually + select layers
-  res <- sapply(gcm, process_one_gcm4,
-                ssp = ssp, period = years,
+  res <- sapply(gcms, process_one_gcm4,
+                ssps = ssps, period = years,
                 dbnames = dbnames_ts, bbox = bbox, dbCon = dbCon,
                 max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE
   )
@@ -220,7 +220,7 @@ gcm_ts_input <- function(dbCon, bbox = NULL, gcm = list_gcm(), ssp = list_ssp(),
 }
 
 
-#' Read and parse gcm models csv files
+#' Read and parse gcms models csv files
 #'
 #' @param files character. A vector of file paths.
 #' @param col_num integer. Vector of indices of elements to retrieve in label. Label is split
@@ -253,7 +253,7 @@ list_unique <- function(files, col_num) {
 #' Process one GCM at a time
 #'
 #' @template gcm_nm
-#' @template ssp
+#' @template ssps
 #' @template bbox
 #' @template period
 #' @template max_run
@@ -267,20 +267,20 @@ list_unique <- function(files, col_num) {
 #'
 #' @return `SpatRaster`
 #' @noRd
-process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnames, dbCon, cache) { ## need to update to all GCMs
+process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run, dbnames = dbnames, dbCon, cache) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   # gcm_nm <- gsub("-", ".", gcm_nm)
   
   rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
   
-  runs <- fread(file.path(rInfoPath, "gcm_period.csv"))
-  runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssp, run]))
+  runs <- fread(file.path(rInfoPath, "gcm_periods.csv"))
+  runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssps, run]))
   sel_runs <- runs[1:(max_run + 1L)]
   
   ## check cached
   needDownload <- TRUE
   
-  cPath <- file.path(cache_path(), "gcm", gcmcode)
+  cPath <- file.path(cache_path(), "gcms", gcmcode)
   
   if (dir.exists(cPath)) {
     bnds <- try(fread(file.path(cPath, "meta_area.csv")), silent = TRUE)
@@ -306,11 +306,11 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
     
     if (length(spat_match) > 0) {
       periods <- fread(file.path(cPath, "meta_period.csv"))
-      ssps <- fread(file.path(cPath, "meta_ssp.csv"))
+      ssps_cached <- fread(file.path(cPath, "meta_ssp.csv"))
       isin <- FALSE
       for (oldid in spat_match) {
         if (all(period %in% periods[uid == oldid, period]) &
-            all(ssp %in% ssps[uid == oldid, ssp]) &
+            all(ssps %in% ssps_cached[uid == oldid, ssps]) &
             max_run <= bnds[uid == oldid, max_run]) {
           isin <- TRUE
           break
@@ -324,7 +324,7 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
         layinfo[, c("Mod", "Var", "Month", "Scenario", "Run", "Period1", "Period2") := tstrsplit(fullnm, "_")]
         layinfo[, Period := paste(Period1, Period2, sep = "_")]
         layinfo[, laynum := seq_along(fullnm)]
-        sel <- layinfo[Scenario %in% ssp & Period %in% period & Run %in% sel_runs, laynum]
+        sel <- layinfo[Scenario %in% ssps & Period %in% period & Run %in% sel_runs, laynum]
         gcm_rast <- gcm_rast[[sel]]
       } else {
         message("Not fully cached :( Will download more")
@@ -338,7 +338,7 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
   
   if (needDownload) {
     q <- paste0(
-      "select * from esm_layers_period where mod = '", gcm_nm, "' and scenario in ('", paste(ssp, collapse = "','"),
+      "select * from esm_layers_period where mod = '", gcm_nm, "' and scenario in ('", paste(ssps, collapse = "','"),
       "') and period in ('", paste(period, collapse = "','"), "') and run in ('", paste(sel_runs, collapse = "','"), "')"
     )
     # print(q)
@@ -360,7 +360,7 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
         numlay = nlyr(gcm_rast), max_run = max_run
       )
       t2 <- data.table(uid = rep(uid, length(period)), period = period)
-      t3 <- data.table(uid = rep(uid, length(ssp)), ssp = ssp)
+      t3 <- data.table(uid = rep(uid, length(ssps)), ssps = ssps)
       fwrite(t1, file = file.path(cPath, "meta_area.csv"), append = TRUE)
       fwrite(t2, file = file.path(cPath, "meta_period.csv"), append = TRUE)
       fwrite(t3, file = file.path(cPath, "meta_ssp.csv"), append = TRUE)
@@ -370,11 +370,11 @@ process_one_gcm2 <- function(gcm_nm, ssp, bbox, period, max_run, dbnames = dbnam
   return(gcm_rast)
 }
 
-#' Process one historic time series at a time
+#' Process one gcm historic time series at a time
 #'
 #' @template gcm_nm
 #' @param years numeric. Vector of desired years. Must be in `1851:2015`.
-#'   Can be obtained from [`list_gcm_period()`]. Default to [`list_gcm_period()`].
+#'   Can be obtained from [`list_gcm_periods()`]. Default to [`list_gcm_periods()`].
 #' @template dbCon
 #' @template bbox
 #' @template max_run
@@ -486,7 +486,7 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
 #' Process one GCM time series at a time
 #'
 #' @template gcm_nm
-#' @template ssp
+#' @template ssps
 #' @template period
 #' @template max_run
 #' @param dbnames `data.frame` with the list of available GCMs (time series projections)
@@ -500,14 +500,14 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
 #'
 #' @return a `SpatRaster`
 #' @noRd
-process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache) { ## need to update to all GCMs
+process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache) { ## need to update to all GCMs
   if(gcm_nm %in% dbnames$GCM){
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   
   rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
   
   runs <- fread(file.path(rInfoPath, "gcm_ts.csv"))
-  runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssp, run]))
+  runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssps, run]))
   if (length(runs) < 1) {
     warning("That GCM isn't in our database yet.")
   }else{
@@ -543,11 +543,11 @@ process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts,
       
       if (length(spat_match) > 0) {
         periods <- fread(file.path(cPath, "meta_period.csv"))
-        ssps <- fread(file.path(cPath, "meta_ssp.csv"))
+        ssps_cache <- fread(file.path(cPath, "meta_ssp.csv"))
         isin <- FALSE
         for (oldid in spat_match) { ## see if any have all required variables
           if (all(period %in% periods[uid == oldid, period]) &
-              all(ssp %in% ssps[uid == oldid, ssp]) &
+              all(ssps %in% ssps_cache[uid == oldid, ssps]) &
               max_run <= bnds[uid == oldid, max_run]) {
             isin <- TRUE
             break
@@ -565,7 +565,7 @@ process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts,
           layinfo <- data.table(fullnm = names(gcm_rast))
           layinfo[, c("Mod", "Var", "Month", "Scenario", "Run", "Year") := tstrsplit(fullnm, "_")]
           layinfo[, laynum := seq_along(fullnm)]
-          sel <- layinfo[Scenario %in% ssp & Year %in% period & Run %in% sel_runs, laynum]
+          sel <- layinfo[Scenario %in% ssps & Year %in% period & Run %in% sel_runs, laynum]
           gcm_rast <- gcm_rast[[sel]]
         } else {
           message("Not fully cached :( Will download more")
@@ -579,7 +579,7 @@ process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts,
     
     if (needDownload) {
       q <- paste0(
-        "select fullnm, laynum from esm_layers_ts where mod = '", gcm_nm, "' and scenario in ('", paste(ssp, collapse = "','"),
+        "select fullnm, laynum from esm_layers_ts where mod = '", gcm_nm, "' and scenario in ('", paste(ssps, collapse = "','"),
         "') and period in ('", paste(period, collapse = "','"), "') and run in ('", paste(sel_runs, collapse = "','"), "')"
       )
       # print(q)
@@ -611,7 +611,7 @@ process_one_gcm4 <- function(gcm_nm, ssp, period, max_run, dbnames = dbnames_ts,
           numlay = nlyr(gcm_rast), max_run = max_run
         )
         t2 <- data.table(uid = rep(uid, length(period)), period = period)
-        t3 <- data.table(uid = rep(uid, length(ssp)), ssp = ssp)
+        t3 <- data.table(uid = rep(uid, length(ssps)), ssps = ssps)
         fwrite(t1, file = file.path(cPath, "meta_area.csv"), append = TRUE)
         fwrite(t2, file = file.path(cPath, "meta_period.csv"), append = TRUE)
         fwrite(t3, file = file.path(cPath, "meta_ssp.csv"), append = TRUE)

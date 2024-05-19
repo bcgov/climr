@@ -1,22 +1,22 @@
-#' Download historic period anomalies.
+#' Download obs period anomalies.
 #'
 #' @description
-#' `historic_input` produces anomalies of historic observed climate for a given **period**.
+#' `input_obs` produces anomalies of obs observed climate for a given **period**.
 #'
 #' @return A `list` of `SpatRasters`, each with possibly multiple layers, that can
 #'   be used with [`downscale()`]. Each element of the list corresponds to a particular period, and the
-#'   values of the `SpatRaster` are anomalies of the historic period compare to the normal period.
+#'   values of the `SpatRaster` are anomalies of the obs period compare to the reference period.
 #'
 #' @template dbCon
 #' @template bbox
 #' @param period character. Vector of labels of the periods to use.
-#'   Can be obtained from [`list_historic()`]. Default to "2001_2020".
+#'   Can be obtained from [`list_obs_periods()`]. Default to "2001_2020".
 #' @template cache
 #'
-#' @seealso [downscale()], [`list_historic()`]
+#' @seealso [downscale()], [`list_obs_periods()`]
 #' @details
 #' Generally, this function should only be used in combination with [`downscale()`] as the values
-#' returned in the rasters are anomalies compared to the 1961-1990 normal period,
+#' returned in the rasters are anomalies compared to the 1961-1990 reference period,
 #' and are usually not meaningful without the whole downscale process.
 #'
 #'
@@ -27,7 +27,7 @@
 #' @importFrom uuid UUIDgenerate
 #' @rdname hist-input-data
 #' @export
-historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache = TRUE) {
+input_obs <- function(dbCon, bbox = NULL, period = list_obs_periods(), cache = TRUE) {
   ## checks
   if (!is.null(bbox)) {
     .check_bb(bbox)
@@ -44,7 +44,7 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
   ## check cached
   needDownload <- TRUE
 
-  cPath <- file.path(cache_path(), "historic", dbcode)
+  cPath <- file.path(cache_path(), "obs", dbcode)
 
   if (dir.exists(cPath)) {
     bnds <- try(fread(file.path(cPath, "meta_area.csv")), silent = TRUE)
@@ -86,12 +86,12 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
   }
 
   if (needDownload) {
-    q <- paste0("select fullnm, laynum from historic_layers where period in ('", paste(period, collapse = "','"), "')")
+    q <- paste0("select var_nm, laynum from historic_layers where period in ('", paste(period, collapse = "','"), "')")
     # print(q)
     layerinfo <- dbGetQuery(dbCon, q)
-    message("Downloading historic anomalies")
+    message("Downloading observed period anomalies")
     hist_rast <- pgGetTerra(dbCon, dbcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
-    names(hist_rast) <- layerinfo$fullnm
+    names(hist_rast) <- layerinfo$var_nm
 
     if (cache) {
       message("Caching data...")
@@ -118,16 +118,16 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 }
 
 
-#' Retrieve historic anomalies for specified years
+#' Retrieve obs anomalies for specified years
 #' @description
-#' `historic_input_ts` produces anomalies of historic observed climate for a given **time series**.
+#' `input_obs_ts` produces anomalies of obs observed climate for a given **time series**.
 #'
 #' @template dbCon
 #' @param dataset Character. Which observational dataset to use? Current options are "climatena" and "cru.gpcc"
 #' @template bbox
 #' @template cache
-#' @param years numeric. Years to retrieve historic anomalies for. Defaults to `2010:2022`.
-#'   See [`list_historic_ts()`] for available years.
+#' @param years numeric. Years to retrieve obs anomalies for. Defaults to `2010:2022`.
+#'   See [`list_obs_years()`] for available years.
 #' @return List of length 1 containing a `SpatRaster`
 #' @details
 #' The returned raster contains anomalies for each year specified in `years`. In general this
@@ -141,7 +141,7 @@ historic_input <- function(dbCon, bbox = NULL, period = list_historic(), cache =
 #' @importFrom uuid UUIDgenerate
 #' @rdname hist-input-data
 #' @export
-historic_input_ts <- function(dbCon, dataset = c("cru.gpcc", "climatena"), bbox = NULL, years = 2010:2022, cache = TRUE) {
+input_obs_ts <- function(dbCon, dataset = c("cru.gpcc", "climatena"), bbox = NULL, years = 2010:2022, cache = TRUE) {
   ## checks
   if (!is.null(bbox)) {
     .check_bb(bbox)
@@ -172,7 +172,7 @@ process_one_historicts <- function(dataset, years, dbCon, bbox, dbnames = dbname
     ## check cached
     needDownload <- TRUE
     
-    cPath <- file.path(cache_path(), "historic_ts", ts_name)
+    cPath <- file.path(cache_path(), "obs_ts", ts_name)
     
     if (dir.exists(cPath)) {
       bnds <- try(fread(file.path(cPath, "meta_area.csv")), silent = TRUE)
@@ -224,12 +224,12 @@ process_one_historicts <- function(dataset, years, dbCon, bbox, dbnames = dbname
     }
     
     if (needDownload) {
-      q <- paste0("select fullnm, laynum from ",dbcode,"_layers where period in ('", paste(years, collapse = "','"), "')")
+      q <- paste0("select var_nm, period, laynum from ",dbcode,"_layers where period in ('", paste(years, collapse = "','"), "')")
       # print(q)
       layerinfo <- dbGetQuery(dbCon, q)
-      message("Downloading historic anomalies")
+      message("Downloading obs anomalies")
       hist_rast <- pgGetTerra(dbCon, dbcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
-      names(hist_rast) <- paste0(ts_name,"_",layerinfo$fullnm)
+      names(hist_rast) <- paste(ts_name,layerinfo$var_nm,layerinfo$period, sep = "_")
       
       if (cache) {
         message("Caching data...")
@@ -253,7 +253,7 @@ process_one_historicts <- function(dataset, years, dbCon, bbox, dbnames = dbname
 
 
 
-# historic_input <- function(period = list_historic()[1]) {
+# input_obs <- function(period = list_obs_periods()[1]) {
 #
 #   # Check if we have data, if not download some.
 #   data_check()
@@ -263,7 +263,7 @@ process_one_historicts <- function(dataset, years, dbCon, bbox, dbnames = dbname
 #     res <- lapply(
 #       file.path(
 #         data_path(),
-#         getOption("climr.historic.path", default = "inputs_pkg/historic"),
+#         getOption("climr.obs.path", default = "inputs_pkg/obs"),
 #         period
 #       ),
 #       list.files, recursive = TRUE, full.names = TRUE, pattern = pattern
@@ -290,20 +290,20 @@ process_one_historicts <- function(dataset, years, dbCon, bbox, dbnames = dbname
 #
 # }
 
-# dat <- rast("../climR-pnw-data/inputs_pkg/historic/Historic_2001_2020/anom_2001_2020.nc")
-# nm <- fread("../climR-pnw-data/inputs_pkg/historic/Historic_2001_2020/anom_2001_2020.csv",header = T)[['x']]
+# dat <- rast("../climR-pnw-data/inputs_pkg/obs/Historic_2001_2020/anom_2001_2020.nc")
+# nm <- fread("../climR-pnw-data/inputs_pkg/obs/Historic_2001_2020/anom_2001_2020.csv",header = T)[['x']]
 # r <- terra::rast(list.files(dir_gcm, full.names = TRUE, pattern = "\\.nc"))
 # names(dat) <- nm
 #
 # message(
-#   "Saving uncompressed historic deltas to: ",
+#   "Saving uncompressed obs deltas to: ",
 #   file.path(dir_hist, sprintf("gcmData.%s.deltas.tif", h))
 # )
 #
 # # Actual writing
 # terra::writeRaster(
 #   dat,
-#   "../climR-pnw-data/inputs_pkg/historic/Historic_2001_2020/2001_2020.tif",
+#   "../climR-pnw-data/inputs_pkg/obs/Historic_2001_2020/2001_2020.tif",
 #   overwrite = TRUE,
 #   gdal="COMPRESS=NONE"
 # )

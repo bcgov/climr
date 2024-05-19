@@ -1,4 +1,4 @@
-#' Retrieve climatologies for normal period
+#' Retrieve climatologies for reference period
 #' @description
 #' This function downloads (or retrieves from cache) monthly Tmin, Tmax, and PPT variables
 #' for the specified climatology and for the specified bounding box. It is intended for use with [`downscale()`],
@@ -7,7 +7,7 @@
 #'
 #' @template dbCon
 #' @template bbox
-#' @template normal
+#' @template reference
 #' @template cache
 #'
 #' @return A `SpatRaster` containing normals, lapse rates
@@ -23,17 +23,17 @@
 #' @importFrom terra rast writeRaster ext
 #' @importFrom data.table fread fwrite data.table
 #' @importFrom uuid UUIDgenerate
-#' @rdname normal-input-data
+#' @rdname reference-input-data
 #' @export
-normal_input <- function(dbCon, bbox, normal = "normal_na", cache = TRUE) {
+input_refmap <- function(dbCon, bbox, reference = "refmap_climatena", cache = TRUE) {
   ## checks
-  if (is(normal, "character")) {
-    match.arg(normal, list_normal())
+  if (is(reference, "character")) {
+    #match.arg(reference, list_refmaps()) ## temporarily disable
   } else {
-    if (!is(normal, "SpatRaster")) {
+    if (!is(reference, "SpatRaster")) {
       stop(
-        "'normal' must be one of 'list_normal()' or a SpatRaster with 36 layers",
-        " of normal climate variables"
+        "'reference' must be one of 'list_refmaps()' or a SpatRaster with 36 layers",
+        " of reference climate variables"
       )
     }
   }
@@ -50,7 +50,7 @@ normal_input <- function(dbCon, bbox, normal = "normal_na", cache = TRUE) {
   ## check cached
   needDownload <- TRUE
 
-  cPath <- file.path(cache_path(), "normal", normal)
+  cPath <- file.path(cache_path(), "reference", reference)
 
   if (dir.exists(cPath)) {
     bnds <- try(fread(file.path(cPath, "meta_data.csv")), silent = TRUE)
@@ -85,7 +85,7 @@ normal_input <- function(dbCon, bbox, normal = "normal_na", cache = TRUE) {
 
   if (needDownload) {
     message("Downloading new data...")
-    res <- pgGetTerra(dbCon, normal, tile = TRUE, boundary = bbox, bands = 1:73)
+    res <- pgGetTerra(dbCon, reference, tile = TRUE, boundary = bbox, bands = 1:73)
     names(res) <- c(
       "PPT_01", "PPT_02", "PPT_03", "PPT_04", "PPT_05", "PPT_06", "PPT_07",
       "PPT_08", "PPT_09", "PPT_10", "PPT_11", "PPT_12", "Tmax_01", "Tmax_02",
