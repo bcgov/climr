@@ -101,6 +101,7 @@ names(tmax_delta) <- nms
 
 gpcc_all <- c(ppt_delta, tmin_delta, tmax_delta)
 writeRaster(gpcc_all,"../Common_Files/cru_gpcc_anom.tif", gdal="COMPRESS=NONE", overwrite = TRUE)
+temp <- rast("../Common_Files/cru_gpcc_anom.tif")
 
 ##check
 delta_nrm <- ppt_delta[[(time(ppt_delta) > as.Date("1961-01-01")) & (time(ppt_delta) < as.Date("1990-01-01"))]]
@@ -132,19 +133,17 @@ dbExecute(conn, "drop table historic_cru_layers")
 ###climate NA
 files <- list.files("noram_dem2/", full.names = T, recursive = T)
 files <- files[!grepl("Rad|Tave",files)]
-dat <- rast(files)
-plot(dat)
 
 yr <- 1902
 years <- 1902:2023
 
 ref.years <- 1961:1990
 
-rlist <- list()
 for(yr in years){
   cat(".")
   f_yr <- files[grep(yr, files)]
   r <- rast(f_yr)
+  r <- terra::aggregate(r, fact = 8, fun = "mean")
   tms <- as.Date(paste0(yr,"-",gsub("\\D", "", names(r)),"-","01"))
   time(r) <- tms
   names(r) <- paste0(names(r),yr)
@@ -155,10 +154,51 @@ for(yr in years){
   }
 }
 
+writeRaster(r_all, "../Common_Files/climate_na_lr.tif")
+
 curr_r <- r_all[[grep("PPT", names(r_all))]]
 r_nrm <- curr_r[[time(curr_r) >= as.Date("1961-01-01") & time(curr_r) <= as.Date("1990-01-01")]]
 nrm <- tapp(r_nrm, index = "months", fun = mean)
-delta <- curr_r/nrm
+delta_ppt <- curr_r/nrm
+nms <- sub("([A-Za-z]+)([0-9]+)(.{4})$", "\\1_\\2_\\3", names(delta_ppt))
+names(delta_ppt) <- nms
+
+curr_r <- r_all[[grep("Tmin", names(r_all))]]
+r_nrm <- curr_r[[time(curr_r) >= as.Date("1961-01-01") & time(curr_r) <= as.Date("1990-01-01")]]
+nrm <- tapp(r_nrm, index = "months", fun = mean)
+delta_tmin <- curr_r - nrm
+nms <- sub("([A-Za-z]+)([0-9]+)(.{4})$", "\\1_\\2_\\3", names(delta_tmin))
+names(delta_tmin) <- nms
+plot(delta_tmin[[7]])
+
+curr_r <- r_all[[grep("Tmax", names(r_all))]]
+r_nrm <- curr_r[[time(curr_r) >= as.Date("1961-01-01") & time(curr_r) <= as.Date("1990-01-01")]]
+nrm <- tapp(r_nrm, index = "months", fun = mean)
+delta_tmax <- curr_r - nrm
+nms <- sub("([A-Za-z]+)([0-9]+)(.{4})$", "\\1_\\2_\\3", names(delta_tmax))
+names(delta_tmax) <- nms
+plot(delta_tmax[[7]])
+
+deltas_all <- c(delta_ppt,delta_tmin,delta_tmax)
+deltas_all <- aggregate(deltas_all, fact = 3, fun = "mean")
+writeRaster(deltas_all,"../Common_Files/climatena_anom.tif", gdal="COMPRESS=NONE", overwrite = TRUE)
+
+nms <- names(deltas_all)
+
+metadt <- data.table(fullnm = nms)
+metadt[,c("var","month","period") := tstrsplit(fullnm, "_")]
+metadt[,var_nm := paste(var,month, sep = "_")]
+metadt[,laynum := seq_along(nms)]
+metadt[,c("var","month") := NULL]
+
+library(RPostgres)
+conn <- dbConnect(RPostgres::Postgres(),dbname = 'climr',
+                  host = '146.190.244.244',
+                  port = 5432,
+                  user = 'postgres',
+                  password = '')
+dbWriteTable(conn, "historic_climatena_layers", metadt, row.names = F, append = TRUE)
+dbExecute(conn, "create index on historic_climatena_layers(period)")
 
 for(yr in years) {
   cat(yr,"...\n")
