@@ -33,11 +33,12 @@ my_points <- data.frame(
 ds_out <- climr_downscale(
   xyz = my_points, 
   which_normal = "auto",
-  gcm_models = c("GFDL-ESM4"), # specify two global climate models
-  ssp = c("ssp370", "ssp245"), # specify two greenhouse gas concentration scenarios
+  obs
+  #gcm_models = c("GFDL-ESM4"), # specify two global climate models
+  #ssp = c("ssp370", "ssp245"), # specify two greenhouse gas concentration scenarios
   #gcm_period = c("2001_2020", "2041_2060"), # specify two 20-year periods
-  gcm_ts_years = 2024:2050,
-  max_run = 3, # specify 3 individual runs for each model
+  #gcm_ts_years = 2024:2050,
+  #max_run = 3, # specify 3 individual runs for each model
   vars = c("PPT", "CMD", "CMI")
 )
 
