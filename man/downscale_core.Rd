@@ -13,7 +13,7 @@ downscale_core(
   gcm_hist_ts = NULL,
   obs_ts = NULL,
   return_refperiod = TRUE,
-  vars = sort(sprintf(c("PPT\%02d", "Tmax\%02d", "Tmin\%02d"), sort(rep(1:12, 3)))),
+  vars = sort(sprintf(c("PPT_\%02d", "Tmax_\%02d", "Tmin_\%02d"), sort(rep(1:12, 3)))),
   ppt_lr = FALSE,
   nthread = 1L,
   out_spatial = FALSE,
