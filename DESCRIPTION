@@ -3,8 +3,8 @@ Title: Downscaling climate data in R
 Version: 0.0.4.1
 Date: 29-04-2024
 Authors@R: c(
-    person("Kiri","Daust", email = "kiri.daust@gov.bc.ca", role = "aut"),
-    person("Colin", "Mahony", email = "Colin.Mahony@gov.bc.ca", role = c("aut", "cre"),
+    person("Kiri","Daust", email = "kiri.daust@gov.bc.ca", role = c("aut", "cre")),
+    person("Colin", "Mahony", email = "Colin.Mahony@gov.bc.ca", role = c("aut"),
            comment = c(ORCID = "0000-0002-6111-5675")),
     person("Bruno", "Tremblay", email = "bruno@boostao.ca", role = c("aut"),
            comment = c(ORCID = "0000-0002-2945-356X")),

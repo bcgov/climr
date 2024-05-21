@@ -8,11 +8,11 @@ plot_bivariate(
   xyz,
   xvar = "Tave_sm",
   yvar = "PPT_sm",
-  period_focal = list_gcm_period()[1],
-  gcm_models = list_gcm()[c(1, 4, 5, 6, 7, 10, 11, 12)],
-  ssp = list_ssp()[2],
-  historic_period = list_historic()[1],
-  gcm_period = list_gcm_period(),
+  period_focal = list_gcm_periods()[1],
+  gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)],
+  ssps = list_ssps()[2],
+  obs_periods = list_obs_periods()[1],
+  gcm_periods = list_gcm_periods(),
   max_run = 10,
   legend_pos = "bottomleft",
   show_runs = TRUE,
@@ -27,25 +27,25 @@ plot_bivariate(
 \item{xyz}{a \code{data.frame} with the following columns "long", "lat", "elev",
 and a unique "id". Any extra columns will be ignored and not output.}
 
-\item{xvar}{character. x-axis variable. options are \code{list_variables()}.}
+\item{xvar}{character. x-axis variable. options are \code{list_vars()}.}
 
-\item{yvar}{character. y-axis variable. options are \code{list_variables()}.}
+\item{yvar}{character. y-axis variable. options are \code{list_vars()}.}
 
 \item{period_focal}{character. The 20-year period for which to plot the ensemble
-detail. options are \code{list_gcm_period()}.}
+detail. options are \code{list_gcm_periods()}.}
 
-\item{gcm_models}{character. Vector of global climate model names. Options
-are \code{\link[=list_gcm]{list_gcm()}}. Used for gcm periods, gcm timeseries, and historic timeseries.
+\item{gcms}{character. Vector of global climate model names. Options
+are \code{\link[=list_gcms]{list_gcms()}}. Used for gcms periods, gcms timeseries, and obs timeseries.
 Defaults to \code{NULL}.}
 
-\item{ssp}{character. Vector of SSP-RCP scenarios (representative concentration pathways paired with shared socioeconomic pathways).
-Options are \code{\link[=list_ssp]{list_ssp()}}. Defaults to all scenarios available.}
+\item{ssps}{character. Vector of SSP-RCP scenarios (representative concentration pathways paired with shared socioeconomic pathways).
+Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to all scenarios available.}
 
-\item{historic_period}{character. Which historic period for observed climate
-data, averaged over this period. Options are \code{\link[=list_historic]{list_historic()}}. Default \code{NULL}}
+\item{obs_periods}{character. Which obs period for observed climate
+data, averaged over this period. Options are \code{\link[=list_obs_periods]{list_obs_periods()}}. Default \code{NULL}}
 
-\item{gcm_period}{character. 20-year normal periods for GCM simulations.
-Options are \code{\link[=list_gcm_period]{list_gcm_period()}}. Defaults to \code{NULL}.}
+\item{gcm_periods}{character. 20-year reference periods for GCM simulations.
+Options are \code{\link[=list_gcm_periods]{list_gcm_periods()}}. Defaults to \code{NULL}.}
 
 \item{max_run}{integer. Maximum number of model runs to include.
 A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
@@ -62,7 +62,7 @@ are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 \item{show_observed}{logical. If TRUE, the 2001-2020 observed climate is plotted.}
 
 \item{show_trajectories}{logical. If TRUE, the values of the single-model ensemble
-mean are plotted for all 20-year periods in \code{list_gcm_period()}, connected by an
+mean are plotted for all 20-year periods in \code{list_gcm_periods()}, connected by an
 interpolation spline.}
 
 \item{interactive}{logical. If TRUE, an interactive plot is generated using \code{{plotly}}.
@@ -87,7 +87,7 @@ All climate changes are relative to the 1961-1990 reference period normals.
 The input table \code{xyz} can be a single location or multiple locations. If multiple
 locations, the plot provides the mean of the anomalies for these locations.
 The climate change trajectories provided by \code{show_trajectories} are points for
-each of the five 20-year periods specified by \code{list_gcm_period()}. These points
+each of the five 20-year periods specified by \code{list_gcm_periods()}. These points
 are connected with an interpolation spline when the x variable is monotonic;
 otherwise the trajectory points are connected by straight lines.
 This plot is designed to be used with a single SSP scenario. If multiple scenarios

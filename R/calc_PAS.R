@@ -11,10 +11,10 @@
 #' climr:::calc_PAS(4, 2, 600)
 #' }
 #' @noRd
-calc_PAS <- function(m, tmin, PPT) {
+calc_PAS <- function(m, tave, PPT) {
   if (FALSE) {
     T0 <- a <- b <- NULL
   }
 
-  param[["PAS"]][m, PPT * a / (1 + exp(-(tmin - T0) / b))]
+  param[["PAS"]][m, PPT * a / (1 + exp(-(tave - T0) / b))]
 }
