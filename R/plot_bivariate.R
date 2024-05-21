@@ -76,7 +76,7 @@ plot_bivariate <- function(
     period_focal = list_gcm_periods()[1],
     gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)],
     ssps = list_ssps()[2],
-    historic_period = list_obs_periods()[1],
+    obs_periods = list_obs_periods()[1],
     gcm_periods = list_gcm_periods(),
     max_run = 10,
     legend_pos = "bottomleft",
@@ -99,8 +99,8 @@ plot_bivariate <- function(
     ColScheme <- colors[1:length(gcms)]
 
     # generate the climate data
-    data <- climr_downscale(xyz,
-      historic_period = historic_period,
+    data <- downscale(xyz,
+      obs_periods = obs_periods,
       gcms = gcms,
       ssps = ssps,
       gcm_periods = gcm_periods,
