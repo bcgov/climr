@@ -32,21 +32,21 @@ plot_timeSeries_input <- function(
     gcms = list_gcms(),
     ssps = list_ssps(),
     max_run = 10,
-    historic_ts_dataset = c("cru.gpcc", "climatena"), 
-    obs_ts = 1901:2022,
+    obs_ts_dataset = c("cru.gpcc", "climatena"), 
+    obs_years = 1901:2022,
     gcm_hist_years = 1850:2014, 
-    gcm_ts_years = 2015:2100, 
+    gcm_ssp_years = 2015:2100, 
     vars = list_vars()
 ) {
-  data <- climr_downscale(xyz = xyz, 
-                          gcms = gcms,
-                          ssps = ssps,
-                          max_run = max_run,
-                          historic_ts_dataset = historic_ts_dataset, 
-                          obs_ts = obs_ts,
-                          gcm_hist_years = gcm_hist_years, 
-                          gcm_ts_years = gcm_ts_years, 
-                          vars = vars
+  data <- downscale(xyz = xyz, 
+                    gcms = gcms,
+                    ssps = ssps,
+                    max_run = max_run,
+                    obs_ts_dataset = obs_ts_dataset, 
+                    obs_years = obs_years,
+                    gcm_hist_years = gcm_hist_years, 
+                    gcm_ssp_years = gcm_ssp_years, 
+                    vars = vars
   )
   data.agg <- data[, lapply(.SD, mean), by = .(GCM, SSP, RUN, PERIOD, DATASET), .SDcols = -c("id", "GCM", "SSP", "RUN", "PERIOD", "DATASET")]
   return(data.agg)

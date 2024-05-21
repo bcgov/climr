@@ -33,17 +33,48 @@ my_points <- data.frame(
 ds_out <- downscale(
   xyz = my_points, 
   which_refmap = "auto",
-  #gcms = list_gcms()[2], # specify two global climate models
-  #ssps = c("ssp370", "ssp245"), # specify two greenhouse gas concentration scenarios
-  #gcm_periods = c("2001_2020", "2041_2060"), # specify two 20-year periods
-  #gcm_ssp_years = 2024:2050,
-  #gcm_hist_years = 1870:1930,
+  gcms = list_gcms()[2], # specify two global climate models
+  ssps = c("ssp370", "ssp245"), # specify two greenhouse gas concentration scenarios
+  gcm_periods = c("2001_2020", "2041_2060"), # specify two 20-year periods
+  gcm_ssp_years = 2024:2050,
+  gcm_hist_years = 1870:1930,
   obs_years = 2015:2023,
   obs_ts_dataset = c("climatena","cru.gpcc"),
-  #obs_periods = "2001_2020",
-  #max_run = 3, # specify 3 individual runs for each model
+  obs_periods = "2001_2020",
+  max_run = 3, # specify 3 individual runs for each model
   vars = c("PPT", "CMD", "CMI", "Tmin_01")
 )
+
+pt <- data.frame(lon = c(-125.13), lat = c(48.825), elev = c(7), id = 1)
+
+data <- downscale(xyz = pt, 
+                  gcms  = list_gcms()[c(1)],
+                  ssps  = list_ssps(),
+                  max_run = 3,
+                  obs_ts_dataset  = c("cru.gpcc", "climatena"), 
+                  obs_years  = 1902:2022,
+                  gcm_hist_years = 1850:2014, 
+                  gcm_ssp_years  = 2015:2100, 
+                  vars = list_vars()
+)
+
+plot_timeSeries(data, var1 = "Tmax_08")
+data <- plot_timeSeries_input(pt, gcms = list_gcms()[4], vars = "MAP")
+plot_timeSeries(data, var1 = "MAP")
+
+data <- downscale(xyz = pt, 
+                        gcm_models = list_gcms()[2],
+                        ssp = list_ssps(),
+                        max_run = 10,
+                        historic_ts_dataset = c("cru.gpcc", "climatena"), 
+                        historic_ts = 1901:2022,
+                        gcm_hist_years = 1850:2014, 
+                        gcm_ts_years = 2015:2100, 
+                        vars = list_vars()
+)
+
+variable <- "MAP"
+plot_timeSeries(data, variable1 = variable, historic_ts_dataset = c("cru.gpcc", "climatena"), mar=c(3,3,2,4), refline = T)
 
 
 library(climr)

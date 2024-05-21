@@ -313,8 +313,8 @@ downscale <- function(xyz, which_refmap = "auto",
   }
   
   if (!is.null(obs_years)) {
-      if (!all(obs_years %in% 1902:2023)) {
-        stop("'obs_years' must be in 1902:2023")
+      if (!all(obs_years %in% 1901:2023)) {
+        stop("'obs_years' must be in 1901:2023")
       }
   }
   

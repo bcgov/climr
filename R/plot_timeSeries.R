@@ -17,15 +17,15 @@
 #' to make multiple calls to [`plot_timeSeries()`] without needing to generate the inputs each time. 
 #' 
 #' Some combinations of `var1` and `var2` are not compatible or meaningful. 
-#' Examples of meaningful combinations are winter vs summer values of the same climate variable or minimum vs. 
+#' Examples of meaningful combinations are winter vs summer values of the same climate var or minimum vs. 
 #' maximum temperatures. 
 #'
 #' @param X  A `data.table` object produced using the function [`plot_timeSeries_input()`]. This 
 #' table can include more models, scenarios, and variables than are used in individual calls to 
 #' [`plot_timeSeries()`].
 #' @inheritParams downscale
-#' @param variable1 character. A climate variable. options are [`list_vars()`].
-#' @param variable2 character. A second climate variable to plot in combination with `variable1`. 
+#' @param var1 character. A climate var. options are [`list_vars()`].
+#' @param var2 character. A second climate var to plot in combination with `var1`. 
 #' options are [`list_vars()`].
 #' @param showObserved logical. Plot a time series of observed climate.  
 #' @param showrange logical. Plot a shaded region indicating the minimum and maximum of the 
@@ -41,7 +41,7 @@
 #' @param compile logical. Compile multiple global climate models into a multi-model ensemble. 
 #' If `FALSE` the single-model ensembles are plotted individually. 
 #' @param simplify logical. Simplify the ensemble range and mean using a smoothing spline. 
-#' @param refline logical. Plot the 1961-1990 reference period mean for the selected variable
+#' @param refline logical. Plot the 1961-1990 reference period mean for the selected var
 #' and extend this line to the year 2100 as a visual reference. 
 #' @param refline.obs logical. Plot the 1961-1990 reference period mean for the observational data. 
 #' This should be the same as the reference line for the GCM time series.  
@@ -69,7 +69,7 @@
 #' plot_timeSeries(my_data, var1 = "Tmin_sm")
 #'
 #' # compare observational time series
-#' plot_timeSeries(my_data, var1 = "Tmin_sm", historic_ts_dataset = c("cru.gpcc", "climatena"))
+#' plot_timeSeries(my_data, var1 = "Tmin_sm", obs_ts_dataset = c("cru.gpcc", "climatena"))
 #' 
 #' # compare mean daily minimum and maximum temperatures
 #' plot_timeSeries(my_data, var1 = "Tmin_sm", var2 = "Tmax_sm")
@@ -100,7 +100,7 @@ plot_timeSeries <- function(
     var1 = "Tmin_sm",
     var2 = NULL,
     showObserved = TRUE,
-    historic_ts_dataset = "climatena",
+    obs_ts_dataset = "climatena",
     gcms = list_gcms()[c(1,4,5,7,10,11,12)], #TODO add GFDL once the data are in climr
     ssps = list_ssps()[1:3],
     showrange = TRUE, 
@@ -156,11 +156,11 @@ plot_timeSeries <- function(
       ensstats <- c("ensmin", "ensmax", "ensmean")
       
       ## Assemble the data that will be used in the plot (for setting the ylim)
-      alldata <-  X[, if(is.null(variable2)) get(variable1) else c(get(variable1), get(variable2))] # a vector of all potential data on the plot for setting the ylim (y axis range)
-      visibledata <-  X[GCM%in%c(NA, gcms) & SSP%in%c(NA, ssps), (if(is.null(variable2)) get(variable1) else c(get(variable1), get(variable2)))] # a vector of all visible data on the plot for setting the ylim (y axis range)
+      alldata <-  X[, if(is.null(var2)) get(var1) else c(get(var1), get(var2))] # a vector of all potential data on the plot for setting the ylim (y axis range)
+      visibledata <-  X[GCM%in%c(NA, gcms) & SSP%in%c(NA, ssps), (if(is.null(var2)) get(var1) else c(get(var1), get(var2)))] # a vector of all visible data on the plot for setting the ylim (y axis range)
       
-      # components of the variable 
-      nums <- if(is.null(var2)) 1 else 1:2 #nums is the set of variable numbers (var1 or var2) (this is used later on as well)
+      # components of the var 
+      nums <- if(is.null(var2)) 1 else 1:2 #nums is the set of var numbers (var1 or var2) (this is used later on as well)
       for(num in nums){ 
         var <- get(paste("var",num,sep=""))
         assign(paste0("yeartime", num), as.character(variables[Code == var, "Code_Time"]) )
@@ -170,7 +170,7 @@ plot_timeSeries <- function(
       # PLOT
       par(mfrow=c(1,1), mar=mar, mgp=c(1.75, 0.25, 0), cex=cex)
       # y axis title. 
-      if(is.null(var2)){ #if there is no second variable
+      if(is.null(var2)){ #if there is no second var
         ylab <- paste(yeartime.names[which(yeartimes==yeartime1)], variables[Code==var1, "Element"])
       } else 
         if(element1==element2){ #if both variables have the same element
@@ -304,7 +304,7 @@ plot_timeSeries <- function(
           }
           
           # Text to identify the time of year
-          if(!is.null(var2)){ #if there is no second variable
+          if(!is.null(var2)){ #if there is no second var
             if(element1==element2){
               label <- yeartime.names[which(yeartimes==yeartime)]
             } else {
@@ -316,11 +316,11 @@ plot_timeSeries <- function(
         }
         
         if(compile){ #this plots a single envelope for the ensemble as a whole
-          temp.data <-  X[GCM%in%gcms, c("PERIOD", "SSP", "RUN", variable), with=FALSE]
+          temp.data <-  X[GCM%in%gcms, c("PERIOD", "SSP", "RUN", var), with=FALSE]
           plot.ensemble(temp.data)
           
-        } else for(gcms in gcms){ #this plots of individual GCM ensembles. 
-          temp.data <-  X[GCM==gcms, c("PERIOD", "SSP", "RUN", variable), with=FALSE]
+        } else for(gcm in gcms){ #this plots of individual GCM ensembles. 
+          temp.data <-  X[GCM==gcm, c("PERIOD", "SSP", "RUN", var), with=FALSE]
           plot.ensemble(temp.data)
           
           print(gcms)
@@ -336,8 +336,8 @@ plot_timeSeries <- function(
         if(showObserved){
           # add in observations
           obs.colors <- c("black", "blue", "red")
-          obs.options <- c("climatena", "cru.gpcc", "era5")
-          for(obs.dataset in historic_ts_dataset){ #TODO update this code block once i know how the datasets are identified in the climr output
+          obs.options <- c("climatena", "cru.gpcc") ##, "era5"
+          for(obs.dataset in obs_ts_dataset){ #TODO update this code block once i know how the datasets are identified in the climr output
             obs.color <- obs.colors[which(obs.options==obs.dataset)]
             x.obs <- as.numeric(X[DATASET==obs.dataset & PERIOD%in%1900:2100, "PERIOD"][[1]])
             y.obs <-  X[DATASET==obs.dataset & PERIOD%in%1900:2100, get(var)]
@@ -365,9 +365,9 @@ plot_timeSeries <- function(
       
       if(showObserved){
         # Sources legend
-        a <- if("climatena"%in%historic_ts_dataset) 1 else NA
-        b <- if("cru.gpcc"%in%historic_ts_dataset) 2 else NA
-        c <- if("era5"%in%historic_ts_dataset) 3 else NA
+        a <- if("climatena"%in%obs_ts_dataset) 1 else NA
+        b <- if("cru.gpcc"%in%obs_ts_dataset) 2 else NA
+        c <- if("era5"%in%obs_ts_dataset) 3 else NA
         d <- if(length(gcms>0)) 4 else NA
         s <- !is.na(c(a,b,c,d))
         legend.GCM <- if(length(gcms)>1) paste("Simulated (", length(gcms), " GCMs)", sep="")  else paste("Simulated (", gcms, ")", sep="")
