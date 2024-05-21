@@ -196,7 +196,7 @@ downscale <- function(xyz, which_refmap = "auto",
   }
 
   if (!is.null(obs_periods)) {
-    message("Getting obsersved anomalies...")
+    message("Getting observed anomalies...")
     obs_periods <- input_obs(dbCon, bbox = thebb, period = obs_periods, cache = cache)
   }
   if (!is.null(obs_years)) {
