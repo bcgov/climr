@@ -126,10 +126,10 @@ in_xyz <- data.frame(
   Subzone = c("vm1", "vm2", "vs1", rep("mm", 3), "dk", "dc")
 )
 
-## obs observational time series
-vars <- c("PPT", "CMD", "Tave07")
-climate_norms_hist <- downscale(
-  xyz = in_xyz, which_refmap = "auto",
+## historic observational time series
+vars <- c("PPT", "CMD", "Tave_07")
+climate_norms_hist <- climr_downscale(
+  xyz = in_xyz, which_normal = "auto",
   return_normal = TRUE,
   obs_periods = "2001_2020",
   vars = vars,
