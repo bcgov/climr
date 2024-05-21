@@ -33,15 +33,15 @@ my_points <- data.frame(
 ds_out <- downscale(
   xyz = my_points, 
   which_refmap = "auto",
-  gcms = list_gcms()[2], # specify two global climate models
-  ssps = c("ssp370", "ssp245"), # specify two greenhouse gas concentration scenarios
-  gcm_periods = c("2001_2020", "2041_2060"), # specify two 20-year periods
-  gcm_ssp_years = 2024:2050,
-  gcm_hist_years = 1870:1930,
-  obs_years = 2015:2022,
-  obs_ts_dataset = c("cru.gpcc", "climatena"),
-  obs_periods = "2001_2020",
-  max_run = 3, # specify 3 individual runs for each model
+  #gcms = list_gcms()[2], # specify two global climate models
+  #ssps = c("ssp370", "ssp245"), # specify two greenhouse gas concentration scenarios
+  #gcm_periods = c("2001_2020", "2041_2060"), # specify two 20-year periods
+  #gcm_ssp_years = 2024:2050,
+  #gcm_hist_years = 1870:1930,
+  obs_years = 2015:2023,
+  obs_ts_dataset = c("climatena","cru.gpcc"),
+  #obs_periods = "2001_2020",
+  #max_run = 3, # specify 3 individual runs for each model
   vars = c("PPT", "CMD", "CMI", "Tmin_01")
 )
 
