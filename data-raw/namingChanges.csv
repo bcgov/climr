@@ -34,7 +34,7 @@ function name,,gcm_input,input_gcm
 parameter,gcm_ts_input,gcm,gcms
 parameter,gcm_hist_input,gcm,gcms
 parameter,gcm_input,gcm,gcms
-parameter,gcm_ts_input ,ssp,ssps
+parameter,gcm_ts_inputÂ ,ssp,ssps
 parameter,gcm_input,ssp,ssps
 parameter,historic_input,period,periods
 options,cache_clear,normal,refmap

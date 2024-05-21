@@ -6,46 +6,46 @@
 \usage{
 plot_timeSeries_input(
   xyz,
-  gcm_models = list_gcm(),
-  ssp = list_ssp(),
+  gcms = list_gcms(),
+  ssps = list_ssps(),
   max_run = 10,
-  historic_ts_dataset = c("cru.gpcc", "climatena"),
-  historic_ts = 1901:2022,
+  obs_ts_dataset = c("cru.gpcc", "climatena"),
+  obs_years = 1901:2022,
   gcm_hist_years = 1850:2014,
-  gcm_ts_years = 2015:2100,
-  vars = list_variables()
+  gcm_ssp_years = 2015:2100,
+  vars = list_vars()
 )
 }
 \arguments{
 \item{xyz}{a \code{data.frame} with the following columns "long", "lat", "elev",
 and a unique "id". Any extra columns will be ignored and not output.}
 
-\item{gcm_models}{character. Vector of global climate model names. Options
-are \code{\link[=list_gcm]{list_gcm()}}. Used for gcm periods, gcm timeseries, and historic timeseries.
+\item{gcms}{character. Vector of global climate model names. Options
+are \code{\link[=list_gcms]{list_gcms()}}. Used for gcms periods, gcms timeseries, and obs timeseries.
 Defaults to \code{NULL}.}
 
-\item{ssp}{character. Vector of SSP-RCP scenarios (representative concentration pathways paired with shared socioeconomic pathways).
-Options are \code{\link[=list_ssp]{list_ssp()}}. Defaults to all scenarios available.}
+\item{ssps}{character. Vector of SSP-RCP scenarios (representative concentration pathways paired with shared socioeconomic pathways).
+Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to all scenarios available.}
 
 \item{max_run}{integer. Maximum number of model runs to include.
 A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
 are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
-\item{historic_ts_dataset}{character. The dataset to use for observed time series data. Options
+\item{obs_ts_dataset}{character. The dataset to use for observed time series data. Options
 are \code{"climatena"} for the ClimateNA gridded time series or \code{"cru.gpcc"} for the combined Climatic
 Research Unit TS dataset (for Temperature) and Global Precipitation Climatology Centre dataset
 (for precipitation). Defaults to \code{NULL}.}
 
-\item{historic_ts}{integer. Vector of years to obtain individual years or time
-series of observed climate data. Default \code{NULL}. See \code{\link[=list_historic_ts]{list_historic_ts()}}
+\item{obs_years}{integer. Vector of years to obtain individual years or time
+series of observed climate data. Default \code{NULL}. See \code{\link[=list_obs_years]{list_obs_years()}}
 for available years.}
 
 \item{gcm_hist_years}{character.  Timeseries years for GCM simulations of the
-historical scenario. See \code{\link[=list_gcm_hist_ts]{list_gcm_hist_ts()}} for available years.
+historical scenario. See \code{\link[=list_gcm_hist_years]{list_gcm_hist_years()}} for available years.
 Defaults to \code{NULL}.}
 
-\item{gcm_ts_years}{character. Timeseries years for GCM simulations of future
-scenarios specified by \code{ssp}. See \code{\link[=list_gcm_ts]{list_gcm_ts()}} for available years.
+\item{gcm_ssp_years}{character. Timeseries years for GCM simulations of future
+scenarios specified by \code{ssps}. See \code{\link[=list_gcm_ssp_years]{list_gcm_ssp_years()}} for available years.
 Defaults to \code{NULL}.}
 }
 \value{

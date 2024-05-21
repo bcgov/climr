@@ -59,7 +59,7 @@ refNormals <- normal_input(
 breaks <- seq(7, 33, 0.1)
 colPal <- colorRampPalette(rev(hcl.colors(11, "RdYlBu")))
 
-plot(refNormals$Tmax07,
+plot(refNormals$Tmax_07,
   col = colPal(length(breaks) - 1),
   breaks = breaks, type = "continuous", ext = studyarea
 )
@@ -94,7 +94,7 @@ plot(bdy, add = T)
 Then we add these smoothed anomalies to the high-resolution 1961-1990 climate map, resulting in a high-resolution map of the simulated climate in 2041-2060.
 
 ```{r, fig.cap = "*Downscaled 2041-2060 July T~max~ for the EC-Earth model, resulting from addition of the interpolated low-resolution model anomalies (change factors) to the high resolution 1961-1990 reference climate.*"}
-gcm_example_downscaled <- refNormals$Tmax07 + gcm_example_interp
+gcm_example_downscaled <- refNormals$Tmax_07 + gcm_example_interp
 plot(gcm_example_downscaled,
   col = colPal(length(breaks) - 1),
   breaks = breaks, type = "continuous", ext = studyarea
@@ -111,7 +111,7 @@ The example above illustrates how change-factor downscaling is able to represent
 `climr` uses elevation adjustment to downscale temperature variables to scales finer than the resolution of the reference climate map. It does this by inferring a relationship between temperature and elevation, known as a lapse rate, from the reference climate maps. The local lapse rate is calculated for each grid cell of the reference climate map using a linear regression of temperature to elevation among the focal cell and its 8 neighbours. The gridded lapse rates are included in the `SpatRaster` returned by the `normal_input()` function used above. This is the `climr` lapse rate layer for July T~max~:
 
 ```{r, fig.cap = "*July T~max~ lapse rates (change in temperature relative to elevation; ^o^C/m) used for elevation adjustment*"}
-lapse <- crop(refNormals$lr_Tmax07, studyarea)
+lapse <- crop(refNormals$lr_Tmax_07, studyarea)
 toChange <- abs(values(lapse)) > quantile(abs(values(lapse)), 0.995, na.rm = TRUE)
 lapse[toChange] <- quantile(abs(values(lapse)), 0.99, na.rm = TRUE)
 plot(lapse, col = colPal(99))
@@ -133,15 +133,15 @@ clim.aoi <- climr_downscale(points_dat,
   gcm_period = list_gcm_period()[3],
   max_run = 0,
   return_normal = TRUE,
-  vars = c("Tmax07", "Tave01", "DD_0_01")
+  vars = c("Tmax_07", "Tave_01", "DDsub0_01")
 )
 X <- dem_aoi
 values(X) <- NA
-X[clim.aoi[PERIOD == "1961_1990", id]] <- clim.aoi[PERIOD == "1961_1990", Tmax07]
+X[clim.aoi[PERIOD == "1961_1990", id]] <- clim.aoi[PERIOD == "1961_1990", Tmax_07]
 par(mfrow = c(1, 2))
 breaks <- seq(14.5, 23.5, 0.1)
 
-plot(refNormals$Tmax07,
+plot(refNormals$Tmax_07,
   col = colPal(length(breaks) - 1), breaks = breaks,
   type = "continuous", ext = ext(dem_aoi),
   main = "climr reference map (800m grid)", cex.main = 0.8
@@ -174,16 +174,16 @@ knitr::include_graphics(normalizePath("WangEtAl2016_Fig4.png", winslash = "/"),
 Using the `climr` output for the EC-Earth3 climate model, we can compare the change in January mean temperature to change in January degree days below 0^o^C in the 2041-2060 period relative to the 1961-1990 baseline. January mean temperature is interpolated directly from the GCM, so the only variation in the climate change trend in this variable is the transition from one GCM grid cell to its neighbours. In contrast, January degree-days below 0^o^C, while derived directly from January mean temperature, has strong elevation-dependence in its climate change trend.
 
 ```{r, fig.cap = "*Downscaled change in January mean temperature (left) and its derived variable January degree days below 0^o^C (right), using the EC-Earth model simulation for 2041-2060.*", fig.show = "hold", fig.dim = c(7, 3)}
-Tave.ref <- Tave.proj <- DD_0.ref <- DD_0.proj <- X
-Tave.ref[clim.aoi[PERIOD == "1961_1990", id]] <- clim.aoi[PERIOD == "1961_1990", Tave01]
-Tave.proj[clim.aoi[PERIOD == "2041_2060", id]] <- clim.aoi[PERIOD == "2041_2060", Tave01]
-DD_0.ref[clim.aoi[PERIOD == "1961_1990", id]] <- clim.aoi[PERIOD == "1961_1990", DD_0_01]
-DD_0.proj[clim.aoi[PERIOD == "2041_2060", id]] <- clim.aoi[PERIOD == "2041_2060", DD_0_01]
+Tave.ref <- Tave.proj <- DDsub0.ref <- DDsub0.proj <- X
+Tave.ref[clim.aoi[PERIOD == "1961_1990", id]] <- clim.aoi[PERIOD == "1961_1990", Tave_01]
+Tave.proj[clim.aoi[PERIOD == "2041_2060", id]] <- clim.aoi[PERIOD == "2041_2060", Tave_01]
+DDsub0.ref[clim.aoi[PERIOD == "1961_1990", id]] <- clim.aoi[PERIOD == "1961_1990", DDsub0_01]
+DDsub0.proj[clim.aoi[PERIOD == "2041_2060", id]] <- clim.aoi[PERIOD == "2041_2060", DDsub0_01]
 par(mfrow = c(1, 2))
 colPal2 <- colorRampPalette(hcl.colors(9, "Reds"))(99)
 plot(Tave.ref - Tave.proj, col = colPal2, main = "Change in January mean temperature", cex.main = 0.8)
 plot(bdy, add = T)
-plot(DD_0.proj - DD_0.ref, col = colPal2, main = "Change in January degree-days <0C", cex.main = 0.8)
+plot(DDsub0.proj - DDsub0.ref, col = colPal2, main = "Change in January degree-days <0C", cex.main = 0.8)
 plot(bdy, add = T)
 ```
 
