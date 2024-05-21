@@ -26,6 +26,10 @@
 #' @param yvar character. y-axis variable. options are `list_vars()`.
 #' @param period_focal character. The 20-year period for which to plot the ensemble
 #'   detail. options are `list_gcm_periods()`.
+#' @param ssp character. A single SSP-RCP scenario (representative concentration pathways paired with shared socioeconomic pathways).
+#'   Options are [`list_ssps()`]. Defaults to SSP2-4.5. 
+#' @param obs_period character. A single 20-year period for observed climate data. 
+#'   Options are `list_obs_periods()`.
 #' @inheritParams downscale
 #' @param legend_pos character. Position of the legend. Options are `c("bottomright",
 #'   "bottom", "bottomleft", "left", "topleft", "top", "topright", "right", "center")`.
@@ -56,6 +60,9 @@
 #' # draw the plot
 #' plot_bivariate(my_points)
 #'
+#' # draw an interactive (plotly) plot
+#' plot_bivariate(my_points, interactive = TRUE)
+#'
 #' # export plot to a temporary directory
 #' figDir <- tempdir()
 #' png(
@@ -75,7 +82,7 @@ plot_bivariate <- function(
     # percent_y = NULL, TODO: set up an override for ratio variables being expressed as percent anomalies
     period_focal = list_gcm_periods()[1],
     gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)],
-    ssps = list_ssps()[2],
+    ssp = list_ssps()[2],
     obs_period = list_obs_periods()[1],
     gcm_periods = list_gcm_periods(),
     max_run = 10,
@@ -102,7 +109,7 @@ plot_bivariate <- function(
     data <- downscale(xyz,
       obs_periods = obs_period,
       gcms = gcms,
-      ssps = ssps,
+      ssps = ssp,
       gcm_periods = gcm_periods,
       max_run = max_run,
       vars = c(xvar, yvar),
@@ -141,19 +148,19 @@ plot_bivariate <- function(
 
       # plot individual runs
       if (show_runs) {
-        for (gcms in gcms) {
-          i <- which(gcms == gcms)
-          x.runs <- data.all[GCM == gcms & RUN != "ensembleMean" & PERIOD == period_focal, xanom]
-          y.runs <- data.all[GCM == gcms & RUN != "ensembleMean" & PERIOD == period_focal, yanom]
+        for (gcm in gcms) {
+          i <- which(gcms == gcm)
+          x.runs <- data.all[GCM == gcm & RUN != "ensembleMean" & PERIOD == period_focal, xanom]
+          y.runs <- data.all[GCM == gcm & RUN != "ensembleMean" & PERIOD == period_focal, yanom]
           points(x.runs, y.runs, pch = 21, bg = ColScheme[i], cex = 1)
         }
       }
 
       # plot model means and trajectories
-      for (gcms in gcms) {
-        i <- which(gcms == gcms)
-        x2 <- c(0, data[GCM == gcms & RUN == "ensembleMean", xanom])
-        y2 <- c(0, data[GCM == gcms & RUN == "ensembleMean", yanom])
+      for (gcm in gcms) {
+        i <- which(gcms == gcm)
+        x2 <- c(0, data[GCM == gcm & RUN == "ensembleMean", xanom])
+        y2 <- c(0, data[GCM == gcm & RUN == "ensembleMean", yanom])
         if (show_trajectories) {
           if (length(unique(sign(diff(x2)))) == 1) {
             x3 <- if (unique(sign(diff(x2))) == -1) rev(x2) else x2
@@ -215,12 +222,12 @@ plot_bivariate <- function(
 
         # plot individual runs
         if (show_runs) {
-          for (gcms in gcms) {
-            i <- which(gcms == gcms)
-            x.runs <- data.all[GCM == gcms & RUN != "ensembleMean" & PERIOD == period_focal, xanom]
-            y.runs <- data.all[GCM == gcms & RUN != "ensembleMean" & PERIOD == period_focal, yanom]
-            runs <- data.all[GCM == gcms & RUN != "ensembleMean" & PERIOD == period_focal, RUN]
-            ssps <- data.all[GCM == gcms & RUN != "ensembleMean" & PERIOD == period_focal, SSP]
+          for (gcm in gcms) {
+            i <- which(gcms == gcm)
+            x.runs <- data.all[GCM == gcm & RUN != "ensembleMean" & PERIOD == period_focal, xanom]
+            y.runs <- data.all[GCM == gcm & RUN != "ensembleMean" & PERIOD == period_focal, yanom]
+            runs <- data.all[GCM == gcm & RUN != "ensembleMean" & PERIOD == period_focal, RUN]
+            ssps <- data.all[GCM == gcm & RUN != "ensembleMean" & PERIOD == period_focal, SSP]
             fig <- fig %>% plotly::add_markers(
               x = x.runs, y = y.runs, color = ColScheme[i], name = "Individual GCM runs", text = paste(gcms[i], ssps, runs), hoverinfo = "text", showlegend = if (i == 1) TRUE else FALSE,
               marker = list(size = 7, color = ColScheme[i], line = list(color = "black", width = 1)), legendgroup = paste("group", i, sep = "")
@@ -230,11 +237,11 @@ plot_bivariate <- function(
 
         # GCM mean trajectories
         # plot model means and trajectories
-        gcms <- gcms[2]
-        for (gcms in gcms) {
-          i <- which(gcms == gcms)
-          x2 <- c(0, data[GCM == gcms & RUN == "ensembleMean", xanom])
-          y2 <- c(0, data[GCM == gcms & RUN == "ensembleMean", yanom])
+        gcm <- gcms[2]
+        for (gcm in gcms) {
+          i <- which(gcms == gcm)
+          x2 <- c(0, data[GCM == gcm & RUN == "ensembleMean", xanom])
+          y2 <- c(0, data[GCM == gcm & RUN == "ensembleMean", yanom])
           if (show_trajectories) {
             if (length(unique(sign(diff(x2)))) == 1) {
               x3 <- if (unique(sign(diff(x2))) == -1) rev(x2) else x2

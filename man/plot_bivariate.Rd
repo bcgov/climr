@@ -10,8 +10,8 @@ plot_bivariate(
   yvar = "PPT_sm",
   period_focal = list_gcm_periods()[1],
   gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)],
-  ssps = list_ssps()[2],
-  obs_periods = list_obs_periods()[1],
+  ssp = list_ssps()[2],
+  obs_period = list_obs_periods()[1],
   gcm_periods = list_gcm_periods(),
   max_run = 10,
   legend_pos = "bottomleft",
@@ -38,11 +38,11 @@ detail. options are \code{list_gcm_periods()}.}
 are \code{\link[=list_gcms]{list_gcms()}}. Used for gcms periods, gcms timeseries, and obs timeseries.
 Defaults to \code{NULL}.}
 
-\item{ssps}{character. Vector of SSP-RCP scenarios (representative concentration pathways paired with shared socioeconomic pathways).
-Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to all scenarios available.}
+\item{ssp}{character. A single SSP-RCP scenario (representative concentration pathways paired with shared socioeconomic pathways).
+Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to SSP2-4.5.}
 
-\item{obs_periods}{character. Which obs period for observed climate
-data, averaged over this period. Options are \code{\link[=list_obs_periods]{list_obs_periods()}}. Default \code{NULL}}
+\item{obs_period}{character. A single 20-year period for observed climate data.
+Options are \code{list_obs_periods()}.}
 
 \item{gcm_periods}{character. 20-year reference periods for GCM simulations.
 Options are \code{\link[=list_gcm_periods]{list_gcm_periods()}}. Defaults to \code{NULL}.}
@@ -105,6 +105,9 @@ my_points <- data.frame(
 
 # draw the plot
 plot_bivariate(my_points)
+
+# draw an interactive (plotly) plot
+plot_bivariate(my_points, interactive = TRUE)
 
 # export plot to a temporary directory
 figDir <- tempdir()
