@@ -11,7 +11,7 @@ plot_bivariate(
   period_focal = list_gcm_periods()[1],
   gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)],
   ssps = list_ssps()[2],
-  historic_period = list_obs_periods()[1],
+  obs_periods = list_obs_periods()[1],
   gcm_periods = list_gcm_periods(),
   max_run = 10,
   legend_pos = "bottomleft",
@@ -40,6 +40,9 @@ Defaults to \code{NULL}.}
 
 \item{ssps}{character. Vector of SSP-RCP scenarios (representative concentration pathways paired with shared socioeconomic pathways).
 Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to all scenarios available.}
+
+\item{obs_periods}{character. Which obs period for observed climate
+data, averaged over this period. Options are \code{\link[=list_obs_periods]{list_obs_periods()}}. Default \code{NULL}}
 
 \item{gcm_periods}{character. 20-year reference periods for GCM simulations.
 Options are \code{\link[=list_gcm_periods]{list_gcm_periods()}}. Defaults to \code{NULL}.}
