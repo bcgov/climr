@@ -10,7 +10,7 @@ plot_timeSeries(
   var2 = NULL,
   showObserved = TRUE,
   obs_ts_dataset = "climatena",
-  gcms = list_gcms()[c(1, 4, 5, 7, 10, 11, 12)],
+  gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)],
   ssps = list_ssps()[1:3],
   showrange = TRUE,
   yfit = TRUE,
