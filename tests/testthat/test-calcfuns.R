@@ -65,12 +65,12 @@ test_that("calc_* give sensible outputs", {
   )
   thebb <- get_bb(xyz)
 
-  normalbc <- normal_input(dbCon = dbCon, normal = "normal_bc", bbox = thebb, cache = TRUE)
+  normalbc <- input_refmap(dbCon = dbCon, reference = "refmap_prism", bbox = thebb, cache = TRUE)
 
-  gcm <- gcm_input(dbCon,
+  gcm <- input_gcms(dbCon,
     bbox = thebb,
-    gcm = c("BCC-CSM2-MR"),
-    ssp = c("ssp126"),
+    gcms = c("BCC-CSM2-MR"),
+    ssps = c("ssp126"),
     period = "2041_2060",
     max_run = 0,
     cache = TRUE
@@ -86,13 +86,13 @@ test_that("calc_* give sensible outputs", {
   )
   sample_xyz[, 3] <- terra::extract(normalbc$dem2_WNA, sample_xyz[, 1:2], method = "bilinear")[, -1L]
 
-  ds_res_bc <- downscale(sample_xyz, normal = normalbc, gcm = gcm, var = list_variables())
+  ds_res_bc <- downscale_core(sample_xyz, refmap = normalbc, gcms = gcm, vars = list_vars())
 
   sample_xyz$ID <- 1:nrow(sample_xyz)
   ds_res_bc <- as.data.table(sample_xyz)[ds_res_bc, on = .(id)]
   ds_res_bc[, .(lat, lon, elev, Tmax, PPT_01, CMD, Eref)]
 
-  ## if elevation of inout climate data are NA, downscaled variables should be as well.
+  ## if elevation of input climate data are NA, downscaled variables should be as well.
   expect_true(all(is.na(ds_res_bc[is.na(elev), .SD, .SDcols = list_variables()])))
   expect_true(all(is.na(ds_res_bc[is.na(PPT_01), .SD, .SDcols = list_variables()])))
   ## conversely, if there is input data, there should be no NAs in downscaled vars
