@@ -4,7 +4,7 @@
 * We overhauled the naming of functions, parameters, and options to make them more intuitive and internally consistent. You will need to revise the climr code in your workflows to accommodate these changes. A table of correspondence specifying the changes is located at ./data-raw/namingChanges.csv and is viewable by calling ?climr. 
 
 ## User Actions Required
-* to implement the out-of-bounds bug fix, users will need to discard their cached reference normals by running the following line of code: cache_clear("normal") 
+* to implement the out-of-bounds bug fix, users will need to discard their cached reference normals by running the following line of code: cache_clear() 
 
 ## Bug Fixes
 * fixed an out-of-bounds error that affected user queries close to the coastline. 
