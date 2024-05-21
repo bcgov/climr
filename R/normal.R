@@ -84,8 +84,19 @@ input_refmap <- function(dbCon, bbox, reference = "refmap_climatena", cache = TR
   }
 
   if (needDownload) {
+    if(!grepl("normal",reference)){
+      rmap_nm <- switch(reference, 
+                        refmap_prism = "normal_bc", 
+                        refmap_climr = "normal_composite",
+                        refmap_climatena = "normal_na",
+                        auto = "normal_composite"
+      )
+    }else{
+      rmap_nm <- reference
+    }
+    
     message("Downloading new data...")
-    res <- pgGetTerra(dbCon, reference, tile = TRUE, boundary = bbox, bands = 1:73)
+    res <- pgGetTerra(dbCon, rmap_nm, tile = TRUE, boundary = bbox, bands = 1:73)
     names(res) <- c(
       "PPT_01", "PPT_02", "PPT_03", "PPT_04", "PPT_05", "PPT_06", "PPT_07",
       "PPT_08", "PPT_09", "PPT_10", "PPT_11", "PPT_12", "Tmax_01", "Tmax_02",

@@ -1,4 +1,4 @@
-test_that("test climr_dowscale basic and spatial", {
+test_that("test dowscale basic and spatial", {
   testInit("data.table")
 
   dbCon <- data_connect()
@@ -18,12 +18,11 @@ test_that("test climr_dowscale basic and spatial", {
   ## get bounding box based on input points
   thebb <- get_bb(xyz)
 
-  ds_hist <- climr_downscale(
-    xyz = xyz, which_normal = "auto",
-    historic_period = "2001_2020",
-    return_normal = TRUE, ## put this to TRUE if you want the 1961-1990 period
+  ds_hist <- downscale(
+    xyz = xyz, which_refmap = "auto",
+    obs_periods = "2001_2020",
     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07")
-  ) ## specify desired variablesds_hist <- climr_downscale(xyz = xyz, which_normal = "auto",
+  ) ## specify desired variablesds_hist <- climr_downscale(xyz = xyz, which_refmap = "auto",
 
   test <- length(setdiff(ds_hist$id, xyz$id)) + length(setdiff(xyz$id, ds_hist$id))
   expect_true(test == 0)
@@ -36,20 +35,20 @@ test_that("test climr_dowscale basic and spatial", {
   ## ID cols shouldn't be present
 
 
-  ds_hist2 <- climr_downscale(
-    xyz = xyz, which_normal = "auto",
-    historic_period = "2001_2020",
-    return_normal = FALSE, ## put this to TRUE if you want the 1961-1990 period
+  ds_hist2 <- downscale(
+    xyz = xyz, which_refmap = "auto",
+    obs_periods = "2001_2020",
+    return_refperiod = FALSE, ## put this to TRUE if you want the 1961-1990 period
     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07")
   )
   expect_true(all(ds_hist2[, .N, by = id][, N] == 1)) ## should have  only historic period per ID
   test <- as.data.table(xyz)[ds_hist2, on = .(id), nomatch = NA]
   expect_false(any(is.na(test)))
 
-  ds_hist_spatial <- climr_downscale(
-    xyz = xyz, which_normal = "auto",
-    historic_period = "2001_2020",
-    return_normal = TRUE, ## put this to TRUE if you want the 1961-1990 period
+  ds_hist_spatial <- downscale(
+    xyz = xyz, which_refmap = "auto",
+    obs_periods = "2001_2020",
+    return_refperiod = TRUE, ## put this to TRUE if you want the 1961-1990 period
     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
     out_spatial = TRUE
   )
@@ -58,9 +57,9 @@ test_that("test climr_dowscale basic and spatial", {
   expect_true(all(test[, .N, by = id][, N] == 2))
 
   ds_hist_spatial2 <- climr_downscale(
-    xyz = xyz, which_normal = "auto",
-    historic_period = "2001_2020",
-    return_normal = FALSE, ## put this to TRUE if you want the 1961-1990 period
+    xyz = xyz, which_refmap = "auto",
+    obs_periods = "2001_2020",
+    return_refperiod = FALSE, ## put this to TRUE if you want the 1961-1990 period
     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
     out_spatial = TRUE
   )
@@ -68,48 +67,48 @@ test_that("test climr_dowscale basic and spatial", {
   test <- as.data.table(ds_hist_spatial2)
   expect_true(all(test[, .N, by = id][, N] == 1))
 
-  if (interactive()) {
-    ## check plots
-    x11()
-    ds_hist_spatial2 <- climr_downscale(
-      xyz = xyz, which_normal = "auto",
-      historic_period = "2001_2020", return_normal = TRUE,
-      vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
-      out_spatial = TRUE, plot = "CMD"
-    )
-
-    ds_hist_spatial2 <- climr_downscale(
-      xyz = xyz, which_normal = "auto",
-      historic_period = "2001_2020",
-      vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
-      out_spatial = TRUE, plot = "CMD"
-    )
-
-    ds_hist_spatial2 <- climr_downscale(
-      xyz = xyz, which_normal = "auto",
-      historic_period = "2001_2020",
-      gcm_models = list_gcm()[1],
-      gcm_period = list_gcm_period()[1],
-      ssp = list_ssp()[1], max_run = 0,
-      return_normal = TRUE, ## put this to TRUE if you want the 1961-1990 period
-      vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
-      out_spatial = TRUE, plot = "CMD"
-    )
-
-    ds_hist_spatial2 <- climr_downscale(
-      xyz = xyz, which_normal = "auto",
-      historic_period = "2001_2020",
-      gcm_models = list_gcm()[1:2],
-      gcm_period = list_gcm_period()[1:2],
-      ssp = list_ssp()[1:2], max_run = 2,
-      return_normal = TRUE, ## put this to TRUE if you want the 1961-1990 period
-      vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
-      out_spatial = TRUE, plot = "CMD"
-    )
-  }
+  # if (interactive()) {
+  #   ## check plots
+  #   x11()
+  #   ds_hist_spatial2 <- downscale(
+  #     xyz = xyz, which_refmap = "auto",
+  #     obs_periods = "2001_2020", return_refperiod = TRUE,
+  #     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
+  #     out_spatial = TRUE, plot = "CMD"
+  #   )
+  # 
+  #   ds_hist_spatial2 <- downscale(
+  #     xyz = xyz, which_refmap = "auto",
+  #     obs_periods = "2001_2020",
+  #     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
+  #     out_spatial = TRUE, plot = "CMD"
+  #   )
+  # 
+  #   ds_hist_spatial2 <- downscale(
+  #     xyz = xyz, which_refmap = "auto",
+  #     obs_periods = "2001_2020",
+  #     gcm_models = list_gcm()[1],
+  #     gcms = list_gcm_period()[1],
+  #     ssp = list_ssp()[1], max_run = 0,
+  #     return_refperiod = TRUE, ## put this to TRUE if you want the 1961-1990 period
+  #     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
+  #     out_spatial = TRUE, plot = "CMD"
+  #   )
+  # 
+  #   ds_hist_spatial2 <- downscale(
+  #     xyz = xyz, which_refmap = "auto",
+  #     obs_periods = "2001_2020",
+  #     gcm_models = list_gcm()[1:2],
+  #     gcms = list_gcm_period()[1:2],
+  #     ssp = list_ssp()[1:2], max_run = 2,
+  #     return_refperiod = TRUE, ## put this to TRUE if you want the 1961-1990 period
+  #     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
+  #     out_spatial = TRUE, plot = "CMD"
+  #   )
+  # }
 })
 
-test_that("test climr_dowscale with different argument combinations", {
+test_that("test downscale with different argument combinations", {
   testInit("data.table")
 
   ## a small no. of points
@@ -126,39 +125,39 @@ test_that("test climr_dowscale with different argument combinations", {
   )
 
   argsCombos <- expand.grid(
-    which_normal = c("auto", "normal_na"), historic_period = c(NA, "2001_2020"),
-    historic_ts = c(NA, "1990:2010"), historic_ts_dataset = c(NA,"cru_gpcc","climate_na"),
-    gcm_models = c(NA, "list_gcm()[2]"),
-    ssp = c(NA, "list_ssp()[1:3]"), gcm_period = c(NA, "list_gcm_period()[1]"),
-    gcm_ts_years = c(NA, "2040:2050"), gcm_hist_years = c(NA, "1990:2010")
+    which_refmap = c("auto", "refmap_composite"), obs_periods = c(NA, "2001_2020"),
+    obs_years = c(NA, "1990:2010"), obs_ts_dataset = c(NA,"cru_gpcc","climate_na"),
+    gcms = c(NA, "list_gcm()[2]"),
+    ssps = c(NA, "list_ssp()[1:3]"), gcm_periods = c(NA, "list_gcm_period()[1]"),
+    gcm_ssp_years = c(NA, "2040:2050"), gcm_hist_years = c(NA, "1990:2010")
   ) |>
     as.data.table()
 
   ## remove silly combos
   argsCombos[
-    is.na(gcm_models),
-    `:=`(gcm_period = NA, gcm_ts_years = NA, gcm_hist_years = NA, ssp = NA)
+    is.na(gcms),
+    `:=`(gcm_periods = NA, gcm_ssp_years = NA, gcm_hist_years = NA, ssps = NA)
   ]
   argsCombos[
-    is.na(historic_ts),
-    `:=`(historic_ts_dataset = NA)
+    is.na(obs_years),
+    `:=`(obs_ts_dataset = NA)
   ]
   argsCombos[
-    is.na(historic_ts_dataset),
-    `:=`(historic_ts = NA)
+    is.na(obs_ts_dataset),
+    `:=`(obs_years = NA)
   ]
   argsCombos[
-    is.na(gcm_period) & is.na(gcm_ts_years) & is.na(gcm_hist_years),
-    `:=`(gcm_models = NA, ssp = NA)
+    is.na(gcm_periods) & is.na(gcm_ssp_years) & is.na(gcm_hist_years),
+    `:=`(gcms = NA, ssps = NA)
   ]
   argsCombos[
-    is.na(gcm_period) & is.na(gcm_ts_years),
-    `:=`(ssp = NA)
+    is.na(gcm_periods) & is.na(gcm_ssp_years),
+    `:=`(ssps = NA)
   ]
   
   argsCombos[
-    is.na(ssp),
-    `:=`(gcm_period = NA, gcm_ts_years = NA)
+    is.na(ssps),
+    `:=`(gcm_periods = NA, gcm_ssp_years = NA)
   ]
   argsCombos <- unique(argsCombos)
 
@@ -168,42 +167,42 @@ test_that("test climr_dowscale with different argument combinations", {
     suppressWarnings(args$xyz <- xyz) # coerces to list.
     args$vars <- c("PPT", "CMD") ## for faster results.
 
-    if (!is.null(args$historic_ts)) {
-      args$historic_ts <- eval(parse(text = args$historic_ts))
+    if (!is.null(args$obs_years)) {
+      args$obs_years <- eval(parse(text = args$obs_years))
     }
-    if (!is.null(args$gcm_models)) {
-      args$gcm_models <- eval(parse(text = args$gcm_models))
+    if (!is.null(args$gcms)) {
+      args$gcms <- eval(parse(text = args$gcms))
     }
-    if (!is.null(args$ssp)) {
-      args$ssp <- eval(parse(text = args$ssp))
+    if (!is.null(args$ssps)) {
+      args$ssps <- eval(parse(text = args$ssps))
     }
-    if (!is.null(args$gcm_period)) {
-      args$gcm_period <- eval(parse(text = args$gcm_period))
+    if (!is.null(args$gcm_periods)) {
+      args$gcm_periods <- eval(parse(text = args$gcm_periods))
     }
-    if (!is.null(args$gcm_ts_years)) {
-      args$gcm_ts_years <- eval(parse(text = args$gcm_ts_years))
+    if (!is.null(args$gcm_ssp_years)) {
+      args$gcm_ssp_years <- eval(parse(text = args$gcm_ssp_years))
     }
     if (!is.null(args$gcm_hist_years)) {
       args$gcm_hist_years <- eval(parse(text = args$gcm_hist_years))
     }
 
-    out <- try(do.call(climr_downscale, args))
+    out <- try(do.call(downscale, args))
 
     test <- is(out, "data.table")
     test2 <- all(c("id") %in% names(out))
     test3 <- all(args$vars %in% names(out))
 
     ## check outputs of arguments that produce changing output columns
-    checkArgs <- setdiff(names(args), c("which_normal", "xyz", "vars"))
+    checkArgs <- setdiff(names(args), c("which_refmap", "xyz", "vars"))
     test4 <- logical(0)
     i <- 1
     if (length(checkArgs)) {
-      if ("historic_period" %in% checkArgs) {
-        test4[i] <- all(args$historic_period %in% unique(out$PERIOD))
+      if ("obs_periods" %in% checkArgs) {
+        test4[i] <- all(args$obs_periods %in% unique(out$PERIOD))
         i <- i + 1
       }
-      if ("historic_ts" %in% checkArgs) {
-        test4[i] <- all(args$historic_ts %in% unique(out$PERIOD))
+      if ("obs_years" %in% checkArgs) {
+        test4[i] <- all(args$obs_years %in% unique(out$PERIOD))
         i <- i + 1
       }
       if ("gcm_models" %in% checkArgs) {
@@ -216,8 +215,8 @@ test_that("test climr_dowscale with different argument combinations", {
         i <- i + 1
       }
 
-      if ("gcm_period" %in% checkArgs) {
-        test4[i] <- all(args$gcm_period %in% unique(out$PERIOD))
+      if ("gcms" %in% checkArgs) {
+        test4[i] <- all(args$gcms %in% unique(out$PERIOD))
         i <- i + 1
       }
 
@@ -226,8 +225,8 @@ test_that("test climr_dowscale with different argument combinations", {
         i <- i + 1
       }
 
-      if ("gcm_ts_years" %in% checkArgs) {
-        test4[i] <- all(args$gcm_ts_years %in% unique(out$PERIOD))
+      if ("gcm_ssp_years" %in% checkArgs) {
+        test4[i] <- all(args$gcm_ssp_years %in% unique(out$PERIOD))
         i <- i + 1
       }
     }
@@ -250,7 +249,7 @@ test_that("test climr_dowscale all periods, all GCMs, all SSPS, all years", {
     id = LETTERS[1:8]
   )
 
-  normals <- c("auto", "normal_bc", "normal_na")
+  normals <- c("auto", "refmap_prism", "refmap_climatena")
 
   sapply(normals, function(normal) {
     maxrun <- 2
@@ -258,16 +257,16 @@ test_that("test climr_dowscale all periods, all GCMs, all SSPS, all years", {
 
     cd_out <- climr_downscale(
       xyz,
-      which_normal = normal,
-      historic_period = list_historic(),
-      historic_ts = 1902:2015,
+      which_refmap = normal,
+      obs_periods = list_historic(),
+      obs_years = 1902:2015,
       historic_ts_dataset = "climate_na",
       gcm_models = gcms,
       ssp = list_ssp(),
-      gcm_period = list_gcm_period(),
-      gcm_ts_years = 2015:2100,
+      gcms = list_gcm_period(),
+      gcm_ssp_years = 2015:2100,
       gcm_hist_years = 1850:2014,
-      return_normal = TRUE,
+      return_refperiod = TRUE,
       max_run = maxrun,
       cache = TRUE,
       vars = list_variables()
