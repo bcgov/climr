@@ -76,7 +76,7 @@ plot_bivariate <- function(
     period_focal = list_gcm_periods()[1],
     gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)],
     ssps = list_ssps()[2],
-    obs_periods = list_obs_periods()[1],
+    obs_period = list_obs_periods()[1],
     gcm_periods = list_gcm_periods(),
     max_run = 10,
     legend_pos = "bottomleft",
@@ -92,15 +92,15 @@ plot_bivariate <- function(
     data("variables", envir = environment())
 
     # variable types for default scaling (percent or absolute)
-    xvar_type <- variables$Scale[which(variables$Code == xvar)]
-    yvar_type <- variables$Scale[which(variables$Code == yvar)]
+    xvar_type <- variables$Type[which(variables$Code == xvar)]
+    yvar_type <- variables$Type[which(variables$Code == yvar)]
 
     colors <- c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C", "#FB9A99", "#E31A1C", "#FDBF6F", "#FF7F00", "#CAB2D6", "#6A3D9A", "#1e90ff", "#B15928", "#FFFF99")
     ColScheme <- colors[1:length(gcms)]
 
     # generate the climate data
     data <- downscale(xyz,
-      obs_periods = obs_periods,
+      obs_periods = obs_period,
       gcms = gcms,
       ssps = ssps,
       gcm_periods = gcm_periods,
@@ -110,8 +110,8 @@ plot_bivariate <- function(
     )
 
     # convert absolute values to anomalies
-    data[, xanom := if (xvar_type == "Log") (get(xvar) / get(xvar)[1] - 1) else (get(xvar) - get(xvar)[1]), by = id]
-    data[, yanom := if (yvar_type == "Log") (get(yvar) / get(yvar)[1] - 1) else (get(yvar) - get(yvar)[1]), by = id]
+    data[, xanom := if (xvar_type == "ratio") (get(xvar) / get(xvar)[1] - 1) else (get(xvar) - get(xvar)[1]), by = id]
+    data[, yanom := if (yvar_type == "ratio") (get(yvar) / get(yvar)[1] - 1) else (get(yvar) - get(yvar)[1]), by = id]
 
     # collapse the points down to a mean anomaly
     data.all <- copy(data[, .(xanom = mean(xanom), yanom = mean(yanom)), by = .(GCM, SSP, RUN, PERIOD)])
@@ -120,7 +120,7 @@ plot_bivariate <- function(
     # ensemble mean for the selected period
     ensMean <- data[!is.na(GCM) & RUN == "ensembleMean" & PERIOD == period_focal, .(xanom = mean(xanom), yanom = mean(yanom)), ]
     # observed climate
-    obs <- data[is.na(GCM) & PERIOD == historic_period]
+    obs <- data[is.na(GCM) & PERIOD == obs_period]
 
     if (interactive == FALSE) {
       # BASE PLOT
@@ -171,8 +171,8 @@ plot_bivariate <- function(
       }
 
       # axis labels
-      axis(1, at = pretty(data.all$xanom), labels = if (xvar_type == "Log") paste(pretty(data.all$xanom) * 100, "%", sep = "") else pretty(data.all$xanom), tck = 0)
-      axis(2, at = pretty(data.all$yanom), labels = if (yvar_type == "Log") paste(pretty(data.all$yanom) * 100, "%", sep = "") else pretty(data.all$yanom), las = 2, tck = 0)
+      axis(1, at = pretty(data.all$xanom), labels = if (xvar_type == "ratio") paste(pretty(data.all$xanom) * 100, "%", sep = "") else pretty(data.all$xanom), tck = 0)
+      axis(2, at = pretty(data.all$yanom), labels = if (yvar_type == "ratio") paste(pretty(data.all$yanom) * 100, "%", sep = "") else pretty(data.all$yanom), las = 2, tck = 0)
 
       # Legend
       s <- c(show_observed, show_runs, TRUE, show_trajectories, show_ensMean)
@@ -262,8 +262,8 @@ plot_bivariate <- function(
           )
         }
 
-        if (xvar_type == "Log") fig <- fig %>% plotly::layout(xaxis = list(tickformat = "%"))
-        if (yvar_type == "Log") fig <- fig %>% plotly::layout(yaxis = list(tickformat = "%"))
+        if (xvar_type == "ratio") fig <- fig %>% plotly::layout(xaxis = list(tickformat = "%"))
+        if (yvar_type == "ratio") fig <- fig %>% plotly::layout(yaxis = list(tickformat = "%"))
 
         fig
       }
