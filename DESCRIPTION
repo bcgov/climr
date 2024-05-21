@@ -35,7 +35,8 @@ Imports:
     terra,
     sf,
     stinepack,
-    uuid
+    uuid,
+    scales
 Suggests: 
     ggplot2,
     knitr,
