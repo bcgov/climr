@@ -6,10 +6,10 @@
 \usage{
 plot_timeSeries(
   X,
-  variable1 = "Tmin_sm",
-  variable2 = NULL,
+  var1 = "Tmin_sm",
+  var2 = NULL,
   showObserved = TRUE,
-  historic_ts_dataset = "climatena",
+  obs_ts_dataset = "climatena",
   gcms = list_gcms()[c(1, 4, 5, 7, 10, 11, 12)],
   ssps = list_ssps()[1:3],
   showrange = TRUE,
@@ -34,12 +34,17 @@ plot_timeSeries(
 table can include more models, scenarios, and variables than are used in individual calls to
 \code{\link[=plot_timeSeries]{plot_timeSeries()}}.}
 
-\item{variable1}{character. A climate variable. options are \code{\link[=list_vars]{list_vars()}}.}
+\item{var1}{character. A climate var. options are \code{\link[=list_vars]{list_vars()}}.}
 
-\item{variable2}{character. A second climate variable to plot in combination with \code{variable1}.
+\item{var2}{character. A second climate var to plot in combination with \code{var1}.
 options are \code{\link[=list_vars]{list_vars()}}.}
 
 \item{showObserved}{logical. Plot a time series of observed climate.}
+
+\item{obs_ts_dataset}{character. The dataset to use for observed time series data. Options
+are \code{"climatena"} for the ClimateNA gridded time series or \code{"cru.gpcc"} for the combined Climatic
+Research Unit TS dataset (for Temperature) and Global Precipitation Climatology Centre dataset
+(for precipitation). Defaults to \code{NULL}.}
 
 \item{gcms}{character. Vector of global climate model names. Options
 are \code{\link[=list_gcms]{list_gcms()}}. Used for gcms periods, gcms timeseries, and obs timeseries.
@@ -52,7 +57,7 @@ Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to all scenarios ava
 selected ensemble of GCM simulations for each selected scenario.}
 
 \item{yfit}{logical. Set the range of the y axis to the range of the visible data. If \code{FALSE}
-the y axis is the range of all values of \code{variable1} (and \code{variable2} if applicable) in the
+the y axis is the range of all values of \code{var1} (and \code{var2} if applicable) in the
 input table defined by \code{X}.}
 
 \item{cex}{Numeric. The magnification factor for text size. Default is 1.}
@@ -68,7 +73,7 @@ If \code{FALSE} the single-model ensembles are plotted individually.}
 
 \item{simplify}{logical. Simplify the ensemble range and mean using a smoothing spline.}
 
-\item{refline}{logical. Plot the 1961-1990 reference period mean for the selected variable
+\item{refline}{logical. Plot the 1961-1990 reference period mean for the selected var
 and extend this line to the year 2100 as a visual reference.}
 
 \item{refline.obs}{logical. Plot the 1961-1990 reference period mean for the observational data.
@@ -109,8 +114,8 @@ The input table \code{X} provides climate data for a single location or the aver
 The purpose of conducting the generation of the input table in a separate function is to allow users
 to make multiple calls to \code{\link[=plot_timeSeries]{plot_timeSeries()}} without needing to generate the inputs each time.
 
-Some combinations of \code{variable1} and \code{variable2} are not compatible or meaningful.
-Examples of meaningful combinations are winter vs summer values of the same climate variable or minimum vs.
+Some combinations of \code{var1} and \code{var2} are not compatible or meaningful.
+Examples of meaningful combinations are winter vs summer values of the same climate var or minimum vs.
 maximum temperatures.
 }
 \examples{
@@ -121,16 +126,16 @@ my_points <- data.frame(lon = c(-127.7300,-127.7500), lat = c(55.34114, 55.25), 
 my_data <- plot_timeSeries_input(my_points)
 
 # use the input to create a plot
-plot_timeSeries(my_data, variable1 = "Tmin_sm")
+plot_timeSeries(my_data, var1 = "Tmin_sm")
 
 # compare observational time series
-plot_timeSeries(my_data, variable1 = "Tmin_sm", historic_ts_dataset = c("cru.gpcc", "climatena"))
+plot_timeSeries(my_data, var1 = "Tmin_sm", obs_ts_dataset = c("cru.gpcc", "climatena"))
 
 # compare mean daily minimum and maximum temperatures
-plot_timeSeries(my_data, variable1 = "Tmin_sm", variable2 = "Tmax_sm")
+plot_timeSeries(my_data, var1 = "Tmin_sm", var2 = "Tmax_sm")
 
 # compare summer and winter temperatures (without simplifying the ensemble range)
-plot_timeSeries(my_data, variable1 = "Tmax_sm", variable2 = "Tmax_wt", simplify = FALSE)
+plot_timeSeries(my_data, var1 = "Tmax_sm", var2 = "Tmax_wt", simplify = FALSE)
 
 # compare global climate models
 plot_timeSeries(my_data, gcms = list_gcms()[c(7,13)], pal = "gcms", ssps = list_ssps()[2], showmean = FALSE, compile = FALSE, simplify = FALSE, endlabel = "gcms", mar=c(3,3,0.1,6), showObserved = FALSE)
@@ -141,7 +146,7 @@ png(
   filename = file.path(figDir, "plot_test.png"), type = "cairo", units = "in",
   width = 6, height = 5, pointsize = 10, res = 300
 )
-plot_timeSeries(my_data, variable1 = "Tmin_sm", mar=c(3,3,2,4))
+plot_timeSeries(my_data, var1 = "Tmin_sm", mar=c(3,3,2,4))
 title("Historical and projected summer night-time warming in the Bulkley Valley, BC")
 dev.off()
 
