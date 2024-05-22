@@ -47,7 +47,7 @@ shinyServer(function(input, output, session) {
     set(monthly_values, j = "RH", value = calc_RH(monthly_values$tasmin, monthly_values$tasmax))
     set(monthly_values, j = "RH", value = calc_RH(monthly_values$tasmin, monthly_values$tasmax))
     set(monthly_values, j = "NFFD", value = calc_NFFD(1:12, tm = monthly_values$tasmin))
-    set(monthly_values, j = "PAS", value = calc_PAS(1:12, tm = monthly_values$tasmin))
+    set(monthly_values, j = "PAS", value = calc_PAS(1:12, tm = monthly_values$Tavg))
     return(monthly_values[ , lapply(.SD, function(x) round(x, 1))])
   })
   

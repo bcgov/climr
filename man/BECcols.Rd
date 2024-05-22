@@ -3,7 +3,7 @@
 \docType{data}
 \name{BECcols}
 \alias{BECcols}
-\title{Colour sscheme for Biogeoclimatic Ecological Classification Zones}
+\title{Colour scheme for Biogeoclimatic Ecological Classification Zones}
 \format{
 a \code{data.table}
 }

@@ -90,10 +90,12 @@ ext <- function(t_max_list, td) {
 
 ## *** RH ***
 
+# Magnus-Tetens empirical formula for saturation vapour pressure, with units of degrees C and kPa
+# obtained from: https://andrewsforest.oregonstate.edu/sites/default/files/lter/data/studies/ms01/dewpt_vpd_calculations.pdf
 # es: saturated vapour pressure at a temperature t
 # t: air temperature
 es <- function(t) {
-  svp <- 0.6105 * exp((17.273 * t) / (t + 237.3))
+  svp <- 0.61078 * exp((17.269 * t) / (t + 237.3))
 
   if (t < 0) {
     return(svp * (1 + (t * 0.01)))
@@ -123,13 +125,13 @@ dd_param_above_18 <- read.csv(file = "data-raw/derivedVariables/optimizedParamet
 
 dd <- function(m, tm) {
   # ***********************************************
-  # Question, I think it should be dd < 5 (not > 5)
+  # NOTE the error in this function (it should be tm > 5, not <)
   # ***********************************************
   dd_param <- ""
 
   if (tm < 0) {
     dd_param <- dd_param_below_0
-  } else if (tm < 5) {
+  } else if (tm < 5) { #TODO check that this is correct
     dd_param <- dd_param_above_5[dd_param_above_5$Region == "All"]
   } else if (tm < 18) {
     dd_param <- dd_param_below_18

@@ -4,16 +4,16 @@
 \name{climr-package}
 \alias{climr}
 \alias{climr-package}
-\title{climr: Downscaling of global climate data}
+\title{climr: Downscaling climate data in R}
 \description{
-`climr` is an experimental R package that builds on the downscaling concepts operationalized in the ClimateNA tool (climatena.ca) (Wang et al. 2016). It provides downscaling of observational and simulated climate data using change-factor downscaling, a simple method that adds low-spatial-resolution climate anomalies to a high-spatial-resolution reference climatological map, with additional elevation adjustment for temperature. Elevation-adjusted monthly values of basic climate elements (temperature and precipitation) are then used to estimate derived variables (e.g., degree-days) based on published equations and parameters from Wang et al. 2016. `climr` is designed to be fast and to minimize local data storage requirements. To do so, it uses a remote PostGIS database, and optionally caches data locally.
+`climr` is an R package that builds on the downscaling concepts operationalized in the ClimateNA tool (climatena.ca) (Wang et al. 2016). It provides downscaling of observational and simulated climate data using change-factor downscaling, a simple method that adds low-spatial-resolution climate anomalies to a high-spatial-resolution reference climatological map, with additional elevation adjustment for temperature. Elevation-adjusted monthly values of basic climate elements (temperature and precipitation) are then used to estimate derived variables (e.g., degree-days) based on published equations and parameters from Wang et al. 2016. `climr` is designed to be fast and to minimize local data storage requirements. To do so, it uses a remote PostGIS database, and optionally caches data locally.
 }
 \author{
-\strong{Maintainer}: Colin Mahony \email{Colin.Mahony@gov.bc.ca} (\href{https://orcid.org/0000-0002-6111-5675}{ORCID})
+\strong{Maintainer}: Kiri Daust \email{kiri.daust@gov.bc.ca}
 
 Authors:
 \itemize{
-  \item Kiri Daust \email{kiri.daust@gov.bc.ca}
+  \item Colin Mahony \email{Colin.Mahony@gov.bc.ca} (\href{https://orcid.org/0000-0002-6111-5675}{ORCID})
   \item Bruno Tremblay \email{bruno@boostao.ca} (\href{https://orcid.org/0000-0002-2945-356X}{ORCID})
   \item Ceres Barros \email{ceres.barros@gov.bc.ca} (\href{https://orcid.org/0000-0003-4036-977X}{ORCID})
 }

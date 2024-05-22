@@ -53,19 +53,22 @@ dbnames_hist <- data.table(
              "hist_ukesm1-0-ll")
 )
 
-dbnames_ts <- structure(list(
+dbnames_hist_obs <- data.table(dataset = c("cru.gpcc", "climatena"),
+                               dbname = c("historic_cru_gpcc","historic_climatena"))
+
+dbnames_ts <- data.table(
   GCM = c(
     "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5",
-    "CNRM-ESM2-1", "EC-Earth3", "GISS-E2-1-G", "INM-CM5-0",
+    "CNRM-ESM2-1", "EC-Earth3", "GISS-E2-1-G", "INM-CM5-0", "GFDL-ESM4",
     "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL"
   ),
   dbname = c(
     "gcmts_VAR_access-esm1-5", "gcmts_VAR_bcc-csm2-mr", "gcmts_VAR_canesm5", "gcmts_VAR_cnrm-esm2-1",
-    "gcmts_VAR_ec-earth3", "gcmts_VAR_giss-e2-1-g", "gcmts_VAR_inm-cm5-0", "gcmts_VAR_ipsl-cm6a-lr",
+    "gcmts_VAR_ec-earth3", "gcmts_VAR_giss-e2-1-g", "gcmts_VAR_inm-cm5-0","gcmts_VAR_gfdl-esm4", "gcmts_VAR_ipsl-cm6a-lr",
     "gcmts_VAR_miroc6", "gcmts_VAR_mpi-esm1-2-hr", "gcmts_VAR_mri-esm2-0", "gcmts_VAR_ukesm1-0-ll"
   )
-), class = "data.frame", row.names = c(NA, -12L))
+)
 
-usethis::use_data(param, dbnames, dbnames_hist, dbnames_ts,
+usethis::use_data(param, dbnames, dbnames_hist, dbnames_ts, dbnames_hist_obs,
   overwrite = TRUE, internal = TRUE
 )
