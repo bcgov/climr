@@ -57,7 +57,8 @@ reference:
     Other useful functions
   contents:
   - plot_bivariate
-  - plot_timeSeries
+  - plot_timeSeries  
+  - plot_timeSeries_input
   - get_bb
   - lapse_rate
 - title: "Data"
@@ -68,7 +69,7 @@ reference:
   contents:
   - variables
   - list_refmaps
-  - list_obs
+  - list_obs_periods
   - list_gcms
   - list_gcm_periods
   - list_ssps
