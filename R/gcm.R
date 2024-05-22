@@ -1,10 +1,10 @@
-#' Retrieve GCM anomalies for `downscale`.
+#' Retrieve global climate model anomalies for `downscale_core`.
 #'
 #' @return A `list` of `SpatRasters`, each with possibly multiple layers, that can
-#'   be used with [`downscale()`].
+#'   be used with [`downscale_core()`].
 #'
 #' @description
-#' `input_gcms` retrieves anomalies for GCM data, given chosen GCMs, SSPs,
+#' `input_gcms` retrieves anomalies of 20-year periods for selected GCMs, SSPs,
 #'  periods and runs.
 #'
 #' @template dbCon
@@ -17,10 +17,10 @@
 #'
 #' @details
 #' This function returns a list with one slot for each requested GCM. Rasters inside the list contain anomalies for all requested SSPs, runs, and periods.
-#' In general this function should only be used in combination with [`downscale()`].
+#' In general this function should only be used in combination with [`downscale_core()`].
 #'
 #'
-#' @seealso [downscale()]
+#' @seealso [downscale_core()]
 #'
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
@@ -80,13 +80,13 @@ input_gcms <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(
 
 
 #' @description
-#' `input_gcm_hist` creates GCM **obs** time series inputs, given chosen GCMs,
+#' `input_gcm_hist` creates GCM time series inputs for the historical scenario (1850-2014), given chosen GCMs,
 #'  years and runs.
 #'
 #' @template dbCon
 #' @template bbox
 #' @template gcms
-#' @param years numeric. Vector of desired years. Default is `1901:1950`.
+#' @param years numeric. Vector of desired years. Default is `1901:2014`.
 #'   See [`list_gcm_hist_years()`] for available years.
 #' @template max_run
 #' @template cache
@@ -94,10 +94,10 @@ input_gcms <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(
 #' @seealso [list_gcm_periods()], [`list_gcm_periods()`]
 #'
 #' @return A `list` of `SpatRasters`, each with possibly multiple layers, that can
-#'   be used with [`downscale()`].
+#'   be used with [`downscale_core()`].
 #'
 #' @details This function returns a list with one slot for each requested GCM. Rasters inside the list contain anomalies for all runs and years.
-#' In general this function should only be used in combination with [`downscale()`].
+#' In general this function should only be used in combination with [`downscale_core()`].
 #'
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
@@ -105,29 +105,10 @@ input_gcms <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(
 #' @import uuid
 #' @import data.table
 #'
-#' @examples {
-#'   library(terra)
-#'   xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10), id = 1:10)
-#'
-#'   ## get bounding box based on input points
-#'   thebb <- get_bb(xyz)
-#'
-#'   ## get database connection
-#'   dbCon <- data_connect()
-#'   on.exit(try(pool::poolClose(dbCon)))
-#'
-#'   gcm_hist <- input_gcm_hist(dbCon, thebb, list_gcms()[1])
-#'
-#'   ## show ensemble means only
-#'   lyrs <- grep("ensemble", names(gcm_hist$`ACCESS-ESM1-5`))
-#'
-#'   plot(gcm_hist$`ACCESS-ESM1-5`[[lyrs]])
-#' }
-#'
 #' @rdname gcms-input-data
 #' @export
 input_gcm_hist <- function(dbCon, bbox = NULL, gcms = list_gcms(),
-                           years = 1901:1950, max_run = 0L, cache = TRUE) {
+                           years = 1901:2014, max_run = 0L, cache = TRUE) {
   ## checks
   if (!is.null(bbox)) {
     .check_bb(bbox)
@@ -166,10 +147,10 @@ input_gcm_hist <- function(dbCon, bbox = NULL, gcms = list_gcms(),
 #' @template cache
 #'
 #' @return A `list` of `SpatRasters`, each with possibly multiple layers, that can
-#'   be used with [`downscale()`].
+#'   be used with [`downscale_core()`].
 #'
 #' @details This function returns a list with one slot for each requested GCM. Rasters inside the list contain anomalies for all SSPs, runs and years.
-#' In general this function should only be used in combination with [`downscale()`]. Note that if you request multiple runs, multiple SSPs, and a lot of years,
+#' In general this function should only be used in combination with [`downscale_core()`]. Note that if you request multiple runs, multiple SSPs, and a lot of years,
 #' it will take a while to download the data (there's lot of it).
 #'
 #' @importFrom terra rast writeRaster ext nlyr
@@ -177,24 +158,6 @@ input_gcm_hist <- function(dbCon, bbox = NULL, gcms = list_gcms(),
 #' @importFrom RPostgres dbGetQuery
 #' @import uuid
 #' @import data.table
-#'
-#' @examples
-#' library(terra)
-#' xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10), id = 1:10)
-#'
-#' ## get bounding box based on input points
-#' thebb <- get_bb(xyz)
-#'
-#' ## get database connection
-#' dbCon <- data_connect()
-#' on.exit(try(pool::poolClose(dbCon)))
-#'
-#' gcm_ts <- input_gcm_ssp(dbCon, thebb, list_gcms()[1], list_ssps()[1])
-#'
-#' ## show ensemble means only
-#' lyrs <- grep("ensemble", names(gcm_ts$`ACCESS-ESM1-5`))
-#'
-#' plot(gcm_ts$`ACCESS-ESM1-5`[[lyrs]])
 #'
 #' @rdname gcms-input-data
 #' @export
