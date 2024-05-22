@@ -51,9 +51,9 @@ The default high-resolution climate maps used by `climr` are 800m gridded maps o
 ```{r, fig.cap = "`climr` *1961-1990 reference climate map for July T~max~*"}
 studyarea <- ext(c(-124, -120, 49, 50.5))
 thebb <- rev(as.vector(studyarea)) # this is a patch until we fix the get_bb() and normal_input() function
-refNormals <- normal_input(
+refNormals <- input_refmap(
   dbCon = dbCon,
-  normal = "normal_composite",
+  reference = "refmap_climr",
   bbox = thebb, cache = TRUE
 )
 breaks <- seq(7, 33, 0.1)
@@ -69,10 +69,10 @@ plot(bdy, add = TRUE)
 Global climate model data are at much lower resolution (60-200km grid scale). Here is the change in July T~max~ for the EC-Earth3 global climate model for the 2041-2060 time period, relative to the model's 1961-1990 climate. In this case, the warming is greater in areas further (eastward) from the coast.
 
 ```{r, fig.cap = "*Low-resolution anomalies (change) in July T~max~ for the EC-Earth3 global climate model for the 2041-2060 time period, relative to the model's 1961-1990 climate*"}
-gcm <- gcm_input(dbCon,
+gcm <- input_gcms(dbCon,
   bbox = thebb,
-  gcm = c("EC-Earth3"),
-  ssp = c("ssp245"),
+  gcms = c("EC-Earth3"),
+  ssps = c("ssp245"),
   period = "2041_2060",
   max_run = 0,
   cache = TRUE
@@ -108,7 +108,7 @@ The example above illustrates how change-factor downscaling is able to represent
 
 #### Stage 2: Elevation adjustment
 
-`climr` uses elevation adjustment to downscale temperature variables to scales finer than the resolution of the reference climate map. It does this by inferring a relationship between temperature and elevation, known as a lapse rate, from the reference climate maps. The local lapse rate is calculated for each grid cell of the reference climate map using a linear regression of temperature to elevation among the focal cell and its 8 neighbours. The gridded lapse rates are included in the `SpatRaster` returned by the `normal_input()` function used above. This is the `climr` lapse rate layer for July T~max~:
+`climr` uses elevation adjustment to downscale temperature variables to scales finer than the resolution of the reference climate map. It does this by inferring a relationship between temperature and elevation, known as a lapse rate, from the reference climate maps. The local lapse rate is calculated for each grid cell of the reference climate map using a linear regression of temperature to elevation among the focal cell and its 8 neighbours. The gridded lapse rates are included in the `SpatRaster` returned by the `input_refmap()` function used above. This is the `climr` lapse rate layer for July T~max~:
 
 ```{r, fig.cap = "*July T~max~ lapse rates (change in temperature relative to elevation; ^o^C/m) used for elevation adjustment*"}
 lapse <- crop(refNormals$lr_Tmax_07, studyarea)
@@ -120,19 +120,19 @@ plot(bdy, add = TRUE)
 
 This example indicates that the BC PRISM maps for July T~max~ have lower lapse rates in maritime influenced mountains (4^o^C/km) than in mountains with less maritime influence (8^o^C/km). The map of lapse rates has artefacts in areas with no relief; these artefacts have no consequence unless users supply elevations for these areas that deviate substantially from realistic ground elevations in areas of flat topography (e.g., asking `climr` to provide climate values for 200m elevation on the Fraser River delta, which is uniformly at sea level).
 
-We can use the `climr_downscale()` function with a 90m digital elevation model (DEM) to illustrate the elevation adjustment on Vancouver's north shore mountains, shown below.
+We can use the `downscale()` function with a 90m digital elevation model (DEM) to illustrate the elevation adjustment on Vancouver's north shore mountains, shown below.
 
 ```{r figures-side, fig.cap = "*1961-1990 July T~max~ in the 800m reference clmate map (left) and elevation-adjusted to a 90m grid (right).*", fig.dim = c(7, 3), fig.show = "hold"}
 dem_aoi <- unwrap(get(data("dem_vancouver", envir = new.env()))) ### get the sample DEM for the North Shore of Vancouver
 points_dat <- as.data.frame(dem_aoi, cells = TRUE, xy = TRUE) ## convert dem cells to data frame
 colnames(points_dat) <- c("id", "lon", "lat", "elev") ## rename the columns to standard climr format
-clim.aoi <- climr_downscale(points_dat,
-  which_normal = "normal_composite",
-  gcm_models = list_gcm()[4],
-  ssp = list_ssp()[2],
-  gcm_period = list_gcm_period()[3],
+clim.aoi <- downscale(points_dat,
+  which_refmap = "refmap_climr",
+  gcms = list_gcms()[4],
+  ssps = list_ssps()[2],
+  gcm_periods = list_gcm_periods()[3],
   max_run = 0,
-  return_normal = TRUE,
+  return_refperiod = TRUE,
   vars = c("Tmax_07", "Tave_01", "DDsub0_01")
 )
 X <- dem_aoi
