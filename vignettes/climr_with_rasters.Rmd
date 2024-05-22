@@ -37,21 +37,20 @@ cpath <- if (interactive()) {
 options("climr.cache.path" = cpath)
 ```
 
-## Spatial inputs and `climr_downscale()`
+## Spatial inputs and `downscale()`
 
 We often start with a spatial object of a study area (in raster or
 vector format) or point locations for which we want to obtain downscaled
 climate variables.
 
-Bellow we show how to work with these spatial objects and
-`climr_downscale()`.
+Bellow we show how to work with these spatial objects and `downscale()`.
 
 ### Raster inputs
 
 Often we have a raster of interest of the study area for which we want
 full coverage of downscaled climate variables.
 
-Since `climr_downscale()` accepts a table of point locations, we need to
+Since `downscale()` accepts a table of point locations, we need to
 convert the raster to a table of cell coordinates, with elevation
 ('elev') information and unique point IDs.
 
@@ -124,7 +123,7 @@ Note that cells with NA's were automagically excluded.
 xyzDT
 ```
 
-We can now pass our table of cell locations to `climr_downscale()`:
+We can now pass our table of cell locations to `downscale()`:
 
 ```{r, results = "hide"}
 ## in this case there's really no need for a spatial output format
@@ -160,7 +159,7 @@ dwscl_Ras <- rast(dwscl_Ras)
 dwscl_Ras
 ```
 
-```{r, echo = FALSE, results = "hide", fig.show = "hold", fig.cap = "`climr_downscale()` outputs converted to raster layers", fig.dim = c(15,9), out.width = "100%"}
+```{r, echo = FALSE, results = "hide", fig.show = "hold", fig.cap = "`downscale()` outputs converted to raster layers", fig.dim = c(15,9), out.width = "100%"}
 minmax <- range(dwscl_out$MAT)
 
 gcmstr <- paste(list_gcms()[1], collapse = "|")
@@ -294,7 +293,7 @@ dwscl_out <- downscale(xyzDT,
 )
 ```
 
-```{r, echo = FALSE, results = "hide", fig.show = "hold", fig.cap = "Plot of spatial outputs from `climr_downscale()` using more spaced point locations", fig.dim = c(15,9), out.width = "100%"}
+```{r, echo = FALSE, results = "hide", fig.show = "hold", fig.cap = "Plot of spatial outputs from `downscale()` using more spaced point locations", fig.dim = c(15,9), out.width = "100%"}
 minmax <- range(dwscl_out$MAT)
 
 dwscl_outLong <- as.data.table(dwscl_out, geom = "XY") |>
@@ -328,7 +327,7 @@ Canada, for which we get elevation values from a Digital Elevation Model
 
 The `terra::extract()` function outputs a `data.frame` with point IDs,
 the extracted values and, optionally x/y coordinates. So we need simply
-to use this output to create our `xyzDT` table for `climr_downscale()`.
+to use this output to create our `xyzDT` table for `downscale()`.
 
 To get point-type outputs simply set
 `climr_downscale(..., out_spatial = TRUE)`.
@@ -359,7 +358,7 @@ dwscl_out
 dwscl_out
 ```
 
-```{r, echo = FALSE, results = "hide", fig.show = "hold", fig.cap = "Plot of spatial outputs from `climr_downscale()`", fig.dim = c(15,9), out.width = "100%"}
+```{r, echo = FALSE, results = "hide", fig.show = "hold", fig.cap = "Plot of spatial outputs from `downscale()`", fig.dim = c(15,9), out.width = "100%"}
 vancouver <- get(data("vancouver")) |>
   unwrap()
 vancouver <- crop(vancouver, ext(vancouver_points))
