@@ -2,99 +2,139 @@
 % Please edit documentation in R/downscale.R
 \name{downscale}
 \alias{downscale}
-\title{Change-factor downscaling of user-supplied climate data}
+\title{Self-contained change-factor downscaling of observed and simulated climate data}
 \usage{
 downscale(
   xyz,
-  normal,
-  gcm = NULL,
-  historic = NULL,
-  gcm_ts = NULL,
-  gcm_hist = NULL,
-  historic_ts = NULL,
-  return_normal = TRUE,
-  vars = sort(sprintf(c("PPT\%02d", "Tmax\%02d", "Tmin\%02d"), sort(rep(1:12, 3)))),
-  ppt_lr = FALSE,
-  nthread = 1L,
-  out_spatial = FALSE,
-  plot = NULL
+  which_refmap = "auto",
+  obs_periods = NULL,
+  obs_years = NULL,
+  obs_ts_dataset = NULL,
+  gcms = NULL,
+  ssps = NULL,
+  gcm_periods = NULL,
+  gcm_ssp_years = NULL,
+  gcm_hist_years = NULL,
+  max_run = 0L,
+  cache = TRUE,
+  ...
 )
 }
 \arguments{
 \item{xyz}{a \code{data.frame} with the following columns "long", "lat", "elev",
 and a unique "id". Any extra columns will be ignored and not output.}
 
-\item{normal}{\code{SpatRaster}. Outputs from \code{\link[=normal_input]{normal_input()}}. The high-resolution
-climate maps for use as the downscaling baseline.}
+\item{which_refmap}{character. Which map of 1961-1990 climatological normals to use as the
+high-resolution reference climate map for downscaling. Default is "auto",
+which selects, for each query point, the best available climatological
+normals map in declining order of \code{"refmap_prism"}, \code{"refmap_climr"}, and \code{"refmap_climatena"}.
+Other options are one of \code{\link[=list_refmaps]{list_refmaps()}}, which will provide a consistent
+reference map for all points.}
 
-\item{gcm}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=gcm_input]{gcm_input()}}. Global
-climate model data for 20-year normal periods to be downscaled. Default to \code{NULL}.}
+\item{obs_periods}{character. Which historical period for observational climate
+data, averaged over this period. Options are \code{\link[=list_obs_periods]{list_obs_periods()}}. Default \code{NULL}}
 
-\item{historic}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=historic_input]{historic_input()}}.
-Observed climate data for 20-year normal periods to be downscaled. Default to \code{NULL}.}
+\item{obs_years}{integer. Vector of years to obtain individual years or time
+series of observational climate data. Default \code{NULL}. See \code{\link[=list_obs_years]{list_obs_years()}}
+for available years.}
 
-\item{gcm_ts}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=gcm_ts_input]{gcm_ts_input()}}.
-Global climate model time series for ssp-rcp scenarios to be downscaled. Default to \code{NULL}.}
+\item{obs_ts_dataset}{character. The dataset to use for observational time series data. Options
+are \code{"climatena"} for the ClimateNA gridded time series or \code{"cru.gpcc"} for the combined Climatic
+Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset
+(for precipitation). Defaults to \code{NULL}.}
 
-\item{gcm_hist}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=gcm_hist_input]{gcm_hist_input()}}.
-Global climate model time series for historical scenario to be downscaled. Default to \code{NULL}.}
+\item{gcms}{character. Vector of global climate model names. Options
+are \code{\link[=list_gcms]{list_gcms()}}. Defaults to \code{NULL}.}
 
-\item{historic_ts}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=historic_input_ts]{historic_input_ts()}}.
-Observed climate time series to be downscaled. Default to \code{NULL}.}
+\item{ssps}{character. Vector of SSP-RCP scenarios (representative concentration pathways paired with shared socioeconomic pathways).
+Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to all scenarios available.}
 
-\item{return_normal}{logical. Return downscaled normal period (1961-1990)? Default \code{TRUE}.}
+\item{gcm_periods}{character. 20-year reference periods for GCM simulations.
+Options are \code{\link[=list_gcm_periods]{list_gcm_periods()}}. Defaults to \code{NULL}.}
 
-\item{vars}{character. A vector of climate variables to compute. Supported variables
-can be obtained with \code{\link[=list_variables]{list_variables()}}. Definitions can be found in this package
-\code{variables} dataset. Default to monthly PPT, Tmax, Tmin.}
+\item{gcm_ssp_years}{character. Timeseries years for GCM simulations of future
+scenarios specified by \code{ssps}. See \code{\link[=list_gcm_ssp_years]{list_gcm_ssp_years()}} for available years.
+Defaults to \code{NULL}.}
 
-\item{ppt_lr}{logical. Apply elevation adjustment to precipitation. Default to FALSE.}
+\item{gcm_hist_years}{character.  Timeseries years for GCM simulations of the
+historical scenario. See \code{\link[=list_gcm_hist_years]{list_gcm_hist_years()}} for available years.
+Defaults to \code{NULL}.}
 
-\item{nthread}{integer. Number of parallel threads to use to do computations. Default to 1L.}
+\item{max_run}{integer. Maximum number of model runs to include.
+A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
+are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
-\item{out_spatial}{logical. Should a SpatVector be returned instead of a
-\code{data.frame}.}
+\item{cache}{logical. Cache data locally? Default \code{TRUE}}
 
-\item{plot}{character. If \code{out_spatial} is TRUE, the name of a variable to plot.
-If the variable exists in \code{normal}, then its normal values will also be plotted.
-Otherwise, normal January total precipitation (PPT01) values will be plotted.
-Defaults to no plotting (NULL).}
+\item{...}{other arguments passed to \code{\link[=downscale_core]{downscale_core()}}. Namely: \code{return_refperiod},
+\code{vars}, \code{out_spatial} and \code{plot}}
 }
 \value{
-A \code{data.table} or SpatVector with downscaled climate variables. If \code{gcm} is NULL,
-this is just the downscaled \code{normal} at point locations. If \code{gcm} is provided,
-this returns a downscaled dataset for each point location, general circulation
-model (GCM), shared socioeconomic pathway (SSP), run and period.
+\code{data.table} of downscaled climate variables for each location.
+All outputs are returned in one table.
 }
 \description{
-\code{downscale()} is the engine for \code{\link[=climr_downscale]{climr_downscale()}}.
-It takes user-supplied high- and low-resolution rasters as input and downscales to user-specified point locations.
-While less user-friendly than \code{\link[=climr_downscale]{climr_downscale()}}, \code{downscale()} is more flexible in that users can supply their own raster inputs. For example, a user could supply their own high-resolution climate map, instead of what is available in climr, as the input to \code{normal}.
+\code{downscale()} provides downscaled climate variables for user-specified
+locations.
+It adapts a simple change-factor (aka "delta') downscaling
+approach originally implemented in \href{https://climatena.ca/}{ClimateNA}.
+This approach downscales climate data in three stages:
+\enumerate{
+\item \emph{Change-factor downscaling} of coarse-resolution (50-200km grid) monthly temperature and precipitation data from climate models or observational sources to high-resolution (800m grid);
+\item \emph{Elevation adjustment} of temperature variables to provide scales finer than the high-resolution reference grid; and
+\item \emph{Calculating derived variables} from the downscaled monthly temperature and precipitation variables.
+}
+See \code{vignette("methods_downscaling")} for a description of the downscaling methodology.
+
+\code{downscale()} is a user-friendly wrapper for \code{downscale_core()}
 }
 \details{
-We recommend \code{\link[=climr_downscale]{climr_downscale()}} for most purposes.
+\code{\link[=downscale_core]{downscale_core()}} parameters can be applied in \code{downscale()}. For example,
+setting \code{ppt_lr = TRUE} in \code{downscale()} will apply elevation adjustment to precipitation values.
+
+Although \code{which_refmap = "auto"} is the default, users are cautioned that
+this can produce artefacts associated with downscaling to different reference
+climate maps within and outside the western North American boundary of \code{refmap_climr}.
+We recommend that queries spanning this boundary use \code{which_refmap = "refmap_climatena"}.
 }
 \examples{
-dbCon <- data_connect()
-on.exit(try(pool::poolClose(dbCon)))
-xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10), id = 1:10)
 
-## get bounding box based on input points
-thebb <- get_bb(xyz)
-normal <- normal_input(dbCon = dbCon, bbox = thebb, cache = TRUE)
+## provide or create a dataframe of lon, lat, elev, and id - usually read from csv file
+in_xyz <- data.frame(
+  lon = c(-127.7052, -127.6227, -127.5623, -127.7162, -127.1858, -127.125, -126.9495, -126.9550),
+  lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
+  elev = c(291, 296, 626, 377, 424, 591, 723, 633),
+  id = 1:8
+)
 
-## pick one GCM, one SSP and one period from the list of available options
-gcm <- gcm_input(dbCon, thebb, gcm = list_gcm()[3], list_ssp()[1], list_gcm_period()[2])
+## historic observational time series
+vars <- c("PPT", "CMD", "Tave_07")
+climate_norms_hist <- downscale(
+  xyz = in_xyz, 
+  which_refmap = "auto",
+  return_refperiod = TRUE,
+  obs_periods = "2001_2020",
+  vars = vars,
+  out_spatial = TRUE, plot = "PPT"
+) ## specify desired variables to plot
 
-## notice coarseness of the data
-terra::plot(gcm[[1]])
+## as a data.table
+climate_norms_hist <- downscale(
+  xyz = in_xyz, which_refmap = "auto",
+  return_refperiod = TRUE,
+  vars = vars,
+  out_spatial = FALSE, plot = "PPT"
+) ## specify desired variables to plot
 
-downscale(xyz, normal, gcm)
-historic <- historic_input(dbCon, thebb)
-terra::plot(historic[[1]])
+## future projections for annual variables from three models
+climate_norms_fut <- downscale(
+  xyz = in_xyz, which_refmap = "auto",
+  gcms = list_gcms()[c(1,5,6)],
+  ssps = list_ssps()[2],
+  gcm_periods = list_gcm_periods()[1:2],
+  # gcm_ssp_years = 2020:2060,
+  max_run = 3, #' we want 3 individual runs for the model
+  vars = list_vars("Annual")
+)
 
-downscale(xyz, normal, gcm = NULL, historic = historic, ppt_lr = FALSE)
-}
-\seealso{
-\code{\link[=gcm_input]{gcm_input()}}, \code{\link[=historic_input]{historic_input()}}, \code{\link[=list_variables]{list_variables()}}
 }

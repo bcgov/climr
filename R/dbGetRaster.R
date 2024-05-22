@@ -17,6 +17,18 @@
 pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
                        boundary) {
   ## Check and prepare the schema.name
+  # if(grepl("refmap",name)){
+  #   if(name == "refmap_climatena"){
+  #     name1 <- "normal_na"
+  #   }else if(name == "refmap_prism"){
+  #     name1 <- "normal_bc"
+  #   }else{
+  #     name1 <- "normal_composite"
+  #   }
+  # }else{
+  #   name1 <- name
+  # }
+  
   name1 <- name
   nameque <- paste(name1, collapse = ".")
   namechar <- gsub("'", "''", paste(gsub('^"|"$', "", name1), collapse = "."))

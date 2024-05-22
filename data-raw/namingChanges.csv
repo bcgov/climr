@@ -1,0 +1,53 @@
+type,function,name_old,name_new
+parameter,downscale,which_normal,which_refmap
+file name,,Variables_ClimateBC.csv,variables.csv
+general,,historic,obs
+parameter,downscale,historic_ts,obs_ts
+parameter,downscale,historic,obs
+parameter,downscale,gcm_ts,gcm_ssp_ts
+parameter,downscale,gcm_hist,gcm_hist_ts
+parameter,downscale,return_normal,return_refperiod
+function name,,list_variables(),list_vars
+function name,,climr_downscale,downscale
+function name,,downscale,downscale_core
+parameter,climr_downscale,which_normal,refmap
+function name,,list_normalO,list_refmaps
+parameter,climr_downscale,historic_period,obs_periods
+function name,,list_historic(),list_obs_periods()
+parameter,climr_downscale,historic_ts,obs_years
+function name,,list_historic_ts(),list_obs_years()
+parameter,climr_downscale,gcm_models,gcms
+function name,,list_gcm(),list_gcms()
+parameter,climr_downscale,ssp,ssps
+function name,,list_ssp(),list_ssps()
+parameter,climr_downscale,gcm_period,gcm_periods
+function name,,list_gcm_period(),list_gcm_periods()
+parameter,climr_downscale,gcm_ts_years,gcm_ssp_years
+function name,,list_gcm_ts(),list_gcm_ssp_years()
+function name,,list_gcm_hist_ts(),list_gcm_hist_years()
+function name,,normal_input,input_refmap
+parameter,normal_input,normal,reference
+options,list_normalO,normal_na,refmap_climatena
+options,list_normalO,normal_bc,refmap_prism
+options,list_normalO,normal_composite,refmap_climr
+function name,,gcm_input,input_gcm
+parameter,gcm_ts_input,gcm,gcms
+parameter,gcm_hist_input,gcm,gcms
+parameter,gcm_input,gcm,gcms
+parameter,gcm_ts_input ,ssp,ssps
+parameter,gcm_input,ssp,ssps
+parameter,historic_input,period,periods
+options,cache_clear,normal,refmap
+options,cache_clear,historic,obs
+options,cache_clear,historic_ts,obs_ts
+parameter,plot_bivariate,gcm_models,gcms
+parameter,plot_bivariate,ssp,ssps
+parameter,plot_bivariate,historic_period,obs_period
+parameter,plot_bivariate,gcm_period,gcm_periods
+parameter,plot_timeSeries,gcm_models,gcms
+parameter,plot_timeSeries,variable1,var1
+parameter,plot_timeSeries,variable2,var2
+function name,,gcm_hist_input,input_gcm_hist
+function name,,gcm_ts_input,input_gcm_ssp
+function name,,historic_input,input_obs
+function name,,historic_input_ts,input_obs_ts

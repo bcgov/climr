@@ -13,18 +13,18 @@ NULL
 .onLoad <- function(libname, pkgname) {
   rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
 
-  packageStartupMessage("Downloading and Caching ESM run info :)")
+  packageStartupMessage("climr version 0.1.0 includes an overhaul of the naming conventions for variables, functions, parameters, and options. Call `data(name_changes)` for a table specifying the correspondence between old and new names. If you have used a previous version of climr you MUST call `cache_clear()` before using this one.")
   dbCon <- data_connect()
   on.exit(try(pool::poolClose(dbCon)), add = TRUE)
 
   if (is.null(dbCon)) {
-    warning("Could not connect to server. Only cached normal periods will be available.")
+    warning("Could not connect to server. Only cached reference periods will be available.")
   } else {
     dir.create(rInfoPath, recursive = TRUE, showWarnings = FALSE)
     gcm_period_runs <- dbGetQuery(dbCon, "select distinct mod, scenario, run from esm_layers_period order by mod, scenario, run;")
     gcm_ts_runs <- dbGetQuery(dbCon, "select distinct mod, scenario, run from esm_layers_ts order by mod, scenario, run;")
     gcm_hist_runs <- dbGetQuery(dbCon, "select distinct mod, run from esm_layers_hist order by mod, run;")
-    fwrite(gcm_period_runs, file.path(rInfoPath, "gcm_period.csv"))
+    fwrite(gcm_period_runs, file.path(rInfoPath, "gcm_periods.csv"))
     fwrite(gcm_period_runs, file.path(rInfoPath, "gcm_ts.csv"))
     fwrite(gcm_period_runs, file.path(rInfoPath, "gcm_hist.csv"))
   }

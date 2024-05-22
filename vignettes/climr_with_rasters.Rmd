@@ -37,21 +37,20 @@ cpath <- if (interactive()) {
 options("climr.cache.path" = cpath)
 ```
 
-## Spatial inputs and `climr_downscale()`
+## Spatial inputs and `downscale()`
 
 We often start with a spatial object of a study area (in raster or
 vector format) or point locations for which we want to obtain downscaled
 climate variables.
 
-Bellow we show how to work with these spatial objects and
-`climr_downscale()`.
+Bellow we show how to work with these spatial objects and `downscale()`.
 
 ### Raster inputs
 
 Often we have a raster of interest of the study area for which we want
 full coverage of downscaled climate variables.
 
-Since `climr_downscale()` accepts a table of point locations, we need to
+Since `downscale()` accepts a table of point locations, we need to
 convert the raster to a table of cell coordinates, with elevation
 ('elev') information and unique point IDs.
 
@@ -124,16 +123,16 @@ Note that cells with NA's were automagically excluded.
 xyzDT
 ```
 
-We can now pass our table of cell locations to `climr_downscale()`:
+We can now pass our table of cell locations to `downscale()`:
 
 ```{r, results = "hide"}
 ## in this case there's really no need for a spatial output format
-dwscl_out <- climr_downscale(xyzDT,
-  which_normal = "auto",
-  gcm_models = list_gcm()[1],
-  ssp = list_ssp()[1],
-  gcm_period = list_gcm_period(),
-  max_run = 0L, return_normal = FALSE,
+dwscl_out <- downscale(xyzDT,
+  which_refmap = "auto",
+  gcms = list_gcms()[1],
+  ssps = list_ssps()[1],
+  gcm_periods = list_gcm_periods(),
+  max_run = 0L, return_refperiod = FALSE,
   vars = "MAT", out_spatial = FALSE
 )
 ```
@@ -160,10 +159,10 @@ dwscl_Ras <- rast(dwscl_Ras)
 dwscl_Ras
 ```
 
-```{r, echo = FALSE, results = "hide", fig.show = "hold", fig.cap = "`climr_downscale()` outputs converted to raster layers", fig.dim = c(15,9), out.width = "100%"}
+```{r, echo = FALSE, results = "hide", fig.show = "hold", fig.cap = "`downscale()` outputs converted to raster layers", fig.dim = c(15,9), out.width = "100%"}
 minmax <- range(dwscl_out$MAT)
 
-gcmstr <- paste(list_gcm()[1], collapse = "|")
+gcmstr <- paste(list_gcms()[1], collapse = "|")
 titles <- sub(paste0("(", gcmstr, ")\\.([[:digit:]]{4})_([[:digit:]]{4})"), "\\1\\\n\\2-\\3", names(dwscl_Ras))
 plot(dwscl_Ras,
   main = titles, nc = 5, nr = 3,
@@ -223,12 +222,12 @@ as before, because we again used the raster cell IDs as point location
 IDs (`xyzDT$id`):
 
 ```{r, eval = FALSE}
-dwscl_out <- climr_downscale(xyzDT,
-  which_normal = "auto",
-  gcm_models = list_gcm()[1],
-  ssp = list_ssp()[1],
-  gcm_period = list_gcm_period(),
-  max_run = 0L, return_normal = FALSE,
+dwscl_out <- downscale(xyzDT,
+  which_refmap = "auto",
+  gcms = list_gcms()[1],
+  ssps = list_ssps()[1],
+  gcm_periods = list_gcm_periods(),
+  max_run = 0L, return_refperiod = FALSE,
   vars = "MAT", out_spatial = FALSE
 )
 
@@ -277,24 +276,24 @@ lowRes_points <- lowRes_points[lowRes_points$id %in% xyzDT$id, ]
 
 ```{r, echo = FALSE, results = "hide", fig.cap = "Points extracted from raster", fig.show = "hold", out.width = "70%"}
 plot(dem_vancouver, col = cols)
-points(lowRes_points, alpha = 0.7)
+#points(lowRes_points, alpha = 0.7)
 ```
 
 As before, pass your `data.table` of point locations to
-`climr_downscale`:
+`downscale`:
 
 ```{r, results = "hide"}
-dwscl_out <- climr_downscale(xyzDT,
-  which_normal = "auto",
-  gcm_models = list_gcm()[1],
-  ssp = list_ssp()[1],
-  gcm_period = list_gcm_period(),
-  max_run = 0L, return_normal = FALSE,
+dwscl_out <- downscale(xyzDT,
+  which_refmap = "auto",
+  gcms = list_gcms()[1],
+  ssps = list_ssps()[1],
+  gcm_periods = list_gcm_periods(),
+  max_run = 0L, return_refperiod = FALSE,
   vars = "MAT", out_spatial = TRUE
 )
 ```
 
-```{r, echo = FALSE, results = "hide", fig.show = "hold", fig.cap = "Plot of spatial outputs from `climr_downscale()` using more spaced point locations", fig.dim = c(15,9), out.width = "100%"}
+```{r, echo = FALSE, results = "hide", fig.show = "hold", fig.cap = "Plot of spatial outputs from `downscale()` using more spaced point locations", fig.dim = c(15,9), out.width = "100%"}
 minmax <- range(dwscl_out$MAT)
 
 dwscl_outLong <- as.data.table(dwscl_out, geom = "XY") |>
@@ -302,7 +301,7 @@ dwscl_outLong <- as.data.table(dwscl_out, geom = "XY") |>
   vect(geom = c("x", "y"), crs = crs(dem_vancouver))
 
 lyrs <- setdiff(names(dwscl_outLong), c("elev", "id", "SSP", "RUN"))
-gcmstr <- paste(list_gcm()[1], collapse = "|")
+gcmstr <- paste(list_gcms()[1], collapse = "|")
 titles <- sub(paste0("(", gcmstr, ")_([[:digit:]]{4})_([[:digit:]]{4})"), "\\1\\\n\\2-\\3", lyrs)
 plot(dwscl_outLong, lyrs,
   main = titles, nc = 5, nr = 3,
@@ -328,10 +327,10 @@ Canada, for which we get elevation values from a Digital Elevation Model
 
 The `terra::extract()` function outputs a `data.frame` with point IDs,
 the extracted values and, optionally x/y coordinates. So we need simply
-to use this output to create our `xyzDT` table for `climr_downscale()`.
+to use this output to create our `xyzDT` table for `downscale()`.
 
 To get point-type outputs simply set
-`climr_downscale(..., out_spatial = TRUE)`.
+`downscale(..., out_spatial = TRUE)`.
 
 ```{r, results = "hide"}
 vancouver_points <- get(data("vancouver_points")) |>
@@ -343,13 +342,13 @@ xyzDT <- extract(dem_vancouver, vancouver_points, xy = TRUE) |>
   as.data.table()
 setnames(xyzDT, c("id", "elev", "lon", "lat"))
 
-dwscl_out <- climr_downscale(xyzDT,
-  which_normal = "auto",
-  gcm_models = list_gcm()[1],
-  ssp = list_ssp()[1],
-  gcm_period = list_gcm_period(),
+dwscl_out <- downscale(xyzDT,
+  which_refmap = "auto",
+  gcms = list_gcms()[1],
+  ssp = list_ssps()[1],
+  gcm_periods = list_gcm_periods(),
   vars = "MAT", max_run = 0L,
-  return_normal = FALSE,
+  return_refperiod = FALSE,
   out_spatial = TRUE
 )
 dwscl_out
@@ -359,7 +358,7 @@ dwscl_out
 dwscl_out
 ```
 
-```{r, echo = FALSE, results = "hide", fig.show = "hold", fig.cap = "Plot of spatial outputs from `climr_downscale()`", fig.dim = c(15,9), out.width = "100%"}
+```{r, echo = FALSE, results = "hide", fig.show = "hold", fig.cap = "Plot of spatial outputs from `downscale()`", fig.dim = c(15,9), out.width = "100%"}
 vancouver <- get(data("vancouver")) |>
   unwrap()
 vancouver <- crop(vancouver, ext(vancouver_points))
@@ -371,7 +370,7 @@ dwscl_outLong <- as.data.table(dwscl_out, geom = "XY") |>
   vect(geom = c("x", "y"), crs = crs(dem_vancouver))
 
 lyrs <- setdiff(names(dwscl_outLong), c("elev", "id", "SSP", "RUN"))
-gcmstr <- paste(list_gcm()[1], collapse = "|")
+gcmstr <- paste(list_gcms()[1], collapse = "|")
 titles <- sub(paste0("(", gcmstr, ")_([[:digit:]]{4})_([[:digit:]]{4})"), "\\1\\\n\\2-\\3", lyrs)
 plot(dwscl_outLong, lyrs,
   main = titles, nc = 5, nr = 3,
@@ -417,20 +416,20 @@ xyzDT <- extract(dem_vancouver, centrds, xy = TRUE) |>
   as.data.table()
 setnames(xyzDT, c("id", "elev", "lon", "lat"))
 
-dwscl_outGrid <- climr_downscale(xyzDT,
-  which_normal = "auto",
-  gcm_models = list_gcm()[1],
-  ssp = list_ssp()[1],
-  gcm_period = list_gcm_period(),
-  max_run = 0L, return_normal = FALSE,
+dwscl_outGrid <- downscale(xyzDT,
+  which_refmap = "auto",
+  gcms = list_gcms()[1],
+  ssp = list_ssps()[1],
+  gcm_periods = list_gcm_periods(),
+  max_run = 0L, return_refperiod = FALSE,
   vars = "MAT", out_spatial = TRUE
 )
 ```
 
 ```{r, echo = FALSE, fig.show = "hold", fig.cap = "Excluded (grey) and retained (blue) polygon centroids", fig.dim = c(7,5), out.width="70%"}
 plot(vancouver_poly, col = hcl.colors(50, palette = "Earth"))
-points(centroids(vancouver_poly), col = "grey")
-points(centrds, col = "navy")
+#points(centroids(vancouver_poly), col = "grey")
+#points(centrds, col = "navy")
 ```
 
 ## References
