@@ -18,7 +18,7 @@
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Intermediate `climr` workflow">
+<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js" integrity="sha512-7O5pXpc0oCRrxk8RUfDYFgn0nO1t+jLuIOQdOMRp4APB7uZ4vSjspzp5y6YDtDs4VzUSTbWzBFZ/LKJhnyFOKw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Intermediate `climr` workflow">
 <meta property="og:description" content="More advanced `climr` workflows.
 ">
 <meta property="og:image" content="https://bcgov.github.io/climr/logo.svg">
@@ -32,11 +32,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">climr</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.0.3.9003</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">0.0.4.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,6 +58,7 @@
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>Methods</h6>
     <a class="dropdown-item" href="../articles/methods_downscaling.html">`climr` downscaling methods</a>
+    <a class="dropdown-item" href="../articles/methods_ensembleSelection.html">Global climate model ensemble selection</a>
     <a class="dropdown-item" href="../articles/lapse_rates.html">Lapse rates</a>
     <div class="dropdown-divider"></div>
     <a class="dropdown-item" href="../articles/index.html">More articles...</a>
@@ -103,7 +104,8 @@ relationship of climate to elevation) of the 1-4km climate maps. The
 elevation-adjusted monthly values of basic climate elements (temperature
 and precipitation) are then used to estimate derived variables (e.g.,
 degree-days, precipitation as snow) based on published equations and
-parameters from <span class="citation">(<a href="#ref-wang2016" role="doc-biblioref">Wang et al. 2016</a>)</span>.</p>
+parameters from <span class="citation">(<a href="#ref-wang2016">Wang et
+al. 2016</a>)</span>.</p>
 <p>See <code>vignette("methods_downscaling.Rmd")</code> for a detailed
 explanation of the downscaling methodology employed in
 <code>climr</code>.</p>
@@ -122,50 +124,47 @@ US.</p></li>
 <p>In this vignette we cover two basic <code>climr</code> workflows to
 obtain historic and future climate projections of a few derived
 variables.</p>
-<p>The first, less code-heavy, workflow uses
-<code><a href="../reference/climr_downscale.html">climr_downscale()</a></code> to do much of the heavy lifting –
-[Workflow with climr_downscale]. The second workflow is a step-by-step
-breakdown of <code><a href="../reference/climr_downscale.html">climr_downscale()</a></code> using the functions
-<code><a href="../reference/climr_downscale.html">climr_downscale()</a></code> calls internally – [Workflow with *_input
-functions and downscale].</p>
+<p>The first, less code-heavy, workflow uses <code><a href="../reference/downscale.html">downscale()</a></code> to
+do much of the heavy lifting – [Workflow with downscale]. The second
+workflow is a step-by-step breakdown of <code><a href="../reference/downscale.html">downscale()</a></code> using
+the functions <code><a href="../reference/downscale.html">downscale()</a></code> calls internally – [Workflow with
+*_input functions and downscale].</p>
 </div>
 <div class="section level2">
 <h2 id="main-functions">Main functions<a class="anchor" aria-label="anchor" href="#main-functions"></a>
 </h2>
 <p>Below is a list of the main functions used in the two workflows.</p>
 <ul>
-<li><p><code><a href="../reference/climr_downscale.html">climr_downscale()</a></code> takes a <code>data.table</code> of
-point coordinates (in lat-long projection), obtains climate normals and
+<li><p><code><a href="../reference/downscale.html">downscale()</a></code> takes a <code>data.table</code> of point
+coordinates (in lat-long projection), obtains climate normals and
 historic and/or future projections covering the extent of the points,
 which are then downscaled using point elevation data and used to
 calculate derived climate variables at the point locations. It outputs
 the downscaled and derived variables in the form of a
 <code>data.table</code> or <code>SpatVector</code> of points.</p></li>
-<li><p><code><a href="../reference/normal-input-data.html">normal_input()</a></code> downloads and prepares
+<li><p><code><a href="../reference/input_refmap.html">input_refmap()</a></code> downloads and prepares
 high-resolution climate normals. Called internally by
-<code><a href="../reference/climr_downscale.html">climr_downscale()</a></code>.</p></li>
-<li><p><code><a href="../reference/hist-input-data.html">historic_input()</a></code> and
-<code><a href="../reference/hist-input-data.html">historic_input_ts()</a></code> download and prepare low-resolution
-historic climate elements for a given historic period or time series,
-respectively. Called internally by
-<code><a href="../reference/climr_downscale.html">climr_downscale()</a></code>.</p></li>
-<li><p><code><a href="../reference/gcm-input-data.html">gcm_input()</a></code>, <code><a href="../reference/gcm-input-data.html">gcm_hist_input()</a></code> and
-<code><a href="../reference/gcm-input-data.html">gcm_ts_input()</a></code> download and prepare low-resolution climate
+<code><a href="../reference/downscale.html">downscale()</a></code>.</p></li>
+<li><p><code><a href="../reference/hist-input-data.html">input_obs()</a></code> and <code><a href="../reference/hist-input-data.html">input_obs_ts()</a></code> download
+and prepare low-resolution historic climate elements for a given
+historic period or time series, respectively. Called internally by
+<code><a href="../reference/downscale.html">downscale()</a></code>.</p></li>
+<li><p><code><a href="../reference/gcms-input-data.html">input_gcms()</a></code>, <code><a href="../reference/gcms-input-data.html">input_gcm_hist()</a></code> and
+<code><a href="../reference/gcms-input-data.html">input_gcm_ssp()</a></code> download and prepare low-resolution climate
 element projections for a future period, historic period or future time
 series, respectively. Called internally by
-<code><a href="../reference/climr_downscale.html">climr_downscale()</a></code>.</p></li>
+<code><a href="../reference/downscale.html">downscale()</a></code>.</p></li>
 <li><p><code><a href="../reference/downscale.html">downscale()</a></code> downscales historic or future climate
 elements and calculates derived climate variables. Called by
-<code><a href="../reference/climr_downscale.html">climr_downscale()</a></code>.</p></li>
+<code><a href="../reference/downscale.html">downscale()</a></code>.</p></li>
 </ul>
 </div>
 <div class="section level2">
-<h2 id="workflow-with-climr_downscale">Workflow with <code>climr_downscale</code><a class="anchor" aria-label="anchor" href="#workflow-with-climr_downscale"></a>
+<h2 id="workflow-with-downscale">Workflow with <code>downscale</code><a class="anchor" aria-label="anchor" href="#workflow-with-downscale"></a>
 </h2>
-<p>In this example workflow we use <code><a href="../reference/climr_downscale.html">climr_downscale()</a></code> to
-calculate mean annual temperature (MAT), total annual precipitation
-(PPT) and precipitation as snow (PAS) at weather stations associated
-with the <a href="https://www.canada.ca/en/environment-climate-change/services/climate-change/science-research-data/climate-trends-variability/adjusted-homogenized-canadian-data.html" class="external-link">Adjusted
+<p>In this example workflow we use <code><a href="../reference/downscale.html">downscale()</a></code> to calculate
+mean annual temperature (MAT), total annual precipitation (PPT) and
+precipitation as snow (PAS) at weather stations associated with the <a href="https://www.canada.ca/en/environment-climate-change/services/climate-change/science-research-data/climate-trends-variability/adjusted-homogenized-canadian-data.html" class="external-link">Adjusted
 and homogenized Canadian climate data</a>.</p>
 <p>We will downscale MAT, PPT and MAS at these locations for a historic
 and a future period, using two separate runs of a GCM and one emissions
@@ -177,9 +176,9 @@ already contains elevation information.</p>
 projection (EPSG:4326) and elevation in m. Point IDs must be unique – we
 will use the weather station IDs.</p>
 <p>We will also add two other columns in our <code>data.table</code>
-(‘ZONE’ and ‘HEZ’) these are ignored by <code><a href="../reference/climr_downscale.html">climr_downscale()</a></code>.
-<code><a href="../reference/climr_downscale.html">climr_downscale()</a></code> preserves the IDs and we use them to join
-back the extra columns used for plotting later on.</p>
+(‘ZONE’ and ‘HEZ’) these are ignored by <code><a href="../reference/downscale.html">downscale()</a></code>.
+<code><a href="../reference/downscale.html">downscale()</a></code> preserves the IDs and we use them to join back
+the extra columns used for plotting later on.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">climr</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span></span>
@@ -227,51 +226,51 @@ Weather stations in North Vancouver
 historic and future periods, GCMs, emissions scenarios, and derived
 variables (in this case only the annual ones).</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/data-option-lists.html">list_historic</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/data-option-lists.html">list_obs_periods</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "2001_2020"</span></span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/data-option-lists.html">list_gcm_period</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/data-option-lists.html">list_gcm_periods</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "2001_2020" "2021_2040" "2041_2060" "2061_2080" "2081_2100"</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/data-option-lists.html">list_gcm</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/data-option-lists.html">list_gcms</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  [1] "ACCESS-ESM1-5" "BCC-CSM2-MR"   "CanESM5"       "CNRM-ESM2-1"  </span></span>
 <span><span class="co">#&gt;  [5] "EC-Earth3"     "GFDL-ESM4"     "GISS-E2-1-G"   "INM-CM5-0"    </span></span>
 <span><span class="co">#&gt;  [9] "IPSL-CM6A-LR"  "MIROC6"        "MPI-ESM1-2-HR" "MRI-ESM2-0"   </span></span>
 <span><span class="co">#&gt; [13] "UKESM1-0-LL"</span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/data-option-lists.html">list_ssp</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/data-option-lists.html">list_ssps</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "ssp126" "ssp245" "ssp370" "ssp585"</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/data-option-lists.html">list_variables</a></span><span class="op">(</span>set <span class="op">=</span> <span class="st">"Annual"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "AHM"   "bFFP"  "CMD"   "CMI"   "DD_0"  "DD_18" "DD18"  "DD5"   "eFFP" </span></span>
-<span><span class="co">#&gt; [10] "EMT"   "Eref"  "EXT"   "FFP"   "MAP"   "MAT"   "MCMT"  "MSP"   "MWMT" </span></span>
-<span><span class="co">#&gt; [19] "NFFD"  "PAS"   "PPT"   "RH"    "SHM"   "Tave"  "TD"    "Tmax"  "Tmin"</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/data-option-lists.html">list_vars</a></span><span class="op">(</span>set <span class="op">=</span> <span class="st">"Annual"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "AHM"     "bFFP"    "CMD"     "CMI"     "DD18"    "DD5"     "DDsub0" </span></span>
+<span><span class="co">#&gt;  [8] "DDsub18" "eFFP"    "EMT"     "Eref"    "EXT"     "FFP"     "MAP"    </span></span>
+<span><span class="co">#&gt; [15] "MAT"     "MCMT"    "MSP"     "MWMT"    "NFFD"    "PAS"     "PPT"    </span></span>
+<span><span class="co">#&gt; [22] "RH"      "SHM"     "Tave"    "TD"      "Tmax"    "Tmin"</span></span></code></pre></div>
 <p>We will chose the only available historic period (2001-2020), the
 2021-2040 future period, the ‘EC-Earth3’ GCM and the SSP 2.45 scenario.
 MAT, PPT and PAS will be selected as output variables.</p>
-<p>We pass our choices to <code><a href="../reference/climr_downscale.html">climr_downscale()</a></code>, choosing the
-“auto” normals option (which defaults to using the highest resolution
-data available for the points selected).</p>
+<p>We pass our choices to <code><a href="../reference/downscale.html">downscale()</a></code>, choosing the “auto”
+normals option (which defaults to using the highest resolution data
+available for the points selected).</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ds_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/climr_downscale.html">climr_downscale</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">ds_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/downscale.html">downscale</a></span><span class="op">(</span></span>
 <span>  xyz <span class="op">=</span> <span class="va">xyzDT</span>,</span>
-<span>  which_normal <span class="op">=</span> <span class="st">"auto"</span>,</span>
-<span>  historic_period <span class="op">=</span> <span class="st">"2001_2020"</span>,</span>
-<span>  gcm_period <span class="op">=</span> <span class="st">"2021_2040"</span>,</span>
-<span>  gcm_models <span class="op">=</span> <span class="st">"EC-Earth3"</span>,</span>
-<span>  ssp <span class="op">=</span> <span class="st">"ssp245"</span>,</span>
+<span>  which_refmap <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  obs_periods <span class="op">=</span> <span class="st">"2001_2020"</span>,</span>
+<span>  gcm_periods <span class="op">=</span> <span class="st">"2021_2040"</span>,</span>
+<span>  gcms <span class="op">=</span> <span class="st">"EC-Earth3"</span>,</span>
+<span>  ssps <span class="op">=</span> <span class="st">"ssp245"</span>,</span>
 <span>  max_run <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  return_normal <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co">## to return the 1961-1990 normals period</span></span>
+<span>  return_refperiod <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co">## to return the 1961-1990 normals period</span></span>
 <span>  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MAT"</span>, <span class="st">"PPT"</span>, <span class="st">"PAS"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Welcome to climr!</span></span>
 <span><span class="co">#&gt; Getting normals...</span></span>
-<span><span class="co">#&gt; for BC...</span></span>
 <span><span class="co">#&gt; Downloading new data...</span></span>
 <span><span class="co">#&gt; .</span></span>
 <span><span class="co">#&gt; Caching data...</span></span>
-<span><span class="co">#&gt; Getting historic...</span></span>
-<span><span class="co">#&gt; Downloading historic anomalies</span></span>
+<span><span class="co">#&gt; Getting observed anomalies...</span></span>
+<span><span class="co">#&gt; Downloading observed period anomalies</span></span>
 <span><span class="co">#&gt; .</span></span>
 <span><span class="co">#&gt; Caching data...</span></span>
 <span><span class="co">#&gt; Getting GCMs...</span></span>
@@ -283,18 +282,18 @@ data available for the points selected).</p>
 – this is expected , as GCMs and SSPs are used to project future climate
 values. Also, future projections were obtained for two runs of EC-Earth3
 (‘r1i1p1f1’ and ‘r10i1p1f1’), plus the ensemble mean.</p>
-<table style="width:100%;" class="table">
-<caption>‘ds_out’ table - Output from <code>climr_downscale</code>.
-Outputs are show for one location (‘id’)</caption>
+<table class="table">
+<caption>‘ds_out’ table - Output from <code>downscale</code>. Outputs
+are show for one location (‘id’)</caption>
 <colgroup>
 <col width="4%">
-<col width="14%">
+<col width="13%">
 <col width="9%">
 <col width="18%">
-<col width="14%">
-<col width="14%">
+<col width="13%">
+<col width="13%">
 <col width="12%">
-<col width="12%">
+<col width="13%">
 </colgroup>
 <thead><tr class="header">
 <th align="right">id</th>
@@ -313,9 +312,9 @@ Outputs are show for one location (‘id’)</caption>
 <td align="left">NA</td>
 <td align="left">NA</td>
 <td align="left">1961_1990</td>
-<td align="right">9.738779</td>
-<td align="right">2614.527</td>
-<td align="right">365.0191</td>
+<td align="right">9.509459</td>
+<td align="right">2838.775</td>
+<td align="right">123.96330</td>
 </tr>
 <tr class="even">
 <td align="right">87</td>
@@ -323,9 +322,9 @@ Outputs are show for one location (‘id’)</caption>
 <td align="left">NA</td>
 <td align="left">NA</td>
 <td align="left">2001_2020</td>
-<td align="right">10.047888</td>
-<td align="right">2565.122</td>
-<td align="right">316.0789</td>
+<td align="right">9.818568</td>
+<td align="right">2783.691</td>
+<td align="right">105.92775</td>
 </tr>
 <tr class="odd">
 <td align="right">87</td>
@@ -333,9 +332,9 @@ Outputs are show for one location (‘id’)</caption>
 <td align="left">ssp245</td>
 <td align="left">ensembleMean</td>
 <td align="left">2021_2040</td>
-<td align="right">11.254584</td>
-<td align="right">2682.471</td>
-<td align="right">214.3795</td>
+<td align="right">11.027859</td>
+<td align="right">2913.681</td>
+<td align="right">68.68399</td>
 </tr>
 <tr class="even">
 <td align="right">87</td>
@@ -343,9 +342,9 @@ Outputs are show for one location (‘id’)</caption>
 <td align="left">ssp245</td>
 <td align="left">r15i1p1f1</td>
 <td align="left">2021_2040</td>
-<td align="right">10.812713</td>
-<td align="right">2773.671</td>
-<td align="right">267.7330</td>
+<td align="right">10.587255</td>
+<td align="right">3013.761</td>
+<td align="right">86.40004</td>
 </tr>
 <tr class="odd">
 <td align="right">87</td>
@@ -353,9 +352,9 @@ Outputs are show for one location (‘id’)</caption>
 <td align="left">ssp245</td>
 <td align="left">r1i1p1f1</td>
 <td align="left">2021_2040</td>
-<td align="right">11.460546</td>
-<td align="right">2711.424</td>
-<td align="right">195.9670</td>
+<td align="right">11.232143</td>
+<td align="right">2935.989</td>
+<td align="right">63.56457</td>
 </tr>
 </tbody>
 </table>
@@ -380,30 +379,26 @@ biogeoclimatic zone (‘ZONE’), in the normals period of 1961-1990:</p>
 the yearly values of MAT and PPT for 2001-2015 and 2021:2040, using the
 same GCM, SSP and number of model runs. Notice how some of the data
 doesn’t need to be downloaded again, and was retrieved from cache.</p>
-<p>The <code><a href="../reference/climr_downscale.html">climr_downscale()</a></code> internally rescales the projected
+<p>The <code><a href="../reference/downscale.html">downscale()</a></code> internally rescales the projected
 historical values so that they align with their observed counterpart.
 See <code>vignette("methods_downscaling.Rmd")</code> for details.</p>
 <!-- missing data for years 2016-2020 -->
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ds_out_ts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/climr_downscale.html">climr_downscale</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">ds_out_ts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/downscale.html">downscale</a></span><span class="op">(</span></span>
 <span>  xyz <span class="op">=</span> <span class="va">xyzDT</span>,</span>
-<span>  which_normal <span class="op">=</span> <span class="st">"auto"</span>,</span>
-<span>  historic_ts <span class="op">=</span> <span class="fl">2001</span><span class="op">:</span><span class="fl">2015</span>, <span class="co">## currently up to 2015</span></span>
+<span>  which_refmap <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  obs_years <span class="op">=</span> <span class="fl">2001</span><span class="op">:</span><span class="fl">2015</span>, <span class="co">## currently up to 2015</span></span>
 <span>  gcm_hist_years <span class="op">=</span> <span class="fl">2001</span><span class="op">:</span><span class="fl">2020</span>, <span class="co">## currently up to 2010</span></span>
-<span>  gcm_ts_years <span class="op">=</span> <span class="fl">2021</span><span class="op">:</span><span class="fl">2040</span>, <span class="co">## currently starting at 2021</span></span>
-<span>  gcm_models <span class="op">=</span> <span class="st">"EC-Earth3"</span>,</span>
-<span>  ssp <span class="op">=</span> <span class="st">"ssp245"</span>,</span>
+<span>  gcm_ssp_years <span class="op">=</span> <span class="fl">2021</span><span class="op">:</span><span class="fl">2040</span>, <span class="co">## currently starting at 2021</span></span>
+<span>  gcms <span class="op">=</span> <span class="st">"EC-Earth3"</span>,</span>
+<span>  ssps <span class="op">=</span> <span class="st">"ssp245"</span>,</span>
 <span>  max_run <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  return_normal <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co">## to return the 1961-1990 normals period</span></span>
+<span>  return_refperiod <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co">## to return the 1961-1990 normals period</span></span>
 <span>  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MAT"</span>, <span class="st">"PPT"</span>, <span class="st">"PAS"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Welcome to climr!</span></span>
 <span><span class="co">#&gt; Getting normals...</span></span>
-<span><span class="co">#&gt; for BC...</span></span>
 <span><span class="co">#&gt; Retrieving from cache...</span></span>
-<span><span class="co">#&gt; Downloading historic anomalies</span></span>
-<span><span class="co">#&gt; .</span></span>
-<span><span class="co">#&gt; Caching data...</span></span>
 <span><span class="co">#&gt; Downloading GCM anomalies</span></span>
 <span><span class="co">#&gt; Precip...</span></span>
 <span><span class="co">#&gt; .</span></span>
@@ -473,8 +468,8 @@ along with future climate projections (<code>proj_fut</code>).</p>
 <span>  <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Year"</span>, col <span class="op">=</span> <span class="st">""</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span><span class="va">variable</span>, scales <span class="op">=</span> <span class="st">"free"</span>, ncol <span class="op">=</span> <span class="fl">1</span>, strip.position <span class="op">=</span> <span class="st">"left"</span>, <span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="climr_workflow_int_files/figure-html/unnamed-chunk-14-1.png" alt="Time series outputs from `climr_downscale`. Pannels show mean annual temperature (MAT), total annual precipitation (PPT) and precipitation as snow (PAS). Line colours refer to observed historic values (grey), projected historic values (gren) and future projected values (blue) for a single location, GCM, emissions scenario and model run." width="80%"><p class="caption">
-Time series outputs from <code>climr_downscale</code>. Pannels show mean
+<img src="climr_workflow_int_files/figure-html/unnamed-chunk-14-1.png" alt="Time series outputs from `downscale`. Pannels show mean annual temperature (MAT), total annual precipitation (PPT) and precipitation as snow (PAS). Line colours refer to observed historic values (grey), projected historic values (gren) and future projected values (blue) for a single location, GCM, emissions scenario and model run." width="80%"><p class="caption">
+Time series outputs from <code>downscale</code>. Pannels show mean
 annual temperature (MAT), total annual precipitation (PPT) and
 precipitation as snow (PAS). Line colours refer to observed historic
 values (grey), projected historic values (gren) and future projected
@@ -485,19 +480,19 @@ run.
 <div class="section level3">
 <h3 id="spatial-output-and-plotting-options">Spatial output and plotting options<a class="anchor" aria-label="anchor" href="#spatial-output-and-plotting-options"></a>
 </h3>
-<p><code>climr_downscale</code> can also provide outputs in the form of
-a <code>SpatVector</code> of points and plot the values of a chosen
+<p><code>downscale</code> can also provide outputs in the form of a
+<code>SpatVector</code> of points and plot the values of a chosen
 climate variable from the list passed to
-<code>climr_downscale(..., vars)</code>, in this case MAT.</p>
+<code>downscale(..., vars)</code>, in this case MAT.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ds_out_spatial</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/climr_downscale.html">climr_downscale</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">ds_out_spatial</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/downscale.html">downscale</a></span><span class="op">(</span></span>
 <span>  xyz <span class="op">=</span> <span class="va">xyzDT</span>,</span>
-<span>  which_normal <span class="op">=</span> <span class="st">"auto"</span>,</span>
-<span>  gcm_models <span class="op">=</span> <span class="st">"EC-Earth3"</span>,</span>
-<span>  gcm_period <span class="op">=</span> <span class="st">"2021_2040"</span>,</span>
-<span>  ssp <span class="op">=</span> <span class="st">"ssp245"</span>,</span>
+<span>  which_refmap <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  gcms <span class="op">=</span> <span class="st">"EC-Earth3"</span>,</span>
+<span>  gcm_periods <span class="op">=</span> <span class="st">"2021_2040"</span>,</span>
+<span>  ssps <span class="op">=</span> <span class="st">"ssp245"</span>,</span>
 <span>  max_run <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  return_normal <span class="op">=</span> <span class="cn">FALSE</span>, <span class="co">## don't return the 1961-1990 normals period</span></span>
+<span>  return_refperiod <span class="op">=</span> <span class="cn">FALSE</span>, <span class="co">## don't return the 1961-1990 normals period</span></span>
 <span>  out_spatial <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  plot <span class="op">=</span> <span class="st">"MAT"</span>,</span>
 <span>  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MAT"</span>, <span class="st">"PPT"</span>, <span class="st">"PAS"</span><span class="op">)</span></span>
@@ -537,41 +532,40 @@ on top of our DEM raster, for prettier visuals:</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="workflow-with-_input-functions-and-downscale">Workflow with <code>*_input</code> functions and
-<code>downscale</code><a class="anchor" aria-label="anchor" href="#workflow-with-_input-functions-and-downscale"></a>
+<h2 id="workflow-with-input_-functions-and-downscale_core">Workflow with <code>input_*</code> functions and
+<code>downscale_core()</code><a class="anchor" aria-label="anchor" href="#workflow-with-input_-functions-and-downscale_core"></a>
 </h2>
 <p>Alternatively, a user may choose to run the climate data preparation
 and downscaling functions separately.</p>
 <p>We suggest doing this at least once or twice to have a full
-understanding of the steps that <code>climr_downscale</code> executes
+understanding of the steps that <code>downscale</code> executes
 internally.</p>
 <p>Steps 1 and 2 bellow download and prepare the climate data used in
 the downscaling step (Step 3).</p>
 <p>We will use the same point locations as above for downscaling.</p>
 <div class="section level3">
-<h3 id="get-climate-normals---normal_input">1) Get climate normals - <code>normal_input()</code><a class="anchor" aria-label="anchor" href="#get-climate-normals---normal_input"></a>
+<h3 id="get-climate-normals---input_refmap">1) Get climate normals - <code>input_refmap()</code><a class="anchor" aria-label="anchor" href="#get-climate-normals---input_refmap"></a>
 </h3>
-<p>When using <code><a href="../reference/normal-input-data.html">normal_input()</a></code>, we establish a connection to
+<p>When using <code><a href="../reference/input_refmap.html">input_refmap()</a></code>, we establish a connection to
 the PostGIS server and pass the bounding box containing the point
 locations of interest.</p>
-<p>There is no “auto” option for to select the source of climate
-normals. <code><a href="../reference/data-option-lists.html">list_normal()</a></code> provides a list of available
-options:</p>
+<p>There is no “auto” option to select the source of climate normals.
+<code>list_refmap()</code> provides a list of available options:</p>
 <ul>
-<li><p>‘normal_na’ corresponds to normals for North America obtained
-from <a href="climatena.ca">ClimateNA</a> <span class="citation">(<a href="#ref-wang2016" role="doc-biblioref">Wang et al.
+<li><p>‘refmap_climatena’ corresponds to normals for North America
+obtained from <a href="climatena.ca">ClimateNA</a> <span class="citation">(<a href="#ref-wang2016">Wang et al.
 2016</a>)</span>;</p></li>
-<li><p>‘normal_bc’ corresponds to the British Columbia PRISM
+<li><p>‘refmap_prism’ corresponds to the British Columbia PRISM
 normals;</p></li>
-<li><p>‘normal_composite’ corresponds to a composite of British Columbia
+<li><p>‘refmap_climr’ corresponds to a composite of British Columbia
 PRISM, adjusted US PRISM and DAYMET (Alberta and Saskatchewan), and
 covers western Canada and western US.</p></li>
 </ul>
-<p>We will use ‘normal_composite’ has it is the highest resolution
-product for the area of interest.</p>
+<p>We will use ‘refmap_climr’ has it is the highest resolution product
+for the area of interest.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/data-option-lists.html">list_normal</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "normal_na"        "normal_bc"        "normal_composite"</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/data-option-lists.html">list_refmaps</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "refmap_climatena" "refmap_prism"     "refmap_climr"</span></span></code></pre></div>
 <p>The extent of the downloaded climate anomalies will often be larger
 than the extent of the bounding box, and vary depending on the spatial
 resolution of the data. To demonstrate this we will define a bounding
@@ -585,9 +579,9 @@ box around the point locations in <code>xyzDT</code>.</p>
 <span><span class="co">## alternatively:</span></span>
 <span><span class="co"># the_bb &lt;- get_bb(xyzDT)</span></span>
 <span></span>
-<span><span class="va">normals</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/normal-input-data.html">normal_input</a></span><span class="op">(</span><span class="va">dbCon</span>,</span>
+<span><span class="va">normals</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/input_refmap.html">input_refmap</a></span><span class="op">(</span><span class="va">dbCon</span>,</span>
 <span>  bbox <span class="op">=</span> <span class="va">the_bb</span>,</span>
-<span>  normal <span class="op">=</span> <span class="st">"normal_composite"</span></span>
+<span>  reference <span class="op">=</span> <span class="st">"refmap_climr"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; .</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
@@ -601,49 +595,51 @@ bounding box.
 <h3 id="get-climate-projections-andor-historical-observations">2) Get climate projections and/or historical observations<a class="anchor" aria-label="anchor" href="#get-climate-projections-andor-historical-observations"></a>
 </h3>
 <p>Data for historic and future climate projections can be obtained with
-the <code>gcm_*()</code> functions. <code><a href="../reference/gcm-input-data.html">gcm_hist_input()</a></code> is
+the <code>gcm_*()</code> functions. <code><a href="../reference/gcms-input-data.html">input_gcm_hist()</a></code> is
 used to obtain historical anomalies projected with a (or several) GCM,
-whereas <code><a href="../reference/gcm-input-data.html">gcm_input()</a></code> and <code>gcm_ts_input</code> are used
-to obtain future anomaly projections for a period or individual years
-(i.e. time series).</p>
+whereas <code><a href="../reference/gcms-input-data.html">input_gcms()</a></code> and <code>input_gcm_ssp</code> are
+used to obtain future anomaly projections for a period or individual
+years (i.e. time series).</p>
 <p>Historical observations for a given period or for individual years
-can be obtained with <code>historic_input</code> and
-<code>historic_input_ts</code>, respectively.</p>
+can be obtained with <code>input_obs</code> and
+<code>input_obs_ts</code>, respectively.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">hist_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gcm-input-data.html">gcm_hist_input</a></span><span class="op">(</span><span class="va">dbCon</span>,</span>
+<code class="sourceCode R"><span><span class="va">hist_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gcms-input-data.html">input_gcm_hist</a></span><span class="op">(</span><span class="va">dbCon</span>,</span>
 <span>  bbox <span class="op">=</span> <span class="va">the_bb</span>,</span>
-<span>  gcm <span class="op">=</span> <span class="st">"EC-Earth3"</span>,</span>
+<span>  gcms <span class="op">=</span> <span class="st">"EC-Earth3"</span>,</span>
 <span>  years <span class="op">=</span> <span class="fl">2001</span><span class="op">:</span><span class="fl">2020</span>,</span>
 <span>  max_run <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; .</span></span>
-<span></span>
-<span><span class="va">fut_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gcm-input-data.html">gcm_input</a></span><span class="op">(</span><span class="va">dbCon</span>,</span>
+<span><span class="co">#&gt; .</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">fut_proj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gcms-input-data.html">input_gcms</a></span><span class="op">(</span><span class="va">dbCon</span>,</span>
 <span>  bbox <span class="op">=</span> <span class="va">the_bb</span>,</span>
-<span>  gcm <span class="op">=</span> <span class="st">"EC-Earth3"</span>,</span>
-<span>  ssp <span class="op">=</span> <span class="st">"ssp245"</span>,</span>
+<span>  gcms <span class="op">=</span> <span class="st">"EC-Earth3"</span>,</span>
+<span>  ssps <span class="op">=</span> <span class="st">"ssp245"</span>,</span>
 <span>  period <span class="op">=</span> <span class="st">"2021_2040"</span>,</span>
 <span>  max_run <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; .</span></span>
-<span></span>
-<span><span class="va">fut_proj_ts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gcm-input-data.html">gcm_ts_input</a></span><span class="op">(</span><span class="va">dbCon</span>,</span>
+<span><span class="co">#&gt; .</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">fut_proj_ts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gcms-input-data.html">input_gcm_ssp</a></span><span class="op">(</span><span class="va">dbCon</span>,</span>
 <span>  bbox <span class="op">=</span> <span class="va">the_bb</span>,</span>
-<span>  gcm <span class="op">=</span> <span class="st">"EC-Earth3"</span>,</span>
-<span>  ssp <span class="op">=</span> <span class="st">"ssp245"</span>,</span>
+<span>  gcms <span class="op">=</span> <span class="st">"EC-Earth3"</span>,</span>
+<span>  ssps <span class="op">=</span> <span class="st">"ssp245"</span>,</span>
 <span>  years <span class="op">=</span> <span class="fl">2021</span><span class="op">:</span><span class="fl">2040</span>,</span>
 <span>  max_run <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">hist_obs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hist-input-data.html">historic_input</a></span><span class="op">(</span><span class="va">dbCon</span>,</span>
+<span><span class="va">hist_obs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hist-input-data.html">input_obs</a></span><span class="op">(</span><span class="va">dbCon</span>,</span>
 <span>  bbox <span class="op">=</span> <span class="va">the_bb</span>,</span>
 <span>  period <span class="op">=</span> <span class="st">"2001_2020"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">hist_obs_ts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hist-input-data.html">historic_input_ts</a></span><span class="op">(</span><span class="va">dbCon</span>,</span>
+<span><span class="va">hist_obs_ts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/hist-input-data.html">input_obs_ts</a></span><span class="op">(</span><span class="va">dbCon</span>,</span>
 <span>  bbox <span class="op">=</span> <span class="va">the_bb</span>,</span>
 <span>  years <span class="op">=</span> <span class="fl">2001</span><span class="op">:</span><span class="fl">2020</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; .</span></span></code></pre></div>
+<span><span class="co">#&gt; ..</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="climr_workflow_int_files/figure-html/unnamed-chunk-22-1.png" alt="Downloaded historical and future anomalies shown with North Vancouver area and the requested bounding box." width="100%"><p class="caption">
 Downloaded historical and future anomalies shown with North Vancouver
@@ -662,121 +658,25 @@ several climate inputs to downscale.</p>
 inputs (<code>inputs</code>) must be named according to
 <code><a href="../reference/downscale.html">downscale()</a></code>’s argument names (you can list them with
 <code>formalArgs(downscale)</code>).</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">inputs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  <span class="st">"gcm"</span> <span class="op">=</span> <span class="va">fut_proj</span>,</span>
-<span>  <span class="st">"historic"</span> <span class="op">=</span> <span class="va">hist_obs</span>,</span>
-<span>  <span class="st">"gcm_ts"</span> <span class="op">=</span> <span class="va">fut_proj_ts</span>,</span>
-<span>  <span class="st">"gcm_hist"</span> <span class="op">=</span> <span class="va">hist_proj</span>,</span>
-<span>  <span class="st">"historic_ts"</span> <span class="op">=</span> <span class="va">hist_obs_ts</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">all_downscale</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">inputs</span><span class="op">)</span>,</span>
-<span>  <span class="kw">function</span><span class="op">(</span><span class="va">input_arg</span>, <span class="va">xyzDT</span>, <span class="va">normals</span>, <span class="va">inputs</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">args</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">inputs</span><span class="op">[[</span><span class="va">input_arg</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span>    <span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">args</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">input_arg</span></span>
-<span></span>
-<span>    <span class="co">## add a few more arguments</span></span>
-<span>    <span class="va">args</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/append.html" class="external-link">append</a></span><span class="op">(</span></span>
-<span>      <span class="va">args</span>,</span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>        <span class="st">"xyz"</span> <span class="op">=</span> <span class="va">xyzDT</span>,</span>
-<span>        <span class="st">"normal"</span> <span class="op">=</span> <span class="va">normals</span>,</span>
-<span>        <span class="st">"return_normal"</span> <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>        <span class="st">"vars"</span> <span class="op">=</span> <span class="st">"MAT"</span>,</span>
-<span>        <span class="st">"out_spatial"</span> <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span></span>
-<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">downscale</span>, <span class="va">args</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">}</span>,</span>
-<span>  normals <span class="op">=</span> <span class="va">normals</span>, inputs <span class="op">=</span> <span class="va">inputs</span>, <span class="va">xyzDT</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">all_downscale</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; $gcm</span></span>
-<span><span class="co">#&gt; Key: &lt;id, GCM, SSP, RUN, PERIOD&gt;</span></span>
-<span><span class="co">#&gt;        id       GCM    SSP          RUN    PERIOD       MAT</span></span>
-<span><span class="co">#&gt;     &lt;int&gt;    &lt;char&gt; &lt;char&gt;       &lt;char&gt;    &lt;char&gt;     &lt;num&gt;</span></span>
-<span><span class="co">#&gt;  1:    87 EC-Earth3 ssp245 ensembleMean 2021_2040 11.241924</span></span>
-<span><span class="co">#&gt;  2:   175 EC-Earth3 ssp245 ensembleMean 2021_2040 11.969482</span></span>
-<span><span class="co">#&gt;  3:   191 EC-Earth3 ssp245 ensembleMean 2021_2040 10.772463</span></span>
-<span><span class="co">#&gt;  4:   208 EC-Earth3 ssp245 ensembleMean 2021_2040 11.903974</span></span>
-<span><span class="co">#&gt;  5:   209 EC-Earth3 ssp245 ensembleMean 2021_2040 10.501632</span></span>
-<span><span class="co">#&gt; ---                                                        </span></span>
-<span><span class="co">#&gt; 84: 12904 EC-Earth3 ssp245 ensembleMean 2021_2040  7.239116</span></span>
-<span><span class="co">#&gt; 85: 12905 EC-Earth3 ssp245 ensembleMean 2021_2040  9.616617</span></span>
-<span><span class="co">#&gt; 86: 12918 EC-Earth3 ssp245 ensembleMean 2021_2040 11.666369</span></span>
-<span><span class="co">#&gt; 87: 12925 EC-Earth3 ssp245 ensembleMean 2021_2040 11.779511</span></span>
-<span><span class="co">#&gt; 88: 12936 EC-Earth3 ssp245 ensembleMean 2021_2040 11.949486</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $historic</span></span>
-<span><span class="co">#&gt; Key: &lt;id, PERIOD&gt;</span></span>
-<span><span class="co">#&gt;        id    PERIOD       MAT</span></span>
-<span><span class="co">#&gt;     &lt;int&gt;    &lt;char&gt;     &lt;num&gt;</span></span>
-<span><span class="co">#&gt;  1:    87 2001_2020 10.047888</span></span>
-<span><span class="co">#&gt;  2:   175 2001_2020 10.784607</span></span>
-<span><span class="co">#&gt;  3:   191 2001_2020  9.557805</span></span>
-<span><span class="co">#&gt;  4:   208 2001_2020 10.723865</span></span>
-<span><span class="co">#&gt;  5:   209 2001_2020  9.311382</span></span>
-<span><span class="co">#&gt; ---                          </span></span>
-<span><span class="co">#&gt; 84: 12904 2001_2020  6.018799</span></span>
-<span><span class="co">#&gt; 85: 12905 2001_2020  8.390223</span></span>
-<span><span class="co">#&gt; 86: 12918 2001_2020 10.478055</span></span>
-<span><span class="co">#&gt; 87: 12925 2001_2020 10.607733</span></span>
-<span><span class="co">#&gt; 88: 12936 2001_2020 10.760592</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $gcm_ts</span></span>
-<span><span class="co">#&gt; Key: &lt;id, GCM, SSP, RUN, PERIOD&gt;</span></span>
-<span><span class="co">#&gt;          id       GCM    SSP          RUN PERIOD      MAT</span></span>
-<span><span class="co">#&gt;       &lt;int&gt;    &lt;char&gt; &lt;char&gt;       &lt;char&gt; &lt;char&gt;    &lt;num&gt;</span></span>
-<span><span class="co">#&gt;    1:    87 EC-Earth3 ssp245 ensembleMean   2021 11.53311</span></span>
-<span><span class="co">#&gt;    2:    87 EC-Earth3 ssp245 ensembleMean   2022 11.05650</span></span>
-<span><span class="co">#&gt;    3:    87 EC-Earth3 ssp245 ensembleMean   2023 10.78489</span></span>
-<span><span class="co">#&gt;    4:    87 EC-Earth3 ssp245 ensembleMean   2024 11.31764</span></span>
-<span><span class="co">#&gt;    5:    87 EC-Earth3 ssp245 ensembleMean   2025 11.24413</span></span>
-<span><span class="co">#&gt;   ---                                                    </span></span>
-<span><span class="co">#&gt; 1756: 12936 EC-Earth3 ssp245 ensembleMean   2036 12.00270</span></span>
-<span><span class="co">#&gt; 1757: 12936 EC-Earth3 ssp245 ensembleMean   2037 11.70371</span></span>
-<span><span class="co">#&gt; 1758: 12936 EC-Earth3 ssp245 ensembleMean   2038 12.63359</span></span>
-<span><span class="co">#&gt; 1759: 12936 EC-Earth3 ssp245 ensembleMean   2039 11.83683</span></span>
-<span><span class="co">#&gt; 1760: 12936 EC-Earth3 ssp245 ensembleMean   2040 12.20357</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $gcm_hist</span></span>
-<span><span class="co">#&gt; Key: &lt;id, GCM, RUN, PERIOD&gt;</span></span>
-<span><span class="co">#&gt;         id       GCM          RUN PERIOD      MAT</span></span>
-<span><span class="co">#&gt;      &lt;int&gt;    &lt;char&gt;       &lt;char&gt; &lt;char&gt;    &lt;num&gt;</span></span>
-<span><span class="co">#&gt;   1:    87 EC-Earth3 ensembleMean   2001 10.37796</span></span>
-<span><span class="co">#&gt;   2:    87 EC-Earth3 ensembleMean   2002 10.41935</span></span>
-<span><span class="co">#&gt;   3:    87 EC-Earth3 ensembleMean   2003 10.94394</span></span>
-<span><span class="co">#&gt;   4:    87 EC-Earth3 ensembleMean   2004 10.71435</span></span>
-<span><span class="co">#&gt;   5:    87 EC-Earth3 ensembleMean   2005 10.92751</span></span>
-<span><span class="co">#&gt;  ---                                             </span></span>
-<span><span class="co">#&gt; 876: 12936 EC-Earth3 ensembleMean   2006 10.97968</span></span>
-<span><span class="co">#&gt; 877: 12936 EC-Earth3 ensembleMean   2007 11.42034</span></span>
-<span><span class="co">#&gt; 878: 12936 EC-Earth3 ensembleMean   2008 11.00490</span></span>
-<span><span class="co">#&gt; 879: 12936 EC-Earth3 ensembleMean   2009 11.11430</span></span>
-<span><span class="co">#&gt; 880: 12936 EC-Earth3 ensembleMean   2010 12.07629</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $historic_ts</span></span>
-<span><span class="co">#&gt; Key: &lt;id, PERIOD&gt;</span></span>
-<span><span class="co">#&gt;          id PERIOD      MAT</span></span>
-<span><span class="co">#&gt;       &lt;int&gt; &lt;char&gt;    &lt;num&gt;</span></span>
-<span><span class="co">#&gt;    1:    87   2001 10.20435</span></span>
-<span><span class="co">#&gt;    2:    87   2002 10.35103</span></span>
-<span><span class="co">#&gt;    3:    87   2003 10.81289</span></span>
-<span><span class="co">#&gt;    4:    87   2004 11.28643</span></span>
-<span><span class="co">#&gt;    5:    87   2005 10.86849</span></span>
-<span><span class="co">#&gt;   ---                      </span></span>
-<span><span class="co">#&gt; 1756: 12936   2016 12.08256</span></span>
-<span><span class="co">#&gt; 1757: 12936   2017 11.26032</span></span>
-<span><span class="co">#&gt; 1758: 12936   2018 11.68008</span></span>
-<span><span class="co">#&gt; 1759: 12936   2019 11.40181</span></span>
-<span><span class="co">#&gt; 1760: 12936   2020 11.52093</span></span></code></pre>
-<p>Binding the tables results in a similar table to the one we would
-have achieved had we used <code><a href="../reference/climr_downscale.html">climr_downscale()</a></code>.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">all_downscale</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="va">all_downscale</span>, use.names <span class="op">=</span> <span class="cn">TRUE</span>, fill <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span></span>
+<span><span class="va">all_downscale</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/downscale_core.html">downscale_core</a></span><span class="op">(</span><span class="va">xyzDT</span>, refmap <span class="op">=</span> <span class="va">normals</span>, gcms <span class="op">=</span> <span class="va">fut_proj</span>, obs <span class="op">=</span> <span class="va">hist_obs</span>, gcm_ssp_ts <span class="op">=</span> <span class="va">fut_proj_ts</span>, gcm_hist_ts <span class="op">=</span> <span class="va">hist_proj</span>, obs_ts <span class="op">=</span> <span class="va">hist_obs_ts</span>, vars <span class="op">=</span> <span class="st">"MAT"</span>, out_spatial <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">all_downscale</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; Key: &lt;id, GCM, SSP, RUN, PERIOD, DATASET&gt;</span></span>
+<span><span class="co">#&gt;          id       GCM    SSP          RUN    PERIOD   DATASET       MAT</span></span>
+<span><span class="co">#&gt;       &lt;int&gt;    &lt;char&gt; &lt;char&gt;       &lt;char&gt;    &lt;char&gt;    &lt;char&gt;     &lt;num&gt;</span></span>
+<span><span class="co">#&gt;    1:    87      &lt;NA&gt;   &lt;NA&gt;         &lt;NA&gt; 1961_1990      &lt;NA&gt;  9.738779</span></span>
+<span><span class="co">#&gt;    2:    87      &lt;NA&gt;   &lt;NA&gt;         &lt;NA&gt;      2001 climatena 10.150806</span></span>
+<span><span class="co">#&gt;    3:    87      &lt;NA&gt;   &lt;NA&gt;         &lt;NA&gt;      2001  cru.gpcc  9.984333</span></span>
+<span><span class="co">#&gt;    4:    87      &lt;NA&gt;   &lt;NA&gt;         &lt;NA&gt; 2001_2020      &lt;NA&gt; 10.047888</span></span>
+<span><span class="co">#&gt;    5:    87      &lt;NA&gt;   &lt;NA&gt;         &lt;NA&gt;      2002 climatena 10.290830</span></span>
+<span><span class="co">#&gt;   ---                                                                  </span></span>
+<span><span class="co">#&gt; 6772: 12936 EC-Earth3 ssp245 ensembleMean      2036      &lt;NA&gt; 12.101026</span></span>
+<span><span class="co">#&gt; 6773: 12936 EC-Earth3 ssp245 ensembleMean      2037      &lt;NA&gt; 12.002702</span></span>
+<span><span class="co">#&gt; 6774: 12936 EC-Earth3 ssp245 ensembleMean      2038      &lt;NA&gt; 11.703712</span></span>
+<span><span class="co">#&gt; 6775: 12936 EC-Earth3 ssp245 ensembleMean      2039      &lt;NA&gt; 12.633595</span></span>
+<span><span class="co">#&gt; 6776: 12936 EC-Earth3 ssp245 ensembleMean      2040      &lt;NA&gt; 11.836830</span></span></code></pre>
 <table class="table">
 <caption>‘all_downscale’ table after binding. Outputs are shown for one
 location (‘id’)</caption>
@@ -786,16 +686,36 @@ location (‘id’)</caption>
 <th align="left">SSP</th>
 <th align="left">RUN</th>
 <th align="left">PERIOD</th>
+<th align="left">DATASET</th>
 <th align="right">MAT</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2021_2040</td>
-<td align="right">11.241924</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">1961_1990</td>
+<td align="left">NA</td>
+<td align="right">9.738779</td>
+</tr>
+<tr class="even">
+<td align="right">87</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2001</td>
+<td align="left">climatena</td>
+<td align="right">10.150806</td>
+</tr>
+<tr class="odd">
+<td align="right">87</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2001</td>
+<td align="left">cru.gpcc</td>
+<td align="right">9.984333</td>
 </tr>
 <tr class="even">
 <td align="right">87</td>
@@ -803,167 +723,350 @@ location (‘id’)</caption>
 <td align="left">NA</td>
 <td align="left">NA</td>
 <td align="left">2001_2020</td>
+<td align="left">NA</td>
 <td align="right">10.047888</td>
 </tr>
 <tr class="odd">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2021</td>
-<td align="right">11.533110</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2002</td>
+<td align="left">climatena</td>
+<td align="right">10.290830</td>
 </tr>
 <tr class="even">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2022</td>
-<td align="right">11.056503</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2002</td>
+<td align="left">cru.gpcc</td>
+<td align="right">10.036438</td>
 </tr>
 <tr class="odd">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2023</td>
-<td align="right">10.784895</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2003</td>
+<td align="left">climatena</td>
+<td align="right">10.787403</td>
 </tr>
 <tr class="even">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2024</td>
-<td align="right">11.317642</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2003</td>
+<td align="left">cru.gpcc</td>
+<td align="right">10.640336</td>
 </tr>
 <tr class="odd">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2025</td>
-<td align="right">11.244127</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2004</td>
+<td align="left">climatena</td>
+<td align="right">11.283665</td>
 </tr>
 <tr class="even">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2026</td>
-<td align="right">11.659147</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2004</td>
+<td align="left">cru.gpcc</td>
+<td align="right">11.016326</td>
 </tr>
 <tr class="odd">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2027</td>
-<td align="right">11.251782</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2005</td>
+<td align="left">climatena</td>
+<td align="right">10.855070</td>
 </tr>
 <tr class="even">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2028</td>
-<td align="right">11.023143</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2005</td>
+<td align="left">cru.gpcc</td>
+<td align="right">10.538086</td>
 </tr>
 <tr class="odd">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2029</td>
-<td align="right">11.120112</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2006</td>
+<td align="left">climatena</td>
+<td align="right">10.649383</td>
 </tr>
 <tr class="even">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2030</td>
-<td align="right">10.860913</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2006</td>
+<td align="left">cru.gpcc</td>
+<td align="right">10.530076</td>
 </tr>
 <tr class="odd">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2031</td>
-<td align="right">11.668988</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2007</td>
+<td align="left">climatena</td>
+<td align="right">10.073401</td>
 </tr>
 <tr class="even">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2032</td>
-<td align="right">11.560028</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2007</td>
+<td align="left">cru.gpcc</td>
+<td align="right">10.017036</td>
 </tr>
 <tr class="odd">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2033</td>
-<td align="right">10.708113</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2008</td>
+<td align="left">climatena</td>
+<td align="right">9.741351</td>
 </tr>
 <tr class="even">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2034</td>
-<td align="right">11.344805</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2008</td>
+<td align="left">cru.gpcc</td>
+<td align="right">9.577286</td>
 </tr>
 <tr class="odd">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2035</td>
-<td align="right">11.391718</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2009</td>
+<td align="left">climatena</td>
+<td align="right">10.187498</td>
 </tr>
 <tr class="even">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2036</td>
-<td align="right">11.295037</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2009</td>
+<td align="left">cru.gpcc</td>
+<td align="right">9.825328</td>
 </tr>
 <tr class="odd">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2037</td>
-<td align="right">10.984661</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2010</td>
+<td align="left">climatena</td>
+<td align="right">10.671701</td>
 </tr>
 <tr class="even">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2038</td>
-<td align="right">11.928165</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2010</td>
+<td align="left">cru.gpcc</td>
+<td align="right">10.446620</td>
 </tr>
 <tr class="odd">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2039</td>
-<td align="right">11.121972</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2011</td>
+<td align="left">climatena</td>
+<td align="right">9.568048</td>
 </tr>
 <tr class="even">
 <td align="right">87</td>
-<td align="left">EC-Earth3</td>
-<td align="left">ssp245</td>
-<td align="left">ensembleMean</td>
-<td align="left">2040</td>
-<td align="right">11.487205</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2011</td>
+<td align="left">cru.gpcc</td>
+<td align="right">9.476500</td>
+</tr>
+<tr class="odd">
+<td align="right">87</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2012</td>
+<td align="left">climatena</td>
+<td align="right">10.134941</td>
+</tr>
+<tr class="even">
+<td align="right">87</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2012</td>
+<td align="left">cru.gpcc</td>
+<td align="right">9.932001</td>
+</tr>
+<tr class="odd">
+<td align="right">87</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2013</td>
+<td align="left">climatena</td>
+<td align="right">10.690569</td>
+</tr>
+<tr class="even">
+<td align="right">87</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2013</td>
+<td align="left">cru.gpcc</td>
+<td align="right">10.568423</td>
+</tr>
+<tr class="odd">
+<td align="right">87</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2014</td>
+<td align="left">climatena</td>
+<td align="right">11.165826</td>
+</tr>
+<tr class="even">
+<td align="right">87</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2014</td>
+<td align="left">cru.gpcc</td>
+<td align="right">10.934338</td>
+</tr>
+<tr class="odd">
+<td align="right">87</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2015</td>
+<td align="left">climatena</td>
+<td align="right">11.887767</td>
+</tr>
+<tr class="even">
+<td align="right">87</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2015</td>
+<td align="left">cru.gpcc</td>
+<td align="right">11.570501</td>
+</tr>
+<tr class="odd">
+<td align="right">87</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2016</td>
+<td align="left">climatena</td>
+<td align="right">11.359098</td>
+</tr>
+<tr class="even">
+<td align="right">87</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2016</td>
+<td align="left">cru.gpcc</td>
+<td align="right">11.228205</td>
+</tr>
+<tr class="odd">
+<td align="right">87</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2017</td>
+<td align="left">climatena</td>
+<td align="right">10.517506</td>
+</tr>
+<tr class="even">
+<td align="right">87</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2017</td>
+<td align="left">cru.gpcc</td>
+<td align="right">10.140266</td>
+</tr>
+<tr class="odd">
+<td align="right">87</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2018</td>
+<td align="left">climatena</td>
+<td align="right">10.983143</td>
+</tr>
+<tr class="even">
+<td align="right">87</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2018</td>
+<td align="left">cru.gpcc</td>
+<td align="right">10.573661</td>
+</tr>
+<tr class="odd">
+<td align="right">87</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2019</td>
+<td align="left">climatena</td>
+<td align="right">10.742770</td>
+</tr>
+<tr class="even">
+<td align="right">87</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2019</td>
+<td align="left">cru.gpcc</td>
+<td align="right">10.109711</td>
+</tr>
+<tr class="odd">
+<td align="right">87</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2020</td>
+<td align="left">climatena</td>
+<td align="right">10.749970</td>
+</tr>
+<tr class="even">
+<td align="right">87</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">2020</td>
+<td align="left">cru.gpcc</td>
+<td align="right">10.541794</td>
 </tr>
 <tr class="odd">
 <td align="right">87</td>
@@ -971,6 +1074,7 @@ location (‘id’)</caption>
 <td align="left">NA</td>
 <td align="left">ensembleMean</td>
 <td align="left">2001</td>
+<td align="left">NA</td>
 <td align="right">10.377962</td>
 </tr>
 <tr class="even">
@@ -979,6 +1083,7 @@ location (‘id’)</caption>
 <td align="left">NA</td>
 <td align="left">ensembleMean</td>
 <td align="left">2002</td>
+<td align="left">NA</td>
 <td align="right">10.419348</td>
 </tr>
 <tr class="odd">
@@ -987,6 +1092,7 @@ location (‘id’)</caption>
 <td align="left">NA</td>
 <td align="left">ensembleMean</td>
 <td align="left">2003</td>
+<td align="left">NA</td>
 <td align="right">10.943936</td>
 </tr>
 <tr class="even">
@@ -995,6 +1101,7 @@ location (‘id’)</caption>
 <td align="left">NA</td>
 <td align="left">ensembleMean</td>
 <td align="left">2004</td>
+<td align="left">NA</td>
 <td align="right">10.714349</td>
 </tr>
 <tr class="odd">
@@ -1003,6 +1110,7 @@ location (‘id’)</caption>
 <td align="left">NA</td>
 <td align="left">ensembleMean</td>
 <td align="left">2005</td>
+<td align="left">NA</td>
 <td align="right">10.927514</td>
 </tr>
 <tr class="even">
@@ -1011,6 +1119,7 @@ location (‘id’)</caption>
 <td align="left">NA</td>
 <td align="left">ensembleMean</td>
 <td align="left">2006</td>
+<td align="left">NA</td>
 <td align="right">10.266208</td>
 </tr>
 <tr class="odd">
@@ -1019,6 +1128,7 @@ location (‘id’)</caption>
 <td align="left">NA</td>
 <td align="left">ensembleMean</td>
 <td align="left">2007</td>
+<td align="left">NA</td>
 <td align="right">10.704759</td>
 </tr>
 <tr class="even">
@@ -1027,6 +1137,7 @@ location (‘id’)</caption>
 <td align="left">NA</td>
 <td align="left">ensembleMean</td>
 <td align="left">2008</td>
+<td align="left">NA</td>
 <td align="right">10.300014</td>
 </tr>
 <tr class="odd">
@@ -1035,6 +1146,7 @@ location (‘id’)</caption>
 <td align="left">NA</td>
 <td align="left">ensembleMean</td>
 <td align="left">2009</td>
+<td align="left">NA</td>
 <td align="right">10.407530</td>
 </tr>
 <tr class="even">
@@ -1043,167 +1155,233 @@ location (‘id’)</caption>
 <td align="left">NA</td>
 <td align="left">ensembleMean</td>
 <td align="left">2010</td>
+<td align="left">NA</td>
 <td align="right">11.369159</td>
 </tr>
 <tr class="odd">
 <td align="right">87</td>
+<td align="left">EC-Earth3</td>
 <td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">2001</td>
-<td align="right">10.204346</td>
-</tr>
-<tr class="even">
-<td align="right">87</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">2002</td>
-<td align="right">10.351032</td>
-</tr>
-<tr class="odd">
-<td align="right">87</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">2003</td>
-<td align="right">10.812891</td>
-</tr>
-<tr class="even">
-<td align="right">87</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">2004</td>
-<td align="right">11.286425</td>
-</tr>
-<tr class="odd">
-<td align="right">87</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">2005</td>
-<td align="right">10.868485</td>
-</tr>
-<tr class="even">
-<td align="right">87</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">2006</td>
-<td align="right">10.682606</td>
-</tr>
-<tr class="odd">
-<td align="right">87</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">2007</td>
-<td align="right">10.167580</td>
-</tr>
-<tr class="even">
-<td align="right">87</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">2008</td>
-<td align="right">9.816912</td>
-</tr>
-<tr class="odd">
-<td align="right">87</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">2009</td>
-<td align="right">10.253012</td>
-</tr>
-<tr class="even">
-<td align="right">87</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">2010</td>
-<td align="right">10.693474</td>
-</tr>
-<tr class="odd">
-<td align="right">87</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
+<td align="left">ensembleMean</td>
 <td align="left">2011</td>
-<td align="right">9.691577</td>
+<td align="left">NA</td>
+<td align="right">11.482420</td>
 </tr>
 <tr class="even">
 <td align="right">87</td>
+<td align="left">EC-Earth3</td>
 <td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
+<td align="left">ensembleMean</td>
 <td align="left">2012</td>
-<td align="right">10.268910</td>
+<td align="left">NA</td>
+<td align="right">10.714641</td>
 </tr>
 <tr class="odd">
 <td align="right">87</td>
+<td align="left">EC-Earth3</td>
 <td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
+<td align="left">ensembleMean</td>
 <td align="left">2013</td>
-<td align="right">10.829844</td>
+<td align="left">NA</td>
+<td align="right">10.255769</td>
 </tr>
 <tr class="even">
 <td align="right">87</td>
+<td align="left">EC-Earth3</td>
 <td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
+<td align="left">ensembleMean</td>
 <td align="left">2014</td>
-<td align="right">11.178109</td>
+<td align="left">NA</td>
+<td align="right">10.992788</td>
 </tr>
 <tr class="odd">
 <td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2021</td>
 <td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">2015</td>
-<td align="right">11.961115</td>
+<td align="right">10.983617</td>
 </tr>
 <tr class="even">
 <td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2021_2040</td>
 <td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">2016</td>
-<td align="right">11.375838</td>
+<td align="right">11.241924</td>
 </tr>
 <tr class="odd">
 <td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2022</td>
 <td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">2017</td>
-<td align="right">10.569581</td>
+<td align="right">11.533110</td>
 </tr>
 <tr class="even">
 <td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2023</td>
 <td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">2018</td>
-<td align="right">10.983173</td>
+<td align="right">11.056503</td>
 </tr>
 <tr class="odd">
 <td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2024</td>
 <td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">2019</td>
-<td align="right">10.718506</td>
+<td align="right">10.784895</td>
 </tr>
 <tr class="even">
 <td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2025</td>
 <td align="left">NA</td>
+<td align="right">11.317642</td>
+</tr>
+<tr class="odd">
+<td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2026</td>
 <td align="left">NA</td>
+<td align="right">11.244127</td>
+</tr>
+<tr class="even">
+<td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2027</td>
 <td align="left">NA</td>
-<td align="left">2020</td>
-<td align="right">10.831819</td>
+<td align="right">11.659147</td>
+</tr>
+<tr class="odd">
+<td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2028</td>
+<td align="left">NA</td>
+<td align="right">11.251782</td>
+</tr>
+<tr class="even">
+<td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2029</td>
+<td align="left">NA</td>
+<td align="right">11.023143</td>
+</tr>
+<tr class="odd">
+<td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2030</td>
+<td align="left">NA</td>
+<td align="right">11.120112</td>
+</tr>
+<tr class="even">
+<td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2031</td>
+<td align="left">NA</td>
+<td align="right">10.860913</td>
+</tr>
+<tr class="odd">
+<td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2032</td>
+<td align="left">NA</td>
+<td align="right">11.668988</td>
+</tr>
+<tr class="even">
+<td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2033</td>
+<td align="left">NA</td>
+<td align="right">11.560028</td>
+</tr>
+<tr class="odd">
+<td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2034</td>
+<td align="left">NA</td>
+<td align="right">10.708113</td>
+</tr>
+<tr class="even">
+<td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2035</td>
+<td align="left">NA</td>
+<td align="right">11.344805</td>
+</tr>
+<tr class="odd">
+<td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2036</td>
+<td align="left">NA</td>
+<td align="right">11.391718</td>
+</tr>
+<tr class="even">
+<td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2037</td>
+<td align="left">NA</td>
+<td align="right">11.295037</td>
+</tr>
+<tr class="odd">
+<td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2038</td>
+<td align="left">NA</td>
+<td align="right">10.984661</td>
+</tr>
+<tr class="even">
+<td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2039</td>
+<td align="left">NA</td>
+<td align="right">11.928165</td>
+</tr>
+<tr class="odd">
+<td align="right">87</td>
+<td align="left">EC-Earth3</td>
+<td align="left">ssp245</td>
+<td align="left">ensembleMean</td>
+<td align="left">2040</td>
+<td align="left">NA</td>
+<td align="right">11.121972</td>
 </tr>
 </tbody>
 </table>
@@ -1212,7 +1390,7 @@ location (‘id’)</caption>
 <div class="section level2 unnumbered">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-wang2016" class="csl-entry">
 Wang, Tongli, Andreas Hamann, Dave Spittlehouse, and Carlos Carroll.
 2016. <span>“Locally Downscaled and Spatially Customizable Climate Data
@@ -1228,13 +1406,11 @@ Inés Álvarez. <em>PLOS ONE</em> 11 (6): e0156720. <a href="https://doi.org/10.
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p>
-<p>Developed by Kiri Daust, Colin Mahony, Bruno Tremblay, Ceres Barros, Province of British Columbia.</p>
+  <p>Developed by Kiri Daust, Colin Mahony, Bruno Tremblay, Ceres Barros, Province of British Columbia.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
     </footer>
