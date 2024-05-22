@@ -3,7 +3,7 @@
 \name{input_obs}
 \alias{input_obs}
 \alias{input_obs_ts}
-\title{Download obs period anomalies.}
+\title{Retrieve observational anomalies.}
 \usage{
 input_obs(dbCon, bbox = NULL, period = list_obs_periods(), cache = TRUE)
 
@@ -25,31 +25,36 @@ Can be obtained from \code{\link[=list_obs_periods]{list_obs_periods()}}. Defaul
 
 \item{cache}{logical. Specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 
-\item{dataset}{Character. Which observational dataset to use? Current options are "climatena" and "cru.gpcc"}
+\item{dataset}{Character. Which observational dataset to use? Options are \code{"climatena"} for the
+ClimateNA gridded time series or \code{"cru.gpcc"} for the combined Climatic Research Unit TS dataset
+(for temperature) and Global Precipitation Climatology Centre dataset (for precipitation).}
 
 \item{years}{numeric. Years to retrieve obs anomalies for. Defaults to \code{2010:2022}.
 See \code{\link[=list_obs_years]{list_obs_years()}} for available years.}
 }
 \value{
 A \code{list} of \code{SpatRasters}, each with possibly multiple layers, that can
-be used with \code{\link[=downscale]{downscale()}}. Each element of the list corresponds to a particular period, and the
+be used with \code{\link[=downscale_core]{downscale_core()}}. Each element of the list corresponds to a particular period, and the
 values of the \code{SpatRaster} are anomalies of the obs period compare to the reference period.
 
 List of length 1 containing a \code{SpatRaster}
 }
 \description{
-\code{input_obs} produces anomalies of obs observed climate for a given \strong{period}.
+\code{input_obs} produces anomalies of the average observed climate for a given \strong{period},
+relative to the 1961-1990 reference period. The anomalies are calculated from the \code{"cru.gpcc"} dataset
+which is the Climatic Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset
+(for precipitation).
 
-\code{input_obs_ts} produces anomalies of obs observed climate for a given \strong{time series}.
+\code{input_obs_ts} produces anomalies of observed climate for a given \strong{time series} of individual years.
 }
 \details{
-Generally, this function should only be used in combination with \code{\link[=downscale]{downscale()}} as the values
+Generally, this function should only be used in combination with \code{\link[=downscale_core]{downscale_core()}} as the values
 returned in the rasters are anomalies compared to the 1961-1990 reference period,
 and are usually not meaningful without the whole downscale process.
 
 The returned raster contains anomalies for each year specified in \code{years}. In general this
-function should only be used in conjunction with \code{\link[=downscale]{downscale()}}.
+function should only be used in conjunction with \code{\link[=downscale_core]{downscale_core()}}.
 }
 \seealso{
-\code{\link[=downscale]{downscale()}}, \code{\link[=list_obs_periods]{list_obs_periods()}}
+\code{\link[=downscale_core]{downscale_core()}}, \code{\link[=list_obs_periods]{list_obs_periods()}}
 }

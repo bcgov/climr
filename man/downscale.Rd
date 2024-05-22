@@ -24,28 +24,27 @@ downscale(
 \item{xyz}{a \code{data.frame} with the following columns "long", "lat", "elev",
 and a unique "id". Any extra columns will be ignored and not output.}
 
-\item{which_refmap}{character. Which climatological normals map to use as the
+\item{which_refmap}{character. Which map of 1961-1990 climatological normals to use as the
 high-resolution reference climate map for downscaling. Default is "auto",
 which selects, for each query point, the best available climatological
-normals map in declining order of normals_bc, normals_composite, and normals_na.
+normals map in declining order of \code{"refmap_prism"}, \code{"refmap_climr"}, and \code{"refmap_climatena"}.
 Other options are one of \code{\link[=list_refmaps]{list_refmaps()}}, which will provide a consistent
 reference map for all points.}
 
-\item{obs_periods}{character. Which obs period for observed climate
+\item{obs_periods}{character. Which historical period for observational climate
 data, averaged over this period. Options are \code{\link[=list_obs_periods]{list_obs_periods()}}. Default \code{NULL}}
 
 \item{obs_years}{integer. Vector of years to obtain individual years or time
-series of observed climate data. Default \code{NULL}. See \code{\link[=list_obs_years]{list_obs_years()}}
+series of observational climate data. Default \code{NULL}. See \code{\link[=list_obs_years]{list_obs_years()}}
 for available years.}
 
-\item{obs_ts_dataset}{character. The dataset to use for observed time series data. Options
+\item{obs_ts_dataset}{character. The dataset to use for observational time series data. Options
 are \code{"climatena"} for the ClimateNA gridded time series or \code{"cru.gpcc"} for the combined Climatic
-Research Unit TS dataset (for Temperature) and Global Precipitation Climatology Centre dataset
+Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset
 (for precipitation). Defaults to \code{NULL}.}
 
 \item{gcms}{character. Vector of global climate model names. Options
-are \code{\link[=list_gcms]{list_gcms()}}. Used for gcms periods, gcms timeseries, and obs timeseries.
-Defaults to \code{NULL}.}
+are \code{\link[=list_gcms]{list_gcms()}}. Defaults to \code{NULL}.}
 
 \item{ssps}{character. Vector of SSP-RCP scenarios (representative concentration pathways paired with shared socioeconomic pathways).
 Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to all scenarios available.}
@@ -67,7 +66,7 @@ are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
 \item{cache}{logical. Cache data locally? Default \code{TRUE}}
 
-\item{...}{other arguments passed to \code{\link[=downscale_core]{downscale_core()}}. Namely: \code{return_normal},
+\item{...}{other arguments passed to \code{\link[=downscale_core]{downscale_core()}}. Namely: \code{return_refperiod},
 \code{vars}, \code{out_spatial} and \code{plot}}
 }
 \value{
@@ -77,7 +76,7 @@ All outputs are returned in one table.
 \description{
 \code{downscale()} provides downscaled climate variables for user-specified
 locations.
-\code{downscale()} adapts a simple change-factor (aka "delta') downscaling
+It adapts a simple change-factor (aka "delta') downscaling
 approach originally implemented in \href{https://climatena.ca/}{ClimateNA}.
 This approach downscales climate data in three stages:
 \enumerate{
@@ -90,8 +89,8 @@ See \code{vignette("methods_downscaling")} for a description of the downscaling 
 \code{downscale()} is a user-friendly wrapper for \code{downscale_core()}
 }
 \details{
-\code{\link[=downscale_core]{downscale_core()}} parameters can be applied in \code{climr_downscale()}. For example,
-setting \code{ppt_lr = TRUE} in \code{climr_downscale()} will apply elevation adjustment to precipitation values.
+\code{\link[=downscale_core]{downscale_core()}} parameters can be applied in \code{downscale()}. For example,
+setting \code{ppt_lr = TRUE} in \code{downscale()} will apply elevation adjustment to precipitation values.
 
 Although \code{which_refmap = "auto"} is the default, users are cautioned that
 this can produce artefacts associated with downscaling to different reference
@@ -99,38 +98,21 @@ climate maps within and outside the western North American boundary of \code{ref
 We recommend that queries spanning this boundary use \code{which_refmap = "refmap_climatena"}.
 }
 \examples{
-library(data.table)
-library(terra)
-set.seed(123)
-dbCon <- data_connect()
-xyz <- data.frame(
-  lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10),
-  id = 1:10
-)
 
-## get bounding box based on input points
-thebb <- get_bb(xyz)
-obs <- input_obs(dbCon, thebb, period = "2001_2020")
-plot(obs[[1]][[2]])
-
-## provide or create a lon, lat, elev, and optionally id, dataframe - usually read from csv file
+## provide or create a dataframe of lon, lat, elev, and id - usually read from csv file
 in_xyz <- data.frame(
-  lon = c(
-    -127.70521, -127.62279, -127.56235, -127.7162,
-    -127.18585, -127.1254, -126.94957, -126.95507
-  ),
+  lon = c(-127.7052, -127.6227, -127.5623, -127.7162, -127.1858, -127.125, -126.9495, -126.9550),
   lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
-  elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
-  id = 1:8,
-  Zone = c(rep("CWH", 3), rep("CDF", 5)),
-  Subzone = c("vm1", "vm2", "vs1", rep("mm", 3), "dk", "dc")
+  elev = c(291, 296, 626, 377, 424, 591, 723, 633),
+  id = 1:8
 )
 
 ## historic observational time series
 vars <- c("PPT", "CMD", "Tave_07")
-climate_norms_hist <- climr_downscale(
-  xyz = in_xyz, which_normal = "auto",
-  return_normal = TRUE,
+climate_norms_hist <- downscale(
+  xyz = in_xyz, 
+  which_refmap = "auto",
+  return_refperiod = TRUE,
   obs_periods = "2001_2020",
   vars = vars,
   out_spatial = TRUE, plot = "PPT"
@@ -139,20 +121,20 @@ climate_norms_hist <- climr_downscale(
 ## as a data.table
 climate_norms_hist <- downscale(
   xyz = in_xyz, which_refmap = "auto",
-  return_normal = TRUE,
+  return_refperiod = TRUE,
   vars = vars,
   out_spatial = FALSE, plot = "PPT"
 ) ## specify desired variables to plot
 
-## future projections
+## future projections for annual variables from three models
 climate_norms_fut <- downscale(
   xyz = in_xyz, which_refmap = "auto",
-  gcms = c("ACCESS-ESM1-5"),
-  ssps = c("ssp370"),
-  gcm_periods = c("2021_2040"),
+  gcms = list_gcms()[c(1,5,6)],
+  ssps = list_ssps()[2],
+  gcm_periods = list_gcm_periods()[1:2],
   # gcm_ssp_years = 2020:2060,
-  max_run = 3, #' we want 3 individual runs for each model
-  vars = vars
+  max_run = 3, #' we want 3 individual runs for the model
+  vars = list_vars("Annual")
 )
 
 }

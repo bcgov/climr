@@ -2,7 +2,7 @@
 % Please edit documentation in R/refmap.R
 \name{input_refmap}
 \alias{input_refmap}
-\title{Retrieve climatologies for reference period}
+\title{Retrieve reference period climate maps}
 \usage{
 input_refmap(dbCon, bbox, reference = "refmap_climatena", cache = TRUE)
 }
@@ -18,13 +18,13 @@ names PPT01:PPT12, Tmax01:Tmax12 and Tmin01:Tmin12. Defaults to \code{list_refer
 \item{cache}{logical. Specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 }
 \value{
-A \code{SpatRaster} containing normals, lapse rates
-and digital elevation model layers, that can be used with \code{\link[=downscale]{downscale()}}.
+A \code{SpatRaster} containing reference period climatologies, lapse rates
+and digital elevation model layers, that can be used with \code{\link[=downscale_core]{downscale_core()}}.
 }
 \description{
-This function downloads (or retrieves from cache) monthly Tmin, Tmax, and PPT variables
-for the specified climatology and for the specified bounding box. It is intended for use with \code{\link[=downscale]{downscale()}},
-but can also be used as a stand-alone climatology.
+This function downloads (or retrieves from cache) monthly Tmin, Tmax, and PPT climatologies (maps of long-term average climate)
+from a specified data source for the specified bounding box.
+It is intended for use with \code{\link[=downscale_core]{downscale_core()}}, but can also be used as stand-alone raster data.
 }
 \details{
 The first 36 layers of the output raster correspond with the actual climate variables. The raster also contains

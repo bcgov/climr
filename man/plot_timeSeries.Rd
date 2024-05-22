@@ -41,14 +41,13 @@ options are \code{\link[=list_vars]{list_vars()}}.}
 
 \item{showObserved}{logical. Plot a time series of observed climate.}
 
-\item{obs_ts_dataset}{character. The dataset to use for observed time series data. Options
+\item{obs_ts_dataset}{character. The dataset to use for observational time series data. Options
 are \code{"climatena"} for the ClimateNA gridded time series or \code{"cru.gpcc"} for the combined Climatic
-Research Unit TS dataset (for Temperature) and Global Precipitation Climatology Centre dataset
+Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset
 (for precipitation). Defaults to \code{NULL}.}
 
 \item{gcms}{character. Vector of global climate model names. Options
-are \code{\link[=list_gcms]{list_gcms()}}. Used for gcms periods, gcms timeseries, and obs timeseries.
-Defaults to \code{NULL}.}
+are \code{\link[=list_gcms]{list_gcms()}}. Defaults to \code{NULL}.}
 
 \item{ssps}{character. Vector of SSP-RCP scenarios (representative concentration pathways paired with shared socioeconomic pathways).
 Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to all scenarios available.}
