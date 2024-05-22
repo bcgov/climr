@@ -2,10 +2,10 @@
 #'
 #' @description
 #' Bivariate plots of 21st century climate change for user-selected locations and climate variables.
-#' The purposes of the plot are to
+#' The purposes of the plot are to:
 #' \enumerate{
-#'   \item show differences in climate change trends among global climate models (GCMs),
-#'   \item show the differences between multiple simulations of each model, and
+#'   \item show differences in climate change trends among global climate models (GCMs);
+#'   \item show the differences between multiple simulations of each model; and
 #'   \item compare simulated climate change to observed climate change in the 2001-2020 period.
 #' }
 #' All climate changes are relative to the 1961-1990 reference period normals.
