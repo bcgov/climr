@@ -1,17 +1,16 @@
-#' Retrieve climatologies for reference period
+#' Retrieve reference period climate maps
 #' @description
-#' This function downloads (or retrieves from cache) monthly Tmin, Tmax, and PPT variables
-#' for the specified climatology and for the specified bounding box. It is intended for use with [`downscale()`],
-#' but can also be used as a stand-alone climatology.
-#'
+#' This function downloads (or retrieves from cache) monthly Tmin, Tmax, and PPT climatologies (maps of long-term average climate)
+#' from a specified data source for the specified bounding box. 
+#' It is intended for use with [`downscale_core()`], but can also be used as stand-alone raster data. 
 #'
 #' @template dbCon
 #' @template bbox
 #' @template reference
 #' @template cache
 #'
-#' @return A `SpatRaster` containing normals, lapse rates
-#'   and digital elevation model layers, that can be used with [`downscale()`].
+#' @return A `SpatRaster` containing reference period climatologies, lapse rates
+#'   and digital elevation model layers, that can be used with [`downscale_core()`].
 #'
 #' @details
 #' The first 36 layers of the output raster correspond with the actual climate variables. The raster also contains
@@ -23,7 +22,7 @@
 #' @importFrom terra rast writeRaster ext
 #' @importFrom data.table fread fwrite data.table
 #' @importFrom uuid UUIDgenerate
-#' @rdname reference-input-data
+#' @rdname input_refmap
 #' @export
 input_refmap <- function(dbCon, bbox, reference = "refmap_climatena", cache = TRUE) {
   ## checks
