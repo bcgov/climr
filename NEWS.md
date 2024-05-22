@@ -1,6 +1,6 @@
 # `climr` 0.1.0
 ## Implementation of naming conventions
-* We overhauled the naming of functions, parameters, and options to make them more intuitive and internally consistent. You will need to revise the climr code in your workflows to accommodate these changes. A table of correspondence specifying the changes is located at ./data-raw/namingChanges.csv and is viewable by calling ?climr. 
+* We overhauled the naming of functions, parameters, and options to make them more intuitive and internally consistent. You will need to revise the climr code in your workflows to accommodate these changes. A table of correspondence specifying the changes is located at ./data-raw/namingChanges.csv and is viewable by calling `data(name_changes)`. 
 * We changed the climate variable naming convention so that the climate element and the time of year are always separated by an underscore. e.g., Tmin01 becomes Tmin_01; DD_0_01 becomes DDsub0_01. The variables table called by `data(variables)` now has a field "Code_ClimateNA" with the variable codes used by ClimateBC/NA to allow users to crosswalk the two conventions. 
 
 ## User Actions Required
