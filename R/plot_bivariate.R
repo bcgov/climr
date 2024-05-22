@@ -47,6 +47,7 @@
 #' @return NULL. Draws a plot in the active graphics device.
 #'
 #' @importFrom graphics axis legend lines par points text title
+#' @importFrom magrittr "%>%"
 #'
 #' @examples
 #' # data frame of arbitrary points on Vancouver Island
