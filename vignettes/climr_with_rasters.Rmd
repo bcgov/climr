@@ -280,7 +280,7 @@ plot(dem_vancouver, col = cols)
 ```
 
 As before, pass your `data.table` of point locations to
-`climr_downscale`:
+`downscale`:
 
 ```{r, results = "hide"}
 dwscl_out <- downscale(xyzDT,
@@ -330,7 +330,7 @@ the extracted values and, optionally x/y coordinates. So we need simply
 to use this output to create our `xyzDT` table for `downscale()`.
 
 To get point-type outputs simply set
-`climr_downscale(..., out_spatial = TRUE)`.
+`downscale(..., out_spatial = TRUE)`.
 
 ```{r, results = "hide"}
 vancouver_points <- get(data("vancouver_points")) |>
