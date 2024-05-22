@@ -1,10 +1,13 @@
-#' Download obs period anomalies.
+#' Retrieve observational anomalies.
 #'
 #' @description
-#' `input_obs` produces anomalies of obs observed climate for a given **period**.
+#' `input_obs` produces anomalies of the average observed climate for a given **period**, 
+#' relative to the 1961-1990 reference period. The anomalies are calculated from the `"cru.gpcc"` dataset
+#' which is the Climatic Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset 
+#' (for precipitation). 
 #'
 #' @return A `list` of `SpatRasters`, each with possibly multiple layers, that can
-#'   be used with [`downscale()`]. Each element of the list corresponds to a particular period, and the
+#'   be used with [`downscale_core()`]. Each element of the list corresponds to a particular period, and the
 #'   values of the `SpatRaster` are anomalies of the obs period compare to the reference period.
 #'
 #' @template dbCon
@@ -13,9 +16,9 @@
 #'   Can be obtained from [`list_obs_periods()`]. Default to "2001_2020".
 #' @template cache
 #'
-#' @seealso [downscale()], [`list_obs_periods()`]
+#' @seealso [downscale_core()], [`list_obs_periods()`]
 #' @details
-#' Generally, this function should only be used in combination with [`downscale()`] as the values
+#' Generally, this function should only be used in combination with [`downscale_core()`] as the values
 #' returned in the rasters are anomalies compared to the 1961-1990 reference period,
 #' and are usually not meaningful without the whole downscale process.
 #'
@@ -118,12 +121,14 @@ input_obs <- function(dbCon, bbox = NULL, period = list_obs_periods(), cache = T
 }
 
 
-#' Retrieve obs anomalies for specified years
+#' Retrieve observational anomalies for specified years
 #' @description
-#' `input_obs_ts` produces anomalies of obs observed climate for a given **time series**.
+#' `input_obs_ts` produces anomalies of observed climate for a given **time series** of individual years.
 #'
 #' @template dbCon
-#' @param dataset Character. Which observational dataset to use? Current options are "climatena" and "cru.gpcc"
+#' @param dataset Character. Which observational dataset to use? Options are `"climatena"` for the 
+#' ClimateNA gridded time series or `"cru.gpcc"` for the combined Climatic Research Unit TS dataset 
+#' (for temperature) and Global Precipitation Climatology Centre dataset (for precipitation).
 #' @template bbox
 #' @template cache
 #' @param years numeric. Years to retrieve obs anomalies for. Defaults to `2010:2022`.
@@ -131,7 +136,7 @@ input_obs <- function(dbCon, bbox = NULL, period = list_obs_periods(), cache = T
 #' @return List of length 1 containing a `SpatRaster`
 #' @details
 #' The returned raster contains anomalies for each year specified in `years`. In general this
-#' function should only be used in conjunction with [`downscale()`].
+#' function should only be used in conjunction with [`downscale_core()`].
 #'
 #'
 #' @importFrom terra rast writeRaster ext nlyr
