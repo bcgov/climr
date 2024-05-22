@@ -19,6 +19,7 @@ articles:
   desc: "Climate downscaling methods used in `climr`"
   contents:
   - methods_downscaling
+  - lapse_rates
 - title: "Caching"
   contents:
   - caching
