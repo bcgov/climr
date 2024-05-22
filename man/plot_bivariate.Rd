@@ -35,8 +35,7 @@ and a unique "id". Any extra columns will be ignored and not output.}
 detail. options are \code{list_gcm_periods()}.}
 
 \item{gcms}{character. Vector of global climate model names. Options
-are \code{\link[=list_gcms]{list_gcms()}}. Used for gcms periods, gcms timeseries, and obs timeseries.
-Defaults to \code{NULL}.}
+are \code{\link[=list_gcms]{list_gcms()}}. Defaults to \code{NULL}.}
 
 \item{ssp}{character. A single SSP-RCP scenario (representative concentration pathways paired with shared socioeconomic pathways).
 Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to SSP2-4.5.}
@@ -75,10 +74,10 @@ NULL. Draws a plot in the active graphics device.
 }
 \description{
 Bivariate plots of 21st century climate change for user-selected locations and climate variables.
-The purposes of the plot are to
+The purposes of the plot are to:
 \enumerate{
-\item show differences in climate change trends among global climate models (GCMs),
-\item show the differences between multiple simulations of each model, and
+\item show differences in climate change trends among global climate models (GCMs);
+\item show the differences between multiple simulations of each model; and
 \item compare simulated climate change to observed climate change in the 2001-2020 period.
 }
 All climate changes are relative to the 1961-1990 reference period normals.
