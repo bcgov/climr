@@ -38,7 +38,7 @@
 #'   Defaults to no plotting (NULL).
 #'
 #' @import data.table
-#' @importFrom terra extract rast sources ext xres yres crop plot as.polygons
+#' @importFrom terra extract rast sources ext xres yres crop plot as.polygons setValues
 #' @importFrom grDevices hcl.colors palette
 #' @importFrom stats complete.cases
 #'
@@ -52,6 +52,7 @@
 #' @export
 #' @examples
 #' ## 
+#' library(terra)
 #' xyz <- data.frame(lon = runif(10, -130, -106), lat = runif(10, 37, 50), elev = runif(10), id = 1:10)
 #'
 #' ## get bounding box based on input points
@@ -59,7 +60,6 @@
 #' 
 #' ## get database connection
 #' dbCon <- data_connect()
-#' on.exit(try(pool::poolClose(dbCon)))
 #' 
 #' # obtain the climatena 1961-1990 normals for the study area. 
 #' refmap <- input_refmap(dbCon, thebb, reference = "refmap_climatena")
@@ -78,6 +78,7 @@
 #' 
 #' # downscale the null values for variables of interest
 #' null_downscaled <- downscale_core(xyz = xyz, refmap = refmap, gcms = null, vars = c("MAT", "PAS"))
+#' pool::poolClose(dbCon)
 #' 
 downscale_core <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NULL,
                       gcm_hist_ts = NULL, obs_ts = NULL, return_refperiod = TRUE,
