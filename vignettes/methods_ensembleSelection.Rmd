@@ -20,8 +20,9 @@ link-citations: true
 
 ### Selection of the global climate model ensemble
 
-The 13 global climate models available in climr were selected by [Mahony et al. 
-(2022)](https://doi.org/10.1002/joc.7566) using the following criteria: 
+The 13 global climate models available in climr were selected by [Mahony
+et al. (2022)](https://doi.org/10.1002/joc.7566) using the following
+criteria:
 
 **Criterion 1: Minimum of 3 historical runs available.** This criterion
 ensures robust bias correction. Bias correction in climr is performed
@@ -186,28 +187,28 @@ climate time series.
 
 ![](cmip6NA.NAM.Tmax.sm%20(1).png) ![](cmip6NA.NAM.Tmax.sm%20(2).png)
 ***Figure 1: Comparison of the ClimateNA 13-model ensemble (dashed
-lines) and 8-model ensemble (solid lines)*****.** \*The variable is mean
+lines) and 8-model ensemble (solid lines)***. *The variable is mean
 summer daily maximum temperature (tasmax/Tmax_sm) averaged over North
 America. The 8-model ensemble excludes models with ECS outside the
-IPCC-assessed 2-5oC range. (top) Ensemble mean projections for the four
-main CMIP6 marker scenarios. (bottom) Ensemble mean and full range
-(min/max for all simulations of all models) for the SSP2-4.5 scenario.\*
+IPCC-assessed 2-5^o^C range. (top) Ensemble mean projections for the
+four main CMIP6 marker scenarios. (bottom) Ensemble mean and full range
+(min/max for all simulations of all models) for the SSP2-4.5 scenario.*
 
-### Box 1: Reconciling the equilibrium climate sensitivity of the CMIP6 ensemble with observational constraints (Excerpted from Mahony et al. 2022)
+### Reconciling the equilibrium climate sensitivity of the CMIP6 ensemble with observational constraints (Excerpted from Mahony et al. 2022)
 
 > The 13-model ensemble, like the full CMIP6 ensemble, has a mean
-> (3.7oC) and upper limit (5.6oC) of equilibrium climate sensitivity
+> (3.7^o^C) and upper limit (5.6^o^C) of equilibrium climate sensitivity
 > that substantially exceeds the IPCC AR6 assessed best estimate ECS of
-> 3oC and very likely upper limit of 5oC (Arias et al. 2021). In other
-> words, the 13-model ensemble contains models that simulate stronger
-> global warming than is supported by multiple lines of observational
-> evidence. Five (38%) of the 13 models are above the IPCC AR6 assessed
-> likely upper limit on ECS of 4oC, and two (15%) of the models are
-> above the very likely upper limit of 5oC. If the ensemble were to
-> strictly conform to the IPCC assessed range, there would be only two
-> models exceeding 4oC ECS and no models exceeding 5oC, following the
-> IPCC’s probabilistic definitions of likely (one-sided p\>83%) and very
-> likely (one-sided p\>95%).\
+> 3^o^C and very likely upper limit of 5^o^C (Arias et al. 2021). In
+> other words, the 13-model ensemble contains models that simulate
+> stronger global warming than is supported by multiple lines of
+> observational evidence. Five (38%) of the 13 models are above the IPCC
+> AR6 assessed likely upper limit on ECS of 4^o^C, and two (15%) of the
+> models are above the very likely upper limit of 5^o^C. If the ensemble
+> were to strictly conform to the IPCC assessed range, there would be
+> only two models exceeding 4^o^C ECS and no models exceeding 5^o^C,
+> following the IPCC’s probabilistic definitions of likely (one-sided
+> p\>83%) and very likely (one-sided p\>95%).\
 > \
 > The need to reconcile the CMIP ensemble ECS range with observational
 > constraints is a new dilemma for climate change impacts and adaptation
@@ -268,7 +269,8 @@ International Journal of Climatology. 42:5871-5891.
 [doi.org/10.1002/joc.7566](https://doi.org/10.1002/joc.7566)
 
 Hausfather, Z., K. Marvel, G. A. Schmidt, J. W. Nielsen-Gammon, and M.
-Zelinka. 2022. [Climate simulations: recognize the “hot model” problem](https://bookcafe.yuntsg.com/ueditor/jsp/upload/file/20220518/1652835870524078994.pdf).
+Zelinka. 2022. [Climate simulations: recognize the “hot model”
+problem](https://bookcafe.yuntsg.com/ueditor/jsp/upload/file/20220518/1652835870524078994.pdf).
 Nature 605:26–29.
 
 Knutti, R. 2010. The end of model democracy? Climatic Change
