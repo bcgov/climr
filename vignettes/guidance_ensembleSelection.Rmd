@@ -1,0 +1,186 @@
+---
+title: "Climate model and scenario selection"
+Author: "Colin Mahony"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
+description: >
+  Recommended practices for selection of global climate model ensembles and use of emissions scenarios. 
+vignette: >
+  %\VignetteIndexEntry{Climate model and scenario selection}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+editor_options: 
+  markdown: 
+    wrap: 72
+bibliography: references.bib
+link-citations: true
+---
+
+Colin Mahony
+([colin.mahony\@gov.bc.ca](mailto:colin.mahony@gov.bc.ca){.email})\
+Research Climatologist\
+British Columbia Ministry of Forests
+
+Released: April 26, 2021
+
+## Purpose
+
+This guidance is developed by the BC Ministry of Forests for users of
+`climr`. This guidance is professional opinion and does not represent
+government policy.
+
+## Model selection
+
+Wherever possible, climate change studies benefit from the use of
+projections from multiple models to assess modeling uncertainties. There
+is broad scientific agreement that an ensemble of at least eight
+independent climate models are required to represent modeling
+uncertainties about climate change outcomes over large regions ([Pierce
+et al. 2009](https://www.pnas.org/content/106/21/8441), [McSweeney et
+al. 2014](https://link.springer.com/article/10.1007/s00382-014-2418-8),
+[Cannon
+2015](https://journals.ametsoc.org/view/journals/clim/28/3/jcli-d-14-00636.1.xml),
+[Wilcke and Bärring
+2016](https://www.sciencedirect.com/science/article/pii/S1364815216300020)).
+However, small ensembles of 3-5 GCMs may be adequate for studies that
+are limited to a small area or a single time of year. If a single
+representative projection of long-term climate trends is desired, a
+multi-GCM ensemble mean is likely more reliable than any single GCM
+projection ([Pierce et al.
+2009](https://www.pnas.org/content/106/21/8441)).
+
+#### Recommended subsets of the 13-model `climr` ensemble
+
+All of the 13 models provided in `climr` are individually useful and
+provide a good representation of the larger CMIP6 ensemble [(Mahony et
+al. 2022)](https://rmets.onlinelibrary.wiley.com/doi/10.1002/joc.7566).
+However, like the full CMIP6 ensemble they should be viewed as an
+arbitrary collection of models that don't necessarily provide a reliable
+representation of climate change uncertainty, as
+[explained](https://www.realclimate.org/index.php/archives/2021/08/notallmodels/)
+by NASA's Gavin Schmidt. In [Mahony et al.
+(2022)](https://rmets.onlinelibrary.wiley.com/doi/10.1002/joc.7566) we
+recommend 8 models for ensemble analysis. This 8-model ensemble is more
+consistent with the IPCC's assessment of climate sensitivity than the
+full 13-model `climr` ensemble, and excludes a model with problematic
+spatial artefacts in BC Coast Mountains. The recommended 8-model
+ensemble is: ACCESS-ESM1.5, CNRM-ESM2-1, EC-Earth3, GFDL-ESM4,
+GISS-E2-1-G, MIROC6, MPI-ESM1.2-HR, and MRI-ESM2.0.
+
+## Scenario selection
+
+CMIP6 climate projections follow scenarios of future greenhouse gas
+emissions called [Shared Socioeconomic
+Pathways](https://www.carbonbrief.org/explainer-how-shared-socioeconomic-pathways-explore-future-climate-change)
+(SSPs). `climr` includes projections for the four major SSP scenarios:
+SSP1-2.6, SSP2-4.5, SSP3-7.0, and SSP5-8.5. SSP1-2.6 assumes strong
+emissions reductions (mitigation) roughly consistent with the goals of
+the Paris Climate Accords to limit global warming to 2^o^C above
+pre-industrial temperatures. SSP2-4.5 assumes moderate mitigation
+roughly consistent with current emissions policies and economic trends.
+SSP3-7.0 is representative of a broader range of "baseline" scenarios
+that assume the absence of mitigation policies, and is associated with
+linear increase in the rate of greenhouse gas emissions. SSP5-8.5 is at
+the high end of the baseline scenarios, representing rapid expansion of
+greenhouse gas emissions over the next several decades and
+end-of-century emissions more than three times higher than current
+emissions [Riahi et al.
+2017](https://www.sciencedirect.com/science/article/pii/S0959378016300681).
+
+Collectively, SSP1-2.6, SSP2-4.5, and SSP3-7.0 provide a reasonable
+representation of optimistic, neutral, and pessimistic outlooks on
+global emissions policies and socioeconomic development. Where possible,
+I recommend using all three scenarios to represent scenario uncertainty
+in climate change projections. SSP2-4.5 alone is sufficient for studies
+focused on the near future (the 2021-2040 period) since there is only
+minor differentiation between the three recommended emissions scenarios
+in this period relative to differences between climate models. SSP5-8.5
+should be used with caution in impacts and adaptation research. The
+emissions pathway described by SSP5-8.5 is extremely unlikely based on
+constraints to the supply and demand for high-carbon energy sources and
+current trends in energy economics and policy ([Hausfather and Peters
+2020](https://www.nature.com/articles/d41586-020-00177-3)), though
+SSP5-8.5 greenhouse gas concentrations may be plausible, if unlikely,
+due to carbon cycle feedbacks.
+
+## Time period selection
+
+Instead of the traditional 30-year definition of climate normals,
+`climr` provides normals for a set of five 20-year periods for the 21st
+Century: 2001-2020, 2021-2040, and so on. These shorter 20-year periods
+are more appropriate to representing the rapidly changing climates of
+this century. The practice of summarizing climate in 20-year periods is
+consistent with recent IPCC reports. The 2001-2020 period provides the
+opportunity for direct comparison of model simulations vs. observations,
+which can give important context to interpretations of future
+projections. `climr` normals for the 2001-2020 period are calculated
+from the historical model runs for the years 2001-2014 and the SSP
+scenario runs for the years 2015-2020.
+
+When interpreting projections for the near future, it is important to
+recognize that individual GCM projections are not predictions. GCM runs
+used for climate change projections are initiated in the 1850s and are
+not directly constrained by observed climate conditions. Consequently,
+GCM projections are essentially as uncertain for next year as they are
+for 20 years into the future. Decadal climate prediction, which is
+analogous to weather prediction for timescales of 1-10 years, is an
+emerging but not yet operational science that may help to reduce the
+uncertainty of near-term projections ([Boer et al.
+2016](https://gmd.copernicus.org/articles/9/3751/2016/)). In the
+meantime, it is considered best practice to use an ensemble of climate
+projections, such as the 8-model ensemble recommended here, for
+near-term regional climate change studies ([Brekke et al.
+2008](https://link.springer.com/article/10.1007/s10584-007-9388-3),
+[Knutti
+2008](https://royalsocietypublishing.org/doi/10.1098/rsta.2008.0169),
+[Pierce et al. 2009](https://www.pnas.org/content/106/21/8441)). Given
+that the recent observed climate may differ substantially from the
+ensemble mean, and may even be outside the ensemble range, climate
+change adaptation decisions for the near-term (1-10 years) should
+carefully consider recent observed trends in addition to climate model
+simulations.
+
+## References
+
+Boer, G. J., D. M. Smith, C. Cassou, et al. 2016. The Decadal Climate
+Prediction Project (DCPP) contribution to CMIP6. Geoscientific Model
+Development 9:3751–3777.
+
+Brekke, L. D., M. D. Dettinger, E. P. Maurer, and M. Anderson. 2008.
+Significance of model credibility in estimating climate projection
+distributions for regional hydroclimatological risk assessments.
+Climatic Change 89:371–394.
+
+Burgess, M., J. Ritchie, J. Shapland, and R. Pielke. 2021. IPCC baseline
+scenarios over-project CO2 emissions and economic growth. Environmental
+Research Letters 16:014016
+
+Cannon, A. J. 2015. Selecting GCM scenarios that span the range of
+changes in a multimodel ensemble: Application to CMIP5 climate extremes
+indices. Journal of Climate 28:1260–1267.
+
+Hausfather, Z., and G. P. Peters. 2020. Emissions - the “business as
+usual” story is misleading. Nature 577:618–620.
+
+Knutti, R. 2008. Should we believe model predictions of future climate
+change? Philosophical Transactions of the Royal Society A: Mathematical,
+Physical and Engineering Sciences 366:4647–4664.
+
+McSweeney, C. F., R. G. Jones, R. W. Lee, and D. P. Rowell. 2014.
+Selecting CMIP5 GCMs for downscaling over multiple regions. Climate
+Dynamics 44:3237–3260.
+
+Pierce, D. W., T. P. Barnett, B. D. Santer, and P. J. Gleckler. 2009.
+Selecting global climate models for regional climate change studies.
+Proceedings of the National Academy of Sciences of the United States of
+America 106:8441–8446.
+
+Riahi et al. 2017. The Shared Socioeconomic Pathways and their energy,
+land use, and greenhouse gas emissions implications: An overview. Global
+Environmental Change 42:153–168.
+
+Wilcke, R. A. I., and L. Bärring. 2016. Selecting regional climate
+scenarios for impact modelling studies. Environmental Modelling and
+Software 78:191–201.

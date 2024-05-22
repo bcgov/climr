@@ -20,6 +20,9 @@ articles:
   contents:
   - methods_downscaling
   - lapse_rates
+- title: "Guidance"
+  contents:
+  - guidance_ensembleSelection
 - title: "Caching"
   contents:
   - caching
