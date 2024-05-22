@@ -13,13 +13,17 @@ It provides downscaling of observational and simulated climate data using change
 `climr` is designed to be fast and to minimize local data storage requirements.
 To do so, it uses a remote PostGIS database, and optionally caches data locally.
 
+### Mailing list
+
+If you would like to receive email updates when new versions of climr are released, send an email to <ffec@gov.bc.ca> with the subject line "climr subscribe". We will not use your email for any other purpose. Unsubscribe with "climr unsubscribe". If you like climr, let us know! If you have suggestions, add them as issues to <https://github.com/bcgov/climr/issues>.
+
 ### Features
 
 `climr` provides the following data:
 
--   Historical observational time series (1902-2022), currently limited to the ClimateNA time series (Wang et al., 2016)
+-   Two historical observational time series: (1) the 1901-2023 ClimateNA time series (Wang et al., 2016) and (2) the 1901-2022 combined Climatic Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset (for precipitation). 
 
--   Multiple historical (1851-2014) and future (2015-2100) climate model simulations for each of 13 CMIP6 global climate models, in monthly time series and 20-year normals
+-   Multiple historical (1851-2014) and future (2015-2100) climate model simulations for each of 13 CMIP6 global climate models, in monthly time series and 20-year normals.
 
 -   User selection of single or multiple climate variables, with derived variables following the ClimateNA methodology of Wang et al. (2016).
 
@@ -32,7 +36,7 @@ The ClimateNA mosaics are accessed from [AdaptWest](https://adaptwest.databasin.
 Historical observational time series are obtained from [ClimateNA](https://climatena.ca/) (Wang et al. 2016).
 
 CMIP6 global climate model simulations were downloaded from the [Earth System Grid Federation](https://aims2.llnl.gov/search/cmip6). The majority of these downloads were conducted by Tongli Wang, Associate Professor at the UBC Department of Forest and Conservation Sciences.
-The 13 global climate models selected for `climr`, and best practices for ensemble analysis, are described in Mahony (2022).
+The 13 global climate models selected for `climr`, and best practices for ensemble analysis, are described in Mahony et al. (2022) and summarized in `vignette("climr_methods_ensembleSelection")`. 
 
 ## Installation
 
@@ -62,8 +66,12 @@ to work with `climr` using spatial inputs and outputs, such as raster and vector
 
 ## Methods
 
-For an overview of downscaling methods used in `climr` see `vignette("lapse_rates")`
-and `vignette("methods_downscaling")`
+For an overview of downscaling methods used in `climr` see `vignette("methods_downscaling")`
+
+## Known issues
+
+-   Downloads of time series take a long time. We are looking into ways to speed this up, but until then we recommend users dedicate some time prior to analysis to cache their time series of interest for their areas of interest in a batch. Once the time series are cached, they don't need to be downloaded again. 
+-   We are still working on the documentation, examples, and vignettes. Please let us know if something isn't clear, preferably as a github issue. 
 
 ### License
 
@@ -79,12 +87,12 @@ See the License for the specific language governing permissions and limitations 
 
 `climr` logo uses icon designed by Freepik, Flaticon.com, available [here](https://www.flaticon.com/free-icon/pin_6093139).
 
-### References
+### Acknowledgements
 
 We acknowledge the World Climate Research Programme, which, through its Working Group on Coupled Modelling, coordinated and promoted CMIP6. We thank the climate modeling groups for producing and making available their model output, the Earth System Grid Federation (ESGF) for archiving the data and providing access, and the multiple funding agencies who support CMIP6 and ESGF. 
 
 ### References
 
-Mahony, Colin. 2022. “Rationale for the ClimateBC/NA 8-Model Ensemble Mean.” [http://climatena.ca/downloads/ClimateNA_8ModelRationale_Mahony_07May2022.pdf](http://climatena.ca/downloads/ClimateNA_8ModelRationale_Mahony_07May2022.pdf).
+Mahony, C.R., T. Wang, A. Hamann, and A.J. Cannon. 2022. [A global climate model ensemble for downscaled monthly climate normals over North America](https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.7566). International Journal of Climatology. 42:5871-5891. [doi.org/10.1002/joc.7566](https://doi.org/10.1002/joc.7566)
 
 Wang, Tongli, Andreas Hamann, Dave Spittlehouse, and Carlos Carroll. 2016. “Locally Downscaled and Spatially Customizable Climate Data for Historical and Future Periods for North America.” Edited by Inés Álvarez. PLOS ONE 11 (6): [e0156720](https://doi.org/10.1371/journal.pone.0156720).

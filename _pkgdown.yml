@@ -29,7 +29,11 @@ articles:
   desc: "Climate downscaling methods used in `climr`"
   contents:
   - methods_downscaling
+  - methods_ensembleSelection
   - lapse_rates
+- title: "Guidance"
+  contents:
+  - guidance_ensembleSelection
 - title: "Caching"
   contents:
   - caching
@@ -40,20 +44,20 @@ reference:
     Functions to used to downscale climate variables
   contents:
   - climr
-  - climr_downscale
   - downscale
+  - downscale_core
 - title: "Downloading raw climate inputs"
   desc: >
     Functions to download climate normals and
     historic/future anomalies used for downscaling
     climate elements and derived variables
   contents:
-  - normal_input
-  - gcm_input
-  - gcm_ts_input
-  - gcm_hist_input
-  - historic_input
-  - historic_input_ts
+  - input_refmap
+  - input_gcms
+  - input_gcm_ssp
+  - input_gcm_hist
+  - input_obs
+  - input_obs_ts
 - title: "Database and caching"
   desc: > 
     Functions used to interact with the PostGIS server
@@ -68,6 +72,8 @@ reference:
     Other useful functions
   contents:
   - plot_bivariate
+  - plot_timeSeries  
+  - plot_timeSeries_input
   - get_bb
   - lapse_rate
 - title: "Data"
@@ -77,13 +83,13 @@ reference:
     Datasets used in vignettes and examples,
   contents:
   - variables
-  - list_normal
-  - list_historic
-  - list_gcm
-  - list_gcm_period
-  - list_ssp
-  - list_run
-  - list_variables
+  - list_refmaps
+  - list_obs_periods
+  - list_gcms
+  - list_gcm_periods
+  - list_ssps
+  - list_run 
+  - list_vars
   - xyzDT
   - BECz_vancouver
   - BECz_vancouver_ras
