@@ -1,12 +1,14 @@
-# `climr` 0.0.5
+# `climr` 0.1.0
 ## Implementation of naming conventions
-* changed the climate variable naming convention so that the climate element and the time of year are always separated by an underscore. e.g., Tmin01 becomes Tmin_01; DD_0_01 becomes DDsub0_01. The variables table called by `data(variables)` now has a field "Code_ClimateNA" with the variable codes used by ClimateBC/NA to allow users to crosswalk the two conventions. 
 * We overhauled the naming of functions, parameters, and options to make them more intuitive and internally consistent. You will need to revise the climr code in your workflows to accommodate these changes. A table of correspondence specifying the changes is located at ./data-raw/namingChanges.csv and is viewable by calling ?climr. 
+* We changed the climate variable naming convention so that the climate element and the time of year are always separated by an underscore. e.g., Tmin01 becomes Tmin_01; DD_0_01 becomes DDsub0_01. The variables table called by `data(variables)` now has a field "Code_ClimateNA" with the variable codes used by ClimateBC/NA to allow users to crosswalk the two conventions. 
 
 ## User Actions Required
-* to implement the out-of-bounds bug fix, users will need to discard their cached reference normals by running the following line of code: cache_clear("normal") 
+* To implement this new version, users must clear their cache of climate data by running the following line of code: cache_clear(). We will do our best to avoid the need for wholesale cache clearing in the future. 
 
 ## Bug Fixes
+* Fixed an error in the calculation of Hogg's climatic moisture index (CMI). This error was inherited from an unreported error in Equation 3 of Hogg (1997).  
+* Fixed an error in the calculation of precipitation as snow. The PAS parameters in ClimateNA and `climr` differ from those originally published in Wang et al. (2016). 
 * fixed an out-of-bounds error that affected user queries close to the coastline. 
 * Added missing future 2015-2100 time series for the GFDL-ESM4 climate model.  
 
