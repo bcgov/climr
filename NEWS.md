@@ -4,7 +4,7 @@
 * We changed the climate variable naming convention so that the climate element and the time of year are always separated by an underscore. e.g., Tmin01 becomes Tmin_01; DD_0_01 becomes DDsub0_01. The variables table called by `data(variables)` now has a field "Code_ClimateNA" with the variable codes used by ClimateBC/NA to allow users to crosswalk the two conventions. 
 
 ## User Actions Required
-* To implement this new version, users must clear their cache of climate data by running the following line of code: cache_clear(). We will do our best to avoid the need for wholesale cache clearing in the future. 
+* To implement this new version, users must clear their cache of climate data by running the following line of code: cache_clear(). We will do our best to avoid the need for wholesale cache-clearing in the future. 
 
 ## Bug Fixes
 * Fixed an error in the calculation of Hogg's climatic moisture index (CMI). This error was inherited from an unreported error in Equation 3 of Hogg (1997).  
@@ -16,6 +16,12 @@
 * Added `plot_timeSeries()` and `plot_timeSeries_input()` functions to generate plots of 20th and 21st century climate change for user-selected locations and climate variables.
 * Added a 1901-2022 observational time series of for the combined Climatic Research Unit TS dataset (for Temperature) and Global Precipitation Climatology Centre dataset (for precipitation). 
 * Extended the ClimateNA observational time series to 1901-2023. 
+* Added a vignette (article) providing guidance for climate model ensemble selection and emissions scenario selection. 
+* Added a vignette (article) on the methods used to select the 13 global climate models provided by climr, and the 8-model ensemble recommended for most purposes. 
+
+## Known issues
+* Downloads of time series take a long time. We are looking into ways to speed this up, but until then we recommend users dedicate some time prior to analysis to cache their time series of interest for their areas of interest in a batch. Once the time series are cached, they don't need to be downloaded again. 
+* Related to the issue of time series download speed, the `plot_timeSeries_input()` function can take >1hr to run for the first time it is called for a location. 
 
 # `climr` 0.0.4
 ## Bug Fixes

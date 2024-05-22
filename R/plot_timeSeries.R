@@ -19,6 +19,11 @@
 #' Some combinations of `var1` and `var2` are not compatible or meaningful. 
 #' Examples of meaningful combinations are winter vs summer values of the same climate var or minimum vs. 
 #' maximum temperatures. 
+#' 
+#' Downloads of GCM time series take a long time. The `plot_timeSeries_input()` function can take >1hr 
+#' to run for the first time it is called for a location. We are looking into ways to speed this up, but until then 
+#' we recommend users dedicate some time to run this function in background. Once the time series are cached, they 
+#' don't need to be downloaded again. 
 #'
 #' @param X  A `data.table` object produced using the function [`plot_timeSeries_input()`]. This 
 #' table can include more models, scenarios, and variables than are used in individual calls to 
