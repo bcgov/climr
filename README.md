@@ -36,7 +36,7 @@ The ClimateNA mosaics are accessed from [AdaptWest](https://adaptwest.databasin.
 Historical observational time series are obtained from [ClimateNA](https://climatena.ca/) (Wang et al. 2016).
 
 CMIP6 global climate model simulations were downloaded from the [Earth System Grid Federation](https://aims2.llnl.gov/search/cmip6). The majority of these downloads were conducted by Tongli Wang, Associate Professor at the UBC Department of Forest and Conservation Sciences.
-The 13 global climate models selected for `climr`, and best practices for ensemble analysis, are described in Mahony et al. (2022) and summarized in Mahony (2022). 
+The 13 global climate models selected for `climr`, and best practices for ensemble analysis, are described in Mahony et al. (2022) and summarized in `vignette("climr_methods_ensembleSelection")`. 
 
 ## Installation
 
@@ -71,6 +71,7 @@ For an overview of downscaling methods used in `climr` see `vignette("methods_do
 ## Known issues
 
 -   Downloads of time series take a long time. We are looking into ways to speed this up, but until then we recommend users dedicate some time prior to analysis to cache their time series of interest for their areas of interest in a batch. Once the time series are cached, they don't need to be downloaded again. 
+-   We are still working on the documentation, examples, and vignettes. Please let us know if something isn't clear, preferably as a github issue. 
 
 ### License
 
@@ -93,7 +94,5 @@ We acknowledge the World Climate Research Programme, which, through its Working 
 ### References
 
 Mahony, C.R., T. Wang, A. Hamann, and A.J. Cannon. 2022. [A global climate model ensemble for downscaled monthly climate normals over North America](https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.7566). International Journal of Climatology. 42:5871-5891. [doi.org/10.1002/joc.7566](https://doi.org/10.1002/joc.7566)
-
-Mahony, Colin. 2022. “Rationale for the ClimateBC/NA 8-Model Ensemble Mean.” [http://climatena.ca/downloads/ClimateNA_8ModelRationale_Mahony_07May2022.pdf](http://climatena.ca/downloads/ClimateNA_8ModelRationale_Mahony_07May2022.pdf).
 
 Wang, Tongli, Andreas Hamann, Dave Spittlehouse, and Carlos Carroll. 2016. “Locally Downscaled and Spatially Customizable Climate Data for Historical and Future Periods for North America.” Edited by Inés Álvarez. PLOS ONE 11 (6): [e0156720](https://doi.org/10.1371/journal.pone.0156720).
