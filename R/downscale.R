@@ -3,7 +3,7 @@
 #' @description
 #' `downscale()` provides downscaled climate variables for user-specified
 #'  locations.
-#' `downscale()` adapts a simple change-factor (aka "delta') downscaling
+#'  It adapts a simple change-factor (aka "delta') downscaling
 #'  approach originally implemented in \href{https://climatena.ca/}{ClimateNA}.
 #'  This approach downscales climate data in three stages:
 #' \enumerate{
@@ -16,8 +16,8 @@
 #' `downscale()` is a user-friendly wrapper for `downscale_core()`
 #'
 #' @details
-#' [`downscale_core()`] parameters can be applied in `climr_downscale()`. For example,
-#' setting `ppt_lr = TRUE` in `climr_downscale()` will apply elevation adjustment to precipitation values.
+#' [`downscale_core()`] parameters can be applied in `downscale()`. For example,
+#' setting `ppt_lr = TRUE` in `downscale()` will apply elevation adjustment to precipitation values.
 #'
 #' Although `which_refmap = "auto"` is the default, users are cautioned that
 #' this can produce artefacts associated with downscaling to different reference
@@ -25,24 +25,23 @@
 #' We recommend that queries spanning this boundary use `which_refmap = "refmap_climatena"`.
 #'
 #' @template xyz
-#' @param which_refmap character. Which climatological normals map to use as the
+#' @param which_refmap character. Which map of 1961-1990 climatological normals to use as the
 #'   high-resolution reference climate map for downscaling. Default is "auto",
 #'   which selects, for each query point, the best available climatological
-#'   normals map in declining order of normals_bc, normals_composite, and normals_na.
+#'   normals map in declining order of `"refmap_prism"`, `"refmap_climr"`, and `"refmap_climatena"`.
 #'   Other options are one of [`list_refmaps()`], which will provide a consistent
 #'   reference map for all points.
-#' @param obs_periods character. Which obs period for observed climate
+#' @param obs_periods character. Which historical period for observational climate
 #'   data, averaged over this period. Options are [`list_obs_periods()`]. Default `NULL`
 #' @param obs_years integer. Vector of years to obtain individual years or time
-#'   series of observed climate data. Default `NULL`. See [`list_obs_years()`]
+#'   series of observational climate data. Default `NULL`. See [`list_obs_years()`]
 #'  for available years.
-#' @param obs_ts_dataset character. The dataset to use for observed time series data. Options
+#' @param obs_ts_dataset character. The dataset to use for observational time series data. Options
 #'   are `"climatena"` for the ClimateNA gridded time series or `"cru.gpcc"` for the combined Climatic 
-#'   Research Unit TS dataset (for Temperature) and Global Precipitation Climatology Centre dataset 
+#'   Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset 
 #'   (for precipitation). Defaults to `NULL`.
 #' @param gcms character. Vector of global climate model names. Options
-#'   are [`list_gcms()`]. Used for gcms periods, gcms timeseries, and obs timeseries.
-#'   Defaults to `NULL`.
+#'   are [`list_gcms()`]. Defaults to `NULL`.
 #' @template ssps
 #' @param gcm_periods character. 20-year reference periods for GCM simulations.
 #'   Options are [`list_gcm_periods()`]. Defaults to `NULL`.
@@ -54,7 +53,7 @@
 #'   Defaults to `NULL`.
 #' @template max_run
 #' @param cache logical. Cache data locally? Default `TRUE`
-#' @param ... other arguments passed to [`downscale_core()`]. Namely: `return_normal`, 
+#' @param ... other arguments passed to [`downscale_core()`]. Namely: `return_refperiod`, 
 #'   `vars`, `out_spatial` and `plot`
 
 #' @return `data.table` of downscaled climate variables for each location.
@@ -95,9 +94,10 @@
 #'
 #' ## historic observational time series
 #' vars <- c("PPT", "CMD", "Tave_07")
-#' climate_norms_hist <- climr_downscale(
-#'   xyz = in_xyz, which_normal = "auto",
-#'   return_normal = TRUE,
+#' climate_norms_hist <- downscale(
+#'   xyz = in_xyz, 
+#'   which_refmap = "auto",
+#'   return_refperiod = TRUE,
 #'   obs_periods = "2001_2020",
 #'   vars = vars,
 #'   out_spatial = TRUE, plot = "PPT"
@@ -106,20 +106,20 @@
 #' ## as a data.table
 #' climate_norms_hist <- downscale(
 #'   xyz = in_xyz, which_refmap = "auto",
-#'   return_normal = TRUE,
+#'   return_refperiod = TRUE,
 #'   vars = vars,
 #'   out_spatial = FALSE, plot = "PPT"
 #' ) ## specify desired variables to plot
 #'
-#' ## future projections
+#' ## future projections for annual variables from three models
 #' climate_norms_fut <- downscale(
 #'   xyz = in_xyz, which_refmap = "auto",
-#'   gcms = c("ACCESS-ESM1-5"),
-#'   ssps = c("ssp370"),
-#'   gcm_periods = c("2021_2040"),
+#'   gcms = list_gcms()[c(1,5,6)],
+#'   ssps = list_ssps()[2],
+#'   gcm_periods = list_gcm_periods()[1:2],
 #'   # gcm_ssp_years = 2020:2060,
-#'   max_run = 3, #' we want 3 individual runs for each model
-#'   vars = vars
+#'   max_run = 3, #' we want 3 individual runs for the model
+#'   vars = list_vars("Annual")
 #' )
 #'
 #' @export

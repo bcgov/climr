@@ -63,12 +63,12 @@ If multiple locations are specified, the output is the average of the climate va
 }
 \examples{
 # data frame of arbitrary points
-my_points <- data.frame(lon = c(-127.7300,-127.7500), lat = c(55.34114, 55.25), elev = c(711, 500), id = 1:2)
+# my_points <- data.frame(lon = c(-127.7300,-127.7500), lat = c(55.34114, 55.25), elev = c(711, 500), id = 1:2)
 
 # generate the input data
-my_data <- plot_timeSeries_input(my_points)
+# my_data <- plot_timeSeries_input(my_points)
 
 # use the input to create a plot
-plot_timeSeries(my_data, variable1 = "Tmin_sm")
+# plot_timeSeries(my_data, variable1 = "Tmin_sm")
 
 }
