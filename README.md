@@ -13,13 +13,17 @@ It provides downscaling of observational and simulated climate data using change
 `climr` is designed to be fast and to minimize local data storage requirements.
 To do so, it uses a remote PostGIS database, and optionally caches data locally.
 
+### Mailing list
+
+If you would like to receive email updates when new versions of climr are released, send an email to <ffec@gov.bc.ca> with the subject line "climr subscribe". We will not use your email for any other purpose. Unsubscribe with "climr unsubscribe". If you like climr, let us know! If you have suggestions, add them as issues to <https://github.com/bcgov/climr/issues>.
+
 ### Features
 
 `climr` provides the following data:
 
--   Historical observational time series (1902-2022), currently limited to the ClimateNA time series (Wang et al., 2016)
+-   Two historical observational time series: (1) the 1901-2023 ClimateNA time series (Wang et al., 2016) and (2) the 1901-2022 combined Climatic Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset (for precipitation). 
 
--   Multiple historical (1851-2014) and future (2015-2100) climate model simulations for each of 13 CMIP6 global climate models, in monthly time series and 20-year normals
+-   Multiple historical (1851-2014) and future (2015-2100) climate model simulations for each of 13 CMIP6 global climate models, in monthly time series and 20-year normals.
 
 -   User selection of single or multiple climate variables, with derived variables following the ClimateNA methodology of Wang et al. (2016).
 
