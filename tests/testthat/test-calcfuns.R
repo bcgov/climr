@@ -93,10 +93,10 @@ test_that("calc_* give sensible outputs", {
   ds_res_bc[, .(lat, lon, elev, Tmax, PPT_01, CMD, Eref)]
 
   ## if elevation of input climate data are NA, downscaled variables should be as well.
-  expect_true(all(is.na(ds_res_bc[is.na(elev), .SD, .SDcols = list_variables()])))
-  expect_true(all(is.na(ds_res_bc[is.na(PPT_01), .SD, .SDcols = list_variables()])))
+  expect_true(all(is.na(ds_res_bc[is.na(elev), .SD, .SDcols = list_vars()])))
+  expect_true(all(is.na(ds_res_bc[is.na(PPT_01), .SD, .SDcols = list_vars()])))
   ## conversely, if there is input data, there should be no NAs in downscaled vars
-  expect_true(all(!is.na(ds_res_bc[!is.na(PPT_01), .SD, .SDcols = list_variables()])))
+  expect_true(all(!is.na(ds_res_bc[!is.na(PPT_01), .SD, .SDcols = list_vars()])))
 
   ## TODO: more sanity checks?
 })
