@@ -21,6 +21,7 @@
 #' @return `data.table` of average downscaled climate variables for all locations.
 #'   
 #' @examples
+#' if(FALSE){
 #' # data frame of arbitrary points
 #' my_points <- data.frame(lon = c(-127.7300,-127.7500), lat = c(55.34114, 55.25), elev = c(711, 500), id = 1:2)
 #' 
@@ -29,7 +30,8 @@
 #' 
 #' # use the input to create a plot
 #' plot_timeSeries(my_data, variable1 = "Tmin_sm")
-#' 
+#' }
+#' #' 
 #' @export
 
 plot_timeSeries_input <- function(

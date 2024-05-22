@@ -37,7 +37,6 @@
 #'
 #' ## get database connection
 #' dbCon <- data_connect()
-#' on.exit(try(pool::poolClose(dbCon)))
 #'
 #' gcms <- input_gcms(dbCon, thebb, list_gcms()[1], list_ssps()[1])
 #'
@@ -45,7 +44,7 @@
 #' lyrs <- grep("ensemble", names(gcms$`ACCESS-ESM1-5`))
 #'
 #' plot(gcms$`ACCESS-ESM1-5`[[lyrs]])
-#'
+#' pool::poolClose(dbCon)
 #' @rdname gcms-input-data
 #' @export
 input_gcms <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(), period = list_gcm_periods(), max_run = 0L, cache = TRUE) {

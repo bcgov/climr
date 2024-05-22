@@ -98,7 +98,6 @@ thebb <- get_bb(xyz)
 
 ## get database connection
 dbCon <- data_connect()
-on.exit(try(pool::poolClose(dbCon)))
 
 gcms <- input_gcms(dbCon, thebb, list_gcms()[1], list_ssps()[1])
 
@@ -106,7 +105,7 @@ gcms <- input_gcms(dbCon, thebb, list_gcms()[1], list_ssps()[1])
 lyrs <- grep("ensemble", names(gcms$`ACCESS-ESM1-5`))
 
 plot(gcms$`ACCESS-ESM1-5`[[lyrs]])
-
+pool::poolClose(dbCon)
 }
 \seealso{
 \code{\link[=downscale_core]{downscale_core()}}
