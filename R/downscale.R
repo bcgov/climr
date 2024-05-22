@@ -66,7 +66,7 @@
 #'
 #' @examples
 #'
-#' ## provide or create a lon, lat, elev, and optionally id, dataframe - usually read from csv file
+#' ## provide or create a dataframe of lon, lat, elev, and id - usually read from csv file
 #' in_xyz <- data.frame(
 #'   lon = c(-127.7052, -127.6227, -127.5623, -127.7162, -127.1858, -127.125, -126.9495, -126.9550),
 #'   lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
