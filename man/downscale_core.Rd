@@ -79,6 +79,7 @@ We recommend \code{\link[=downscale]{downscale()}} for most purposes.
 }
 \examples{
 ## 
+library(terra)
 xyz <- data.frame(lon = runif(10, -130, -106), lat = runif(10, 37, 50), elev = runif(10), id = 1:10)
 
 ## get bounding box based on input points
@@ -86,7 +87,6 @@ thebb <- get_bb(xyz)
 
 ## get database connection
 dbCon <- data_connect()
-on.exit(try(pool::poolClose(dbCon)))
 
 # obtain the climatena 1961-1990 normals for the study area. 
 refmap <- input_refmap(dbCon, thebb, reference = "refmap_climatena")
@@ -105,6 +105,7 @@ for(var in names(null[[1]])){ values(null[[1]][[var]]) <- if(length(grep("PPT", 
 
 # downscale the null values for variables of interest
 null_downscaled <- downscale_core(xyz = xyz, refmap = refmap, gcms = null, vars = c("MAT", "PAS"))
+pool::poolClose(dbCon)
 
 }
 \seealso{
