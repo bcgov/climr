@@ -65,31 +65,13 @@
 #' @importFrom data.table getDTthreads setDTthreads rbindlist setkey
 #'
 #' @examples
-#' library(data.table)
-#' library(terra)
-#' set.seed(123)
-#' dbCon <- data_connect()
-#' xyz <- data.frame(
-#'   lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = runif(10),
-#'   id = 1:10
-#' )
-#'
-#' ## get bounding box based on input points
-#' thebb <- get_bb(xyz)
-#' obs <- input_obs(dbCon, thebb, period = "2001_2020")
-#' plot(obs[[1]][[2]])
 #'
 #' ## provide or create a lon, lat, elev, and optionally id, dataframe - usually read from csv file
 #' in_xyz <- data.frame(
-#'   lon = c(
-#'     -127.70521, -127.62279, -127.56235, -127.7162,
-#'     -127.18585, -127.1254, -126.94957, -126.95507
-#'   ),
+#'   lon = c(-127.7052, -127.6227, -127.5623, -127.7162, -127.1858, -127.125, -126.9495, -126.9550),
 #'   lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
-#'   elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
-#'   id = 1:8,
-#'   Zone = c(rep("CWH", 3), rep("CDF", 5)),
-#'   Subzone = c("vm1", "vm2", "vs1", rep("mm", 3), "dk", "dc")
+#'   elev = c(291, 296, 626, 377, 424, 591, 723, 633),
+#'   id = 1:8
 #' )
 #'
 #' ## historic observational time series
