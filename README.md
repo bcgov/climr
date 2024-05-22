@@ -13,9 +13,16 @@ It provides downscaling of observational and simulated climate data using change
 `climr` is designed to be fast and to minimize local data storage requirements.
 To do so, it uses a remote PostGIS database, and optionally caches data locally.
 
-### Mailing list
+### Subscribe
 
-If you would like to receive email updates when new versions of climr are released, send an email to <ffec@gov.bc.ca> with the subject line "climr subscribe". We will not use your email for any other purpose. Unsubscribe with "climr unsubscribe". If you like climr, let us know! If you have suggestions, add them as issues to <https://github.com/bcgov/climr/issues>.
+We are actively developing `climr` and releasing minor versions every month or two. 
+If you would like to receive email updates when new versions of climr are released, 
+subscribe to the `climr` GitHub repo using the following steps: 
+
+1. Navigate to [https://github.com/bcgov/climr](https://github.com/bcgov/climr). 
+2. Click the "Watch" button at the top right of the repository page.
+3. Choose "Custom".
+4. Select "Releases".
 
 ### Features
 
@@ -71,7 +78,7 @@ For an overview of downscaling methods used in `climr` see `vignette("methods_do
 ## Known issues
 
 -   Downloads of time series take a long time. We are looking into ways to speed this up, but until then we recommend users dedicate some time prior to analysis to cache their time series of interest for their areas of interest in a batch. Once the time series are cached, they don't need to be downloaded again. 
--   We are still working on the documentation, examples, and vignettes. Please let us know if something isn't clear, preferably as a github issue. 
+-   We are still working on the documentation, examples, and vignettes. Please let us know if something isn't clear, preferably as a [GitHub](https://github.com/bcgov/climr) issue. 
 
 ### License
 
