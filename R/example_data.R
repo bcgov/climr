@@ -83,7 +83,7 @@
 "BECz_vancouver_ras"
 
 
-#' Colour sscheme for Biogeoclimatic Ecological Classification Zones
+#' Colour scheme for Biogeoclimatic Ecological Classification Zones
 #'
 #' A `data.table` with RGB and HEX colours for biogeoclimatic zones in BC.
 #'

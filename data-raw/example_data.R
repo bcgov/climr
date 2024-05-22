@@ -1,3 +1,7 @@
+library(data.table)
+name_changes <- fread("data-raw/namingChanges.csv")
+usethis::use_data(name_changes,overwrite = TRUE)
+
 ## `variables` data object (external)
 
 library(terra)

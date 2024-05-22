@@ -3,11 +3,11 @@
 #' @return a character vector.
 #'
 #' @description
-#' `list_gcm` lists available global circulation models.
+#' `list_gcms` lists available global circulation models.
 #'
 #' @rdname data-option-lists
 #' @export
-list_gcm <- function() {
+list_gcms <- function() {
   c(
     "ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5", "CNRM-ESM2-1", "EC-Earth3",
     "GFDL-ESM4", "GISS-E2-1-G", "INM-CM5-0", "IPSL-CM6A-LR", "MIROC6",
@@ -17,21 +17,21 @@ list_gcm <- function() {
 }
 
 #' @description
-#' `list_ssp` lists available shared socioeconomic pathways.
+#' `list_ssps` lists available shared socioeconomic pathways.
 #'
 #' @rdname data-option-lists
 #' @export
-list_ssp <- function() {
+list_ssps <- function() {
   # sort(dbGetQuery(dbCon, "SELECT DISTINCT scenario FROM esm_layers")[,1])
   c("ssp126", "ssp245", "ssp370", "ssp585")
 }
 
 #' @description
-#' `list_gcm_period` lists available periods.
+#' `list_gcm_periods` lists available periods.
 #'
 #' @rdname data-option-lists
 #' @export
-list_gcm_period <- function() {
+list_gcm_periods <- function() {
   # sort(dbGetQuery(dbCon, "SELECT DISTINCT period FROM esm_layers")[,1])
   c("2001_2020", "2021_2040", "2041_2060", "2061_2080", "2081_2100")
 }
@@ -40,51 +40,51 @@ list_gcm_period <- function() {
 #' `list_run` lists available runs for a given GCM.
 #'
 #' @template dbCon
-#' @param gcm Character vector to specify requested GCMs
+#' @param gcms Character vector to specify requested GCMs
 #' @importFrom RPostgres dbGetQuery
 #'
 #' @rdname data-option-lists
 #' @export
-list_run <- function(dbCon, gcm) {
-  sort(dbGetQuery(dbCon, paste0("SELECT DISTINCT run FROM esm_layers_period WHERE mod IN ('", paste(gcm, collapse = "','", "')")))[, 1])
+list_run <- function(dbCon, gcms) {
+  sort(dbGetQuery(dbCon, paste0("SELECT DISTINCT run FROM esm_layers_period WHERE mod IN ('", paste(gcms, collapse = "','", "')")))[, 1])
 }
 
 #' @description
-#' `list_normal` lists available normals.
+#' `list_refmaps` lists available normals.
 #'
 #' @details
-#' Currently available normals (`list_normal()`) are:
-#'   * "normal_na" for Climate NA derived normals
-#'   * "normal_bc" for British Columbia PRISM climatologies derived normals
-#'   * "normal_composite" for a composite of BC PRISM, adjusted US PRISM and
+#' Currently available normals (`list_refmaps()`) are:
+#'   * "refmap_climatena" for Climate NA derived normals
+#'   * "refmap_prism" for British Columbia PRISM climatologies derived normals
+#'   * "refmap_climr" for a composite of BC PRISM, adjusted US PRISM and
 #'     DAYMET (Alberta and Saskatchewan), covering western Canada and western
 #'     US.
 #'
 #' @rdname data-option-lists
 #' @export
-list_normal <- function() {
-  c("normal_na", "normal_bc", "normal_composite")
+list_refmaps <- function() {
+  c("refmap_climatena", "refmap_prism", "refmap_climr")
 }
 
 
 #' @description
-#' `list_historic` lists available historic periods
+#' `list_obs_periods` lists available obs periods
 #'
 #' @rdname data-option-lists
 #' @export
-list_historic <- function() {
+list_obs_periods <- function() {
   return("2001_2020")
 }
 
 #' @description
-#' `list_variables` lists climate variables
+#' `list_vars` lists climate variables
 #'
 #' @param set character. One of All, Monthly, Seasonal, Annual, or any combination thereof. Defaults to "All".
 #' @param only_extra logical. Should Tmin, Tmax and PPT be excluded? Defaults to FALSE.
 #'
 #' @rdname data-option-lists
 #' @export
-list_variables <- function(set = c("All", "Monthly", "Seasonal", "Annual"), only_extra = FALSE) {
+list_vars <- function(set = c("All", "Monthly", "Seasonal", "Annual"), only_extra = FALSE) {
   if (FALSE) {
     variables <- NULL
   }
@@ -102,28 +102,28 @@ list_variables <- function(set = c("All", "Monthly", "Seasonal", "Annual"), only
 
 
 #' @description
-#' `list_historic_ts` lists available years for historic time series
+#' `list_obs_years` lists available years for obs time series
 #'
 #' @rdname data-option-lists
 #' @export
-list_historic_ts <- function() {
+list_obs_years <- function() {
   1902:2022
 }
 
 #' @description
-#' `list_gcm_ts` lists available years for future projections' time series
+#' `list_gcm_ssp_years` lists available years for future projections' time series
 #'
 #' @rdname data-option-lists
 #' @export
-list_gcm_ts <- function() {
+list_gcm_ssp_years <- function() {
   2015:2100
 }
 
 #' @description
-#' `list_gcm_hist_ts` lists available years for historic projections' time series
+#' `list_gcm_hist_years` lists available years for obs projections' time series
 #'
 #' @rdname data-option-lists
 #' @export
-list_gcm_hist_ts <- function() {
+list_gcm_hist_years <- function() {
   1851:2015
 }
