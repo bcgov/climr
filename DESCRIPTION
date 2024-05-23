@@ -1,14 +1,14 @@
 Package: climr
 Title: Downscaling climate data in R
 Version: 0.1.0
-Date: 29-04-2024
+Date: 23-05-2024
 Authors@R: c(
     person("Kiri","Daust", email = "kiri.daust@gov.bc.ca", role = c("aut", "cre")),
     person("Colin", "Mahony", email = "Colin.Mahony@gov.bc.ca", role = c("aut"),
            comment = c(ORCID = "0000-0002-6111-5675")),
     person("Bruno", "Tremblay", email = "bruno@boostao.ca", role = c("aut"),
            comment = c(ORCID = "0000-0002-2945-356X")),
-    person("Ceres", "Barros", email = "ceres.barros@gov.bc.ca", role = c("aut"),
+    person("Ceres", "Barros", email = "ceres.barros@nrcan-rncan.gc.ca", role = c("aut"),
            comment = c(ORCID = "0000-0003-4036-977X")),       
     person("Francois", "Bornais", email = "francois@boostao.ca", role = c("ctb")),
     person(family = "Province of British Columbia", role = c("cph", "fnd")))
