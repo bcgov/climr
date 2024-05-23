@@ -12,8 +12,8 @@ input_refmap(dbCon, bbox, reference = "refmap_climatena", cache = TRUE)
 \item{bbox}{numeric. Vector of length 4 giving bounding box of study region, in the order ymax,ymin,xmax,xmin. In general this is created by \code{get_bb()}, but can also be user-defined.}
 
 \item{reference}{A \code{character} or a \code{SpatRaster}. For character, label of the normal baseline to use.
-Can be obtained from \code{\link[=list_normal]{list_normal()}}. For \code{SpatRaster}, 36 layers normal climate variables with
-names PPT01:PPT12, Tmax01:Tmax12 and Tmin01:Tmin12. Defaults to \code{list_reference()[1]}.}
+Can be obtained from \code{\link[=list_refmaps]{list_refmaps()}}. For \code{SpatRaster}, 36 layers normal climate variables with
+names PPT01:PPT12, Tmax01:Tmax12 and Tmin01:Tmin12. Defaults to \code{list_refmaps()[1]}.}
 
 \item{cache}{logical. Specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 }
