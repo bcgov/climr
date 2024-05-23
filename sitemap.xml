@@ -16,6 +16,9 @@
     <loc>https://bcgov.github.io/climr/articles/climr_workflow_int.html</loc>
   </url>
   <url>
+    <loc>https://bcgov.github.io/climr/articles/guidance_ensembleSelection.html</loc>
+  </url>
+  <url>
     <loc>https://bcgov.github.io/climr/articles/index.html</loc>
   </url>
   <url>
@@ -23,6 +26,9 @@
   </url>
   <url>
     <loc>https://bcgov.github.io/climr/articles/methods_downscaling.html</loc>
+  </url>
+  <url>
+    <loc>https://bcgov.github.io/climr/articles/methods_ensembleSelection.html</loc>
   </url>
   <url>
     <loc>https://bcgov.github.io/climr/authors.html</loc>
@@ -49,9 +55,6 @@
     <loc>https://bcgov.github.io/climr/reference/climr-package.html</loc>
   </url>
   <url>
-    <loc>https://bcgov.github.io/climr/reference/climr_downscale.html</loc>
-  </url>
-  <url>
     <loc>https://bcgov.github.io/climr/reference/data-option-lists.html</loc>
   </url>
   <url>
@@ -67,7 +70,10 @@
     <loc>https://bcgov.github.io/climr/reference/downscale.html</loc>
   </url>
   <url>
-    <loc>https://bcgov.github.io/climr/reference/gcm-input-data.html</loc>
+    <loc>https://bcgov.github.io/climr/reference/downscale_core.html</loc>
+  </url>
+  <url>
+    <loc>https://bcgov.github.io/climr/reference/gcms-input-data.html</loc>
   </url>
   <url>
     <loc>https://bcgov.github.io/climr/reference/get_bb.html</loc>
@@ -79,16 +85,25 @@
     <loc>https://bcgov.github.io/climr/reference/index.html</loc>
   </url>
   <url>
+    <loc>https://bcgov.github.io/climr/reference/input_refmap.html</loc>
+  </url>
+  <url>
     <loc>https://bcgov.github.io/climr/reference/lapse_rate.html</loc>
   </url>
   <url>
-    <loc>https://bcgov.github.io/climr/reference/normal-input-data.html</loc>
+    <loc>https://bcgov.github.io/climr/reference/name_changes.html</loc>
   </url>
   <url>
     <loc>https://bcgov.github.io/climr/reference/pgGetTerra.html</loc>
   </url>
   <url>
     <loc>https://bcgov.github.io/climr/reference/plot_bivariate.html</loc>
+  </url>
+  <url>
+    <loc>https://bcgov.github.io/climr/reference/plot_timeSeries.html</loc>
+  </url>
+  <url>
+    <loc>https://bcgov.github.io/climr/reference/plot_timeSeries_input.html</loc>
   </url>
   <url>
     <loc>https://bcgov.github.io/climr/reference/vancouver.html</loc>
