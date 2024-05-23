@@ -6,7 +6,7 @@ output:
     toc: true
     toc_depth: 2
 description: >
-  Recommended practices for selection of global climate model ensembles and use of emissions scenarios. 
+  Criteria for climate model inclusion in climr, and rationale for the recommended 8-GCM general-purpose ensemble. 
 vignette: >
   %\VignetteIndexEntry{Climate model and scenario selection}
   %\VignetteEngine{knitr::rmarkdown}
