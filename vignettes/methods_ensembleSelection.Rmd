@@ -185,7 +185,7 @@ variability of individual model runs does not affect most users of climr
 illustrates the importance of careful ensemble selection in analysis of
 climate time series.
 
-![](cmip6NA.NAM.Tmax.sm%20(1).png) ![](cmip6NA.NAM.Tmax.sm%20(2).png)
+![](cmip6NA_NAM_Tmax_sm1.png) ![](cmip6NA_NAM_Tmax_sm2.png)
 ***Figure 1: Comparison of the ClimateNA 13-model ensemble (dashed
 lines) and 8-model ensemble (solid lines)***. *The variable is mean
 summer daily maximum temperature (tasmax/Tmax_sm) averaged over North
