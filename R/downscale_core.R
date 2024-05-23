@@ -25,9 +25,7 @@
 #' @param obs_ts `list` of `SpatRasters`. Outputs from [`input_obs_ts()`].
 #'   Observed climate time series to be downscaled. Default to `NULL`.
 #' @param return_refperiod logical. Return downscaled reference period (1961-1990)? Default `TRUE`.
-#' @param vars character. A vector of climate variables to compute. Supported variables
-#'   can be obtained with [`list_vars()`]. Definitions can be found in this package
-#'  `variables` dataset. Default to monthly PPT, Tmax, Tmin.
+#' @template vars
 #' @param ppt_lr logical. Apply elevation adjustment to precipitation. Default to FALSE.
 #' @param nthread integer. Number of parallel threads to use to do computations. Default to 1L.
 #' @param out_spatial logical. Should a SpatVector be returned instead of a
