@@ -1,7 +1,7 @@
 url: https://bcgov.github.io/climr/ 
 
 development:
-  mode: auto
+  mode: release
 
 template:
   bootstrap: 5
