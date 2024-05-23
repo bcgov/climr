@@ -40,7 +40,7 @@ The high resolution reference climate maps for Western Canada and Western US are
 Reference climatologies for North America are the 4km-resolution ClimateNA (Wang et al. 2016) mosaics of PRISM (BC, US, W. Canada) and WorldClim (rest of North America).
 The ClimateNA mosaics are accessed from [AdaptWest](https://adaptwest.databasin.org/pages/adaptwest-climatena/).
 
-Historical observational time series are obtained from [ClimateNA](https://climatena.ca/) (Wang et al. 2016).
+Historical observational time series are obtained from [ClimateNA](https://climatena.ca/) (Wang et al. 2016), [Climatic Research Unit](https://crudata.uea.ac.uk/cru/data/hrg/), and [Global Precipitation Climatology Centre](https://psl.noaa.gov/data/gridded/data.gpcc.html). 
 
 CMIP6 global climate model simulations were downloaded from the [Earth System Grid Federation](https://aims2.llnl.gov/search/cmip6). The majority of these downloads were conducted by Tongli Wang, Associate Professor at the UBC Department of Forest and Conservation Sciences.
 The 13 global climate models selected for `climr`, and best practices for ensemble analysis, are described in Mahony et al. (2022) and summarized in `vignette("climr_methods_ensembleSelection")`. 
