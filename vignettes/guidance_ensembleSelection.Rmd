@@ -23,17 +23,9 @@ Colin Mahony
 Research Climatologist\
 British Columbia Ministry of Forests
 
-Released: April 26, 2021
-
-## Purpose
-
-This guidance is developed by the BC Ministry of Forests for users of
-`climr`. This guidance is professional opinion and does not represent
-government policy.
-
 ## Model selection
 
-Wherever possible, climate change studies benefit from the use of
+Wherever possible, climate change studies will benefit from the use of
 projections from multiple models to assess modeling uncertainties. There
 is broad scientific agreement that an ensemble of at least eight
 independent climate models are required to represent modeling
@@ -86,8 +78,8 @@ linear increase in the rate of greenhouse gas emissions. SSP5-8.5 is at
 the high end of the baseline scenarios, representing rapid expansion of
 greenhouse gas emissions over the next several decades and
 end-of-century emissions more than three times higher than current
-emissions [Riahi et al.
-2017](https://www.sciencedirect.com/science/article/pii/S0959378016300681).
+emissions [(Riahi et al.
+2017)](https://www.sciencedirect.com/science/article/pii/S0959378016300681).
 
 Collectively, SSP1-2.6, SSP2-4.5, and SSP3-7.0 provide a reasonable
 representation of optimistic, neutral, and pessimistic outlooks on
