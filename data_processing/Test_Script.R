@@ -225,7 +225,7 @@ gcm <- gcm_input(
   bbox = c(80, 20, -50, -170),
   gcm = list_gcm(),
   ssp = list_ssp()[2],
-  period = list_gcm_period()[2],
+  period = list_gcm_periods()[2],
 )
 
 for(i in 1:length(list_gcm())){
@@ -250,7 +250,7 @@ gcmres <- gcm_input(
   bbox = c(80, 20, -50, -170),
   gcm = c("ACCESS-ESM1-5", "BCC-CSM2-MR", "CanESM5"),
   ssp = list_ssp()[2],
-  period = list_gcm_period()[2])
+  period = list_gcm_periods()[2])
 
 plot(gcmres$`ACCESS-ESM1-5`[[6]])
 
@@ -267,7 +267,7 @@ ds_out <- climr_downscale(
   xyz = temp, 
   which_normal = "auto",
   gcm_models = mods,
-  gcm_period = list_gcm_period()[2],
+  gcm_period = list_gcm_periods()[2],
   gcm_ts_years = 2020:2050,
   ssp = list_ssp()[4],
   max_run = 3, # we want 3 individual runs for each model
