@@ -17,7 +17,7 @@ test_that("test normal_input", {
 
   thebb <- get_bb(xyz)
 
-  normals <- as.list(list_normal())
+  normals <- as.list(list_refmaps())
 
   sapply(normals, FUN = function(normal) {
     normalout <- normal_input(dbCon, thebb, normal = normal, cache = TRUE)
