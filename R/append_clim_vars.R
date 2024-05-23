@@ -1,7 +1,7 @@
 #' Add extra climate variables to a `data.table`
 #'
 #' @param dt A `data.table` with TminXX, TmaxXX, PPTXX for XX in 01 to 12.
-#' @param vars A character vector of climate variables to compute.
+#' @template vars
 #'
 #' @return a `data.table`
 #'
