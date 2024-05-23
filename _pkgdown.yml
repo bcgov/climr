@@ -1,10 +1,20 @@
 url: https://bcgov.github.io/climr/ 
 
 development:
-  mode: auto
+  mode: release
 
 template:
   bootstrap: 5
+
+home:   
+  sidebar:
+    structure: [links, license, community, citation, authors, dev]
+  links: 
+  - text: GitHub repo
+    href: https://github.com/bcgov/climr
+  - text: Reporting issues
+    href: https://github.com/bcgov/climr/issues
+
 
 articles:
 - title: "`climr` workflows"
