@@ -31,16 +31,14 @@ articles:
 reference:
 - title: "Downscaling functions"
   desc: >
-    Functions to used to downscale climate variables
+    Functions for downscaling climate variables
   contents:
   - climr
   - downscale
   - downscale_core
 - title: "Downloading raw climate inputs"
   desc: >
-    Functions to download climate normals and
-    historic/future anomalies used for downscaling
-    climate elements and derived variables
+    Functions to generate inputs for downscale_core()
   contents:
   - input_refmap
   - input_gcms
@@ -50,7 +48,7 @@ reference:
   - input_obs_ts
 - title: "Database and caching"
   desc: > 
-    Functions used to interact with the PostGIS server
+    Functions for interacting with the PostGIS server
     and the data cache folder
   contents:
   - cache_clear
@@ -68,11 +66,11 @@ reference:
   - lapse_rate
 - title: "Data"
   desc: >
-    available climate variables and functions listing 
-    available data.
-    Datasets used in vignettes and examples,
+    Available climate variables and functions listing available data.
+    Datasets used in vignettes and examples.
   contents:
   - variables
+  - name_changes
   - list_refmaps
   - list_obs_periods
   - list_gcms
