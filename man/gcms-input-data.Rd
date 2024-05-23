@@ -47,7 +47,7 @@ Can be obtained from \code{\link[=list_gcms]{list_gcms()}}. Default to all GCMs 
 Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to all scenarios available.}
 
 \item{period}{character. Vector of labels of the periods to use.
-Can be obtained from \code{\link[=list_gcm_period]{list_gcm_period()}}. Defaults to all periods available.}
+Can be obtained from \code{\link[=list_gcm_periods]{list_gcm_periods()}}. Defaults to all periods available.}
 
 \item{max_run}{integer. Maximum number of model runs to include.
 A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
