@@ -15,7 +15,7 @@ Authors:
 \itemize{
   \item Colin Mahony \email{Colin.Mahony@gov.bc.ca} (\href{https://orcid.org/0000-0002-6111-5675}{ORCID})
   \item Bruno Tremblay \email{bruno@boostao.ca} (\href{https://orcid.org/0000-0002-2945-356X}{ORCID})
-  \item Ceres Barros \email{ceres.barros@gov.bc.ca} (\href{https://orcid.org/0000-0003-4036-977X}{ORCID})
+  \item Ceres Barros \email{ceres.barros@nrcan-rncan.gc.ca} (\href{https://orcid.org/0000-0003-4036-977X}{ORCID})
 }
 
 Other contributors:

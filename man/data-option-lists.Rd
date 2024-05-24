@@ -54,9 +54,9 @@ a character vector.
 
 \code{list_run} lists available runs for a given GCM.
 
-\code{list_refmaps} lists available normals.
+\code{list_refmaps} lists available reference maps of gridded climate normals
 
-\code{list_obs_periods} lists available obs periods
+\code{list_obs_periods} lists available observational periods
 
 \code{list_vars} lists climate variables
 
@@ -67,7 +67,7 @@ a character vector.
 \code{list_gcm_hist_years} lists available years for obs projections' time series
 }
 \details{
-Currently available normals (\code{list_refmaps()}) are:
+Currently available reference maps of gridded climate normals (\code{list_refmaps()}) are:
 \itemize{
 \item "refmap_climatena" for Climate NA derived normals
 \item "refmap_prism" for British Columbia PRISM climatologies derived normals
