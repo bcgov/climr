@@ -15,3 +15,11 @@
 ^pkgdown$
 ^doc$
 ^Meta$
+^COMPLIANCE\.yaml$
+^Compare_CHELSA\.R$
+^DD_Processing_Scripts$
+^archive$
+^data_processing$
+^logo\.svg$
+^logo_icon\.png$
+^man-roxygen$
