@@ -50,10 +50,10 @@ list_run <- function(dbCon, gcms) {
 }
 
 #' @description
-#' `list_refmaps` lists available normals.
+#' `list_refmaps` lists available reference maps of gridded climate normals
 #'
 #' @details
-#' Currently available normals (`list_refmaps()`) are:
+#' Currently available reference maps of gridded climate normals (`list_refmaps()`) are:
 #'   * "refmap_climatena" for Climate NA derived normals
 #'   * "refmap_prism" for British Columbia PRISM climatologies derived normals
 #'   * "refmap_climr" for a composite of BC PRISM, adjusted US PRISM and
@@ -68,7 +68,7 @@ list_refmaps <- function() {
 
 
 #' @description
-#' `list_obs_periods` lists available obs periods
+#' `list_obs_periods` lists available observational periods
 #'
 #' @rdname data-option-lists
 #' @export
