@@ -30,7 +30,7 @@ parameter,normal_input(),normal,reference
 options,list_normal(),normal_na,refmap_climatena
 options,list_normal(),normal_bc,refmap_prism
 options,list_normal(),normal_composite,refmap_climr
-function name,,gcm_input(),input_gcm()
+function name,,gcm_input(),input_gcms()
 parameter,gcm_ts_input(),gcm,gcms
 parameter,gcm_hist_input(),gcm,gcms
 parameter,gcm_input(),gcm,gcms
