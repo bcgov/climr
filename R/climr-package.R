@@ -5,6 +5,17 @@
 ## usethis namespace: end
 NULL
 
+.onAttach <- function(libname, pkgname) {
+  packageStartupMessage(
+    "climr version 0.1.0 includes an overhaul of the naming conventions ",
+    "for variables, functions, parameters, and options. ",
+    "Call `data(name_changes)` for a table specifying the correspondence ",
+    "between old and new names. ",
+    "If you have used a previous version of climr you MUST call `cache_clear()` ",
+    "before using this one."
+  )
+}
+
 # On load, instantiate either as new or from cache
 #' @importFrom data.table fwrite
 #' @importFrom RPostgres dbGetQuery
@@ -13,7 +24,6 @@ NULL
 .onLoad <- function(libname, pkgname) {
   rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
 
-  packageStartupMessage("climr version 0.1.0 includes an overhaul of the naming conventions for variables, functions, parameters, and options. Call `data(name_changes)` for a table specifying the correspondence between old and new names. If you have used a previous version of climr you MUST call `cache_clear()` before using this one.")
   dbCon <- data_connect()
   on.exit(try(pool::poolClose(dbCon)), add = TRUE)
 
