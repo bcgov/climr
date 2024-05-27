@@ -1,0 +1,8 @@
+bibentry(
+  bibtype  = "Manual",
+  title    = "climr: Downscaling climate data in R",
+  author   = "Kiri Daust, Colin Mahony, Bruno Tremblay, Ceres Barros",
+  year     = "2024",
+  version  = "0.1.0",
+  url      = "https://bcgov.github.io/climr/"
+)
