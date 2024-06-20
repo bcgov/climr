@@ -1,3 +1,8 @@
+# `climr` 0.1.1
+
+## Bug Fixes
+* Fixed a bug in `plot_downscale()` that affected colors when `pal = "gcms"` and labels when `endlabel = "gcms"`
+
 # `climr` 0.1.0
 ## Implementation of naming conventions
 * We overhauled the naming of functions, parameters, and options to make them more intuitive and internally consistent. You will need to revise the climr code in your workflows to accommodate these changes. A table of correspondence specifying the changes is located at ./data-raw/namingChanges.csv and is viewable by calling `data(name_changes)`. 
