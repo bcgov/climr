@@ -143,11 +143,11 @@ plot_timeSeries <- function(
       pal.gcms <- c("#004949","#009292","#ff6db6","#ffb6db", "#490092","#006ddb","#b66dff","#6db6ff","#b6dbff", "#920000","#924900","#db6d00","#24ff24")
       
       # function for specifying the color
-      colSelect <- function(scenario, gcms){
-        if(missing(gcms)){ 
+      colSelect <- function(scenario, gcm){
+        if(missing(gcm)){ 
           col = pal.scenario[which(scenarios==scenario)]
         } else {
-          col = if(pal=="gcms") pal.gcms[which(list_gcms()==gcms)] else pal.scenario[which(scenarios==scenario)]
+          col = if(pal=="gcms") pal.gcms[which(list_gcms()==gcm)] else pal.scenario[which(scenarios==scenario)]
         }
         return(col)
       }
@@ -223,7 +223,7 @@ plot_timeSeries <- function(
             if(simplify==FALSE){
               for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])]){
                 x3 <- get(paste("x", scenario, sep="."))
-                polygon(c(x3, rev(x3)), c(get(paste("ensmin", scenario, sep=".")), rev(get(paste("ensmax", scenario, sep=".")))), col=alpha(colSelect(scenario, gcms), 0.35), border=colSelect(scenario, gcms))
+                polygon(c(x3, rev(x3)), c(get(paste("ensmin", scenario, sep=".")), rev(get(paste("ensmax", scenario, sep=".")))), col=alpha(colSelect(scenario, gcm), 0.35), border=colSelect(scenario, gcm))
               }
             } else {
               scenarios.select <- scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])][-1]
@@ -237,8 +237,8 @@ plot_timeSeries <- function(
                   s.ensmax <- smooth.spline(x4,y.ensmax, df=8) 
                   subset.hist <- which(x4%in%x.historical)
                   subset.proj <- which(x4%in%get(paste("x", scenario, sep=".")))
-                  polygon(c(s.ensmin$x[subset.hist], rev(s.ensmax$x[subset.hist])), c(s.ensmin$y[subset.hist], rev(s.ensmax$y[subset.hist])), col=alpha(if(pal=="gcms") colSelect(scenario, gcms) else pal.scenario[which(scenarios=="historical")], 0.35), border=NA)
-                  polygon(c(s.ensmin$x[subset.proj], rev(s.ensmax$x[subset.proj])), c(s.ensmin$y[subset.proj], rev(s.ensmax$y[subset.proj])), col=alpha(colSelect(scenario, gcms), 0.35), border=NA)
+                  polygon(c(s.ensmin$x[subset.hist], rev(s.ensmax$x[subset.hist])), c(s.ensmin$y[subset.hist], rev(s.ensmax$y[subset.hist])), col=alpha(if(pal=="gcms") colSelect(scenario, gcm) else pal.scenario[which(scenarios=="historical")], 0.35), border=NA)
+                  polygon(c(s.ensmin$x[subset.proj], rev(s.ensmax$x[subset.proj])), c(s.ensmin$y[subset.proj], rev(s.ensmax$y[subset.proj])), col=alpha(colSelect(scenario, gcm), 0.35), border=NA)
                 } else { # this second routine uses interpolation splines so that the starting point for all scenarios is the same
                   x5 <- c(x.historical, get(paste("x", scenario, sep="."))[-1])
                   y.ensmin2 <- c(ensmin.historical, get(paste("ensmin", scenario, sep="."))[-1])
@@ -249,7 +249,7 @@ plot_timeSeries <- function(
                   knots.proj <- which(x5%in%c(seq(2030, 2090, 20), 2100))
                   s.ensmin3 <- stinterp(x5[c(knots.hist, knots.proj)],c(s.ensmin$y[knots.hist], s.ensmin2$y[knots.proj]), x5)
                   s.ensmax3 <- stinterp(x5[c(knots.hist, knots.proj)],c(s.ensmax$y[knots.hist], s.ensmax2$y[knots.proj]), x5)
-                  polygon(c(s.ensmin3$x[subset.proj], rev(s.ensmax3$x[subset.proj])), c(s.ensmin3$y[subset.proj], rev(s.ensmax3$y[subset.proj])), col=alpha(colSelect(scenario, gcms), 0.35), border=NA)
+                  polygon(c(s.ensmin3$x[subset.proj], rev(s.ensmax3$x[subset.proj])), c(s.ensmin3$y[subset.proj], rev(s.ensmax3$y[subset.proj])), col=alpha(colSelect(scenario, gcm), 0.35), border=NA)
                 }
               }
             }
@@ -278,8 +278,8 @@ plot_timeSeries <- function(
             # plot the ensemble mean
             if(showmean){
               if(simplify){
-                lines(x=s4$x[subset], y=s4$y[subset], col=colSelect(scenario, gcms), lwd=2)
-              } else lines(x=get(paste("x", scenario, sep=".")), y=get(paste("ensmean", scenario, sep=".")), col=colSelect(scenario, gcms), lwd=2)
+                lines(x=s4$x[subset], y=s4$y[subset], col=colSelect(scenario, gcm), lwd=2)
+              } else lines(x=get(paste("x", scenario, sep=".")), y=get(paste("ensmean", scenario, sep=".")), col=colSelect(scenario, gcm), lwd=2)
             }
             
             # end labels
@@ -291,20 +291,20 @@ plot_timeSeries <- function(
                 if(endlabel=="change"){
                   if(element%in%c("PPT", "PAS", "CMD", "MAP", "MSP", "DDsub18", "DD18", "DDsub0", "DD5", "Eref")){
                     change <- round(projected/baseline-1,2)
-                    if(is.na(change)==FALSE) text(2099,projected, if(change>0) paste("+",change*100,"%", sep="") else paste(change*100,"%", sep=""), col=colSelect(scenario, gcms), pos=4, font=2, cex=1)
+                    if(is.na(change)==FALSE) text(2099,projected, if(change>0) paste("+",change*100,"%", sep="") else paste(change*100,"%", sep=""), col=colSelect(scenario, gcm), pos=4, font=2, cex=1)
                   } else if(element%in%c("Tave", "Tmin", "Tmax", "MCMT", "MWMT", "EXT", "EMT", "MAT")){
                     change <- round(projected-baseline,1)
-                    if(is.na(change)==FALSE) text(2099,projected, if(change>0) bquote("+" * .(change) * degree * C) else bquote(.(change) * degree * C), col=colSelect(scenario, gcms), pos=4, font=2, cex=1)
+                    if(is.na(change)==FALSE) text(2099,projected, if(change>0) bquote("+" * .(change) * degree * C) else bquote(.(change) * degree * C), col=colSelect(scenario, gcm), pos=4, font=2, cex=1)
                   } else if(element%in%c("RH")){
                     change <- round(projected-baseline,1)
-                    if(is.na(change)==FALSE) text(2099,projected, if(change>0) paste("+",change,"%", sep="") else paste(change,"%", sep=""), col=colSelect(scenario, gcms), pos=4, font=2, cex=1)
+                    if(is.na(change)==FALSE) text(2099,projected, if(change>0) paste("+",change,"%", sep="") else paste(change,"%", sep=""), col=colSelect(scenario, gcm), pos=4, font=2, cex=1)
                   } else {
                     change <- round(projected-baseline,1)
-                    if(is.na(change)==FALSE) text(2099,projected, if(change>0) paste("+",change, sep="") else paste(change, sep=""), col=colSelect(scenario, gcms), pos=4, font=2, cex=1)
+                    if(is.na(change)==FALSE) text(2099,projected, if(change>0) paste("+",change, sep="") else paste(change, sep=""), col=colSelect(scenario, gcm), pos=4, font=2, cex=1)
                   }
                 }
                 if(endlabel=="gcms"){
-                  text(2099,projected, if(compile) "ensemble" else gcms, col=colSelect(scenario, gcms), pos=4, font=1, cex=1)
+                  text(2099,projected, if(compile) "ensemble" else gcm, col=colSelect(scenario, gcm), pos=4, font=1, cex=1)
                 }
                 par(xpd=FALSE)
               }
@@ -330,8 +330,6 @@ plot_timeSeries <- function(
         } else for(gcm in gcms){ #this plots of individual GCM ensembles. 
           temp.data <-  X[GCM==gcm, c("PERIOD", "SSP", "RUN", var), with=FALSE]
           plot.ensemble(temp.data)
-          
-          print(gcms)
         }
         
         # overlay the 5-year lines on top of all polygons
