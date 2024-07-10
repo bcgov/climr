@@ -313,11 +313,11 @@ downscale <- function(xyz, which_refmap = "auto",
       }
   }
   
-  if(!is.null(obs_ts_dataset)){
-    if(any(!obs_ts_dataset %in% c("cru.gpcc","climatena"))){
-      stop("obs_ts_dataset must be cru.gpcc, climatena, or both")
+  if (!is.null(obs_ts_dataset)){
+    if (any(!obs_ts_dataset %in% c("cru.gpcc","climatena"))){
+      stop("obs_ts_dataset must be 'cru.gpcc', 'climatena', or 'both'")
     }
-    if(is.null(obs_years)){
+    if (is.null(obs_years)){
       stop("'obs_years' must be specified")
     }
   }
