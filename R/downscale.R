@@ -253,7 +253,7 @@ downscale <- function(xyz, which_refmap = "auto",
 
     results_na <- downscale_core(
       xyz = na_xyz,
-      reference = reference,
+      refmap = reference,
       obs = obs_periods,
       obs_ts = obs_years,
       gcms = gcm_ssp_periods,
