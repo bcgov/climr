@@ -284,19 +284,32 @@ downscale <- function(xyz, which_refmap = "auto",
     stop("ssps must be specified")
   }
   
-  if(!is.null(ssps))  ssps <- match.arg(ssps, list_ssps(), several.ok = TRUE)
+  if(!is.null(ssps)) {
+    notSupportedSsps <- setdiff(ssps, list_ssps())
+    if (length(notSupportedSsps)) {
+      stop("The following SSPs are not supported:", 
+           "\n  ", paste(notSupportedSsps, collapse = ", "),
+           "\n  Please see 'list_ssps' for list of supported SSPs.")
+    }
+  } 
   
   if (!is.null(which_refmap)) {
     which_refmap <- match.arg(which_refmap, c("auto", list_refmaps()))
   }
   
   if (!is.null(obs_periods)) {
-    obs_periods <- match.arg(obs_periods, list_obs_periods(), several.ok = TRUE)
+    notSupportedPeriods <- setdiff(obs_periods, list_obs_periods())
+    if (length(notSupportedPeriods)) {
+      stop("The following observed periods are not supported:", 
+           "\n  ", paste(notSupportedPeriods, collapse = ", "),
+           "\n  Please see 'list_obs_periods' for list of supported periods.")
+    }
   }
   
   if (!is.null(obs_years)) {
-      if (!all(obs_years %in% 1901:2023)) {
-        stop("'obs_years' must be in 1901:2023")
+      if (!all(obs_years %in% list_obs_years())) {
+        stop("'obs_years' must be in ", range(list_obs_years())[1], ":",
+             range(list_obs_years())[2])
       }
   }
   
@@ -310,16 +323,27 @@ downscale <- function(xyz, which_refmap = "auto",
   }
   
   if (!is.null(gcms)) {
-    gcms <- match.arg(gcms, list_gcms(), several.ok = TRUE)
+    notSupportedGCMs <- setdiff(gcms, list_gcms())
+    if (length(notSupportedGCMs)) {
+      stop("The following GCMs are not supported:", 
+           "\n  ", paste(notSupportedGCMs, collapse = ", "),
+           "\n  Please see 'list_gcms' for list of supported GCMs.")
+    }
   }
   
   if (!is.null(gcm_periods)) {
-    gcm_periods <- match.arg(gcm_periods, list_gcm_periods(), several.ok = TRUE)
+    notSupportedGCMPs <- setdiff(gcm_periods, list_gcm_periods())
+    if (length(notSupportedGCMPs)) {
+      stop("The following projected periods are not supported:", 
+           "\n  ", paste(notSupportedGCMPs, collapse = ", "),
+           "\n  Please see 'list_gcm_periods' for list of supported periods.")
+    }
   }
   
   if (!is.null(gcm_ssp_years)) {
-    if (!all(gcm_ssp_years %in% 2015:2100)) {
-      stop("'gcm_ssp_years' must be in 2015:2100")
+    if (!all(gcm_ssp_years %in% list_gcm_ssp_years()())) {
+      stop("'gcm_ssp_years' must be in ", range(list_gcm_ssp_years())[1], ":",
+           range(list_gcm_ssp_years())[2])
     }
   }
   

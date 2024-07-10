@@ -700,7 +700,13 @@ unpackRasters <- function(ras) {
 .checkDwnsclArgs <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NULL, gcm_hist_ts = NULL,
                              obs_ts = NULL, return_refperiod = FALSE,
                              out_spatial = FALSE, plot = NULL, vars = list_vars()) {
-  vars <- match.arg(vars, list_vars(), several.ok = TRUE)
+  
+  notSupportedVars <- setdiff(vars, list_vars())
+  if (length(notSupportedVars)) {
+    stop("The following variables are not supported:", 
+         "\n  ", paste(notSupportedVars, collapse = ", "),
+         "\n  Please see 'list_vars' for list of supported variables.")
+  }
   
   if (!return_refperiod %in% c(TRUE, FALSE)) {
     stop("'return_refperiod' must be TRUE or FALSE")
