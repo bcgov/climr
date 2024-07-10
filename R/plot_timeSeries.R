@@ -100,6 +100,7 @@
 #'
 #' @importFrom scales alpha
 #' @importFrom stinepack stinterp
+#' @importFrom utils data
 #'
 #' @export
 
