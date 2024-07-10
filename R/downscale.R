@@ -341,7 +341,7 @@ downscale <- function(xyz, which_refmap = "auto",
   }
   
   if (!is.null(gcm_ssp_years)) {
-    if (!all(gcm_ssp_years %in% list_gcm_ssp_years()())) {
+    if (!all(gcm_ssp_years %in% list_gcm_ssp_years())) {
       stop("'gcm_ssp_years' must be in ", range(list_gcm_ssp_years())[1], ":",
            range(list_gcm_ssp_years())[2])
     }
