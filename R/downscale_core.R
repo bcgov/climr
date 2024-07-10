@@ -716,7 +716,7 @@ unpackRasters <- function(ras) {
   }
   
   plot <- if (!is.null(plot)) {
-    match.arg(plot,list_vars())
+    match.arg(plot, list_vars())
   }
   
   if (!isTRUE(attr(refmap, "builder") == "climr")) {
