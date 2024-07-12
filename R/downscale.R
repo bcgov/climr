@@ -163,7 +163,12 @@ downscale <- function(xyz, which_refmap = "auto",
     reference <- input_refmap(dbCon = dbCon, reference = "normal_composite", bbox = thebb, cache = cache)
   } else {
     # message("Normals not specified, using highest resolution available for each point")
-    bc_outline <- rast(system.file("extdata", "wna_outline.tif", package = "climr"))
+    rastFile <- system.file("extdata", "wna_outline.tif", package = "climr")
+    ## if package is loaded with devtools::load_all, file won't be found and we need to pass .libPaths
+    if (rastFile == "") {
+      rastFile <- system.file("extdata", "wna_outline.tif", package = "climr", lib.loc = .libPaths())  
+    }
+    bc_outline <- rast(rastFile)
     pnts <- extract(bc_outline, xyz[, .(lon, lat)], method = "simple")
     bc_ids <- xyz[["id"]][!is.na(pnts$PPT_01)]
     if (length(bc_ids) >= 1) {
