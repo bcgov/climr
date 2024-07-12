@@ -83,7 +83,7 @@ downscale_core <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NU
                       vars = sort(sprintf(c("PPT_%02d", "Tmax_%02d", "Tmin_%02d"), sort(rep(1:12, 3)))),
                       ppt_lr = FALSE, nthread = 1L, out_spatial = FALSE, plot = NULL) {
   ## checks
-  .checkDwnsclArgs(
+  .checkDwnsclCoreArgs(
     xyz, refmap, gcms, obs, gcm_ssp_ts, gcm_hist_ts,
     obs_ts, return_refperiod, out_spatial, plot, vars
   )
@@ -697,7 +697,7 @@ unpackRasters <- function(ras) {
 #'
 #' @return NULL
 #' @noRd
-.checkDwnsclArgs <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NULL, gcm_hist_ts = NULL,
+.checkDwnsclCoreArgs <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NULL, gcm_hist_ts = NULL,
                              obs_ts = NULL, return_refperiod = FALSE,
                              out_spatial = FALSE, plot = NULL, vars = list_vars()) {
   
