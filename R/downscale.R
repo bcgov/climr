@@ -116,7 +116,7 @@ downscale <- function(xyz, which_refmap = "auto",
   message("Welcome to climr!")
 
   ## checks
-  .checkClimrDwnsclArgs(
+  .checkDwnsclArgs(
     xyz, which_refmap, obs_periods, obs_years, obs_ts_dataset,
     gcms, ssps, gcm_periods, gcm_ssp_years,
     gcm_hist_years, max_run
@@ -277,7 +277,7 @@ downscale <- function(xyz, which_refmap = "auto",
 #'
 #' @return NULL
 #' @noRd
-.checkClimrDwnsclArgs <- function(xyz, which_refmap = NULL, obs_periods = NULL, obs_years = NULL,
+.checkDwnsclArgs <- function(xyz, which_refmap = NULL, obs_periods = NULL, obs_years = NULL,
                                   obs_ts_dataset = NULL, gcms = NULL, ssps = list_ssps(), gcm_periods = NULL, gcm_ssp_years = NULL,
                                   gcm_hist_years = NULL, max_run = 0L) {
   if(is.null(ssps) & (!is.null(gcm_periods) | !is.null(gcm_ssp_years))){
