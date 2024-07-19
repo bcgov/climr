@@ -283,6 +283,8 @@ plot_timeSeries <- function(
 
 #' function for plotting time series for gcms or compiled ensemble
 #' 
+#' @param x climate data
+#' 
 #' @importFrom graphics polygon
 #' @importFrom stats smooth.spline
 plot.ensemble <- function(x) {
