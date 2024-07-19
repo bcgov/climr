@@ -6,6 +6,9 @@
 \usage{
 plot.ensemble(x)
 }
+\arguments{
+\item{x}{climate data}
+}
 \description{
 function for plotting time series for gcms or compiled ensemble
 }
