@@ -69,6 +69,18 @@ dbnames_ts <- data.table(
   )
 )
 
-usethis::use_data(param, dbnames, dbnames_hist, dbnames_ts, dbnames_hist_obs,
+dbnames_ts_fast <- data.table(
+  GCM = c(
+    "GFDL-ESM4"
+  ),
+  dbname = c(
+    "gfdl_template"
+  ),
+  dbarray = c(
+    "gfdl_array"
+  )
+)
+
+usethis::use_data(param, dbnames, dbnames_hist, dbnames_ts, dbnames_hist_obs, dbnames_ts_fast,
   overwrite = TRUE, internal = TRUE
 )
