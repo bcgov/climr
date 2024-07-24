@@ -49,27 +49,27 @@ applied best practice in ensemble selection [(Leduc et al.
 2016)](https://journals.ametsoc.org/view/journals/clim/29/23/jcli-d-15-0761.1.xml).
 The rationale for each selection is provided below.
 
--   CNRM-ESM2-1 (ECS 4.8^o^C) was chosen over CNRM-CM6-1 (ECS 4.9^o^C) to give preference to
-the ESM over the AOGCM configuration; 
+-   CNRM-ESM2-1 (ECS 4.8^o^C) was chosen over CNRM-CM6-1 (ECS 4.9^o^C)
+    to give preference to the ESM over the AOGCM configuration;
 
--   EC-Earth3 (ECS 4.3^o^C) was
-arbitrarily chosen over EC-Earth3-Veg (ECS 4.3^o^C); 
+-   EC-Earth3 (ECS 4.3^o^C) was arbitrarily chosen over EC-Earth3-Veg
+    (ECS 4.3^o^C);
 
--   INM-CM5-0 (ECS
-1.9^o^C) was arbitrarily chosen over INM-CM4-8 (ECS 1.8^o^C);
+-   INM-CM5-0 (ECS 1.9^o^C) was arbitrarily chosen over INM-CM4-8 (ECS
+    1.8^o^C);
 
--   MPI-ESM1-2-HR (ECS 3.0^o^C) was chosen over MPI-ESM1-2-LR (ECS 3.0^o^C)
-due to its high resolution and availability of \>1 run for all but
-SSP5-8.5.
+-   MPI-ESM1-2-HR (ECS 3.0^o^C) was chosen over MPI-ESM1-2-LR (ECS
+    3.0^o^C) due to its high resolution and availability of \>1 run for
+    all but SSP5-8.5.
 
--   MIROC6 (ECS 2.6^o^C) was chosen over MIROC-ES2L (ECS
-2.7^o^C) because it has more runs/scenario, higher resolution, and
-because the latter has very high temperature bias over British Columbia.
+-   MIROC6 (ECS 2.6^o^C) was chosen over MIROC-ES2L (ECS 2.7^o^C)
+    because it has more runs/scenario, higher resolution, and because
+    the latter has very high temperature bias over British Columbia.
 
 -   For the purposes of this ensemble, different physics or forcing
-schemes were considered different models. We used only the r\*i1p3f1
-variants of the GISS-E2-1-G model, as these had the most complete set of
-scenario simulations.
+    schemes were considered different models. We used only the r\*i1p3f1
+    variants of the GISS-E2-1-G model, as these had the most complete
+    set of scenario simulations.
 
 **Criterion 5. No closely related models.** Models that share components
 were excluded, following Figure 5 of [Brunner et al.
@@ -194,14 +194,14 @@ variability of individual model runs does not affect most users of climr
 illustrates the importance of careful ensemble selection in analysis of
 climate time series.
 
-![](cmip6NA_NAM_Tmax_sm1.png) ![](cmip6NA_NAM_Tmax_sm2.png)
-***Figure 1: Comparison of the ClimateNA 13-model ensemble (dashed
-lines) and 8-model ensemble (solid lines)***. *The variable is mean
-summer daily maximum temperature (tasmax/Tmax_sm) averaged over North
-America. The 8-model ensemble excludes models with ECS outside the
-IPCC-assessed 2-5^o^C range. (top) Ensemble mean projections for the
-four main CMIP6 marker scenarios. (bottom) Ensemble mean and full range
-(min/max for all simulations of all models) for the SSP2-4.5 scenario.*
+![](cmip6NA_NAM_Tmax_sm1.png) ![](cmip6NA_NAM_Tmax_sm2.png) ***Figure 1:
+Comparison of the ClimateNA 13-model ensemble (dashed lines) and 8-model
+ensemble (solid lines)***. *The variable is mean summer daily maximum
+temperature (tasmax/Tmax_sm) averaged over North America. The 8-model
+ensemble excludes models with ECS outside the IPCC-assessed 2-5^o^C
+range. (top) Ensemble mean projections for the four main CMIP6 marker
+scenarios. (bottom) Ensemble mean and full range (min/max for all
+simulations of all models) for the SSP2-4.5 scenario.*
 
 ### Reconciling the equilibrium climate sensitivity of the CMIP6 ensemble with observational constraints (Excerpted from Mahony et al. 2022)
 
