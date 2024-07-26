@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_timeSeries.R
 \name{plot.ensemble}
 \alias{plot.ensemble}
-\title{function for plotting time series for gcms or compiled ensemble}
+\title{Function for plotting time series for gcms or compiled ensemble}
 \usage{
 plot.ensemble(
   x,
@@ -29,7 +29,45 @@ plot.ensemble(
 }
 \arguments{
 \item{x}{climate data}
+
+\item{var}{TODO}
+
+\item{scenarios.selected}{TODO}
+
+\item{scenarios}{TODO}
+
+\item{showrange}{TODO}
+
+\item{simplify}{TODO}
+
+\item{gcm}{TODO}
+
+\item{pal}{TODO}
+
+\item{pal.scenario}{TODO}
+
+\item{refline}{TODO}
+
+\item{showmean}{TODO}
+
+\item{endlabel}{TODO}
+
+\item{element}{TODO}
+
+\item{compile}{TODO}
+
+\item{var2}{TODO}
+
+\item{element1}{TODO}
+
+\item{element2}{TODO}
+
+\item{yeartime.names}{TODO}
+
+\item{yeartimes}{TODO}
+
+\item{yeartime}{TODO}
 }
 \description{
-function for plotting time series for gcms or compiled ensemble
+Function for plotting time series for gcms or compiled ensemble
 }

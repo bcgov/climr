@@ -296,9 +296,28 @@ plot_timeSeries <- function(
 }
 
 
-#' function for plotting time series for gcms or compiled ensemble
+#' Function for plotting time series for gcms or compiled ensemble
 #' 
 #' @param x climate data
+#' @param var TODO
+#' @param scenarios.selected TODO
+#' @param scenarios  TODO
+#' @param showrange  TODO
+#' @param simplify  TODO
+#' @param gcm  TODO
+#' @param pal  TODO
+#' @param pal.scenario  TODO
+#' @param refline  TODO
+#' @param showmean  TODO
+#' @param endlabel  TODO
+#' @param element  TODO
+#' @param compile  TODO
+#' @param var2  TODO
+#' @param element1  TODO
+#' @param element2  TODO
+#' @param yeartime.names  TODO
+#' @param yeartimes  TODO
+#' @param yeartime  TODO
 #' 
 #' @importFrom graphics polygon
 #' @importFrom stats smooth.spline
