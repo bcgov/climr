@@ -371,7 +371,7 @@ plot.ensemble <- function(x) {
     }
     
     # end labels
-    if(is.null(endlabel)==FALSE){
+    if(!is.null(endlabel)){
       if(scenario != "historical"){
         par(xpd=TRUE)
         baseline <- mean(ensmean.historical[which(x.historical%in%1961:1990)])
