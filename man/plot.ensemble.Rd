@@ -4,7 +4,28 @@
 \alias{plot.ensemble}
 \title{function for plotting time series for gcms or compiled ensemble}
 \usage{
-plot.ensemble(x)
+plot.ensemble(
+  x,
+  var,
+  scenarios.selected,
+  scenarios,
+  showrange = TRUE,
+  simplify = TRUE,
+  gcm,
+  pal,
+  pal.scenario,
+  refline = FALSE,
+  showmean = TRUE,
+  endlabel = "change",
+  element,
+  compile = TRUE,
+  var2 = NULL,
+  element1,
+  element2,
+  yeartime.names,
+  yeartimes,
+  yeartime
+)
 }
 \arguments{
 \item{x}{climate data}

@@ -123,7 +123,7 @@ we recommend users dedicate some time to run this function in background. Once t
 don't need to be downloaded again.
 }
 \examples{
-if(FALSE){
+if (FALSE){
 # data frame of arbitrary points
 my_points <- data.frame(lon = c(-127.7300,-127.7500), lat = c(55.34114, 55.25), elev = c(711, 500), id = 1:2)
 
