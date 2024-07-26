@@ -308,7 +308,7 @@ plot.ensemble <- function(x) {
   }
   
   if(showrange) {
-    if(simplify==FALSE){
+    if(isFALSE(simplify)){
       for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])]){
         x3 <- get(paste("x", scenario, sep="."))
         polygon(c(x3, rev(x3)), c(get(paste("ensmin", scenario, sep=".")), rev(get(paste("ensmax", scenario, sep=".")))), col=alpha(colSelect(scenario, gcm), 0.35), border=colSelect(scenario, gcm))
