@@ -64,7 +64,7 @@
 #' @return NULL. Draws a plot in the active graphics device.
 #'
 #' @examples
-#' if(FALSE){
+#' if (FALSE){
 #' # data frame of arbitrary points
 #' my_points <- data.frame(lon = c(-127.7300,-127.7500), lat = c(55.34114, 55.25), elev = c(711, 500), id = 1:2)
 #'
@@ -132,64 +132,64 @@ plot_timeSeries <- function(
   } else   if (!requireNamespace("stinepack", quietly = TRUE)) {
     stop("package stinepack must be installed to use this function")
   } else {
-      data("variables", envir = environment()) 
-
-      # Scenario definitions
-      scenarios.selected <- c("historical", ssps)
-      scenarios <- c("historical", list_ssps())
-      scenario.names <- c("Historical simulations", "SSP1-2.6", "SSP2-4.5", "SSP3-7.0", "SSP5-8.5")
-      pal.scenario <- c("gray60", "dodgerblue4", "seagreen", "darkorange3", "darkred")  # these roughly match the IPCC standard scenario colours. 
-      
-      # GCM color palette (from https://mk.bcgsc.ca/colorblind/)
-      pal.gcms <- c("#004949","#009292","#ff6db6","#ffb6db", "#490092","#006ddb","#b66dff","#6db6ff","#b6dbff", "#920000","#924900","#db6d00","#24ff24")
-      
-      # function for specifying the color
-      colSelect <- function(scenario, gcm){
-        if(missing(gcm)){ 
-          col = pal.scenario[which(scenarios==scenario)]
-        } else {
-          col = if(pal=="gcms") pal.gcms[which(list_gcms()==gcm)] else pal.scenario[which(scenarios==scenario)]
-        }
-        return(col)
+    data("variables", envir = environment()) 
+    
+    # Scenario definitions
+    scenarios.selected <- c("historical", ssps)
+    scenarios <- c("historical", list_ssps())
+    scenario.names <- c("Historical simulations", "SSP1-2.6", "SSP2-4.5", "SSP3-7.0", "SSP5-8.5")
+    pal.scenario <- c("gray60", "dodgerblue4", "seagreen", "darkorange3", "darkred")  # these roughly match the IPCC standard scenario colours. 
+    
+    # GCM color palette (from https://mk.bcgsc.ca/colorblind/)
+    pal.gcms <- c("#004949","#009292","#ff6db6","#ffb6db", "#490092","#006ddb","#b66dff","#6db6ff","#b6dbff", "#920000","#924900","#db6d00","#24ff24")
+    
+    # function for specifying the color
+    colSelect <- function(scenario, gcm){
+      if(missing(gcm)){ 
+        col = pal.scenario[which(scenarios==scenario)]
+      } else {
+        col = if(pal=="gcms") pal.gcms[which(list_gcms()==gcm)] else pal.scenario[which(scenarios==scenario)]
       }
-      
-      # yeartime definitions
-      monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12")
-      seasonmonth.mat <- matrix(monthcodes[c(12, 1:11)],4, byrow=TRUE)
-      seasons <- c("wt", "sp", "sm", "at")
-      season.names <- c("Winter", "Spring", "Summer", "Autumn")
-      yeartimes <- c(seasons, monthcodes)
-      yeartime.names <- c(season.names, month.name)
-      
-      # ensemble statistics definitions
-      ensstats <- c("ensmin", "ensmax", "ensmean")
-      
-      ## Assemble the data that will be used in the plot (for setting the ylim)
-      alldata <-  X[, if(is.null(var2)) get(var1) else c(get(var1), get(var2))] # a vector of all potential data on the plot for setting the ylim (y axis range)
-      visibledata <-  X[GCM%in%c(NA, gcms) & SSP%in%c(NA, ssps), (if(is.null(var2)) get(var1) else c(get(var1), get(var2)))] # a vector of all visible data on the plot for setting the ylim (y axis range)
-      
-      # components of the var 
-      nums <- if(is.null(var2)) 1 else 1:2 #nums is the set of var numbers (var1 or var2) (this is used later on as well)
-      for(num in nums){ 
-        var <- get(paste("var",num,sep=""))
-        assign(paste0("yeartime", num), as.character(variables[Code == var, "Code_Time"]) )
-        assign(paste0("element", num), as.character(variables[Code == var, "Code_Element"]) )
-      }
-      
-      # PLOT
-      par(mfrow=c(1,1), mar=mar, mgp=c(1.75, 0.25, 0), cex=cex)
-      # y axis title. 
-      if(is.null(var2)){ #if there is no second var
-        ylab <- paste(yeartime.names[which(yeartimes==yeartime1)], variables[Code==var1, "Element"])
+      return(col)
+    }
+    
+    # yeartime definitions
+    monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12")
+    seasonmonth.mat <- matrix(monthcodes[c(12, 1:11)],4, byrow=TRUE)
+    seasons <- c("wt", "sp", "sm", "at")
+    season.names <- c("Winter", "Spring", "Summer", "Autumn")
+    yeartimes <- c(seasons, monthcodes)
+    yeartime.names <- c(season.names, month.name)
+    
+    # ensemble statistics definitions
+    ensstats <- c("ensmin", "ensmax", "ensmean")
+    
+    ## Assemble the data that will be used in the plot (for setting the ylim)
+    alldata <-  X[, if(is.null(var2)) get(var1) else c(get(var1), get(var2))] # a vector of all potential data on the plot for setting the ylim (y axis range)
+    visibledata <-  X[GCM%in%c(NA, gcms) & SSP%in%c(NA, ssps), (if(is.null(var2)) get(var1) else c(get(var1), get(var2)))] # a vector of all visible data on the plot for setting the ylim (y axis range)
+    
+    # components of the var 
+    nums <- if(is.null(var2)) 1 else 1:2 #nums is the set of var numbers (var1 or var2) (this is used later on as well)
+    for(num in nums){ 
+      var <- get(paste("var",num,sep=""))
+      assign(paste0("yeartime", num), as.character(variables[Code == var, "Code_Time"]) )
+      assign(paste0("element", num), as.character(variables[Code == var, "Code_Element"]) )
+    }
+    
+    # PLOT
+    par(mfrow=c(1,1), mar=mar, mgp=c(1.75, 0.25, 0), cex=cex)
+    # y axis title. 
+    if(is.null(var2)){ #if there is no second var
+      ylab <- paste(yeartime.names[which(yeartimes==yeartime1)], variables[Code==var1, "Element"])
+    } else 
+      if(element1==element2){ #if both variables have the same element
+        ylab <- variables[Code==var1, "Element"]
       } else 
-        if(element1==element2){ #if both variables have the same element
-          ylab <- variables[Code==var1, "Element"]
-        } else 
-          if(yeartime1==yeartime2){ #if both variables have the same yeartime
-            ylab <- paste(yeartime.names[which(yeartimes==yeartime1)], variables[Code==var1, "Element"], "or", variables[Code==var2, "Element"])
-          } else { #if variables1 and 2 have different elements and yeartimes
-            ylab <- paste(yeartime.names[which(yeartimes==yeartime1)], variables[Code==var1, "Element"], "or", variables[Code==var2, "Element"])
-          }
+        if(yeartime1==yeartime2){ #if both variables have the same yeartime
+          ylab <- paste(yeartime.names[which(yeartimes==yeartime1)], variables[Code==var1, "Element"], "or", variables[Code==var2, "Element"])
+        } else { #if variables1 and 2 have different elements and yeartimes
+          ylab <- paste(yeartime.names[which(yeartimes==yeartime1)], variables[Code==var1, "Element"], "or", variables[Code==var2, "Element"])
+        }
       plot(0, col="white", xlim=c(1900, 2100), ylim=range(if(yfit) visibledata else alldata, na.rm = TRUE), xaxs="i", xaxt="n", tck=0, xlab="", ylab=ylab)
       axis(1, at=seq(1850,2100,25), labels = seq(1850,2100,25), tck=0)
       
@@ -197,7 +197,7 @@ plot_timeSeries <- function(
       for(num in nums){
         yeartime <- get(paste("yeartime",num,sep=""))
         element <- get(paste("element",num,sep=""))
-        var <- get(paste("var",num,sep=""))
+      var <- get(paste("var",num,sep=""))
       
       if (compile) { #this plots a single envelope for the ensemble as a whole
         temp.data <-  X[GCM%in%gcms, c("PERIOD", "SSP", "RUN", var), with=FALSE]
@@ -224,75 +224,75 @@ plot_timeSeries <- function(
       }
       
       # overlay the 5-year lines on top of all polygons
-        if(yearlines){
-          for(n in seq(1905, 2095, 5)){
-            lines(c(n, n), c(-9999, 9999), col="grey", lty=2)
-          }
+      if(yearlines){
+        for(n in seq(1905, 2095, 5)){
+          lines(c(n, n), c(-9999, 9999), col="grey", lty=2)
         }
-        
-        if(showObserved){
-          # add in observations
-          obs.colors <- c("black", "blue", "red")
-          obs.options <- c("climatena", "cru.gpcc") ##, "era5"
-          for(obs.dataset in obs_ts_dataset){ #TODO update this code block once i know how the datasets are identified in the climr output
-            obs.color <- obs.colors[which(obs.options==obs.dataset)]
-            x.obs <- as.numeric(X[DATASET==obs.dataset & PERIOD%in%1900:2100, "PERIOD"][[1]])
-            y.obs <-  X[DATASET==obs.dataset & PERIOD%in%1900:2100, get(var)]
-            recent.obs <- mean(y.obs[which(x.obs%in%2014:2023)], na.rm=TRUE)
-            baseline.obs <- mean(y.obs[which(x.obs%in%1961:1990)], na.rm=TRUE)
-            end <- max(which(!is.na(y.obs)))
-            lines(x.obs[which(x.obs<1951)], y.obs[which(x.obs<1951)], lwd=3, lty=3, col=obs.color)
-            lines(x.obs[which(x.obs>1949)], y.obs[which(x.obs>1949)], lwd=4, col=obs.color)
-            if(yearmarkers){
-              points(x.obs[which(x.obs>1949)], y.obs[which(x.obs>1949)], pch=21, bg="white", col=obs.color, cex=0.4)
-              points(x.obs[which(x.obs>1949)[seq(1,999,5)]], y.obs[which(x.obs>1949)[seq(1,999,5)]], pch=21, bg="white", col=obs.color, cex=0.7)
-            }
-            if(label.endyear){
-              points(x.obs[end], y.obs[end], pch=16, cex=1, col=obs.color)
-              text(x.obs[end], y.obs[end], x.obs[end], pos= 4, offset = 0.25, col=obs.color, cex=1,)
-            }
-            if(refline.obs){
-              lines(1961:1990, rep(baseline.obs, 30), lwd=1, col=obs.color)
-              lines(c(1990,2100), rep(baseline.obs, 2), lty=2, col=obs.color)
-            }
-          }
-        }
-        print(num)
       }
       
       if(showObserved){
-        # Sources legend
-        a <- if("climatena"%in%obs_ts_dataset) 1 else NA
-        b <- if("cru.gpcc"%in%obs_ts_dataset) 2 else NA
-        c <- if("era5"%in%obs_ts_dataset) 3 else NA
-        d <- if(length(gcms>0)) 4 else NA
-        s <- !is.na(c(a,b,c,d))
-        legend.GCM <- if(length(gcms)>1) paste("Simulated (", length(gcms), " GCMs)", sep="")  else paste("Simulated (", gcms, ")", sep="")
-        legend(legend_pos, title = "", legend=c("Observed (ClimateNA)", "Observed (CRU/GPCC)", "Observed (ERA5)", legend.GCM)[s], bty="n",
-               lty=c(1,1,1,1)[s], 
-               col=c(obs.colors, "gray")[s], 
-               lwd=c(4,4,4,2)[s], 
-               pch=c(NA,NA,NA,NA)[s], 
-               pt.bg = c(NA, NA,NA,NA)[s], 
-               pt.cex=c(NA,NA,NA,NA)[s])
+        # add in observations
+        obs.colors <- c("black", "blue", "red")
+        obs.options <- c("climatena", "cru.gpcc") ##, "era5"
+        for(obs.dataset in obs_ts_dataset){ #TODO update this code block once i know how the datasets are identified in the climr output
+          obs.color <- obs.colors[which(obs.options==obs.dataset)]
+          x.obs <- as.numeric(X[DATASET==obs.dataset & PERIOD%in%1900:2100, "PERIOD"][[1]])
+          y.obs <-  X[DATASET==obs.dataset & PERIOD%in%1900:2100, get(var)]
+          recent.obs <- mean(y.obs[which(x.obs%in%2014:2023)], na.rm=TRUE)
+          baseline.obs <- mean(y.obs[which(x.obs%in%1961:1990)], na.rm=TRUE)
+          end <- max(which(!is.na(y.obs)))
+          lines(x.obs[which(x.obs<1951)], y.obs[which(x.obs<1951)], lwd=3, lty=3, col=obs.color)
+          lines(x.obs[which(x.obs>1949)], y.obs[which(x.obs>1949)], lwd=4, col=obs.color)
+          if(yearmarkers){
+            points(x.obs[which(x.obs>1949)], y.obs[which(x.obs>1949)], pch=21, bg="white", col=obs.color, cex=0.4)
+            points(x.obs[which(x.obs>1949)[seq(1,999,5)]], y.obs[which(x.obs>1949)[seq(1,999,5)]], pch=21, bg="white", col=obs.color, cex=0.7)
+          }
+          if(label.endyear){
+            points(x.obs[end], y.obs[end], pch=16, cex=1, col=obs.color)
+            text(x.obs[end], y.obs[end], x.obs[end], pos= 4, offset = 0.25, col=obs.color, cex=1,)
+          }
+          if(refline.obs){
+            lines(1961:1990, rep(baseline.obs, 30), lwd=1, col=obs.color)
+            lines(c(1990,2100), rep(baseline.obs, 2), lty=2, col=obs.color)
+          }
+        }
       }
-      
-      #Scenario legend
-      if(pal=="gcms"){
-        s <- which(list_gcms()%in%gcms)
-        legend(c("top", "bottom")[if(length(grep("top", legend_pos))==1) 1 else 2], title = "GCMs", legend=gcms, bty="n",
-               col=pal.gcms[s], pch=22, pt.bg = alpha(pal.gcms[s], 0.35), pt.cex=2)
-      } else {
-        s <- rev(which(scenarios[-1]%in%scenarios.selected))
-        legend(c("top", "bottom")[if(length(grep("top", legend_pos))==1) 1 else 2], title = "Scenarios", legend=c("Historical", scenario.names[-1][s]), bty="n",
-               lty=c(NA,NA,NA,NA,NA)[c(1,s+1)], col=pal.scenario[c(1,s+1)], lwd=c(NA,NA,NA,NA,NA)[c(1,s+1)], pch=c(22,22,22,22,22)[c(1,s+1)], pt.bg = alpha(pal.scenario[c(1,s+1)], 0.35), pt.cex=c(2,2,2,2,2)[c(1,s+1)])
-      }
-      
-      # mtext(paste(" Created using climr (https://bcgov.github.io/climr/)"), side=1, line=1.5, adj=0.0, font=1, cex=1.1, col="gray")
-      
-      box()
-      
+      print(num)
     }
+    
+    if(showObserved){
+      # Sources legend
+      a <- if("climatena"%in%obs_ts_dataset) 1 else NA
+      b <- if("cru.gpcc"%in%obs_ts_dataset) 2 else NA
+      c <- if("era5"%in%obs_ts_dataset) 3 else NA
+      d <- if(length(gcms>0)) 4 else NA
+      s <- !is.na(c(a,b,c,d))
+      legend.GCM <- if(length(gcms)>1) paste("Simulated (", length(gcms), " GCMs)", sep="")  else paste("Simulated (", gcms, ")", sep="")
+      legend(legend_pos, title = "", legend=c("Observed (ClimateNA)", "Observed (CRU/GPCC)", "Observed (ERA5)", legend.GCM)[s], bty="n",
+             lty=c(1,1,1,1)[s], 
+             col=c(obs.colors, "gray")[s], 
+             lwd=c(4,4,4,2)[s], 
+             pch=c(NA,NA,NA,NA)[s], 
+             pt.bg = c(NA, NA,NA,NA)[s], 
+             pt.cex=c(NA,NA,NA,NA)[s])
+    }
+    
+    #Scenario legend
+    if(pal=="gcms"){
+      s <- which(list_gcms()%in%gcms)
+      legend(c("top", "bottom")[if(length(grep("top", legend_pos))==1) 1 else 2], title = "GCMs", legend=gcms, bty="n",
+             col=pal.gcms[s], pch=22, pt.bg = alpha(pal.gcms[s], 0.35), pt.cex=2)
+    } else {
+      s <- rev(which(scenarios[-1]%in%scenarios.selected))
+      legend(c("top", "bottom")[if(length(grep("top", legend_pos))==1) 1 else 2], title = "Scenarios", legend=c("Historical", scenario.names[-1][s]), bty="n",
+             lty=c(NA,NA,NA,NA,NA)[c(1,s+1)], col=pal.scenario[c(1,s+1)], lwd=c(NA,NA,NA,NA,NA)[c(1,s+1)], pch=c(22,22,22,22,22)[c(1,s+1)], pt.bg = alpha(pal.scenario[c(1,s+1)], 0.35), pt.cex=c(2,2,2,2,2)[c(1,s+1)])
+    }
+    
+    # mtext(paste(" Created using climr (https://bcgov.github.io/climr/)"), side=1, line=1.5, adj=0.0, font=1, cex=1.1, col="gray")
+    
+    box()
+    
+  }
 }
 
 
