@@ -198,17 +198,32 @@ plot_timeSeries <- function(
         yeartime <- get(paste("yeartime",num,sep=""))
         element <- get(paste("element",num,sep=""))
         var <- get(paste("var",num,sep=""))
+      
+      if (compile) { #this plots a single envelope for the ensemble as a whole
+        temp.data <-  X[GCM%in%gcms, c("PERIOD", "SSP", "RUN", var), with=FALSE]
+        plot.ensemble(temp.data, var = var, var2 = var2, yeartime = yeartime, 
+                      gcm = gcm, refline = refline, showmean = showmean, 
+                      endlabel = endlabel, element = element,
+                      element1 = element1, element2 = element2,
+                      compile = compile, yeartime.names = yeartime.names,
+                      yeartimes = yeartimes, yeartime = yeartime,
+                      scenarios.selected = scenarios.selected,vscenarios = scenarios, 
+                      showrange = showrange, simplify = simplify)
         
-        if (compile) { #this plots a single envelope for the ensemble as a whole
-          temp.data <-  X[GCM%in%gcms, c("PERIOD", "SSP", "RUN", var), with=FALSE]
-          plot.ensemble(temp.data)
-          
-        } else for(gcm in gcms){ #this plots of individual GCM ensembles. 
-          temp.data <-  X[GCM==gcm, c("PERIOD", "SSP", "RUN", var), with=FALSE]
-          plot.ensemble(temp.data)
-        }
-        
-        # overlay the 5-year lines on top of all polygons
+      } else for(gcm in gcms){ #this plots of individual GCM ensembles. 
+        temp.data <-  X[GCM==gcm, c("PERIOD", "SSP", "RUN", var), with=FALSE]
+        plot.ensemble(temp.data, var = var, var2 = var2, yeartime = yeartime, 
+                      refline = refline, showmean = showmean,
+                      endlabel = endlabel, element = element,
+                      element1 = element1, element2 = element2,
+                      compile = compile, yeartime.names = yeartime.names, 
+                      yeartimes = yeartimes, yeartime = yeartime,
+                      gcm = gcm, pal = pal, pal.scenario = pal.scenario,
+                      scenarios.selected = scenarios.selected,vscenarios = scenarios, 
+                      showrange = showrange, simplify = simplify)
+      }
+      
+      # overlay the 5-year lines on top of all polygons
         if(yearlines){
           for(n in seq(1905, 2095, 5)){
             lines(c(n, n), c(-9999, 9999), col="grey", lty=2)
@@ -287,7 +302,12 @@ plot_timeSeries <- function(
 #' 
 #' @importFrom graphics polygon
 #' @importFrom stats smooth.spline
-plot.ensemble <- function(x) {
+plot.ensemble <- function(x, var, scenarios.selected, scenarios, 
+                          showrange = TRUE, simplify = TRUE, gcm, 
+                          pal, pal.scenario, refline = FALSE, showmean = TRUE, 
+                          endlabel = "change", element, 
+                          compile = TRUE, var2 = NULL, element1, element2, 
+                          yeartime.names, yeartimes, yeartime) {
   # scenario <- scenarios.selected[1]
   temp.historical <- x[is.na(SSP), c("PERIOD", "RUN", var), with=FALSE]
   x.historical <- as.numeric(temp.historical[, .(min = min(get(var))), by = PERIOD][["PERIOD"]])
