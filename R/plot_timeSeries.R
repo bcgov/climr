@@ -207,14 +207,15 @@ plot_timeSeries <- function(
       temp.data <- X[GCM %in% gcms, c("PERIOD", "SSP", "RUN", var), with = FALSE]
       plot.ensemble(temp.data,
                     var = var, var2 = var2,
-                    gcm = gcm, refline = refline, showmean = showmean,
+                    refline = refline, showmean = showmean,
                     endlabel = endlabel, element = element,
                     element1 = element1, element2 = element2,
                     compile = compile, yeartime.names = yeartime.names,
                     yeartimes = yeartimes, yeartime = yeartime,
-                    scenarios.selected = scenarios.selected, vscenarios = scenarios,
-                    showrange = showrange, simplify = simplify
-      )
+                    gcm = NULL, pal = pal, pal.scenario = pal.scenario,
+                    pal.gcms = pal.gcms,
+                    scenarios.selected = scenarios.selected, scenarios = scenarios,
+                    showrange = showrange, simplify = simplify)
     } else {
       for (gcm in gcms) { # this plots of individual GCM ensembles.
         temp.data <- X[GCM == gcm, c("PERIOD", "SSP", "RUN", var), with = FALSE]
@@ -226,9 +227,9 @@ plot_timeSeries <- function(
                       compile = compile, yeartime.names = yeartime.names,
                       yeartimes = yeartimes, yeartime = yeartime,
                       gcm = gcm, pal = pal, pal.scenario = pal.scenario,
-                      scenarios.selected = scenarios.selected, vscenarios = scenarios,
-                      showrange = showrange, simplify = simplify
-        )
+                      pal.gcms = pal.gcms,
+                      scenarios.selected = scenarios.selected, scenarios = scenarios,
+                      showrange = showrange, simplify = simplify)
       }
     }
     
@@ -352,8 +353,8 @@ plot_timeSeries <- function(
 #' @importFrom graphics polygon
 #' @importFrom stats smooth.spline
 plot.ensemble <- function(x, var, scenarios.selected, scenarios,
-                          showrange = TRUE, simplify = TRUE, gcm,
-                          pal, pal.scenario, refline = FALSE, showmean = TRUE,
+                          showrange = TRUE, simplify = TRUE, gcm = NULL,
+                          pal, pal.scenario, pal.gcms, refline = FALSE, showmean = TRUE,
                           endlabel = "change", element,
                           compile = TRUE, var2 = NULL, element1, element2,
                           yeartime.names, yeartimes, yeartime) {
@@ -530,7 +531,7 @@ plot.ensemble <- function(x, var, scenarios.selected, scenarios,
 #'
 #' @examples
 colSelect <- function(scenario, gcm, pal.scenario, scenarios, pal, pal.gcms) {
-  if (missing(gcm)) {
+  if (is.null(gcm)) {
     col <- pal.scenario[which(scenarios == scenario)]
   } else {
     col <- if (pal == "gcms") pal.gcms[which(list_gcms() == gcm)] else pal.scenario[which(scenarios == scenario)]
