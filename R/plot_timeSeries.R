@@ -135,8 +135,14 @@ plot_timeSeries <- function(
     stop("package stinepack must be installed to use this function")
   }
   
-    data("variables", envir = environment())
-
+  legopts <- c("bottomright", "bottomleft", "topleft", "topright")
+  if (!legend_pos %in% legopts) {
+    stop("'legend_pos' must be one of: ", 
+         paste(legopts, collapse = ", "))
+  }
+  
+  data("variables", envir = environment())
+  
     # Scenario definitions
     scenarios.selected <- c("historical", ssps)
     scenarios <- c("historical", list_ssps())
