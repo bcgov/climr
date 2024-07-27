@@ -78,7 +78,7 @@ in the example for this function.
 We recommend \code{\link[=downscale]{downscale()}} for most purposes.
 }
 \examples{
-## 
+##
 library(terra)
 xyz <- data.frame(lon = runif(10, -130, -106), lat = runif(10, 37, 50), elev = runif(10), id = 1:10)
 
@@ -88,10 +88,10 @@ thebb <- get_bb(xyz)
 ## get database connection
 dbCon <- data_connect()
 
-# obtain the climatena 1961-1990 normals for the study area. 
+# obtain the climatena 1961-1990 normals for the study area.
 refmap <- input_refmap(dbCon, thebb, reference = "refmap_climatena")
 
-# obtain the low-resolution climate data for a single gcm, 20-year period, and ssp scenario. 
+# obtain the low-resolution climate data for a single gcm, 20-year period, and ssp scenario.
 gcm_raw <- input_gcms(dbCon, thebb, list_gcms()[3], list_ssps()[1], period = list_gcm_periods()[2])
 
 # downscale the GCM data
@@ -100,8 +100,10 @@ gcm_downscaled <- downscale_core(xyz = xyz, refmap = refmap, gcms = gcm_raw, var
 # create an input of uniform warming of 2 degrees Celsius and no precipitation change, for use as a null comparison to the GCM warming
 null <- gcm_raw #' use the gcm input object as a template
 names(null) <- "null_2C"
-names(null[[1]]) <-  sapply(strsplit(names(null[[1]]), "_"), function(x) paste("null2C", x[2], x[3], "NA", "NA", "NA", "NA", sep="_"))
-for(var in names(null[[1]])){ values(null[[1]][[var]]) <- if(length(grep("PPT", var)==1)) 1 else 2 } #' repopulate with the null values
+names(null[[1]]) <- sapply(strsplit(names(null[[1]]), "_"), function(x) paste("null2C", x[2], x[3], "NA", "NA", "NA", "NA", sep = "_"))
+for (var in names(null[[1]])) {
+  values(null[[1]][[var]]) <- if (length(grep("PPT", var) == 1)) 1 else 2
+} #' repopulate with the null values
 
 # downscale the null values for variables of interest
 null_downscaled <- downscale_core(xyz = xyz, refmap = refmap, gcms = null, vars = c("MAT", "PAS"))
