@@ -58,8 +58,8 @@
 #' to indicate the global climate model.
 #' @param yearmarkers logical. Add white points to the observational time series as a visual aid.
 #' @param yearlines logical. Add vertical lines on every fifth year as a visual reference
-#' @param legend_pos character. Position of the legend. Viable options are c("bottomright",
-#'   "bottomleft", "topleft", and "topright").
+#' @param legend_pos character. Position of the legend. Viable options are `c("bottomright",
+#'   "bottomleft", "topleft", "topright")`.
 #'
 #' @return NULL. Draws a plot in the active graphics device.
 #'
@@ -127,6 +127,8 @@ plot_timeSeries <- function(
     yearmarkers = TRUE,
     yearlines = FALSE,
     legend_pos = "topleft") {
+  
+  ## checks
   if (!requireNamespace("scales", quietly = TRUE)) {
     stop("package scales must be installed to use this function")
   } 
@@ -143,10 +145,10 @@ plot_timeSeries <- function(
   
   data("variables", envir = environment())
   
-    # Scenario definitions
-    scenarios.selected <- c("historical", ssps)
-    scenarios <- c("historical", list_ssps())
-    scenario.names <- c("Historical simulations", "SSP1-2.6", "SSP2-4.5", "SSP3-7.0", "SSP5-8.5")
+  # Scenario definitions
+  scenarios.selected <- c("historical", ssps)
+  scenarios <- c("historical", list_ssps())
+  scenario.names <- c("Historical simulations", "SSP1-2.6", "SSP2-4.5", "SSP3-7.0", "SSP5-8.5")
   pal.scenario <- c("gray60", "dodgerblue4", "seagreen", "darkorange3", "darkred") # these roughly match the IPCC standard scenario colours.
   
   # GCM color palette (from https://mk.bcgsc.ca/colorblind/)
@@ -159,11 +161,11 @@ plot_timeSeries <- function(
   seasonmonth.mat <- matrix(monthcodes[c(12, 1:11)], 4, byrow = TRUE)
   seasons <- c("wt", "sp", "sm", "at")
   season.names <- c("Winter", "Spring", "Summer", "Autumn")
-    yeartimes <- c(seasons, monthcodes)
-    yeartime.names <- c(season.names, month.name)
-
-    # ensemble statistics definitions
-    ensstats <- c("ensmin", "ensmax", "ensmean")
+  yeartimes <- c(seasons, monthcodes)
+  yeartime.names <- c(season.names, month.name)
+  
+  # ensemble statistics definitions
+  ensstats <- c("ensmin", "ensmax", "ensmean")
   
   ## Assemble the data that will be used in the plot (for setting the ylim)
   alldata <- X[, if (is.null(var2)) get(var1) else c(get(var1), get(var2))] # a vector of all potential data on the plot for setting the ylim (y axis range)
@@ -172,21 +174,21 @@ plot_timeSeries <- function(
   
   # components of the var
   nums <- if (is.null(var2)) 1 else 1:2 # nums is the set of var numbers (var1 or var2) (this is used later on as well)
-    for (num in nums) {
-      var <- get(paste("var", num, sep = ""))
-      assign(paste0("yeartime", num), as.character(variables[Code == var, "Code_Time"]))
-      assign(paste0("element", num), as.character(variables[Code == var, "Code_Element"]))
-    }
-
-    # PLOT
-    par(mfrow = c(1, 1), mar = mar, mgp = c(1.75, 0.25, 0), cex = cex)
-    # y axis title.
-    if (is.null(var2)) { # if there is no second var
-      ylab <- paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"])
-    } else if (element1 == element2) { # if both variables have the same element
-      ylab <- variables[Code == var1, "Element"]
-    } else if (yeartime1 == yeartime2) { # if both variables have the same yeartime
-      ylab <- paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"])
+  for (num in nums) {
+    var <- get(paste("var", num, sep = ""))
+    assign(paste0("yeartime", num), as.character(variables[Code == var, "Code_Time"]))
+    assign(paste0("element", num), as.character(variables[Code == var, "Code_Element"]))
+  }
+  
+  # PLOT
+  par(mfrow = c(1, 1), mar = mar, mgp = c(1.75, 0.25, 0), cex = cex)
+  # y axis title.
+  if (is.null(var2)) { # if there is no second var
+    ylab <- paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"])
+  } else if (element1 == element2) { # if both variables have the same element
+    ylab <- variables[Code == var1, "Element"]
+  } else if (yeartime1 == yeartime2) { # if both variables have the same yeartime
+    ylab <- paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"])
   } else { # if variables1 and 2 have different elements and yeartimes
     ylab <- paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"])
   }
@@ -196,57 +198,57 @@ plot_timeSeries <- function(
   axis(1, at = seq(1850, 2100, 25), labels = seq(1850, 2100, 25), tck = 0)
   
   num <- 1
-    for (num in nums) {
-      yeartime <- get(paste("yeartime", num, sep = ""))
-      element <- get(paste("element", num, sep = ""))
-      var <- get(paste("var", num, sep = ""))
-
-      if (compile) { # this plots a single envelope for the ensemble as a whole
-        temp.data <- X[GCM %in% gcms, c("PERIOD", "SSP", "RUN", var), with = FALSE]
+  for (num in nums) {
+    yeartime <- get(paste("yeartime", num, sep = ""))
+    element <- get(paste("element", num, sep = ""))
+    var <- get(paste("var", num, sep = ""))
+    
+    if (compile) { # this plots a single envelope for the ensemble as a whole
+      temp.data <- X[GCM %in% gcms, c("PERIOD", "SSP", "RUN", var), with = FALSE]
+      plot.ensemble(temp.data,
+                    var = var, var2 = var2,
+                    gcm = gcm, refline = refline, showmean = showmean,
+                    endlabel = endlabel, element = element,
+                    element1 = element1, element2 = element2,
+                    compile = compile, yeartime.names = yeartime.names,
+                    yeartimes = yeartimes, yeartime = yeartime,
+                    scenarios.selected = scenarios.selected, vscenarios = scenarios,
+                    showrange = showrange, simplify = simplify
+      )
+    } else {
+      for (gcm in gcms) { # this plots of individual GCM ensembles.
+        temp.data <- X[GCM == gcm, c("PERIOD", "SSP", "RUN", var), with = FALSE]
         plot.ensemble(temp.data,
-          var = var, var2 = var2,
-          gcm = gcm, refline = refline, showmean = showmean,
-          endlabel = endlabel, element = element,
-          element1 = element1, element2 = element2,
-          compile = compile, yeartime.names = yeartime.names,
-          yeartimes = yeartimes, yeartime = yeartime,
-          scenarios.selected = scenarios.selected, vscenarios = scenarios,
-          showrange = showrange, simplify = simplify
+                      var = var, var2 = var2,
+                      refline = refline, showmean = showmean,
+                      endlabel = endlabel, element = element,
+                      element1 = element1, element2 = element2,
+                      compile = compile, yeartime.names = yeartime.names,
+                      yeartimes = yeartimes, yeartime = yeartime,
+                      gcm = gcm, pal = pal, pal.scenario = pal.scenario,
+                      scenarios.selected = scenarios.selected, vscenarios = scenarios,
+                      showrange = showrange, simplify = simplify
         )
-      } else {
-        for (gcm in gcms) { # this plots of individual GCM ensembles.
-          temp.data <- X[GCM == gcm, c("PERIOD", "SSP", "RUN", var), with = FALSE]
-          plot.ensemble(temp.data,
-            var = var, var2 = var2,
-            refline = refline, showmean = showmean,
-            endlabel = endlabel, element = element,
-            element1 = element1, element2 = element2,
-            compile = compile, yeartime.names = yeartime.names,
-            yeartimes = yeartimes, yeartime = yeartime,
-            gcm = gcm, pal = pal, pal.scenario = pal.scenario,
-            scenarios.selected = scenarios.selected, vscenarios = scenarios,
-            showrange = showrange, simplify = simplify
-          )
-        }
       }
-
-      # overlay the 5-year lines on top of all polygons
-      if (yearlines) {
-        for (n in seq(1905, 2095, 5)) {
-          lines(c(n, n), c(-9999, 9999), col = "grey", lty = 2)
-        }
+    }
+    
+    # overlay the 5-year lines on top of all polygons
+    if (yearlines) {
+      for (n in seq(1905, 2095, 5)) {
+        lines(c(n, n), c(-9999, 9999), col = "grey", lty = 2)
       }
-
-      if (showObserved) {
-        # add in observations
-        obs.colors <- c("black", "blue", "red")
-        obs.options <- c("climatena", "cru.gpcc") ## , "era5"
-        for (obs.dataset in obs_ts_dataset) { # TODO update this code block once i know how the datasets are identified in the climr output
-          obs.color <- obs.colors[which(obs.options == obs.dataset)]
-          x.obs <- as.numeric(X[DATASET == obs.dataset & PERIOD %in% 1900:2100, "PERIOD"][[1]])
-          y.obs <- X[DATASET == obs.dataset & PERIOD %in% 1900:2100, get(var)]
-          recent.obs <- mean(y.obs[which(x.obs %in% 2014:2023)], na.rm = TRUE)
-          baseline.obs <- mean(y.obs[which(x.obs %in% 1961:1990)], na.rm = TRUE)
+    }
+    
+    if (showObserved) {
+      # add in observations
+      obs.colors <- c("black", "blue", "red")
+      obs.options <- c("climatena", "cru.gpcc") ## , "era5"
+      for (obs.dataset in obs_ts_dataset) { # TODO update this code block once i know how the datasets are identified in the climr output
+        obs.color <- obs.colors[which(obs.options == obs.dataset)]
+        x.obs <- as.numeric(X[DATASET == obs.dataset & PERIOD %in% 1900:2100, "PERIOD"][[1]])
+        y.obs <- X[DATASET == obs.dataset & PERIOD %in% 1900:2100, get(var)]
+        recent.obs <- mean(y.obs[which(x.obs %in% 2014:2023)], na.rm = TRUE)
+        baseline.obs <- mean(y.obs[which(x.obs %in% 1961:1990)], na.rm = TRUE)
         end <- max(which(!is.na(y.obs)))
         lines(x.obs[which(x.obs < 1951)], y.obs[which(x.obs < 1951)], lwd = 3, lty = 3, col = obs.color)
         lines(x.obs[which(x.obs > 1949)], y.obs[which(x.obs > 1949)], lwd = 4, col = obs.color)
@@ -269,16 +271,16 @@ plot_timeSeries <- function(
         if (refline.obs) {
           lines(1961:1990, rep(baseline.obs, 30), lwd = 1, col = obs.color)
           lines(c(1990, 2100), rep(baseline.obs, 2), lty = 2, col = obs.color)
-          }
         }
       }
-      print(num)
     }
-
-    if (showObserved) {
-      # Sources legend
-      a <- if ("climatena" %in% obs_ts_dataset) 1 else NA
-      b <- if ("cru.gpcc" %in% obs_ts_dataset) 2 else NA
+    print(num)
+  }
+  
+  if (showObserved) {
+    # Sources legend
+    a <- if ("climatena" %in% obs_ts_dataset) 1 else NA
+    b <- if ("cru.gpcc" %in% obs_ts_dataset) 2 else NA
     c <- if ("era5" %in% obs_ts_dataset) 3 else NA
     d <- if (length(gcms > 0)) 4 else NA
     s <- !is.na(c(a, b, c, d))
@@ -361,7 +363,7 @@ plot.ensemble <- function(x, var, scenarios.selected, scenarios,
   ensmin.historical <- temp.historical[RUN != "ensembleMean", .(min = min(get(var), na.rm = TRUE)), by = PERIOD][["min"]]
   ensmax.historical <- temp.historical[RUN != "ensembleMean", .(max = max(get(var), na.rm = TRUE)), by = PERIOD][["max"]]
   ensmean.historical <- temp.historical[RUN == "ensembleMean", .(mean = mean(get(var), na.rm = TRUE)), by = PERIOD][["mean"]] # calculate mean using the single-model ensembleMean, to ensure that the mean isn't biased towards models with more runs
-
+  
   for (scenario in scenarios.selected[order(c(1, 4, 5, 3, 2)[which(scenarios %in% scenarios.selected)])][-1]) {
     temp <- x[SSP == scenario, c("PERIOD", "RUN", var), with = FALSE]
     x.temp <- as.numeric(temp[, .(min = min(get(var))), by = PERIOD][["PERIOD"]])
@@ -373,7 +375,7 @@ plot.ensemble <- function(x, var, scenarios.selected, scenarios,
     assign(paste("ensmax", scenario, sep = "."), c(ensmax.historical[length(ensmax.historical)], ensmax.temp)) # add last year of historical runs. this is necessary to get a seamless transition from the historical polygon to the future polygon.
     assign(paste("ensmean", scenario, sep = "."), c(ensmean.historical[length(ensmean.historical)], ensmean.temp)) # add last year of historical runs. this is necessary to get a seamless transition from the historical polygon to the future polygon.
   }
-
+  
   if (showrange) {
     if (isFALSE(simplify)) {
       for (scenario in scenarios.selected[order(c(1, 4, 5, 3, 2)[which(scenarios %in% scenarios.selected)])]) {
@@ -431,13 +433,13 @@ plot.ensemble <- function(x, var, scenarios.selected, scenarios,
       }
     }
   }
-
+  
   if (refline) {
     ref.temp <- mean(ensmean.historical[which(x.historical %in% 1961:1990)])
     lines(1961:1990, rep(ref.temp, 30), lwd = 2)
     lines(c(1990, 2100), rep(ref.temp, 2), lty = 2)
   }
-
+  
   # overlay the ensemble mean lines on top of all polygons
   for (scenario in scenarios.selected[order(c(1, 4, 5, 3, 2)[which(scenarios %in% scenarios.selected)])]) {
     # calculate a spline through the time series (used for plotting and the text warming value)
@@ -507,7 +509,7 @@ plot.ensemble <- function(x, var, scenarios.selected, scenarios,
       }
     }
   }
-
+  
   # Text to identify the time of year
   if (!is.null(var2)) { # if there is no second var
     if (element1 == element2) {
