@@ -3,10 +3,10 @@
 #' @description
 #' `downscale_core()` is the engine for [`downscale()`].
 #' It takes user-supplied high- and low-resolution rasters as input and downscales to user-specified point locations.
-#' While less user-friendly than [`downscale()`], `downscale_core()` is more flexible in that users can supply their 
-#' own raster inputs. For example, a user could supply their own high-resolution climate map, instead of what is 
-#' available in climr, as the input to `refmap`. Another example is in downscaling a uniform warming level, as shown 
-#' in the example for this function. 
+#' While less user-friendly than [`downscale()`], `downscale_core()` is more flexible in that users can supply their
+#' own raster inputs. For example, a user could supply their own high-resolution climate map, instead of what is
+#' available in climr, as the input to `refmap`. Another example is in downscaling a uniform warming level, as shown
+#' in the example for this function.
 #'
 #' @details
 #' We recommend [`downscale()`] for most purposes.
@@ -31,7 +31,7 @@
 #' @param out_spatial logical. Should a SpatVector be returned instead of a
 #'   `data.frame`.
 #' @param plot character. If `out_spatial` is TRUE, the name of a variable to plot.
-#'   If the variable exists in `reference`, then its reference values will also be plotted. 
+#'   If the variable exists in `reference`, then its reference values will also be plotted.
 #'   Otherwise, reference January total precipitation (PPT01) values will be plotted.
 #'   Defaults to no plotting (NULL).
 #'
@@ -49,39 +49,41 @@
 #'
 #' @export
 #' @examples
-#' ## 
+#' ##
 #' library(terra)
 #' xyz <- data.frame(lon = runif(10, -130, -106), lat = runif(10, 37, 50), elev = runif(10), id = 1:10)
 #'
 #' ## get bounding box based on input points
 #' thebb <- get_bb(xyz)
-#' 
+#'
 #' ## get database connection
 #' dbCon <- data_connect()
-#' 
-#' # obtain the climatena 1961-1990 normals for the study area. 
+#'
+#' # obtain the climatena 1961-1990 normals for the study area.
 #' refmap <- input_refmap(dbCon, thebb, reference = "refmap_climatena")
-#' 
-#' # obtain the low-resolution climate data for a single gcm, 20-year period, and ssp scenario. 
+#'
+#' # obtain the low-resolution climate data for a single gcm, 20-year period, and ssp scenario.
 #' gcm_raw <- input_gcms(dbCon, thebb, list_gcms()[3], list_ssps()[1], period = list_gcm_periods()[2])
-#' 
+#'
 #' # downscale the GCM data
 #' gcm_downscaled <- downscale_core(xyz = xyz, refmap = refmap, gcms = gcm_raw, vars = c("MAT", "PAS"))
-#' 
+#'
 #' # create an input of uniform warming of 2 degrees Celsius and no precipitation change, for use as a null comparison to the GCM warming
 #' null <- gcm_raw #' use the gcm input object as a template
 #' names(null) <- "null_2C"
-#' names(null[[1]]) <-  sapply(strsplit(names(null[[1]]), "_"), function(x) paste("null2C", x[2], x[3], "NA", "NA", "NA", "NA", sep="_"))
-#' for(var in names(null[[1]])){ values(null[[1]][[var]]) <- if(length(grep("PPT", var)==1)) 1 else 2 } #' repopulate with the null values
-#' 
+#' names(null[[1]]) <- sapply(strsplit(names(null[[1]]), "_"), function(x) paste("null2C", x[2], x[3], "NA", "NA", "NA", "NA", sep = "_"))
+#' for (var in names(null[[1]])) {
+#'   values(null[[1]][[var]]) <- if (length(grep("PPT", var) == 1)) 1 else 2
+#' } #' repopulate with the null values
+#'
 #' # downscale the null values for variables of interest
 #' null_downscaled <- downscale_core(xyz = xyz, refmap = refmap, gcms = null, vars = c("MAT", "PAS"))
 #' pool::poolClose(dbCon)
-#' 
+#'
 downscale_core <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NULL,
-                      gcm_hist_ts = NULL, obs_ts = NULL, return_refperiod = TRUE,
-                      vars = sort(sprintf(c("PPT_%02d", "Tmax_%02d", "Tmin_%02d"), sort(rep(1:12, 3)))),
-                      ppt_lr = FALSE, nthread = 1L, out_spatial = FALSE, plot = NULL) {
+                           gcm_hist_ts = NULL, obs_ts = NULL, return_refperiod = TRUE,
+                           vars = sort(sprintf(c("PPT_%02d", "Tmax_%02d", "Tmin_%02d"), sort(rep(1:12, 3)))),
+                           ppt_lr = FALSE, nthread = 1L, out_spatial = FALSE, plot = NULL) {
   ## checks
   .checkDwnsclCoreArgs(
     xyz, refmap, gcms, obs, gcm_ssp_ts, gcm_hist_ts,
@@ -363,7 +365,7 @@ downscale_ <- function(xyz, refmap, gcms, gcm_ssp_ts, gcm_hist_ts,
     labels <- nm
     normal_ <- res
     # Reshape (melt / dcast) to obtain final form
-    #ref_dt <- tstrsplit(nm, "_")
+    # ref_dt <- tstrsplit(nm, "_")
     ref_dt <- data.table(VAR = nm)
     # setDT(ref_dt)
     # setnames(ref_dt, c("VAR"))
@@ -469,38 +471,40 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
   # Cropping will reduce the size of data to load in memory
 
   climaterast <- crop(climaterast, ex, snap = "out")
-  gc(reset = TRUE)  ## free unused memory
-  
+  gc(reset = TRUE) ## free unused memory
+
   climaterast <- try(extract(x = climaterast, y = xyz[, .(lon, lat)], method = "bilinear"))
-  
+
   ## we may have run out of memory if there are MANY rasters
-  ## attempt to get only unique raster cell values 
+  ## attempt to get only unique raster cell values
   ## (i.e. xyz may be at higher res than the climaterast leading to extracting the same values many times)
   if (is(climaterast, "try-error")) {
     if (grepl("bad_alloc", climaterast)) {
       message("System is out of memory to extract climate values for the supplied coordinates")
-        stop("Insufficient memory to downscale climate data for these many points/climate layers.\n",
-             "  Try reducing number of points/layers.")
-      }
-  } 
-  
+      stop(
+        "Insufficient memory to downscale climate data for these many points/climate layers.\n",
+        "  Try reducing number of points/layers."
+      )
+    }
+  }
+
   # else { Ceres not sure what this is for but it's always causing fails
   #     stop("Climate value extraction failed.",
   #          "\n   Please contact developers with a reproducible example and the error:\n",
-  #          climaterast) 
+  #          climaterast)
   #   }
-  
-  # Create match set to match with res names
-  
 
-    labels <- vapply(
-      strsplit(nm, "_"),
-      \(x) {
-        paste0(x[2:3], collapse = "_")
-      },
-      character(1)
-    )
-  
+  # Create match set to match with res names
+
+
+  labels <- vapply(
+    strsplit(nm, "_"),
+    \(x) {
+      paste0(x[2:3], collapse = "_")
+    },
+    character(1)
+  )
+
   if (type %in% c("obs")) {
     ## Create match set to match with res names
     labels <- nm
@@ -525,12 +529,12 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
   }
 
   setDT(ref_dt)
-  if (type %in% c("obs","obs_ts")) {
+  if (type %in% c("obs", "obs_ts")) {
     if (timeseries) {
       setnames(ref_dt, c("DATASET", "VAR", "MONTH", "PERIOD"))
       set(ref_dt, j = "variable", value = nm)
     } else {
-      setnames(ref_dt, c("VAR","MONTH"))
+      setnames(ref_dt, c("VAR", "MONTH"))
       set(ref_dt, j = "variable", value = nm)
       set(ref_dt, j = "PERIOD", value = "2001_2020")
     }
@@ -686,7 +690,7 @@ unpackRasters <- function(ras) {
   if (!inherits(xyz$id, colTypes)) {
     stop("'xyz$id' must be an column of type ", paste(colTypes, collapse = ", "))
   }
-  
+
   return(xyz)
 }
 
@@ -698,27 +702,28 @@ unpackRasters <- function(ras) {
 #' @return NULL
 #' @noRd
 .checkDwnsclCoreArgs <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NULL, gcm_hist_ts = NULL,
-                             obs_ts = NULL, return_refperiod = FALSE,
-                             out_spatial = FALSE, plot = NULL, vars = list_vars()) {
-  
+                                 obs_ts = NULL, return_refperiod = FALSE,
+                                 out_spatial = FALSE, plot = NULL, vars = list_vars()) {
   notSupportedVars <- setdiff(vars, list_vars())
   if (length(notSupportedVars)) {
-    stop("The following variables are not supported:", 
-         "\n  ", paste(notSupportedVars, collapse = ", "),
-         "\n  Please see 'list_vars' for list of supported variables.")
+    stop(
+      "The following variables are not supported:",
+      "\n  ", paste(notSupportedVars, collapse = ", "),
+      "\n  Please see 'list_vars' for list of supported variables."
+    )
   }
-  
+
   if (!return_refperiod %in% c(TRUE, FALSE)) {
     stop("'return_refperiod' must be TRUE or FALSE")
   }
   if (!out_spatial %in% c(TRUE, FALSE)) {
     stop("'out_spatial' must be TRUE or FALSE")
   }
-  
+
   plot <- if (!is.null(plot)) {
     match.arg(plot, list_vars())
   }
-  
+
   if (!isTRUE(attr(refmap, "builder") == "climr")) {
     stop(
       "Please use `input_refmap` function to create `refmap`.",
