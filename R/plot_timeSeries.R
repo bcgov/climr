@@ -335,6 +335,7 @@ plot_timeSeries <- function(
 #' @param scenarios  TODO
 #' @param gcm  TODO
 #' @param pal.scenario  TODO
+#' @param pal.gcms TODO
 #' @param element  TODO
 #' @param element1  TODO
 #' @param element2  TODO
