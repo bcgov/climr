@@ -17,6 +17,8 @@ colSelect(scenario, gcm, pal.scenario, scenarios, pal, pal.gcms)
 
 \item{pal}{character. color palette. Options are "scenario", for use when comparing scenarios,
 and "gcms", for use when comparing GCMs.}
+
+\item{pal.gcms}{TODO}
 }
 \description{
 function for specifying the color

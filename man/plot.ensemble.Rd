@@ -49,6 +49,8 @@ and "gcms", for use when comparing GCMs.}
 
 \item{pal.scenario}{TODO}
 
+\item{pal.gcms}{TODO}
+
 \item{refline}{logical. Plot the 1961-1990 reference period mean for the selected var
 and extend this line to the year 2100 as a visual reference.}
 
