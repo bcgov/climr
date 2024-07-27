@@ -201,7 +201,7 @@ plot_timeSeries <- function(
       
       if (compile) { #this plots a single envelope for the ensemble as a whole
         temp.data <-  X[GCM%in%gcms, c("PERIOD", "SSP", "RUN", var), with=FALSE]
-        plot.ensemble(temp.data, var = var, var2 = var2, yeartime = yeartime, 
+        plot.ensemble(temp.data, var = var, var2 = var2,
                       gcm = gcm, refline = refline, showmean = showmean, 
                       endlabel = endlabel, element = element,
                       element1 = element1, element2 = element2,
@@ -212,7 +212,7 @@ plot_timeSeries <- function(
         
       } else for(gcm in gcms){ #this plots of individual GCM ensembles. 
         temp.data <-  X[GCM==gcm, c("PERIOD", "SSP", "RUN", var), with=FALSE]
-        plot.ensemble(temp.data, var = var, var2 = var2, yeartime = yeartime, 
+        plot.ensemble(temp.data, var = var, var2 = var2,
                       refline = refline, showmean = showmean,
                       endlabel = endlabel, element = element,
                       element1 = element1, element2 = element2,
