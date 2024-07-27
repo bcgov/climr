@@ -129,9 +129,12 @@ plot_timeSeries <- function(
     legend_pos = "topleft") {
   if (!requireNamespace("scales", quietly = TRUE)) {
     stop("package scales must be installed to use this function")
-  } else if (!requireNamespace("stinepack", quietly = TRUE)) {
+  } 
+  
+  if (!requireNamespace("stinepack", quietly = TRUE)) {
     stop("package stinepack must be installed to use this function")
-  } else {
+  }
+  
     data("variables", envir = environment())
 
     # Scenario definitions
@@ -312,7 +315,6 @@ plot_timeSeries <- function(
   # mtext(paste(" Created using climr (https://bcgov.github.io/climr/)"), side=1, line=1.5, adj=0.0, font=1, cex=1.1, col="gray")
   
   box()
-  }
 }
 
 
