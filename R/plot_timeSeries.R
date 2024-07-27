@@ -101,6 +101,7 @@
 #' @importFrom scales alpha
 #' @importFrom stinepack stinterp
 #' @importFrom utils data
+#' @importFrom graphics box
 #'
 #' @export
 
@@ -180,13 +181,13 @@ plot_timeSeries <- function(
         } else { #if variables1 and 2 have different elements and yeartimes
           ylab <- paste(yeartime.names[which(yeartimes==yeartime1)], variables[Code==var1, "Element"], "or", variables[Code==var2, "Element"])
         }
-      plot(0, col="white", xlim=c(1900, 2100), ylim=range(if(yfit) visibledata else alldata, na.rm = TRUE), xaxs="i", xaxt="n", tck=0, xlab="", ylab=ylab)
-      axis(1, at=seq(1850,2100,25), labels = seq(1850,2100,25), tck=0)
-      
-      num <- 1
-      for(num in nums){
-        yeartime <- get(paste("yeartime",num,sep=""))
-        element <- get(paste("element",num,sep=""))
+    plot(0, col="white", xlim=c(1900, 2100), ylim=range(if(yfit) visibledata else alldata, na.rm = TRUE), xaxs="i", xaxt="n", tck=0, xlab="", ylab=ylab)
+    axis(1, at=seq(1850,2100,25), labels = seq(1850,2100,25), tck=0)
+    
+    num <- 1
+    for(num in nums){
+      yeartime <- get(paste("yeartime",num,sep=""))
+      element <- get(paste("element",num,sep=""))
       var <- get(paste("var",num,sep=""))
       
       if (compile) { #this plots a single envelope for the ensemble as a whole
