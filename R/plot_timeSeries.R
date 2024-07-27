@@ -340,7 +340,10 @@ plot.ensemble <- function(x, var, scenarios.selected, scenarios,
     if(isFALSE(simplify)){
       for(scenario in scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])]){
         x3 <- get(paste("x", scenario, sep="."))
-        polygon(c(x3, rev(x3)), c(get(paste("ensmin", scenario, sep=".")), rev(get(paste("ensmax", scenario, sep=".")))), col=alpha(colSelect(scenario, gcm), 0.35), border=colSelect(scenario, gcm))
+        polygon(c(x3, rev(x3)), 
+                c(get(paste("ensmin", scenario, sep=".")), rev(get(paste("ensmax", scenario, sep=".")))), 
+                col = alpha(colSelect(scenario, gcm), 0.35), 
+                border = colSelect(scenario, gcm, pal.scenario, scenarios, pal, pal.gcms))
       }
     } else {
       scenarios.select <- scenarios.selected[order(c(1,4,5,3,2)[which(scenarios%in%scenarios.selected)])][-1]
@@ -354,8 +357,18 @@ plot.ensemble <- function(x, var, scenarios.selected, scenarios,
           s.ensmax <- smooth.spline(x4,y.ensmax, df=8) 
           subset.hist <- which(x4%in%x.historical)
           subset.proj <- which(x4%in%get(paste("x", scenario, sep=".")))
-          polygon(c(s.ensmin$x[subset.hist], rev(s.ensmax$x[subset.hist])), c(s.ensmin$y[subset.hist], rev(s.ensmax$y[subset.hist])), col=alpha(if(pal=="gcms") colSelect(scenario, gcm) else pal.scenario[which(scenarios=="historical")], 0.35), border=NA)
-          polygon(c(s.ensmin$x[subset.proj], rev(s.ensmax$x[subset.proj])), c(s.ensmin$y[subset.proj], rev(s.ensmax$y[subset.proj])), col=alpha(colSelect(scenario, gcm), 0.35), border=NA)
+          polygon(c(s.ensmin$x[subset.hist], rev(s.ensmax$x[subset.hist])), 
+                  c(s.ensmin$y[subset.hist], rev(s.ensmax$y[subset.hist])), 
+                  col=alpha(if(pal=="gcms") {
+                    colSelect(scenario, gcm, pal.scenario, scenarios, pal, pal.gcms)
+                  } else {
+                    pal.scenario[which(scenarios=="historical")]
+                  }, 0.35), 
+                  border=NA)
+          polygon(c(s.ensmin$x[subset.proj], rev(s.ensmax$x[subset.proj])),
+                  c(s.ensmin$y[subset.proj], rev(s.ensmax$y[subset.proj])), 
+                  col=alpha(colSelect(scenario, gcm, pal.scenario, scenarios, pal, pal.gcms), 0.35),
+                  border=NA)
         } else { # this second routine uses interpolation splines so that the starting point for all scenarios is the same
           x5 <- c(x.historical, get(paste("x", scenario, sep="."))[-1])
           y.ensmin2 <- c(ensmin.historical, get(paste("ensmin", scenario, sep="."))[-1])
@@ -366,7 +379,10 @@ plot.ensemble <- function(x, var, scenarios.selected, scenarios,
           knots.proj <- which(x5%in%c(seq(2030, 2090, 20), 2100))
           s.ensmin3 <- stinterp(x5[c(knots.hist, knots.proj)],c(s.ensmin$y[knots.hist], s.ensmin2$y[knots.proj]), x5)
           s.ensmax3 <- stinterp(x5[c(knots.hist, knots.proj)],c(s.ensmax$y[knots.hist], s.ensmax2$y[knots.proj]), x5)
-          polygon(c(s.ensmin3$x[subset.proj], rev(s.ensmax3$x[subset.proj])), c(s.ensmin3$y[subset.proj], rev(s.ensmax3$y[subset.proj])), col=alpha(colSelect(scenario, gcm), 0.35), border=NA)
+          polygon(c(s.ensmin3$x[subset.proj], rev(s.ensmax3$x[subset.proj])),
+                  c(s.ensmin3$y[subset.proj], rev(s.ensmax3$y[subset.proj])), 
+                  col=alpha(colSelect(scenario, gcm, pal.scenario, scenarios, pal, pal.gcms), 0.35),
+                  border=NA)
         }
       }
     }
