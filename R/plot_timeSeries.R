@@ -143,16 +143,6 @@ plot_timeSeries <- function(
     # GCM color palette (from https://mk.bcgsc.ca/colorblind/)
     pal.gcms <- c("#004949","#009292","#ff6db6","#ffb6db", "#490092","#006ddb","#b66dff","#6db6ff","#b6dbff", "#920000","#924900","#db6d00","#24ff24")
     
-    # function for specifying the color
-    colSelect <- function(scenario, gcm){
-      if(missing(gcm)){ 
-        col = pal.scenario[which(scenarios==scenario)]
-      } else {
-        col = if(pal=="gcms") pal.gcms[which(list_gcms()==gcm)] else pal.scenario[which(scenarios==scenario)]
-      }
-      return(col)
-    }
-    
     # yeartime definitions
     monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12")
     seasonmonth.mat <- matrix(monthcodes[c(12, 1:11)],4, byrow=TRUE)
@@ -448,4 +438,20 @@ plot.ensemble <- function(x, var, scenarios.selected, scenarios,
     temp <- get("ensmax.historical")
     text(1925,mean(temp[10:40]), label, col="black", pos=3, font=2, cex=1)
   }
+}
+
+
+#' function for specifying the color
+#'
+#' @param scenario TODO
+#' @param gcm TODO
+#'
+#' @examples
+colSelect <- function(scenario, gcm, pal.scenario, scenarios, pal, pal.gcms) {
+  if (missing(gcm)){ 
+    col <- pal.scenario[which(scenarios==scenario)]
+  } else {
+    col <- if(pal=="gcms") pal.gcms[which(list_gcms()==gcm)] else pal.scenario[which(scenarios==scenario)]
+  }
+  return(col)
 }
