@@ -11,9 +11,10 @@ plot.ensemble(
   scenarios,
   showrange = TRUE,
   simplify = TRUE,
-  gcm,
+  gcm = NULL,
   pal,
   pal.scenario,
+  pal.gcms,
   refline = FALSE,
   showmean = TRUE,
   endlabel = "change",
@@ -36,27 +37,35 @@ plot.ensemble(
 
 \item{scenarios}{TODO}
 
-\item{showrange}{TODO}
+\item{showrange}{logical. Plot a shaded region indicating the minimum and maximum of the
+selected ensemble of GCM simulations for each selected scenario.}
 
-\item{simplify}{TODO}
+\item{simplify}{logical. Simplify the ensemble range and mean using a smoothing spline.}
 
 \item{gcm}{TODO}
 
-\item{pal}{TODO}
+\item{pal}{character. color palette. Options are "scenario", for use when comparing scenarios,
+and "gcms", for use when comparing GCMs.}
 
 \item{pal.scenario}{TODO}
 
-\item{refline}{TODO}
+\item{refline}{logical. Plot the 1961-1990 reference period mean for the selected var
+and extend this line to the year 2100 as a visual reference.}
 
-\item{showmean}{TODO}
+\item{showmean}{logical. Plot the ensemble mean time series. Multi-model ensemble means are
+calculated from the mean of simulations for each model.}
 
-\item{endlabel}{TODO}
+\item{endlabel}{character. Add a label to the end of each simulated time series. Options
+are "change", to indicate the change in year 2100 relative to the 1961-1990 baseline, or "gcms"
+to indicate the global climate model.}
 
 \item{element}{TODO}
 
-\item{compile}{TODO}
+\item{compile}{logical. Compile multiple global climate models into a multi-model ensemble.
+If \code{FALSE} the single-model ensembles are plotted individually.}
 
-\item{var2}{TODO}
+\item{var2}{character. A second climate var to plot in combination with \code{var1}.
+options are \code{\link[=list_vars]{list_vars()}}.}
 
 \item{element1}{TODO}
 

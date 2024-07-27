@@ -333,22 +333,15 @@ plot_timeSeries <- function(
 #' @param var TODO
 #' @param scenarios.selected TODO
 #' @param scenarios  TODO
-#' @param showrange  TODO
-#' @param simplify  TODO
 #' @param gcm  TODO
-#' @param pal  TODO
 #' @param pal.scenario  TODO
-#' @param refline  TODO
-#' @param showmean  TODO
-#' @param endlabel  TODO
 #' @param element  TODO
-#' @param compile  TODO
-#' @param var2  TODO
 #' @param element1  TODO
 #' @param element2  TODO
 #' @param yeartime.names  TODO
 #' @param yeartimes  TODO
 #' @param yeartime  TODO
+#' @inheritParams plot_timeSeries
 #'
 #' @importFrom graphics polygon
 #' @importFrom stats smooth.spline
@@ -527,9 +520,8 @@ plot.ensemble <- function(x, var, scenarios.selected, scenarios,
 #' function for specifying the color
 #'
 #' @param scenario TODO
-#' @param gcm TODO
-#'
-#' @examples
+#' @inheritParams plot.ensemble
+
 colSelect <- function(scenario, gcm, pal.scenario, scenarios, pal, pal.gcms) {
   if (is.null(gcm)) {
     col <- pal.scenario[which(scenarios == scenario)]
