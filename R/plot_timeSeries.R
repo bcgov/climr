@@ -479,7 +479,8 @@ plot.ensemble <- function(x, var, scenarios.selected, scenarios,
           } else if (element %in% c("Tave", "Tmin", "Tmax", "MCMT", "MWMT", "EXT", "EMT", "MAT")) {
             change <- round(projected - baseline, 1)
             if (is.na(change) == FALSE) {
-              txt <- ifelse(change > 0, bquote("+" * .(change) * degree * C), bquote(.(change) * degree * C))
+              ## ifelse won't work with bquote.
+              txt <- if (change > 0) bquote("+" * .(change) * degree * C) else bquote(.(change) * degree * C)
               text(2099, projected, txt, col = colSel, pos = 4, font = 2, cex = 1)
             }
           } else if (element %in% c("RH")) {
