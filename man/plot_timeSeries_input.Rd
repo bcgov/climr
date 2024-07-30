@@ -78,7 +78,7 @@ if (FALSE) {
   my_data <- plot_timeSeries_input(my_points)
 
   # use the input to create a plot
-  plot_timeSeries(my_data, variable1 = "Tmin_sm")
+  plot_timeSeries(my_data, var1 = "Tmin_sm")
 }
 #'
 }
