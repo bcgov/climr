@@ -1,8 +1,8 @@
 #' Retrieve reference period climate maps
 #' @description
 #' This function downloads (or retrieves from cache) monthly Tmin, Tmax, and PPT climatologies (maps of long-term average climate)
-#' from a specified data source for the specified bounding box. 
-#' It is intended for use with [`downscale_core()`], but can also be used as stand-alone raster data. 
+#' from a specified data source for the specified bounding box.
+#' It is intended for use with [`downscale_core()`], but can also be used as stand-alone raster data.
 #'
 #' @template dbCon
 #' @template bbox
@@ -27,7 +27,7 @@
 input_refmap <- function(dbCon, bbox, reference = "refmap_climatena", cache = TRUE) {
   ## checks
   if (is(reference, "character")) {
-    #match.arg(reference, list_refmaps()) ## temporarily disable
+    # match.arg(reference, list_refmaps()) ## temporarily disable
   } else {
     if (!is(reference, "SpatRaster")) {
       stop(
@@ -40,7 +40,7 @@ input_refmap <- function(dbCon, bbox, reference = "refmap_climatena", cache = TR
   if (!is(cache, "logical")) {
     stop("please pass a logical value to 'cache'")
   }
-  
+
   if (!is.null(bbox)) {
     .check_bb(bbox)
   }
@@ -83,17 +83,17 @@ input_refmap <- function(dbCon, bbox, reference = "refmap_climatena", cache = TR
   }
 
   if (needDownload) {
-    if(!grepl("normal",reference)){
-      rmap_nm <- switch(reference, 
-                        refmap_prism = "normal_bc", 
-                        refmap_climr = "normal_composite",
-                        refmap_climatena = "normal_na",
-                        auto = "normal_composite"
+    if (!grepl("normal", reference)) {
+      rmap_nm <- switch(reference,
+        refmap_prism = "normal_bc",
+        refmap_climr = "normal_composite",
+        refmap_climatena = "normal_na",
+        auto = "normal_composite"
       )
-    }else{
+    } else {
       rmap_nm <- reference
     }
-    
+
     message("Downloading new data...")
     res <- pgGetTerra(dbCon, rmap_nm, tile = TRUE, boundary = bbox, bands = 1:73)
     names(res) <- c(

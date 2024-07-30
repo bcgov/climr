@@ -37,8 +37,8 @@
 #'   series of observational climate data. Default `NULL`. See [`list_obs_years()`]
 #'  for available years.
 #' @param obs_ts_dataset character. The dataset to use for observational time series data. Options
-#'   are `"climatena"` for the ClimateNA gridded time series or `"cru.gpcc"` for the combined Climatic 
-#'   Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset 
+#'   are `"climatena"` for the ClimateNA gridded time series or `"cru.gpcc"` for the combined Climatic
+#'   Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset
 #'   (for precipitation). Defaults to `NULL`.
 #' @param gcms character. Vector of global climate model names. Options
 #'   are [`list_gcms()`]. Defaults to `NULL`.
@@ -53,7 +53,7 @@
 #'   Defaults to `NULL`.
 #' @template max_run
 #' @param cache logical. Cache data locally? Default `TRUE`
-#' @param ... other arguments passed to [`downscale_core()`]. Namely: `return_refperiod`, 
+#' @param ... other arguments passed to [`downscale_core()`]. Namely: `return_refperiod`,
 #'   `vars`, `out_spatial` and `plot`
 
 #' @return `data.table` of downscaled climate variables for each location.
@@ -77,7 +77,7 @@
 #' ## historic observational time series
 #' vars <- c("PPT", "CMD", "Tave_07")
 #' climate_norms_hist <- downscale(
-#'   xyz = in_xyz, 
+#'   xyz = in_xyz,
 #'   which_refmap = "auto",
 #'   return_refperiod = TRUE,
 #'   obs_periods = "2001_2020",
@@ -96,7 +96,7 @@
 #' ## future projections for annual variables from three models
 #' climate_norms_fut <- downscale(
 #'   xyz = in_xyz, which_refmap = "auto",
-#'   gcms = list_gcms()[c(1,5,6)],
+#'   gcms = list_gcms()[c(1, 5, 6)],
 #'   ssps = list_ssps()[2],
 #'   gcm_periods = list_gcm_periods()[1:2],
 #'   # gcm_ssp_years = 2020:2060,
@@ -105,18 +105,18 @@
 #' )
 #'
 #' @export
-downscale <- function(xyz, which_refmap = "auto", 
-                            obs_periods = NULL, 
-                            obs_years = NULL,
-                            obs_ts_dataset = NULL,
-                            gcms = NULL, ssps = NULL,
-                            gcm_periods = NULL, gcm_ssp_years = NULL,
-                            gcm_hist_years = NULL, max_run = 0L,
-                            cache = TRUE, ...) {
+downscale <- function(xyz, which_refmap = "auto",
+                      obs_periods = NULL,
+                      obs_years = NULL,
+                      obs_ts_dataset = NULL,
+                      gcms = NULL, ssps = NULL,
+                      gcm_periods = NULL, gcm_ssp_years = NULL,
+                      gcm_hist_years = NULL, max_run = 0L,
+                      cache = TRUE, ...) {
   message("Welcome to climr!")
 
   ## checks
-  .checkClimrDwnsclArgs(
+  .checkDwnsclArgs(
     xyz, which_refmap, obs_periods, obs_years, obs_ts_dataset,
     gcms, ssps, gcm_periods, gcm_ssp_years,
     gcm_hist_years, max_run
@@ -163,7 +163,12 @@ downscale <- function(xyz, which_refmap = "auto",
     reference <- input_refmap(dbCon = dbCon, reference = "normal_composite", bbox = thebb, cache = cache)
   } else {
     # message("Normals not specified, using highest resolution available for each point")
-    bc_outline <- rast(system.file("extdata", "wna_outline.tif", package = "climr"))
+    rastFile <- system.file("extdata", "wna_outline.tif", package = "climr")
+    ## if package is loaded with devtools::load_all, file won't be found and we need to pass .libPaths
+    if (rastFile == "") {
+      rastFile <- system.file("extdata", "wna_outline.tif", package = "climr", lib.loc = .libPaths())
+    }
+    bc_outline <- rast(rastFile)
     pnts <- extract(bc_outline, xyz[, .(lon, lat)], method = "simple")
     bc_ids <- xyz[["id"]][!is.na(pnts$PPT_01)]
     if (length(bc_ids) >= 1) {
@@ -182,8 +187,10 @@ downscale <- function(xyz, which_refmap = "auto",
     obs_periods <- input_obs(dbCon, bbox = thebb, period = obs_periods, cache = cache)
   }
   if (!is.null(obs_years)) {
-    obs_years <- input_obs_ts(dbCon, dataset = obs_ts_dataset, 
-                                     bbox = thebb, years = obs_years, cache = cache)
+    obs_years <- input_obs_ts(dbCon,
+      dataset = obs_ts_dataset,
+      bbox = thebb, years = obs_years, cache = cache
+    )
   }
 
   if (!is.null(gcms)) {
@@ -253,7 +260,7 @@ downscale <- function(xyz, which_refmap = "auto",
 
     results_na <- downscale_core(
       xyz = na_xyz,
-      reference = reference,
+      refmap = reference,
       obs = obs_periods,
       obs_ts = obs_years,
       gcms = gcm_ssp_periods,
@@ -277,72 +284,108 @@ downscale <- function(xyz, which_refmap = "auto",
 #'
 #' @return NULL
 #' @noRd
-.checkClimrDwnsclArgs <- function(xyz, which_refmap = NULL, obs_periods = NULL, obs_years = NULL,
-                                  obs_ts_dataset = NULL, gcms = NULL, ssps = list_ssps(), gcm_periods = NULL, gcm_ssp_years = NULL,
-                                  gcm_hist_years = NULL, max_run = 0L) {
-  if(is.null(ssps) & (!is.null(gcm_periods) | !is.null(gcm_ssp_years))){
+.checkDwnsclArgs <- function(xyz, which_refmap = NULL, obs_periods = NULL, obs_years = NULL,
+                             obs_ts_dataset = NULL, gcms = NULL, ssps = list_ssps(), gcm_periods = NULL, gcm_ssp_years = NULL,
+                             gcm_hist_years = NULL, max_run = 0L) {
+  if (is.null(ssps) & (!is.null(gcm_periods) | !is.null(gcm_ssp_years))) {
     stop("ssps must be specified")
   }
-  
-  if(!is.null(ssps))  ssps <- match.arg(ssps, list_ssps(), several.ok = TRUE)
-  
+
+  if (!is.null(ssps)) {
+    notSupportedSsps <- setdiff(ssps, list_ssps())
+    if (length(notSupportedSsps)) {
+      stop(
+        "The following SSPs are not supported:",
+        "\n  ", paste(notSupportedSsps, collapse = ", "),
+        "\n  Please see 'list_ssps' for list of supported SSPs."
+      )
+    }
+  }
+
   if (!is.null(which_refmap)) {
     which_refmap <- match.arg(which_refmap, c("auto", list_refmaps()))
   }
-  
+
   if (!is.null(obs_periods)) {
-    obs_periods <- match.arg(obs_periods, list_obs_periods(), several.ok = TRUE)
-  }
-  
-  if (!is.null(obs_years)) {
-      if (!all(obs_years %in% 1901:2023)) {
-        stop("'obs_years' must be in 1901:2023")
-      }
-  }
-  
-  if(!is.null(obs_ts_dataset)){
-    if(any(!obs_ts_dataset %in% c("cru.gpcc","climatena"))){
-      stop("obs_ts_dataset must be cru.gpcc, climatena, or both")
+    notSupportedPeriods <- setdiff(obs_periods, list_obs_periods())
+    if (length(notSupportedPeriods)) {
+      stop(
+        "The following observed periods are not supported:",
+        "\n  ", paste(notSupportedPeriods, collapse = ", "),
+        "\n  Please see 'list_obs_periods' for list of supported periods."
+      )
     }
-    if(is.null(obs_years)){
+  }
+
+  if (!is.null(obs_years)) {
+    if (!all(obs_years %in% list_obs_years())) {
+      stop(
+        "'obs_years' must be in ", range(list_obs_years())[1], ":",
+        range(list_obs_years())[2]
+      )
+    }
+  }
+
+  if (!is.null(obs_ts_dataset)) {
+    if (any(!obs_ts_dataset %in% c("cru.gpcc", "climatena"))) {
+      stop("obs_ts_dataset must be 'cru.gpcc', 'climatena', or 'both'")
+    }
+    if (is.null(obs_years)) {
       stop("'obs_years' must be specified")
     }
   }
-  
+
   if (!is.null(gcms)) {
-    gcms <- match.arg(gcms, list_gcms(), several.ok = TRUE)
-  }
-  
-  if (!is.null(gcm_periods)) {
-    gcm_periods <- match.arg(gcm_periods, list_gcm_periods(), several.ok = TRUE)
-  }
-  
-  if (!is.null(gcm_ssp_years)) {
-    if (!all(gcm_ssp_years %in% 2015:2100)) {
-      stop("'gcm_ssp_years' must be in 2015:2100")
+    notSupportedGCMs <- setdiff(gcms, list_gcms())
+    if (length(notSupportedGCMs)) {
+      stop(
+        "The following GCMs are not supported:",
+        "\n  ", paste(notSupportedGCMs, collapse = ", "),
+        "\n  Please see 'list_gcms' for list of supported GCMs."
+      )
     }
   }
-  
+
+  if (!is.null(gcm_periods)) {
+    notSupportedGCMPs <- setdiff(gcm_periods, list_gcm_periods())
+    if (length(notSupportedGCMPs)) {
+      stop(
+        "The following projected periods are not supported:",
+        "\n  ", paste(notSupportedGCMPs, collapse = ", "),
+        "\n  Please see 'list_gcm_periods' for list of supported periods."
+      )
+    }
+  }
+
+  if (!is.null(gcm_ssp_years)) {
+    if (!all(gcm_ssp_years %in% list_gcm_ssp_years())) {
+      stop(
+        "'gcm_ssp_years' must be in ", range(list_gcm_ssp_years())[1], ":",
+        range(list_gcm_ssp_years())[2]
+      )
+    }
+  }
+
   msg <- "'max_run' must be 0 or larger"
   if (!inherits(max_run, c("integer", "numeric"))) {
     stop(msg)
   } else if (max_run < 0) {
     stop(msg)
   }
-  
+
   ## check for "silly" parameter combinations
   if (!is.null(gcms) &
-      all(is.null(gcm_hist_years), is.null(gcm_ssp_years), is.null(gcm_periods), is.null(ssps))) {
+    all(is.null(gcm_hist_years), is.null(gcm_ssp_years), is.null(gcm_periods), is.null(ssps))) {
     message("'gcms' will be ignored, since 'gcm_hist_years', 'gcm_ssp_years', 'gcm_periods' and 'ssps' are missing")
   }
-  
+
   if (is.null(gcms) &
-      any(!is.null(gcm_hist_years), !is.null(gcm_ssp_years), !is.null(gcm_periods), !is.null(ssps))) {
+    any(!is.null(gcm_hist_years), !is.null(gcm_ssp_years), !is.null(gcm_periods), !is.null(ssps))) {
     message("'gcms' is missing. 'gcm_hist_years', 'gcm_ssp_years', 'gcm_periods' and 'ssps' will be ignored")
   }
-  
+
   if ((!is.null(max_run) | max_run > 0) &
-      is.null(gcms)) {
+    is.null(gcms)) {
     message("'gcms' is missing. 'max_run' will be ignored")
   }
   return(invisible(NULL))

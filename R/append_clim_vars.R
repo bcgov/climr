@@ -150,43 +150,43 @@ append_clim_vars <- function(dt, vars) {
       set(dt, j = "PET_12", value = calc_PET(v("Tave_12"), v("Tmin_12"), v("Tmax_12"), v("elev")))
     },
     "CMI" = function() {
-      set(dt, j = "CMI", value = (v("PPT") - (v("PET_01") + v("PET_02") + v("PET_03") + v("PET_04") + v("PET_05") + v("PET_06") + v("PET_07") + v("PET_08") + v("PET_09") + v("PET_10") + v("PET_11") + v("PET_12")))/ 10)
+      set(dt, j = "CMI", value = (v("PPT") - (v("PET_01") + v("PET_02") + v("PET_03") + v("PET_04") + v("PET_05") + v("PET_06") + v("PET_07") + v("PET_08") + v("PET_09") + v("PET_10") + v("PET_11") + v("PET_12"))) / 10)
     },
     "CMI_01" = function() {
-      set(dt, j = "CMI_01", value = (v("PPT_01") - v("PET_01"))/ 10)
+      set(dt, j = "CMI_01", value = (v("PPT_01") - v("PET_01")) / 10)
     },
     "CMI_02" = function() {
-      set(dt, j = "CMI_02", value = (v("PPT_02") - v("PET_02"))/ 10)
+      set(dt, j = "CMI_02", value = (v("PPT_02") - v("PET_02")) / 10)
     },
     "CMI_03" = function() {
-      set(dt, j = "CMI_03", value = (v("PPT_03") - v("PET_03"))/ 10)
+      set(dt, j = "CMI_03", value = (v("PPT_03") - v("PET_03")) / 10)
     },
     "CMI_04" = function() {
-      set(dt, j = "CMI_04", value = (v("PPT_04") - v("PET_04"))/ 10)
+      set(dt, j = "CMI_04", value = (v("PPT_04") - v("PET_04")) / 10)
     },
     "CMI_05" = function() {
-      set(dt, j = "CMI_05", value = (v("PPT_05") - v("PET_05"))/ 10)
+      set(dt, j = "CMI_05", value = (v("PPT_05") - v("PET_05")) / 10)
     },
     "CMI_06" = function() {
-      set(dt, j = "CMI_06", value = (v("PPT_06") - v("PET_06"))/ 10)
+      set(dt, j = "CMI_06", value = (v("PPT_06") - v("PET_06")) / 10)
     },
     "CMI_07" = function() {
-      set(dt, j = "CMI_07", value = (v("PPT_07") - v("PET_07"))/ 10)
+      set(dt, j = "CMI_07", value = (v("PPT_07") - v("PET_07")) / 10)
     },
     "CMI_08" = function() {
-      set(dt, j = "CMI_08", value = (v("PPT_08") - v("PET_08"))/ 10)
+      set(dt, j = "CMI_08", value = (v("PPT_08") - v("PET_08")) / 10)
     },
     "CMI_09" = function() {
-      set(dt, j = "CMI_09", value = (v("PPT_09") - v("PET_09"))/ 10)
+      set(dt, j = "CMI_09", value = (v("PPT_09") - v("PET_09")) / 10)
     },
     "CMI_10" = function() {
-      set(dt, j = "CMI_10", value = (v("PPT_10") - v("PET_10"))/ 10)
+      set(dt, j = "CMI_10", value = (v("PPT_10") - v("PET_10")) / 10)
     },
     "CMI_11" = function() {
-      set(dt, j = "CMI_11", value = (v("PPT_11") - v("PET_11"))/ 10)
+      set(dt, j = "CMI_11", value = (v("PPT_11") - v("PET_11")) / 10)
     },
     "CMI_12" = function() {
-      set(dt, j = "CMI_12", value = (v("PPT_12") - v("PET_12"))/ 10)
+      set(dt, j = "CMI_12", value = (v("PPT_12") - v("PET_12")) / 10)
     },
     "NFFD_01" = function() {
       set(dt, j = "NFFD_01", value = calc_NFFD(1, v("Tmin_01")))
@@ -711,11 +711,11 @@ append_clim_vars <- function(dt, vars) {
   }
 
   # Remove unwanted variables
-  j_out <- names(dt)[!names(dt) %in% c("id","DATASET", "GCM", "SSP", "RUN", "PERIOD", vars)]
+  j_out <- names(dt)[!names(dt) %in% c("id", "DATASET", "GCM", "SSP", "RUN", "PERIOD", vars)]
   if (length(j_out)) {
     set(dt, j = j_out, value = NULL)
   }
 
   # Reorder to match vars
-  setcolorder(dt, c(names(dt)[names(dt) %in% c("id","DATASET", "GCM", "SSP", "RUN", "PERIOD")], vars))
+  setcolorder(dt, c(names(dt)[names(dt) %in% c("id", "DATASET", "GCM", "SSP", "RUN", "PERIOD")], vars))
 }
