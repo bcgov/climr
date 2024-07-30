@@ -110,7 +110,7 @@ in_xyz <- data.frame(
 ## historic observational time series
 vars <- c("PPT", "CMD", "Tave_07")
 climate_norms_hist <- downscale(
-  xyz = in_xyz, 
+  xyz = in_xyz,
   which_refmap = "auto",
   return_refperiod = TRUE,
   obs_periods = "2001_2020",
@@ -129,7 +129,7 @@ climate_norms_hist <- downscale(
 ## future projections for annual variables from three models
 climate_norms_fut <- downscale(
   xyz = in_xyz, which_refmap = "auto",
-  gcms = list_gcms()[c(1,5,6)],
+  gcms = list_gcms()[c(1, 5, 6)],
   ssps = list_ssps()[2],
   gcm_periods = list_gcm_periods()[1:2],
   # gcm_ssp_years = 2020:2060,
