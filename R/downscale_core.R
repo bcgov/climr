@@ -499,7 +499,7 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
 
   labels <- vapply(
     strsplit(nm, "_"),
-    \(x) {
+    function(x) {
       paste0(x[2:3], collapse = "_")
     },
     character(1)
