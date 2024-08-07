@@ -261,7 +261,7 @@ process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run, dbnames = dbna
   if (!needDownload) {
     setorder(bnds, -numlay)
 
-    spat_match <- lapply(1:nrow(bnds), FUN = \(x){
+    spat_match <- lapply(1:nrow(bnds), FUN = function(x){
       if (is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]
     })
     spat_match <- spat_match[!sapply(spat_match, is.null)]
@@ -381,7 +381,7 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
     if (!needDownload) {
       setorder(bnds, -numlay)
 
-      spat_match <- lapply(1:nrow(bnds), FUN = \(x){
+      spat_match <- lapply(1:nrow(bnds), FUN = function(x){
         if (is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]
       })
       spat_match <- spat_match[!sapply(spat_match, is.null)]
@@ -498,7 +498,7 @@ process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts
       if (!needDownload) {
         setorder(bnds, -numlay)
 
-        spat_match <- lapply(1:nrow(bnds), FUN = \(x){
+        spat_match <- lapply(1:nrow(bnds), FUN = function(x){
           if (is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]
         })
         spat_match <- spat_match[!sapply(spat_match, is.null)]

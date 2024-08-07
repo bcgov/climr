@@ -196,7 +196,7 @@ process_one_historicts <- function(dataset, years, dbCon, bbox, dbnames = dbname
     if (!needDownload) {
       setorder(bnds, -numlay)
 
-      spat_match <- lapply(1:nrow(bnds), FUN = \(x){
+      spat_match <- lapply(1:nrow(bnds), FUN = function(x){
         if (is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]
       })
       spat_match <- spat_match[!sapply(spat_match, is.null)]
