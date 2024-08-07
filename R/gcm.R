@@ -47,7 +47,7 @@
 #' pool::poolClose(dbCon)
 #' @rdname gcms-input-data
 #' @export
-input_gcms <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(), period = list_gcm_periods(), max_run = 0L, cache = TRUE) {
+input_gcms <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(), period = list_gcm_periods(), max_run = 0L, cache = TRUE, run_nm = NULL) {
   ## checks
   if (!is.null(bbox)) {
     .check_bb(bbox)
@@ -69,7 +69,8 @@ input_gcms <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(
   res <- sapply(gcms, process_one_gcm2,
                 ssps = ssps, period = period,
                 bbox = bbox, dbnames = dbnames, dbCon = dbCon,
-                max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE
+                max_run = max_run, cache = cache, run_nm = run_nm, 
+                USE.NAMES = TRUE, simplify = FALSE
   )
   attr(res, "builder") <- "climr"
   
@@ -239,15 +240,20 @@ list_unique <- function(files, col_num) {
 #'
 #' @return `SpatRaster`
 #' @noRd
-process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run, dbnames = dbnames, dbCon, cache) { ## need to update to all GCMs
+process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run, dbnames = dbnames, dbCon, cache, run_nm = NULL) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   # gcm_nm <- gsub("-", ".", gcm_nm)
   
   rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
   
-  runs <- fread(file.path(rInfoPath, "gcm_periods.csv"))
-  runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssps, run]))
-  sel_runs <- runs[1:(max_run + 1L)]
+  if(is.null(run_nm)){
+    runs <- fread(file.path(rInfoPath, "gcm_periods.csv"))
+    runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssps, run]))
+    sel_runs <- runs[1:(max_run + 1L)]
+  }else{
+    sel_runs <- run_nm
+  }
+  
   
   ## check cached
   needDownload <- TRUE
