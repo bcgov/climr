@@ -4,9 +4,10 @@ library(climr)
 library(stringi)
 library(DBI)
 library(dplyr)
-
+library(pool)
 library(RPostgres)
-conn <- dbConnect(RPostgres::Postgres(),dbname = 'climr',
+conn <- dbPool(RPostgres::Postgres(),
+               dbname = 'climr',
                   host = '146.190.244.244',
                   port = 5432,
                   user = 'postgres',
@@ -145,7 +146,7 @@ create_ts_table <- function(gcm_nm, template_nm, tmp_table_nm, table_nm){
       template <- orig[[1]]
       temp <- 1:ncell(template)
       values(template) <- temp
-      writeRaster(template, paste0("../Common_Files/gcmts_templates/",template_nm))
+      writeRaster(template, paste0("../Common_Files/gcmts_templates/",template_nm), overwrite = TRUE)
     }
     nlays <- nlyr(orig)
     splits <- c(seq(1,nlays,by = 10000),nlays+1)
@@ -171,7 +172,7 @@ create_ts_table <- function(gcm_nm, template_nm, tmp_table_nm, table_nm){
   
 }
 
-
+create_ts_table("CNRM-ESM2-1","cnrm_template.tif","cnrm_temp","cnrm_array")
 q <- paste0("create table gfdl_array as (
         select cellid, ssp, run, year, array_agg(value) as vals
         from (select * from gfdl_temp order by cellid, year, ssp, run, var, month) as a 
@@ -180,6 +181,12 @@ q <- paste0("create table gfdl_array as (
 
 dbExecute(conn, q)
 create_ts_table("GFDL-ESM4","gfdl_template.tif","gfdl_temp","gfdl_array")
+
+##testing
+my_points <- data.frame(lon = c(-127.7300,-127.7500), lat = c(55.34114, 55.25), elev = c(711, 500), id = 1:2)
+ts_dat <- plot_timeSeries_input(my_points, gcms = "GFDL-ESM4")
+plot_timeSeries(ts_dat)
+
 
 orig <- rast("../Common_Files/gcmts_deltas/gcmts.tmin.ACCESS-ESM1-5.deltas.tif")
 template <- orig[[1]]
