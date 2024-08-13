@@ -2,6 +2,22 @@ library(data.table)
 library(terra)
 library(climr)
 
+
+wlr <- rast("../Common_Files/composite_WNA_dem.tif")
+plot(wlr)
+
+dem <- rast("../Common_Files/dem_noram_lowres.tif")
+test <- rast("../Common_Files/climatena_normals/Normal_1961_1990MP/Tmin07.asc")
+plot(test)
+
+my_grid <- as.data.frame(dem, cells = TRUE, xy = TRUE)
+colnames(my_grid) <- c("id", "lon", "lat", "elev") # rename column names to what climr expects
+db <- data_connect()
+bbox <- get_bb(my_grid)
+refmap <- input_refmap(db, bbox)
+
+plot(refmap$Tmax_07)
+
 pts <- data.frame(lon = c(-124.11, -125.11), lat = rep(48.82, 2), elev = rep(25,2), id = 1:2)
 
 bbox <- get_bb(pts[2,])
@@ -10,11 +26,11 @@ test <- normal_input(dbcon, bbox)
 plot(test[[8]])
 
 projected <- climr_downscale(pts[2,], 
-                                                          gcm_models = list_gcm()[c(4)],
-                                                           ssp = list_ssp()[c(1,2)],
-                                                           max_run = 3,
-                                                           gcm_hist_years = 1851:2014,
-                                                           gcm_ts_years = 2015:2100
+                             gcm_models = list_gcm()[c(4)],
+                             ssp = list_ssp()[c(1,2)],
+                             max_run = 3,
+                             gcm_hist_years = 1851:2014,
+                             gcm_ts_years = 2015:2100
                               )
 
 dat <- fread("../climatena/Perioddat/Year_1905.ann")
