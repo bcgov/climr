@@ -155,12 +155,8 @@ downscale <- function(xyz, which_refmap = "auto",
   # xyz <- as.data.frame(xyz)
 
   message("Getting normals...")
-  if (which_refmap == "refmap_climatena") {
-    reference <- input_refmap(dbCon = dbCon, reference = "normal_na", bbox = thebb, cache = cache)
-  } else if (which_refmap == "refmap_prism") {
-    reference <- input_refmap(dbCon = dbCon, reference = "normal_bc", bbox = thebb, cache = cache)
-  } else if (which_refmap == "refmap_climr") {
-    reference <- input_refmap(dbCon = dbCon, reference = "normal_composite", bbox = thebb, cache = cache)
+  if(which_refmap %in% c("refmap_climatena","refmap_prism","refmap_climr")){
+    reference <- input_refmap(dbCon = dbCon, reference = which_refmap, bbox = thebb, cache = cache)
   } else {
     # message("Normals not specified, using highest resolution available for each point")
     rastFile <- system.file("extdata", "wna_outline.tif", package = "climr")
@@ -176,9 +172,9 @@ downscale <- function(xyz, which_refmap = "auto",
       xyz <- xyz[!is.na(pnts$PPT_01), ]
       thebb_bc <- get_bb(xyz)
       message("for BC...")
-      reference <- input_refmap(dbCon = dbCon, reference = "normal_bc", bbox = thebb_bc, cache = cache)
+      reference <- input_refmap(dbCon = dbCon, reference = "refmap_prism", bbox = thebb_bc, cache = cache)
     } else {
-      reference <- input_refmap(dbCon = dbCon, reference = "normal_na", bbox = thebb, cache = cache)
+      reference <- input_refmap(dbCon = dbCon, reference = "refmap_climatena", bbox = thebb, cache = cache)
     }
   }
 
