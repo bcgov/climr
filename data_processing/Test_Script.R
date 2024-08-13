@@ -14,6 +14,7 @@ my_grid <- as.data.frame(dem, cells = TRUE, xy = TRUE)
 colnames(my_grid) <- c("id", "lon", "lat", "elev") # rename column names to what climr expects
 db <- data_connect()
 bbox <- get_bb(my_grid)
+bbox2 <- c(20,14.83,-80,-120)
 refmap <- input_refmap(db, bbox)
 
 plot(refmap$Tmax_07)
