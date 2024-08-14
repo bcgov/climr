@@ -1,10 +1,10 @@
 #' Retrieve observational anomalies.
 #'
 #' @description
-#' `input_obs` produces anomalies of the average observed climate for a given **period**, 
+#' `input_obs` produces anomalies of the average observed climate for a given **period**,
 #' relative to the 1961-1990 reference period. The anomalies are calculated from the `"cru.gpcc"` dataset
-#' which is the Climatic Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset 
-#' (for precipitation). 
+#' which is the Climatic Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset
+#' (for precipitation).
 #'
 #' @return A `list` of `SpatRasters`, each with possibly multiple layers, that can
 #'   be used with [`downscale_core()`]. Each element of the list corresponds to a particular period, and the
@@ -35,7 +35,7 @@ input_obs <- function(dbCon, bbox = NULL, period = list_obs_periods(), cache = T
   if (!is.null(bbox)) {
     .check_bb(bbox)
   }
-  
+
   dbnames2 <- structure(list(
     PERIOD = c("2001_2020"),
     dbname = c("historic_periods")
@@ -126,8 +126,8 @@ input_obs <- function(dbCon, bbox = NULL, period = list_obs_periods(), cache = T
 #' `input_obs_ts` produces anomalies of observed climate for a given **time series** of individual years.
 #'
 #' @template dbCon
-#' @param dataset Character. Which observational dataset to use? Options are `"climatena"` for the 
-#' ClimateNA gridded time series or `"cru.gpcc"` for the combined Climatic Research Unit TS dataset 
+#' @param dataset Character. Which observational dataset to use? Options are `"climatena"` for the
+#' ClimateNA gridded time series or `"cru.gpcc"` for the combined Climatic Research Unit TS dataset
 #' (for temperature) and Global Precipitation Climatology Centre dataset (for precipitation).
 #' @template bbox
 #' @template cache
@@ -151,15 +151,15 @@ input_obs_ts <- function(dbCon, dataset = c("cru.gpcc", "climatena"), bbox = NUL
   if (!is.null(bbox)) {
     .check_bb(bbox)
   }
-  
+
   res <- sapply(dataset, process_one_historicts,
-                years = years,
-                dbnames = dbnames_hist_obs, bbox = bbox, dbCon = dbCon,
-                cache = cache, USE.NAMES = TRUE, simplify = FALSE
+    years = years,
+    dbnames = dbnames_hist_obs, bbox = bbox, dbCon = dbCon,
+    cache = cache, USE.NAMES = TRUE, simplify = FALSE
   )
-  res <- res[!sapply(res, is.null)] ##remove NULL
+  res <- res[!sapply(res, is.null)] ## remove NULL
   attr(res, "builder") <- "climr"
-  
+
   # Return a list of SpatRasters, one element for each model
   return(res)
 
@@ -170,18 +170,18 @@ input_obs_ts <- function(dbCon, dataset = c("cru.gpcc", "climatena"), bbox = NUL
 }
 
 process_one_historicts <- function(dataset, years, dbCon, bbox, dbnames = dbnames_hist_obs, cache) {
-  if(dataset %in% dbnames$dataset){
+  if (dataset %in% dbnames$dataset) {
     ts_name <- dataset
     dbcode <- dbnames$dbname[dbnames$dataset == dataset]
-    
+
     ## check cached
     needDownload <- TRUE
-    
+
     cPath <- file.path(cache_path(), "obs_ts", ts_name)
-    
+
     if (dir.exists(cPath)) {
       bnds <- try(fread(file.path(cPath, "meta_area.csv")), silent = TRUE)
-      
+
       if (is(bnds, "try-error")) {
         ## try to get the data again
         message(
@@ -192,11 +192,11 @@ process_one_historicts <- function(dataset, years, dbCon, bbox, dbnames = dbname
         needDownload <- FALSE
       }
     }
-    
+
     if (!needDownload) {
       setorder(bnds, -numlay)
-      
-      spat_match <- lapply(1:nrow(bnds), FUN = \(x){
+
+      spat_match <- lapply(1:nrow(bnds), FUN = function(x){
         if (is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]
       })
       spat_match <- spat_match[!sapply(spat_match, is.null)]
@@ -209,7 +209,7 @@ process_one_historicts <- function(dataset, years, dbCon, bbox, dbnames = dbname
             break
           }
         }
-        
+
         if (isin) {
           message("Retrieving from cache...")
           hist_rast <- rast(file.path(cPath, paste0(oldid, ".tif")))
@@ -227,20 +227,20 @@ process_one_historicts <- function(dataset, years, dbCon, bbox, dbnames = dbname
         needDownload <- TRUE
       }
     }
-    
+
     if (needDownload) {
-      q <- paste0("select var_nm, period, laynum from ",dbcode,"_layers where period in ('", paste(years, collapse = "','"), "')")
+      q <- paste0("select var_nm, period, laynum from ", dbcode, "_layers where period in ('", paste(years, collapse = "','"), "')")
       # print(q)
       layerinfo <- dbGetQuery(dbCon, q)
       message("Downloading obs anomalies")
       hist_rast <- pgGetTerra(dbCon, dbcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
-      names(hist_rast) <- paste(ts_name,layerinfo$var_nm,layerinfo$period, sep = "_")
-      
+      names(hist_rast) <- paste(ts_name, layerinfo$var_nm, layerinfo$period, sep = "_")
+
       if (cache) {
         message("Caching data...")
         uid <- UUIDgenerate()
         dir.create(cPath, recursive = TRUE, showWarnings = FALSE)
-        
+
         writeRaster(hist_rast, file.path(cPath, paste0(uid, ".tif")))
         rastext <- ext(hist_rast)
         t1 <- data.table(

@@ -28,7 +28,7 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
   # }else{
   #   name1 <- name
   # }
-  
+
   name1 <- name
   nameque <- paste(name1, collapse = ".")
   namechar <- gsub("'", "''", paste(gsub('^"|"$', "", name1), collapse = "."))
