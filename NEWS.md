@@ -1,6 +1,8 @@
 # `climr` 0.1.1
 
 ## Bug Fixes
+* Modified the Hargreaves method for calculation of monthly solar radiation to allow for calculation of Eref and CMD above the arctic circle in a way that matches ClimateNA results. 
+* Fix an edge case in the tiling that resulted in NA values in southern Mexico if full North American extent was queried. 
 * Fixed a bug in `plot_downscale()` that affected colors when `pal = "gcms"` and labels when `endlabel = "gcms"`
 
 # `climr` 0.1.0
