@@ -78,7 +78,10 @@ data <- downscale(xyz = pt,
 plot_timeSeries(data, var1 = "Tmax_08")
 library(abind)
 library(dplyr)
-data <- plot_timeSeries_input(pt, gcms = list_gcms()[5], max_run = 5)
+library(terra)
+data <- plot_timeSeries_input(pt, gcms = list_gcms()[1], max_run = 5)
+data <- downscale(pt, gcms = list_gcms(), gcm_ssp_years = list_gcm_ssp_years(),
+                  ssps = list_ssps()[1:3], max_run = 5L)
 plot_timeSeries(data, var1 = "MAT")
 
 data <- downscale(xyz = pt, 
