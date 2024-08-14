@@ -1,3 +1,11 @@
+# `climr` 0.1.1
+
+## Bug Fixes
+* Modified the Hargreaves method for calculation of monthly solar radiation to allow for calculation of Eref and CMD above the arctic circle in a way that matches ClimateNA results. 
+* Fixed an edge case in the tiling that resulted in NA values in southern Mexico if full North American extent was queried. 
+* Fixed bug in caching where cache would fail due to incorrect folder name in certain cases. 
+* Fixed a bug in `plot_downscale()` that affected colors when `pal = "gcms"` and labels when `endlabel = "gcms"`
+
 # `climr` 0.1.0
 ## Implementation of naming conventions
 * We overhauled the naming of functions, parameters, and options to make them more intuitive and internally consistent. You will need to revise the climr code in your workflows to accommodate these changes. A table of correspondence specifying the changes is located at ./data-raw/namingChanges.csv and is viewable by calling `data(name_changes)`. 

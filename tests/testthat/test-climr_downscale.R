@@ -186,7 +186,6 @@ test_that("test downscale with different argument combinations", {
       args$gcm_hist_years <- eval(parse(text = args$gcm_hist_years))
     }
     
-    #browser()
     out <- try(do.call(downscale, args))
 
     test <- is(out, "data.table")

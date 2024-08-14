@@ -23,8 +23,29 @@ pts <- data.frame(lon = c(-124.11, -125.11), lat = rep(48.82, 2), elev = rep(25,
 
 bbox <- get_bb(pts[2,])
 dbcon <- data_connect()
-test <- normal_input(dbcon, bbox)
+test <- input_refmap(dbcon, bbox)
 plot(test[[8]])
+
+dem <- rast("../Common_Files/dem_noram_lowres.tif")
+test <- rast("../Common_Files/climatena_normals/Normal_1961_1990MP/Tmin07.asc")
+plot(test)
+
+my_grid <- as.data.frame(dem, cells = TRUE, xy = TRUE)
+colnames(my_grid) <- c("id", "lon", "lat", "elev") # rename column names to what climr expects
+climr <- downscale(
+  xyz = my_grid, which_refmap = "refmap_climatena", vars = "MAT"
+)
+
+X <- rast(dem) 
+X[climr[, id]] <- climr$MAT 
+plot(X)
+
+
+db <- data_connect()
+bbox <- get_bb(my_grid)
+bbox2 <- c(20,14.83,-80,-120)
+refmap <- input_refmap(db, bbox)
+
 
 projected <- climr_downscale(pts[2,], 
                              gcm_models = list_gcm()[c(4)],
