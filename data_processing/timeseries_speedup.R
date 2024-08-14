@@ -17,9 +17,10 @@ pts <- data.frame(lon = c(-124.11, -125.11), lat = rep(48.82, 2), elev = rep(25,
 
 bbox <- get_bb(pts)
 dbcon <- data_connect()
-
-res <- input_gcm_ssp(dbcon, bbox, gcms = "GFDL-ESM4", years = 2020:2050, 
-                     max_run = 1L, cache = T, fast = T)
+library(abind)
+library(dplyr)
+res <- input_gcm_ssp(dbcon, bbox, gcms = list_gcms()[2], years = 2020:2050, 
+                     max_run = 5L, cache = T, fast = T)
 
 input_gcm_ssp_fast <- function(dbCon, bbox = NULL, gcm_nm = list_gcms(), ssps = list_ssps(),
                                years = 2020:2030, max_run = 0L, cache = TRUE){

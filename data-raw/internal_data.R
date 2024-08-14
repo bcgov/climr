@@ -71,14 +71,14 @@ dbnames_ts <- data.table(
 
 dbnames_ts_fast <- data.table(
   GCM = c(
-    "GFDL-ESM4"
+    "BCC-CSM2-MR", "CanESM5",
+    "CNRM-ESM2-1", "EC-Earth3", "GISS-E2-1-G", "INM-CM5-0", "GFDL-ESM4",
+    "IPSL-CM6A-LR", "MIROC6", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL"
   ),
-  dbname = c(
-    "gfdl_template"
-  ),
-  dbarray = c(
-    "gfdl_array"
-  )
+  dbname = c("bcc_template","canesm_template","cnrm_template", "ecearth3_template","giss_template","inm_template",
+            "gfdl_template",  "ipsl_template","miroc6_template","mpi_template","mri_template","ukesm_template"),
+  dbarray = c("bcc_array","canesm_array","cnrm_array", "ecearth3_array","giss_array","inm_array",
+              "gfdl_array",  "ipsl_array","miroc6_array","mpi_array","mri_array","ukesm_array")
 )
 
 usethis::use_data(param, dbnames, dbnames_hist, dbnames_ts, dbnames_hist_obs, dbnames_ts_fast,

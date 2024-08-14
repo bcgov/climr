@@ -76,11 +76,13 @@ data <- downscale(xyz = pt,
 )
 
 plot_timeSeries(data, var1 = "Tmax_08")
-data <- plot_timeSeries_input(pt, gcms = list_gcms()[4], vars = "MAP")
-plot_timeSeries(data, var1 = "MAP")
+library(abind)
+library(dplyr)
+data <- plot_timeSeries_input(pt, gcms = list_gcms()[5], max_run = 5)
+plot_timeSeries(data, var1 = "MAT")
 
 data <- downscale(xyz = pt, 
-                        gcm_models = list_gcms()[2],
+                        gcm_models = list_gcms()[5],
                         ssp = list_ssps(),
                         max_run = 10,
                         historic_ts_dataset = c("cru.gpcc", "climatena"), 
