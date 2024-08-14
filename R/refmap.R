@@ -45,11 +45,20 @@ input_refmap <- function(dbCon, bbox, reference = "refmap_climatena", cache = TR
     .check_bb(bbox)
   }
 
-  ## check cached
-  ## check cached
   needDownload <- TRUE
+  if (!grepl("normal", reference)) {
+    rmap_nm <- switch(reference,
+                      refmap_prism = "normal_bc",
+                      refmap_climr = "normal_composite",
+                      refmap_climatena = "normal_na",
+                      auto = "normal_composite"
+    )
+  } else {
+    rmap_nm <- reference
+  }
+  
 
-  cPath <- file.path(cache_path(), "reference", reference)
+  cPath <- file.path(cache_path(), "reference", rmap_nm)
 
   if (dir.exists(cPath)) {
     bnds <- try(fread(file.path(cPath, "meta_data.csv")), silent = TRUE)
@@ -83,17 +92,7 @@ input_refmap <- function(dbCon, bbox, reference = "refmap_climatena", cache = TR
   }
 
   if (needDownload) {
-    if (!grepl("normal", reference)) {
-      rmap_nm <- switch(reference,
-        refmap_prism = "normal_bc",
-        refmap_climr = "normal_composite",
-        refmap_climatena = "normal_na",
-        auto = "normal_composite"
-      )
-    } else {
-      rmap_nm <- reference
-    }
-
+    
     message("Downloading new data...")
     res <- pgGetTerra(dbCon, rmap_nm, tile = TRUE, boundary = bbox, bands = 1:73)
     names(res) <- c(
