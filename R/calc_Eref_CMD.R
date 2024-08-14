@@ -62,7 +62,7 @@ calc_S0_I <- function(d, tm, latitude) {
   XLR <- latitude / 57.2958
   Z <- -tan(XLR) * tan(DEC)
   OM <- -atan(Z / sqrt(-Z * Z + 1)) + pi / 2
-  OM[!is.finite(OM)] <- if(m %in% c(4:9)) 3.14 else 0 # NB this is a modification of Hargreaves program to provide finite values above the arctic circle. 
+  OM[!is.finite(OM)] <- if(m %in% c(4:9)) 3.1 else 0 # NB this is a modification of Hargreaves program to provide finite values above the arctic circle. 
   # CALCULATE THE DAILY EXTRATERRESTRIAL RADIATION IN LANGLEYS/DAY
   DL <- OM / 0.1309
   RAL <- 120 * (DL * sin(XLR) * sin(DEC) + 7.639 * cos(XLR) * cos(DEC) * sin(OM)) / ES
