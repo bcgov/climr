@@ -156,8 +156,10 @@ input_gcm_hist <- function(dbCon, bbox = NULL, gcms = list_gcms(),
 #' @importFrom terra rast writeRaster ext nlyr
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
+#' @importFrom dplyr tbl sql collect mutate
 #' @import uuid
 #' @import data.table
+#' @import abind
 #'
 #' @rdname gcms-input-data
 #' @export
@@ -616,10 +618,6 @@ process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts
 #' @template cache
 #'
 #' @importFrom tools R_user_dir
-#' @import data.table
-#' @import dplyr
-#' @import abind
-#' @import terra
 #'
 #' @return a `SpatRaster`
 #' @noRd
@@ -711,10 +709,11 @@ process_one_gcmts_fast <- function(gcm_nm, ssps, period, max_run, dbnames = dbna
                                   and year in ('",paste(period, collapse = "','"),"') and ssp in ('",paste(ssps, collapse = "','"),"') and run in ('", paste(sel_runs, collapse = "','"), "')")))
         }
         
-        dat <-
-          results %>% 
-          mutate(vals = unnest(vals)) %>%
-          collect()
+        # dat <-
+        #   results %>% 
+        #   mutate(vals = unnest(vals)) %>%
+        #   collect()
+        dat <- collect(mutate(results,vals = unnest(vals)))
         setDT(dat)
         setorder(dat, cellid, year, ssp, run)
         dat[, month := rep(sort(sprintf(c("PPT_%02d", "Tmax_%02d", "Tmin_%02d"), sort(rep(1:12, 3)))), 

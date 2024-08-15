@@ -101,7 +101,7 @@ library(abind)
 library(dplyr)
 library(terra)
 data <- plot_timeSeries_input(pt, gcms = list_gcms()[1], max_run = 5)
-data <- downscale(pt, gcms = list_gcms(), gcm_ssp_years = list_gcm_ssp_years(),
+data <- downscale(pt, gcms = list_gcms()[1], gcm_ssp_years = list_gcm_ssp_years(),
                   ssps = list_ssps()[1:3], max_run = 5L)
 plot_timeSeries(data, var1 = "MAT")
 
