@@ -40,7 +40,9 @@ Imports:
     sf,
     stinepack,
     terra,
-    uuid
+    uuid,
+    dplyr,
+    abind
 Suggests: 
     ggplot2,
     knitr,

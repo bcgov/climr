@@ -13,7 +13,8 @@ input_gcms(
   ssps = list_ssps(),
   period = list_gcm_periods(),
   max_run = 0L,
-  cache = TRUE
+  cache = TRUE,
+  run_nm = NULL
 )
 
 input_gcm_hist(
@@ -32,7 +33,8 @@ input_gcm_ssp(
   ssps = list_ssps(),
   years = 2020:2030,
   max_run = 0L,
-  cache = TRUE
+  cache = TRUE,
+  fast = TRUE
 )
 }
 \arguments{
@@ -57,6 +59,8 @@ are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
 \item{years}{Numeric or character vector in \code{2020:2100}. Defaults to \code{2020:2030}.
 See \code{\link[=list_gcm_ssp_years]{list_gcm_ssp_years()}} for available years.}
+
+\item{fast}{Logical. Should we use the faster method of downloading data from the database using arrays instead of Postgis rasters?}
 }
 \value{
 A \code{list} of \code{SpatRasters}, each with possibly multiple layers, that can
