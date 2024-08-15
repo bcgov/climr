@@ -208,7 +208,8 @@ downscale <- function(xyz, which_refmap = "auto",
         ssps = ssps,
         years = gcm_ssp_years,
         max_run = max_run,
-        cache = cache
+        cache = cache,
+        fast = TRUE
       )
     } else {
       gcm_ssp_ts <- NULL
