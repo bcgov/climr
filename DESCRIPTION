@@ -42,7 +42,8 @@ Imports:
     terra,
     uuid,
     dplyr,
-    abind
+    abind,
+    dbplyr
 Suggests: 
     ggplot2,
     knitr,
