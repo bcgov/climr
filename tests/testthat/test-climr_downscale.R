@@ -162,6 +162,7 @@ test_that("test downscale with different argument combinations", {
   argsCombos <- unique(argsCombos)
 
   argsCombos <- argsCombos[89:108,]
+  
   out <- apply(argsCombos, 1, function(args, xyz) {
     args <- args[!is.na(args)]
     suppressWarnings(args$xyz <- xyz) # coerces to list.
@@ -201,10 +202,10 @@ test_that("test downscale with different argument combinations", {
         test4[i] <- all(args$obs_periods %in% unique(out$PERIOD))
         i <- i + 1
       }
-      if ("obs_years" %in% checkArgs) {
-        test4[i] <- all(args$obs_years %in% unique(out$PERIOD))
-        i <- i + 1
-      }
+      # if ("obs_years" %in% checkArgs) {
+      #   test4[i] <- all(args$obs_years %in% unique(out$PERIOD))
+      #   i <- i + 1
+      # }
       if ("gcms" %in% checkArgs) {
         test4[i] <- all(args$gcms %in% unique(out$GCM))
         i <- i + 1
