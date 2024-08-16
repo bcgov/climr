@@ -1,6 +1,6 @@
 Package: climr
 Title: Downscaling climate data in R
-Version: 0.1.0.9004
+Version: 0.1.1
 Date: 14-08-2024
 Authors@R: c(
     person("Kiri", "Daust", , "kiri.daust@gov.bc.ca", role = c("aut", "cre")),
@@ -40,7 +40,10 @@ Imports:
     sf,
     stinepack,
     terra,
-    uuid
+    uuid,
+    dplyr,
+    abind,
+    dbplyr
 Suggests: 
     ggplot2,
     knitr,

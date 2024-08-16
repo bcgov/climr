@@ -7,31 +7,31 @@ library(analogsea)
 library(ssh)
 
 
-bc_rast <- rast("../Common_Files/composite_wna_wlrdem.tif")[[32]]
-plot(bc_rast)
-bc_rast[!is.na(bc_rast)] <- 1L
-plot(bc_rast)
-bc_rast2 <- terra::aggregate(bc_rast, fact = 4, fun = "max")
-plot(bc_rast2)
-
-writeRaster(bc_rast2, filename = "inst/extdata/wna_outline.tif", datatype = "INT1U")
+# bc_rast <- rast("../Common_Files/composite_wna_wlrdem.tif")[[32]]
+# plot(bc_rast)
+# bc_rast[!is.na(bc_rast)] <- 1L
+# plot(bc_rast)
+# bc_rast2 <- terra::aggregate(bc_rast, fact = 4, fun = "max")
+# plot(bc_rast2)
+# 
+# writeRaster(bc_rast2, filename = "inst/extdata/wna_outline.tif", datatype = "INT1U")
 
 ##process NA normals
 # Load normal files
-dir_normal <- "../Common_Files/colin_climatology/"
+dir_normal <- "../Common_Files/climatena_normals/Normal_1961_1990MP/"
 files <- list.files(dir_normal, full.names = T)
-fnames <- list.files(dir_normal)
+files <- files[grep("Tmin|Tmax|PPT",files)]
 d <- rast(files)
-names(d) <- c("PPT01", "PPT02", "PPT03", "PPT04", "PPT05", "PPT06", "PPT07", "PPT08", "PPT09", "PPT10", 
-              "PPT11", "PPT12", "Tmax01", "Tmax02", "Tmax03", "Tmax04", "Tmax05", "Tmax06", "Tmax07", 
-              "Tmax08", "Tmax09", "Tmax10", "Tmax11", "Tmax12", "Tmin01", "Tmin02", "Tmin03", "Tmin04",
-              "Tmin05", "Tmin06", "Tmin07", "Tmin08", "Tmin09", "Tmin10", "Tmin11", "Tmin12")
+# names(d) <- c("PPT01", "PPT02", "PPT03", "PPT04", "PPT05", "PPT06", "PPT07", "PPT08", "PPT09", "PPT10", 
+#               "PPT11", "PPT12", "Tmax01", "Tmax02", "Tmax03", "Tmax04", "Tmax05", "Tmax06", "Tmax07", 
+#               "Tmax08", "Tmax09", "Tmax10", "Tmax11", "Tmax12", "Tmin01", "Tmin02", "Tmin03", "Tmin04",
+#               "Tmin05", "Tmin06", "Tmin07", "Tmin08", "Tmin09", "Tmin10", "Tmin11", "Tmin12")
 
-dem <- rast("../Common_Files/composite_WNA_dem.tif")
+dem <- rast("../climatena/InputFiles/na4000.asc")
 #r <- r[[grep("PPT|Tmin|Tmax", names(r))]]
 
 lr <- lapse_rate(
-  normal = d,
+  reference = d,
   dem = dem,
   NA_replace = TRUE,
   nthread = 4,
@@ -42,7 +42,7 @@ names(lr) <- paste0("lr_",names(lr))
 # Actual writing
 terra::writeRaster(
   c(d, lr, dem),
-  file.path("../Common_Files/composite_wna_wlrdem.tif"),
+  file.path("../Common_Files/climatena_wlrdem.tif"),
   overwrite = TRUE,
   gdal="COMPRESS=NONE"
 )

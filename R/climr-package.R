@@ -7,12 +7,7 @@ NULL
 
 .onAttach <- function(libname, pkgname) {
   packageStartupMessage(
-    "climr version 0.1.0 includes an overhaul of the naming conventions ",
-    "for variables, functions, parameters, and options. ",
-    "Call `data(name_changes)` for a table specifying the correspondence ",
-    "between old and new names. ",
-    "If you have used a previous version of climr you MUST call `cache_clear()` ",
-    "before using this one."
+    "Welcome to climr 0.1.1!"
   )
 }
 
