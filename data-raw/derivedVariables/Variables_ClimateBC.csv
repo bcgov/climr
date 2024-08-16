@@ -159,7 +159,7 @@ PAS_09,September precipitation as snow,PAS,precipitation as snow,09,September,Mo
 PAS_10,October precipitation as snow,PAS,precipitation as snow,10,October,Monthly,ratio,mm,PAS10
 PAS_11,November precipitation as snow,PAS,precipitation as snow,11,November,Monthly,ratio,mm,PAS11
 PAS_12,December precipitation as snow,PAS,precipitation as snow,12,December,Monthly,ratio,mm,PAS12
-PPT,Precipitation,PPT,Precipitation,,Any,Annual,ratio,mm,PPT
+PPT,Precipitation,PPT,Precipitation,,Any,Annual,ratio,mm,MAP
 PPT_at,Autumn precipitation,PPT,precipitation,at,Autumn,Seasonal,ratio,mm,PPT_at
 PPT_sm,Summer precipitation,PPT,precipitation,sm,Summer,Seasonal,ratio,mm,PPT_sm
 PPT_sp,Spring precipitation,PPT,precipitation,sp,Spring,Seasonal,ratio,mm,PPT_sp
