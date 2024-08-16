@@ -76,14 +76,14 @@ test_that("test dowscale basic and spatial", {
   #     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
   #     out_spatial = TRUE, plot = "CMD"
   #   )
-  # 
+  #
   #   ds_hist_spatial2 <- downscale(
   #     xyz = xyz, which_refmap = "auto",
   #     obs_periods = "2001_2020",
   #     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
   #     out_spatial = TRUE, plot = "CMD"
   #   )
-  # 
+  #
   #   ds_hist_spatial2 <- downscale(
   #     xyz = xyz, which_refmap = "auto",
   #     obs_periods = "2001_2020",
@@ -94,7 +94,7 @@ test_that("test dowscale basic and spatial", {
   #     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
   #     out_spatial = TRUE, plot = "CMD"
   #   )
-  # 
+  #
   #   ds_hist_spatial2 <- downscale(
   #     xyz = xyz, which_refmap = "auto",
   #     obs_periods = "2001_2020",
@@ -110,6 +110,7 @@ test_that("test dowscale basic and spatial", {
 
 test_that("test downscale with different argument combinations", {
   testInit("data.table")
+  testInit("terra")
 
   ## a small no. of points
   xyz <- data.frame(
@@ -207,6 +208,7 @@ test_that("test downscale with different argument combinations", {
       #   i <- i + 1
       # }
       if ("gcms" %in% checkArgs) {
+        message(paste(c(names(out), checkArgs, "\n"),sep = " "))
         test4[i] <- all(args$gcms %in% unique(out$GCM))
         i <- i + 1
       }
