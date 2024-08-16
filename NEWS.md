@@ -1,6 +1,7 @@
 # `climr` 0.1.1
 
 ## Bug Fixes
+* Redesigned the database to substantially improve speed of downloading gcm ssp timeseries, especially for a small number of points.
 * Modified the Hargreaves method for calculation of monthly solar radiation to allow for calculation of Eref and CMD above the arctic circle in a way that matches ClimateNA results. 
 * Fixed an edge case in the tiling that resulted in NA values in southern Mexico if full North American extent was queried. 
 * Fixed bug in caching where cache would fail due to incorrect folder name in certain cases. 
