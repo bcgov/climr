@@ -159,7 +159,7 @@ PAS_09,September precipitation as snow,PAS,precipitation as snow,09,September,Mo
 PAS_10,October precipitation as snow,PAS,precipitation as snow,10,October,Monthly,ratio,mm,PAS10
 PAS_11,November precipitation as snow,PAS,precipitation as snow,11,November,Monthly,ratio,mm,PAS11
 PAS_12,December precipitation as snow,PAS,precipitation as snow,12,December,Monthly,ratio,mm,PAS12
-PPT,Precipitation,PPT,Precipitation,,Any,Annual,ratio,mm,PPT
+PPT,Precipitation,PPT,Precipitation,,Any,Annual,ratio,mm,MAP
 PPT_at,Autumn precipitation,PPT,precipitation,at,Autumn,Seasonal,ratio,mm,PPT_at
 PPT_sm,Summer precipitation,PPT,precipitation,sm,Summer,Seasonal,ratio,mm,PPT_sm
 PPT_sp,Spring precipitation,PPT,precipitation,sp,Spring,Seasonal,ratio,mm,PPT_sp
@@ -194,7 +194,7 @@ RH_10,October relative humidity,RH,relative humidity,10,October,Monthly,interval
 RH_11,November relative humidity,RH,relative humidity,11,November,Monthly,interval,%,RH11
 RH_12,December relative humidity,RH,relative humidity,12,December,Monthly,interval,%,RH12
 SHM,Summer heat:moisture index,SHM,Summer heat:moisture index,,Annual,Annual,ratio,,SHM
-Tave,Mean temperature,Tave,Mean temperature,,Any,Annual,interval,deg. C,Tave
+Tave,Mean temperature,Tave,Mean temperature,,Any,Annual,interval,deg. C,MAT
 Tave_at,Autumn mean temperature,Tave,mean temperature,at,Autumn,Seasonal,interval,deg. C,Tave_at
 Tave_sm,Summer mean temperature,Tave,mean temperature,sm,Summer,Seasonal,interval,deg. C,Tave_sm
 Tave_sp,Spring mean temperature,Tave,mean temperature,sp,Spring,Seasonal,interval,deg. C,Tave_sp
@@ -212,7 +212,7 @@ Tave_10,October mean temperature,Tave,mean temperature,10,October,Monthly,interv
 Tave_11,November mean temperature,Tave,mean temperature,11,November,Monthly,interval,deg. C,Tave11
 Tave_12,December mean temperature,Tave,mean temperature,12,December,Monthly,interval,deg. C,Tave12
 TD,Continentality (MWMT-MCMT),TD,Continentality (MWMT-MCMT),,Annual,Annual,interval,deg. C,TD
-Tmax,Mean daily maximum temperature,Tmax,Mean daily maximum temperature,,Any,Annual,interval,deg. C,Tmax
+Tmax,Mean daily maximum temperature,Tmax,Mean daily maximum temperature,,Any,Annual,interval,deg. C,
 Tmax_at,Autumn mean daily maximum temperature,Tmax,mean daily maximum temperature,at,Autumn,Seasonal,interval,deg. C,Tmax_at
 Tmax_sm,Summer mean daily maximum temperature,Tmax,mean daily maximum temperature,sm,Summer,Seasonal,interval,deg. C,Tmax_sm
 Tmax_sp,Spring mean daily maximum temperature,Tmax,mean daily maximum temperature,sp,Spring,Seasonal,interval,deg. C,Tmax_sp
@@ -229,7 +229,7 @@ Tmax_09,September mean daily maximum temperature,Tmax,mean daily maximum tempera
 Tmax_10,October mean daily maximum temperature,Tmax,mean daily maximum temperature,10,October,Monthly,interval,deg. C,Tmax10
 Tmax_11,November mean daily maximum temperature,Tmax,mean daily maximum temperature,11,November,Monthly,interval,deg. C,Tmax11
 Tmax_12,December mean daily maximum temperature,Tmax,mean daily maximum temperature,12,December,Monthly,interval,deg. C,Tmax12
-Tmin,Mean daily minimum temperature,Tmin,Mean daily minimum temperature,,Any,Annual,interval,deg. C,Tmin
+Tmin,Mean daily minimum temperature,Tmin,Mean daily minimum temperature,,Any,Annual,interval,deg. C,
 Tmin_at,Autumn mean daily minimum temperature,Tmin,mean daily minimum temperature,at,Autumn,Seasonal,interval,deg. C,Tmin_at
 Tmin_sm,Summer mean daily minimum temperature,Tmin,mean daily minimum temperature,sm,Summer,Seasonal,interval,deg. C,Tmin_sm
 Tmin_sp,Spring mean daily minimum temperature,Tmin,mean daily minimum temperature,sp,Spring,Seasonal,interval,deg. C,Tmin_sp

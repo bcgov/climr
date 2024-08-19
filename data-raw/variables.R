@@ -2,6 +2,6 @@
 
 library(data.table)
 
-variables <- fread("data-raw/derivedVariables/Variables_ClimateBC.csv")
+variables <- fread("data-raw/derivedVariables/variables.csv")
 
 usethis::use_data(variables, overwrite = TRUE, internal = FALSE)

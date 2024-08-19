@@ -1,20 +1,60 @@
 library(data.table)
+
 library(terra)
 library(climr)
+
+
+wlr <- rast("../Common_Files/composite_WNA_dem.tif")
+plot(wlr)
+
+dem <- rast("../Common_Files/dem_noram_lowres.tif")
+test <- rast("../Common_Files/climatena_normals/Normal_1961_1990MP/Tmin07.asc")
+plot(test)
+
+my_grid <- as.data.frame(dem, cells = TRUE, xy = TRUE)
+colnames(my_grid) <- c("id", "lon", "lat", "elev") # rename column names to what climr expects
+db <- data_connect()
+bbox <- get_bb(my_grid)
+bbox2 <- c(20,14.83,-80,-120)
+refmap <- input_refmap(db, bbox)
+
+plot(refmap$Tmax_07)
 
 pts <- data.frame(lon = c(-124.11, -125.11), lat = rep(48.82, 2), elev = rep(25,2), id = 1:2)
 
 bbox <- get_bb(pts[2,])
 dbcon <- data_connect()
-test <- normal_input(dbcon, bbox)
+test <- input_refmap(dbcon, bbox)
 plot(test[[8]])
 
+dem <- rast("../Common_Files/dem_noram_lowres.tif")
+test <- rast("../Common_Files/climatena_normals/Normal_1961_1990MP/Tmin07.asc")
+plot(test)
+
+my_grid <- as.data.frame(dem, cells = TRUE, xy = TRUE)
+colnames(my_grid) <- c("id", "lon", "lat", "elev") # rename column names to what climr expects
+climr <- downscale(
+  xyz = my_grid, which_refmap = "refmap_climatena", gcms = list_gcms()[1], ssps = list_ssps()[1:3], 
+  gcm_periods = list_gcm_periods(), run_nm = "r1i1p1f1", vars = "MAT"
+)
+
+X <- rast(dem) 
+X[climr[, id]] <- climr$MAT 
+plot(X)
+
+
+db <- data_connect()
+bbox <- get_bb(my_grid)
+bbox2 <- c(20,14.83,-80,-120)
+refmap <- input_refmap(db, bbox)
+
+
 projected <- climr_downscale(pts[2,], 
-                                                          gcm_models = list_gcm()[c(4)],
-                                                           ssp = list_ssp()[c(1,2)],
-                                                           max_run = 3,
-                                                           gcm_hist_years = 1851:2014,
-                                                           gcm_ts_years = 2015:2100
+                             gcm_models = list_gcm()[c(4)],
+                             ssp = list_ssp()[c(1,2)],
+                             max_run = 3,
+                             gcm_hist_years = 1851:2014,
+                             gcm_ts_years = 2015:2100
                               )
 
 dat <- fread("../climatena/Perioddat/Year_1905.ann")
@@ -58,12 +98,18 @@ data <- downscale(xyz = pt,
                   vars = list_vars()
 )
 
+"#E404D1"
 plot_timeSeries(data, var1 = "Tmax_08")
-data <- plot_timeSeries_input(pt, gcms = list_gcms()[4], vars = "MAP")
-plot_timeSeries(data, var1 = "MAP")
+library(abind)
+library(dplyr)
+library(terra)
+data <- plot_timeSeries_input(pt, gcms = list_gcms()[1], max_run = 5)
+data <- downscale(pt, gcms = list_gcms()[1], gcm_ssp_years = list_gcm_ssp_years(),
+                  ssps = list_ssps()[1:3], max_run = 5L)
+plot_timeSeries(data, var1 = "MAT")
 
 data <- downscale(xyz = pt, 
-                        gcm_models = list_gcms()[2],
+                        gcm_models = list_gcms()[5],
                         ssp = list_ssps(),
                         max_run = 10,
                         historic_ts_dataset = c("cru.gpcc", "climatena"), 

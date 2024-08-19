@@ -27,8 +27,8 @@
 #' @param period_focal character. The 20-year period for which to plot the ensemble
 #'   detail. options are `list_gcm_periods()`.
 #' @param ssp character. A single SSP-RCP scenario (representative concentration pathways paired with shared socioeconomic pathways).
-#'   Options are [`list_ssps()`]. Defaults to SSP2-4.5. 
-#' @param obs_period character. A single 20-year period for observed climate data. 
+#'   Options are [`list_ssps()`]. Defaults to SSP2-4.5.
+#' @param obs_period character. A single 20-year period for observed climate data.
 #'   Options are `list_obs_periods()`.
 #' @inheritParams downscale
 #' @param legend_pos character. Position of the legend. Options are `c("bottomright",

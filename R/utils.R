@@ -37,13 +37,13 @@ is_in_bbox <- function(newbb, oldbb) {
 get_bb <- function(in_xyz) {
   .checkXYZ(copy(in_xyz))
   thebb <- c(max(in_xyz[, "lat"]), min(in_xyz[, "lat"]), max(in_xyz[, "lon"]), min(in_xyz[, "lon"]))
-  
+
   if (any(is.na(thebb))) {
     stop("Couldn't guess bounding box. Are there NA's in 'xyz'?")
   }
-  
+
   .check_bb(thebb)
-  
+
   return(thebb)
 }
 
@@ -54,15 +54,17 @@ get_bb <- function(in_xyz) {
 #'
 #' @return NULL
 #' @noRd
-.check_bb <- function (bbox) {
+.check_bb <- function(bbox) {
   ## check projection
-  minLon <- -179.0625 
+  minLon <- -179.0625
   maxLon <- -51.5625
   minLat <- 14.375
   maxLat <- 83.125
-  
-  if (any((bbox[4] < minLon), (bbox[3] > maxLon),
-      (bbox[2] < minLat), (bbox[1] > maxLat))) {
-    stop("lon and lat are not in lat/long projection EPSG:4326")
+
+  if (any(
+    (bbox[4] < minLon), (bbox[3] > maxLon),
+    (bbox[2] < minLat), (bbox[1] > maxLat)
+  )) {
+    stop("input fields lon and lat are not in lat/long coordinates, or extent is outside ext(-179.0625, -51.5625, 14.375, 83.125)")
   }
 }
