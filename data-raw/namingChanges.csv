@@ -51,3 +51,5 @@ function name,,gcm_hist_input(),input_gcm_hist()
 function name,,gcm_ts_input(),input_gcm_ssp()
 function name,,historic_input(),input_obs()
 function name,,historic_input_ts(),input_obs_ts()
+variable,,DD_0,DDsub0
+variable,,DD_18,DDsub18
