@@ -12,7 +12,7 @@
 \alias{list_obs_years}
 \alias{list_gcm_ssp_years}
 \alias{list_gcm_hist_years}
-\title{List available runs, global circulation models, periods and climate scenarios}
+\title{List available runs, global climate models (GCMs), time periods and scenarios (SSPs)}
 \usage{
 list_gcms()
 
@@ -39,7 +39,7 @@ list_gcm_hist_years()
 \arguments{
 \item{gcm}{Name of GCM}
 
-\item{ssp}{Name of scenario}
+\item{ssp}{Name of scenario Must be one of the elements in list_ssps().}
 
 \item{set}{character. One of All, Monthly, Seasonal, Annual, or any combination thereof. Defaults to "All".}
 
@@ -49,27 +49,27 @@ list_gcm_hist_years()
 a character vector.
 }
 \description{
-\code{list_gcms} lists available global circulation models.
+\code{list_gcms} lists available global climate models.
 
-\code{list_ssps} lists available shared socioeconomic pathways.
+\code{list_ssps} lists available greenhouse gas concentration scenarios (SSP-RCPs).
 
-\code{list_gcm_periods} lists available periods.
+\code{list_gcm_periods} lists available 20-year normal periods for GCM simulations.
 
 lists available runs for a given GCM/ssp.
 
-lists available runs for a given historic GCM.
+lists available runs from the historical simulation (1851-2014) for a specified GCM.
 
 \code{list_refmaps} lists available reference maps of gridded climate normals
 
-\code{list_obs_periods} lists available observational periods
+\code{list_obs_periods} lists available normal periods for observational climate data
 
-\code{list_vars} lists climate variables
+\code{list_vars} lists available climate variables
 
-\code{list_obs_years} lists available years for obs time series
+\code{list_obs_years} lists available years for time series of observational climate data
 
-\code{list_gcm_ssp_years} lists available years for future projections' time series
+\code{list_gcm_ssp_years} lists available years for time series of global climate model future simulations
 
-\code{list_gcm_hist_years} lists available years for obs projections' time series
+\code{list_gcm_hist_years} lists available years for time series of global climate model historical simulations
 }
 \details{
 Currently available reference maps of gridded climate normals (\code{list_refmaps()}) are:
