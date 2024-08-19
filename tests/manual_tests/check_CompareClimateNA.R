@@ -27,6 +27,9 @@ data("variables")
 figDir <- tempdir()
 
 vars <- list_vars()
+vars <- vars[-which(vars%in%c("Tave", "Tmin", "Tmax"))]
+
+# for(var in vars[grep("NFFD", vars)]){
 for(var in vars){
   png(filename=paste(figDir, "/climrVclimna", var, "png",sep="."), type="cairo", units="in", width=6.5, height=2, pointsize=10, res=600)
   
@@ -43,9 +46,20 @@ for(var in vars){
   X[climr[, id]] <- data_climna
   plot(X, main=paste("ClimateNA", var_climna), axes=F)
   
-  var_type <- if(length(grep("Eref|CMD|PPT|PAS|DD|AHM|MSP|MAP", var))>0) "ratio" else "interval"
-  X[climna[, id1]] <- if(var_type=="interval") data_climna-data_climr else data_climna/data_climr 
-  plot(X, axes=F, main= if(var_type=="interval") "Difference (ClimateNA - climr)" else "Difference (ClimateNA/climr)")
+  # var_type <- if(length(grep("Eref|CMD|PPT|PAS|DD|AHM|MSP|MAP", var))>0) "ratio" else "interval"
+  var_type <- "interval"
+  diff <- if(var_type=="interval") data_climna-data_climr else data_climna/data_climr 
+  plotrange <- quantile(diff, c(0.001, 0.999), na.rm=T)
+  ceiling <- max(abs(plotrange))
+  pal <- colorRampPalette(c("#67001F", "#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#F7F7F7", "#D1E5F0", "#92C5DE", "#4393C3", "#2166AC", "#053061"))(99)
+  X[climna[, id1]] <- diff
+  plot(X, axes=F, range= if(is.finite(ceiling)) c(-ceiling, ceiling) else NULL, main= if(var_type=="interval") "Difference (ClimateNA - climr)" else "Difference (ClimateNA/climr)", col=pal)
+  
+  # library(scales)
+  # par(mar=c(3,3,2,2))
+  # hist_climr <- hist(data_climr, xlab=var, main="")
+  # hist(data_climna, add=T, col=alpha("dodgerblue", 0.5), breaks=hist_climr$breaks)
+  # legend("topright", legend=c("climr", "ClimateNA"), fill=c("gray", alpha("dodgerblue", 0.5)), bty="n")
   
   print(var)
   dev.off()
