@@ -14,6 +14,7 @@
 #' @template period
 #' @template max_run
 #' @template cache
+#' @template run_nm
 #'
 #' @details
 #' This function returns a list with one slot for each requested GCM. Rasters inside the list contain anomalies for all requested SSPs, runs, and periods.
@@ -69,7 +70,8 @@ input_gcms <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(
   res <- sapply(gcms, process_one_gcm2,
     ssps = ssps, period = period,
     bbox = bbox, dbnames = dbnames, dbCon = dbCon,
-    max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE
+    max_run = max_run, cache = cache, run_nm = run_nm, 
+    USE.NAMES = TRUE, simplify = FALSE
   )
   attr(res, "builder") <- "climr"
 
@@ -89,6 +91,7 @@ input_gcms <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(
 #'   See [`list_gcm_hist_years()`] for available years.
 #' @template max_run
 #' @template cache
+#' @template run_nm
 #'
 #' @seealso [list_gcm_periods()], [`list_gcm_periods()`]
 #'
@@ -107,7 +110,7 @@ input_gcms <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(
 #' @rdname gcms-input-data
 #' @export
 input_gcm_hist <- function(dbCon, bbox = NULL, gcms = list_gcms(),
-                           years = 1901:2014, max_run = 0L, cache = TRUE) {
+                           years = 1901:2014, max_run = 0L, cache = TRUE, run_nm = NULL) {
   ## checks
   if (!is.null(bbox)) {
     .check_bb(bbox)
@@ -117,7 +120,7 @@ input_gcm_hist <- function(dbCon, bbox = NULL, gcms = list_gcms(),
   res <- sapply(gcms, process_one_gcm3,
     years = years,
     dbCon = dbCon, bbox = bbox, dbnames = dbnames_hist,
-    max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE
+    max_run = max_run, cache = cache, run_nm = run_nm, USE.NAMES = TRUE, simplify = FALSE
   )
   res <- res[!sapply(res, is.null)] ## remove NULL
   attr(res, "builder") <- "climr"
@@ -144,6 +147,7 @@ input_gcm_hist <- function(dbCon, bbox = NULL, gcms = list_gcms(),
 #'   See [`list_gcm_ssp_years()`] for available years.
 #' @template max_run
 #' @template cache
+#' @template run_nm
 #' @param fast Logical. Should we use the faster method of downloading data from the database using arrays instead of Postgis rasters?
 #'
 #' @return A `list` of `SpatRasters`, each with possibly multiple layers, that can
@@ -164,7 +168,7 @@ input_gcm_hist <- function(dbCon, bbox = NULL, gcms = list_gcms(),
 #' @rdname gcms-input-data
 #' @export
 input_gcm_ssp <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(),
-                         years = 2020:2030, max_run = 0L, cache = TRUE, fast = TRUE) {
+                         years = 2020:2030, max_run = 0L, cache = TRUE, run_nm = NULL, fast = TRUE) {
 
   ## checks
   if (!is.null(bbox)) {
@@ -177,13 +181,13 @@ input_gcm_ssp <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ss
     res <- sapply(gcms, process_one_gcmts_fast,
                   ssps = ssps, period = years,
                   dbnames = dbnames_ts_fast, bbox = bbox, dbCon = dbCon,
-                  max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE
+                  max_run = max_run, cache = cache, run_nm = run_nm, USE.NAMES = TRUE, simplify = FALSE
     )
   }else{
     res <- sapply(gcms, process_one_gcm4,
                   ssps = ssps, period = years,
                   dbnames = dbnames_ts, bbox = bbox, dbCon = dbCon,
-                  max_run = max_run, cache = cache, USE.NAMES = TRUE, simplify = FALSE
+                  max_run = max_run, cache = cache, run_nm = run_nm, USE.NAMES = TRUE, simplify = FALSE
     )
   }
   
@@ -237,23 +241,27 @@ list_unique <- function(files, col_num) {
 #'   corresponding names in the PostGIS data base.  See climr:::dbnames
 #' @template dbCon
 #' @template cache
+#' @template run_nm
 #'
 #' @importFrom tools R_user_dir
 #' @importFrom data.table fread
 #'
 #' @return `SpatRaster`
 #' @noRd
-process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run, dbnames = dbnames, dbCon, cache, run_nm = NULL) { ## need to update to all GCMs
+process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run, dbnames = dbnames, dbCon, cache, run_nm) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   # gcm_nm <- gsub("-", ".", gcm_nm)
 
   rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
   
+  runs <- fread(file.path(rInfoPath, "gcm_periods.csv"))
+  runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssps, run]))
   if(is.null(run_nm)){
-    runs <- fread(file.path(rInfoPath, "gcm_periods.csv"))
-    runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssps, run]))
     sel_runs <- runs[1:(max_run + 1L)]
   }else{
+    if(!run_nm %in% runs){
+      stop("Run ", run_nm, "doesn't exist for this GCM.")
+    }
     sel_runs <- run_nm
   }
   
@@ -362,13 +370,14 @@ process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run, dbnames = dbna
 #' @param dbnames `data.frame` with the list of available GCMs (historical projections)
 #'   and their corresponding names in the PostGIS data base. See climr:::dbnames_hist
 #' @template cache
+#' @template run_nm
 #'
 #' @importFrom tools R_user_dir
 #' @importFrom data.table fread
 #'
 #' @return `SpatRaster`
 #' @noRd
-process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbnames_hist, cache) { ## need to update to all GCMs
+process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbnames_hist, cache, run_nm) { ## need to update to all GCMs
   if (gcm_nm %in% dbnames$GCM) {
     gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
 
@@ -376,7 +385,15 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
 
     runs <- fread(file.path(rInfoPath, "gcm_hist.csv"))
     runs <- sort(unique(runs[mod == gcm_nm, run]))
-    sel_runs <- runs[1:(max_run + 1L)]
+    if(is.null(run_nm)){
+      sel_runs <- runs[1:(max_run + 1L)]
+    }else{
+      if(!run_nm %in% runs){
+        stop("Run ", run_nm, "doesn't exist for this GCM.")
+      }
+      sel_runs <- run_nm
+    }
+    
 
     ## check cached
     needDownload <- TRUE
@@ -475,13 +492,14 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
 #' @template bbox
 #' @template dbCon
 #' @template cache
+#' @template run_nm
 #'
 #' @importFrom tools R_user_dir
 #' @importFrom data.table fread
 #'
 #' @return a `SpatRaster`
 #' @noRd
-process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache) { ## need to update to all GCMs
+process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache, run_nm) { ## need to update to all GCMs
   if (gcm_nm %in% dbnames$GCM) {
     gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
 
@@ -492,7 +510,14 @@ process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts
     if (length(runs) < 1) {
       warning("That GCM isn't in our database yet.")
     } else {
-      sel_runs <- runs[1:(max_run + 1L)]
+      if(is.null(run_nm)){
+        sel_runs <- runs[1:(max_run + 1L)]
+      }else{
+        if(!run_nm %in% runs){
+          stop("Run ", run_nm, "doesn't exist for this GCM.")
+        }
+        sel_runs <- run_nm
+      }
 
       ## check cached
       needDownload <- TRUE
@@ -616,12 +641,13 @@ process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts
 #' @template bbox
 #' @template dbCon
 #' @template cache
+#' @template run_nm
 #'
 #' @importFrom tools R_user_dir
 #'
 #' @return a `SpatRaster`
 #' @noRd
-process_one_gcmts_fast <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache) { ## need to update to all GCMs
+process_one_gcmts_fast <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache, run_nm) { 
   if(gcm_nm %in% dbnames$GCM){
     gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
     gcmarray <- dbnames$dbarray[dbnames$GCM == gcm_nm]
@@ -632,7 +658,15 @@ process_one_gcmts_fast <- function(gcm_nm, ssps, period, max_run, dbnames = dbna
     if (length(runs) < 1) {
       warning("That GCM isn't in our database yet.")
     }else{
-      sel_runs <- runs[1:(max_run + 1L)]
+      if(is.null(run_nm)){
+        sel_runs <- runs[1:(max_run + 1L)]
+      }else{
+        if(!run_nm %in% runs){
+          stop("Run ", run_nm, "doesn't exist for this GCM.")
+        }
+        sel_runs <- run_nm
+      }
+      
       
       ## check cached
       needDownload <- TRUE

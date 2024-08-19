@@ -4,7 +4,8 @@
 \alias{list_gcms}
 \alias{list_ssps}
 \alias{list_gcm_periods}
-\alias{list_run}
+\alias{list_runs_ssp}
+\alias{list_runs_historic}
 \alias{list_refmaps}
 \alias{list_obs_periods}
 \alias{list_vars}
@@ -19,7 +20,9 @@ list_ssps()
 
 list_gcm_periods()
 
-list_run(dbCon, gcms)
+list_runs_ssp(gcm, ssp)
+
+list_runs_historic(gcm)
 
 list_refmaps()
 
@@ -34,9 +37,9 @@ list_gcm_ssp_years()
 list_gcm_hist_years()
 }
 \arguments{
-\item{dbCon}{A db connection object created by \code{data_connect}.}
+\item{gcm}{Name of GCM}
 
-\item{gcms}{Character vector to specify requested GCMs}
+\item{ssp}{Name of scenario}
 
 \item{set}{character. One of All, Monthly, Seasonal, Annual, or any combination thereof. Defaults to "All".}
 
@@ -52,7 +55,9 @@ a character vector.
 
 \code{list_gcm_periods} lists available periods.
 
-\code{list_run} lists available runs for a given GCM.
+lists available runs for a given GCM/ssp.
+
+lists available runs for a given historic GCM.
 
 \code{list_refmaps} lists available reference maps of gridded climate normals
 

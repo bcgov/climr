@@ -52,6 +52,7 @@
 #'   historical scenario. See [`list_gcm_hist_years()`] for available years.
 #'   Defaults to `NULL`.
 #' @template max_run
+#' @template run_nm
 #' @param cache logical. Cache data locally? Default `TRUE`
 #' @param ... other arguments passed to [`downscale_core()`]. Namely: `return_refperiod`,
 #'   `vars`, `out_spatial` and `plot`
@@ -112,6 +113,7 @@ downscale <- function(xyz, which_refmap = "auto",
                       gcms = NULL, ssps = NULL,
                       gcm_periods = NULL, gcm_ssp_years = NULL,
                       gcm_hist_years = NULL, max_run = 0L,
+                      run_nm = NULL,
                       cache = TRUE, ...) {
   message("Welcome to climr!")
 
@@ -119,7 +121,7 @@ downscale <- function(xyz, which_refmap = "auto",
   .checkDwnsclArgs(
     xyz, which_refmap, obs_periods, obs_years, obs_ts_dataset,
     gcms, ssps, gcm_periods, gcm_ssp_years,
-    gcm_hist_years, max_run
+    gcm_hist_years, max_run, run_nm
   )
 
   expectedCols <- c("lon", "lat", "elev", "id")
@@ -197,6 +199,7 @@ downscale <- function(xyz, which_refmap = "auto",
         ssps = ssps,
         period = gcm_periods,
         max_run = max_run,
+        run_nm = run_nm,
         cache = cache
       )
     } else {
@@ -209,6 +212,7 @@ downscale <- function(xyz, which_refmap = "auto",
         years = gcm_ssp_years,
         max_run = max_run,
         cache = cache,
+        run_nm = run_nm,
         fast = TRUE
       )
     } else {
@@ -219,6 +223,7 @@ downscale <- function(xyz, which_refmap = "auto",
         bbox = thebb, gcms = gcms,
         years = gcm_hist_years,
         max_run = max_run,
+        run_nm = run_nm,
         cache = cache
       )
     } else {
@@ -228,7 +233,7 @@ downscale <- function(xyz, which_refmap = "auto",
     gcm_ssp_periods <- gcm_ssp_ts <- gcm_hist_ts <- NULL
   }
 
-  message("Downscaling!!")
+  message("Downscaling...")
   results <- downscale_core(
     xyz = xyz,
     refmap = reference,
@@ -283,9 +288,13 @@ downscale <- function(xyz, which_refmap = "auto",
 #' @noRd
 .checkDwnsclArgs <- function(xyz, which_refmap = NULL, obs_periods = NULL, obs_years = NULL,
                              obs_ts_dataset = NULL, gcms = NULL, ssps = list_ssps(), gcm_periods = NULL, gcm_ssp_years = NULL,
-                             gcm_hist_years = NULL, max_run = 0L) {
+                             gcm_hist_years = NULL, max_run = 0L, run_nm = NULL) {
   if (is.null(ssps) & (!is.null(gcm_periods) | !is.null(gcm_ssp_years))) {
     stop("ssps must be specified")
+  }
+  
+  if(!is.null(run_nm) & max_run > 1){
+    warning("max_run is > 0, but run_nm is specified. Only named runs will be returned.")
   }
 
   if (!is.null(ssps)) {
