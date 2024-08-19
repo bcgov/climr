@@ -36,17 +36,34 @@ list_gcm_periods <- function() {
   c("2001_2020", "2021_2040", "2041_2060", "2061_2080", "2081_2100")
 }
 
+
 #' @description
-#' `list_run` lists available runs for a given GCM.
-#'
-#' @template dbCon
-#' @param gcms Character vector to specify requested GCMs
-#' @importFrom RPostgres dbGetQuery
-#'
+#' lists available runs for a given GCM/ssp.
+#' @param gcm Name of GCM
+#' @param ssp Name of scenario
+#' @importFrom data.table fread
+#' @importFrom tools R_user_dir
+#' 
 #' @rdname data-option-lists
 #' @export
-list_run <- function(dbCon, gcms) {
-  sort(dbGetQuery(dbCon, paste0("SELECT DISTINCT run FROM esm_layers_period WHERE mod IN ('", paste(gcms, collapse = "','", "')")))[, 1])
+list_runs_ssp <- function(gcm, ssp){
+  rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
+  runs <- fread(file.path(rInfoPath, "gcm_periods.csv"))
+  runs[mod == gcm & scenario == ssp, run]
+}
+
+#' @description
+#' lists available runs for a given historic GCM.
+#' @param gcm Name of GCM
+#' @importFrom data.table fread
+#' @importFrom tools R_user_dir
+#' 
+#' @rdname data-option-lists
+#' @export
+list_runs_historic <- function(gcm){
+  rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
+  runs <- fread(file.path(rInfoPath, "gcm_hist.csv"))
+  runs[mod == gcm, run]
 }
 
 #' @description
