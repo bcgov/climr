@@ -2,16 +2,21 @@
 
 ## Bug Fixes
 
--   Redesigned the database to substantially improve speed of downloading gcm ssp timeseries, especially for a small number of points.
 -   Modified the Hargreaves method for calculation of monthly solar radiation to allow for calculation of Eref and CMD above the arctic circle in a way that matches ClimateNA results.
 -   Fixed an edge case in the tiling that resulted in NA values in southern Mexico if full North American extent was queried.
 -   Fixed bug in caching where cache would fail due to incorrect folder name in certain cases.
 -   Fixed a bug in `plot_downscale()` that affected colors when `pal = "gcms"` and labels when `endlabel = "gcms"`
+-   Fixed a bug where climr didn't download the correct run names for historic GCMs
 -   Modified the equations for frost-free period so that they are confined to a range of 0-365.
+
+## Enhancements
+
+-   Redesigned the database to substantially improve speed of downloading gcm ssp timeseries, especially for a small number of points.
+-   Added `run_nm` parameter to `downscale` and `input_gcm_*` functions so users can specify desired run(s). Also added `list_runs_ssp()` and `list_runs_historic()`
 
 ## Known issues
 
--   There are discrepancies between climr and ClimateNA in values of frost-free period (eFFP, bFFP, and FFP) and frost-free days (NFFD). For FFP see issue [#297](https://github.com/bcgov/climr/issues/297); For NFFD see issue [#295](https://github.com/bcgov/climr/issues/295). We will attempt to resolve these differences in a future version. 
+-   There are discrepancies between climr and ClimateNA in values of frost-free period (eFFP, bFFP, and FFP) and frost-free days (NFFD). For FFP see issue [#297](https://github.com/bcgov/climr/issues/297); For NFFD see issue [#295](https://github.com/bcgov/climr/issues/295). We will attempt to resolve these differences in a future version.
 
 # `climr` 0.1.0
 
