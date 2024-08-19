@@ -23,7 +23,8 @@ input_gcm_hist(
   gcms = list_gcms(),
   years = 1901:2014,
   max_run = 0L,
-  cache = TRUE
+  cache = TRUE,
+  run_nm = NULL
 )
 
 input_gcm_ssp(
@@ -34,6 +35,7 @@ input_gcm_ssp(
   years = 2020:2030,
   max_run = 0L,
   cache = TRUE,
+  run_nm = NULL,
   fast = TRUE
 )
 }
@@ -56,6 +58,8 @@ A value of 0 returns the \code{ensembleMean} only. Runs are included in the orde
 are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
 \item{cache}{logical. Specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
+
+\item{run_nm}{character. \code{NULL} or length >= 1. Name of specified run(s) to return, instead of using \code{max_run}. Use the \verb{list_runs_*()} functions to list available runs.Defaults to \code{NULL}.}
 
 \item{years}{Numeric or character vector in \code{2020:2100}. Defaults to \code{2020:2030}.
 See \code{\link[=list_gcm_ssp_years]{list_gcm_ssp_years()}} for available years.}
