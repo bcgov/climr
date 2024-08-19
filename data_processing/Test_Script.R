@@ -1,4 +1,5 @@
 library(data.table)
+
 library(terra)
 library(climr)
 
@@ -33,7 +34,8 @@ plot(test)
 my_grid <- as.data.frame(dem, cells = TRUE, xy = TRUE)
 colnames(my_grid) <- c("id", "lon", "lat", "elev") # rename column names to what climr expects
 climr <- downscale(
-  xyz = my_grid, which_refmap = "refmap_climatena", vars = "MAT"
+  xyz = my_grid, which_refmap = "refmap_climatena", gcms = list_gcms()[1], ssps = list_ssps()[1:3], 
+  gcm_periods = list_gcm_periods(), run_nm = "r1i1p1f1", vars = "MAT"
 )
 
 X <- rast(dem) 

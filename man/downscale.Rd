@@ -16,6 +16,7 @@ downscale(
   gcm_ssp_years = NULL,
   gcm_hist_years = NULL,
   max_run = 0L,
+  run_nm = NULL,
   cache = TRUE,
   ...
 )
@@ -63,6 +64,8 @@ Defaults to \code{NULL}.}
 \item{max_run}{integer. Maximum number of model runs to include.
 A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
 are found in the models data until \code{max_run} is reached. Defaults to 0L.}
+
+\item{run_nm}{character. \code{NULL} or length >= 1. Name of specified run(s) to return, instead of using \code{max_run}. Use the \verb{list_runs_*()} functions to list available runs.Defaults to \code{NULL}.}
 
 \item{cache}{logical. Cache data locally? Default \code{TRUE}}
 
