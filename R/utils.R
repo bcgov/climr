@@ -65,6 +65,6 @@ get_bb <- function(in_xyz) {
     (bbox[4] < minLon), (bbox[3] > maxLon),
     (bbox[2] < minLat), (bbox[1] > maxLat)
   )) {
-    stop("lon and lat are not in lat/long projection EPSG:4326")
+    stop("input fields lon and lat are not in lat/long coordinates, or extent is outside ext(-179.0625, -51.5625, 14.375, 83.125)")
   }
 }
