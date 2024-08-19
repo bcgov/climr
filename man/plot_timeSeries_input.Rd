@@ -64,21 +64,20 @@ without needing to generate the inputs each time.
 This function generates standardized inputs for one or multiple locations at any spatial scale.
 If multiple locations are specified, the output is the average of the climate variables for all locations.
 
-Downloads of GCM time series take a long time. The \code{plot_timeSeries_input()} function can take >1hr
-to run for the first time it is called for a location. We are looking into ways to speed this up, but until then
-we recommend users dedicate some time to run this function in background. Once the time series are cached, they
+Downloads of GCM time series take some time. The \code{plot_timeSeries_input()} function can take ~5 minutes
+to run for the first time it is called for a location. Once the time series are cached, they
 don't need to be downloaded again.
 }
 \examples{
-if(FALSE){
-# data frame of arbitrary points
-my_points <- data.frame(lon = c(-127.7300,-127.7500), lat = c(55.34114, 55.25), elev = c(711, 500), id = 1:2)
+if (FALSE) {
+  # data frame of arbitrary points
+  my_points <- data.frame(lon = c(-127.7300, -127.7500), lat = c(55.34114, 55.25), elev = c(711, 500), id = 1:2)
 
-# generate the input data
-my_data <- plot_timeSeries_input(my_points)
+  # generate the input data
+  my_data <- plot_timeSeries_input(my_points)
 
-# use the input to create a plot
-plot_timeSeries(my_data, variable1 = "Tmin_sm")
+  # use the input to create a plot
+  plot_timeSeries(my_data, var1 = "Tmin_sm")
 }
-#' 
+#'
 }

@@ -91,8 +91,7 @@ to indicate the global climate model.}
 
 \item{yearlines}{logical. Add vertical lines on every fifth year as a visual reference}
 
-\item{legend_pos}{character. Position of the legend. Viable options are c("bottomright",
-"bottomleft", "topleft", and "topright").}
+\item{legend_pos}{character. Position of the legend. Viable options are \code{c("bottomright", "bottomleft", "topleft", "topright")}.}
 }
 \value{
 NULL. Draws a plot in the active graphics device.
@@ -117,44 +116,42 @@ Some combinations of \code{var1} and \code{var2} are not compatible or meaningfu
 Examples of meaningful combinations are winter vs summer values of the same climate var or minimum vs.
 maximum temperatures.
 
-Downloads of GCM time series take a long time. The \code{plot_timeSeries_input()} function can take >1hr
-to run for the first time it is called for a location. We are looking into ways to speed this up, but until then
-we recommend users dedicate some time to run this function in background. Once the time series are cached, they
+Downloads of GCM time series take some time. The \code{plot_timeSeries_input()} function can take ~5 minutes
+to run for the first time it is called for a location. Once the time series are cached, they
 don't need to be downloaded again.
 }
 \examples{
-if(FALSE){
-# data frame of arbitrary points
-my_points <- data.frame(lon = c(-127.7300,-127.7500), lat = c(55.34114, 55.25), elev = c(711, 500), id = 1:2)
+if (FALSE) {
+  # data frame of arbitrary points
+  my_points <- data.frame(lon = c(-127.7300, -127.7500), lat = c(55.34114, 55.25), elev = c(711, 500), id = 1:2)
 
-# generate the input data
-my_data <- plot_timeSeries_input(my_points)
+  # generate the input data
+  my_data <- plot_timeSeries_input(my_points)
 
-# use the input to create a plot
-plot_timeSeries(my_data, var1 = "Tmin_sm")
+  # use the input to create a plot
+  plot_timeSeries(my_data, var1 = "Tmin_sm")
 
-# compare observational time series
-plot_timeSeries(my_data, var1 = "Tmin_sm", obs_ts_dataset = c("cru.gpcc", "climatena"))
+  # compare observational time series
+  plot_timeSeries(my_data, var1 = "Tmin_sm", obs_ts_dataset = c("cru.gpcc", "climatena"))
 
-# compare mean daily minimum and maximum temperatures
-plot_timeSeries(my_data, var1 = "Tmin_sm", var2 = "Tmax_sm")
+  # compare mean daily minimum and maximum temperatures
+  plot_timeSeries(my_data, var1 = "Tmin_sm", var2 = "Tmax_sm")
 
-# compare summer and winter temperatures (without simplifying the ensemble range)
-plot_timeSeries(my_data, var1 = "Tmax_sm", var2 = "Tmax_wt", simplify = FALSE)
+  # compare summer and winter temperatures (without simplifying the ensemble range)
+  plot_timeSeries(my_data, var1 = "Tmax_sm", var2 = "Tmax_wt", simplify = FALSE)
 
-# compare global climate models
-plot_timeSeries(my_data, gcms = list_gcms()[c(7,13)], pal = "gcms", ssps = list_ssps()[2], showmean = FALSE, compile = FALSE, simplify = FALSE, endlabel = "gcms", mar=c(3,3,0.1,6), showObserved = FALSE)
+  # compare global climate models
+  plot_timeSeries(my_data, gcms = list_gcms()[c(7, 13)], pal = "gcms", ssps = list_ssps()[2], showmean = FALSE, compile = FALSE, simplify = FALSE, endlabel = "gcms", mar = c(3, 3, 0.1, 6), showObserved = FALSE)
 
-# export plot to a temporary directory, including a title
-figDir <- tempdir()
-png(
-  filename = file.path(figDir, "plot_test.png"), type = "cairo", units = "in",
-  width = 6, height = 5, pointsize = 10, res = 300
-)
-plot_timeSeries(my_data, var1 = "Tmin_sm", mar=c(3,3,2,4))
-title("Historical and projected summer night-time warming in the Bulkley Valley, BC")
-dev.off()
+  # export plot to a temporary directory, including a title
+  figDir <- tempdir()
+  png(
+    filename = file.path(figDir, "plot_test.png"), type = "cairo", units = "in",
+    width = 6, height = 5, pointsize = 10, res = 300
+  )
+  plot_timeSeries(my_data, var1 = "Tmin_sm", mar = c(3, 3, 2, 4))
+  title("Historical and projected summer night-time warming in the Bulkley Valley, BC")
+  dev.off()
 }
-
 
 }

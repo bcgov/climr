@@ -28,7 +28,7 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
   # }else{
   #   name1 <- name
   # }
-  
+
   name1 <- name
   nameque <- paste(name1, collapse = ".")
   namechar <- gsub("'", "''", paste(gsub('^"|"$', "", name1), collapse = "."))
@@ -96,11 +96,11 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
 
     boundary_ls <- list()
     if (length(x_seq) < 2 | length(y_seq) < 2) {
-      boundary_ls[["11"]] <- boundary
+      boundary_ls[["1_1"]] <- boundary
     } else {
       for (i in 1:(length(x_seq) - 1)) {
         for (j in 1:(length(y_seq) - 1)) {
-          boundary_ls[[paste0(i, j)]] <- c(x_seq[i + 1], x_seq[i], y_seq[j + 1], y_seq[j])
+          boundary_ls[[paste0(i,"_", j)]] <- c(x_seq[i + 1], x_seq[i], y_seq[j + 1], y_seq[j])
         }
       }
     }

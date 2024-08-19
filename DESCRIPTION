@@ -1,55 +1,63 @@
 Package: climr
 Title: Downscaling climate data in R
-Version: 0.1.0.9000
-Date: 23-05-2024
+Version: 0.1.1
+Date: 19-08-2024
 Authors@R: c(
-    person("Kiri","Daust", email = "kiri.daust@gov.bc.ca", role = c("aut", "cre")),
-    person("Colin", "Mahony", email = "Colin.Mahony@gov.bc.ca", role = c("aut"),
+    person("Kiri", "Daust", , "kiri.daust@gov.bc.ca", role = c("aut", "cre")),
+    person("Colin", "Mahony", , "Colin.Mahony@gov.bc.ca", role = "aut",
            comment = c(ORCID = "0000-0002-6111-5675")),
-    person("Bruno", "Tremblay", email = "bruno@boostao.ca", role = c("aut"),
+    person("Bruno", "Tremblay", , "bruno@boostao.ca", role = "aut",
            comment = c(ORCID = "0000-0002-2945-356X")),
-    person("Ceres", "Barros", email = "ceres.barros@nrcan-rncan.gc.ca", role = c("aut"),
-           comment = c(ORCID = "0000-0003-4036-977X")),       
-    person("Francois", "Bornais", email = "francois@boostao.ca", role = c("ctb")),
-    person(family = "Province of British Columbia", role = c("cph", "fnd")))
-Description: `climr` is an R package that builds on the downscaling concepts 
-    operationalized in the ClimateNA tool (climatena.ca) (Wang et al. 2016).
-    It provides downscaling of observational and simulated climate data using change-factor 
-    downscaling, a simple method that adds low-spatial-resolution 
-    climate anomalies to a high-spatial-resolution reference climatological map, with additional 
-    elevation adjustment for temperature. Elevation-adjusted monthly values of basic climate 
-    elements (temperature and precipitation) are then used to estimate derived variables 
-    (e.g., degree-days) based on published equations and parameters from  Wang et al. 2016.
-    `climr` is designed to be fast and to minimize local data storage requirements. To do so, 
-    it uses a remote PostGIS database, and optionally caches data locally.
+    person("Ceres", "Barros", , "ceres.barros@nrcan-rncan.gc.ca", role = "aut",
+           comment = c(ORCID = "0000-0003-4036-977X")),
+    person("Francois", "Bornais", , "francois@boostao.ca", role = "ctb"),
+    person(, "Province of British Columbia", role = c("cph", "fnd"))
+  )
+Description: Builds on the downscaling concepts operationalized in the
+    'ClimateNA' tool (<https://climatena.ca>) (Wang et al. 2016
+    <doi:10.1371/journal.pone.0156720>).  It provides downscaling of
+    observational and simulated climate data using change-factor
+    downscaling, a simple method that adds low-spatial-resolution climate
+    anomalies to a high-spatial-resolution reference climatological map,
+    with additional elevation adjustment for temperature.
+    Elevation-adjusted monthly values of basic climate elements
+    (temperature and precipitation) are then used to estimate derived
+    variables (e.g., degree-days) based on published equations and
+    parameters from Wang et al. 2016.  This package is designed to be fast
+    and to minimize local data storage requirements.  To do so, it uses a
+    remote 'PostGIS' database, and optionally caches data locally.
 License: Apache License (== 2)
-Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+Depends: 
+    R (>= 4.0)
 Imports: 
     data.table,
     DBI,
+    magrittr,
     methods,
     pool,
     RPostgres,
-    terra,
+    scales,
     sf,
     stinepack,
+    terra,
     uuid,
-    scales,
-    magrittr
+    dplyr,
+    abind,
+    dbplyr
 Suggests: 
     ggplot2,
     knitr,
     parallel,
     plotly,
-    rmarkdown,
     remotes,
+    rmarkdown,
     testthat (>= 3.0.0),
     utils,
     withr
-Depends: 
-    R (>= 4.0)
+VignetteBuilder: 
+    knitr
 Config/testthat/edition: 3
+Encoding: UTF-8
 LazyData: true
-VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1

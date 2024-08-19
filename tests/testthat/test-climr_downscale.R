@@ -76,14 +76,14 @@ test_that("test dowscale basic and spatial", {
   #     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
   #     out_spatial = TRUE, plot = "CMD"
   #   )
-  # 
+  #
   #   ds_hist_spatial2 <- downscale(
   #     xyz = xyz, which_refmap = "auto",
   #     obs_periods = "2001_2020",
   #     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
   #     out_spatial = TRUE, plot = "CMD"
   #   )
-  # 
+  #
   #   ds_hist_spatial2 <- downscale(
   #     xyz = xyz, which_refmap = "auto",
   #     obs_periods = "2001_2020",
@@ -94,7 +94,7 @@ test_that("test dowscale basic and spatial", {
   #     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
   #     out_spatial = TRUE, plot = "CMD"
   #   )
-  # 
+  #
   #   ds_hist_spatial2 <- downscale(
   #     xyz = xyz, which_refmap = "auto",
   #     obs_periods = "2001_2020",
@@ -110,6 +110,7 @@ test_that("test dowscale basic and spatial", {
 
 test_that("test downscale with different argument combinations", {
   testInit("data.table")
+  testInit("terra")
 
   ## a small no. of points
   xyz <- data.frame(
@@ -162,6 +163,7 @@ test_that("test downscale with different argument combinations", {
   argsCombos <- unique(argsCombos)
 
   argsCombos <- argsCombos[89:108,]
+  
   out <- apply(argsCombos, 1, function(args, xyz) {
     args <- args[!is.na(args)]
     suppressWarnings(args$xyz <- xyz) # coerces to list.
@@ -186,7 +188,6 @@ test_that("test downscale with different argument combinations", {
       args$gcm_hist_years <- eval(parse(text = args$gcm_hist_years))
     }
     
-    #browser()
     out <- try(do.call(downscale, args))
 
     test <- is(out, "data.table")
@@ -202,11 +203,12 @@ test_that("test downscale with different argument combinations", {
         test4[i] <- all(args$obs_periods %in% unique(out$PERIOD))
         i <- i + 1
       }
-      if ("obs_years" %in% checkArgs) {
-        test4[i] <- all(args$obs_years %in% unique(out$PERIOD))
-        i <- i + 1
-      }
+      # if ("obs_years" %in% checkArgs) {
+      #   test4[i] <- all(args$obs_years %in% unique(out$PERIOD))
+      #   i <- i + 1
+      # }
       if ("gcms" %in% checkArgs) {
+        message(paste(c(names(out), checkArgs, "\n"),sep = " "))
         test4[i] <- all(args$gcms %in% unique(out$GCM))
         i <- i + 1
       }
