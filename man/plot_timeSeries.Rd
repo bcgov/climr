@@ -116,9 +116,8 @@ Some combinations of \code{var1} and \code{var2} are not compatible or meaningfu
 Examples of meaningful combinations are winter vs summer values of the same climate var or minimum vs.
 maximum temperatures.
 
-Downloads of GCM time series take a long time. The \code{plot_timeSeries_input()} function can take >1hr
-to run for the first time it is called for a location. We are looking into ways to speed this up, but until then
-we recommend users dedicate some time to run this function in background. Once the time series are cached, they
+Downloads of GCM time series take some time. The \code{plot_timeSeries_input()} function can take ~5 minutes
+to run for the first time it is called for a location. Once the time series are cached, they
 don't need to be downloaded again.
 }
 \examples{
