@@ -96,6 +96,7 @@ data <- downscale(xyz = pt,
                   vars = list_vars()
 )
 
+"#E404D1"
 plot_timeSeries(data, var1 = "Tmax_08")
 library(abind)
 library(dplyr)
