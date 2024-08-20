@@ -67,10 +67,13 @@
 #' # downscale the GCM data
 #' gcm_downscaled <- downscale_core(xyz = xyz, refmap = refmap, gcms = gcm_raw, vars = c("MAT", "PAS"))
 #'
-#' # create an input of uniform warming of 2 degrees Celsius and no precipitation change, for use as a null comparison to the GCM warming
+#' # create an input of uniform warming of 2 degrees Celsius and no precipitation change,
+#' # for use as a null comparison to the GCM warming
 #' null <- gcm_raw #' use the gcm input object as a template
 #' names(null) <- "null_2C"
-#' names(null[[1]]) <- sapply(strsplit(names(null[[1]]), "_"), function(x) paste("null2C", x[2], x[3], "NA", "NA", "NA", "NA", sep = "_"))
+#' names(null[[1]]) <- sapply(strsplit(names(null[[1]]), "_"), function(x) {
+#'   paste("null2C", x[2], x[3], "NA", "NA", "NA", "NA", sep = "_")
+#' })
 #' for (var in names(null[[1]])) {
 #'   values(null[[1]][[var]]) <- if (length(grep("PPT", var) == 1)) 1 else 2
 #' } #' repopulate with the null values
@@ -258,12 +261,11 @@ downscale_ <- function(xyz, refmap, gcms, gcm_ssp_ts, gcm_hist_ts,
   # https://github.com/rspatial/terra/issues/287
 
   # stack before extracting
-  res <-
-    extract(
-      x = refmap,
-      y = xyz[, .(lon, lat)],
-      method = "bilinear"
-    )
+  res <- extract(
+    x = refmap,
+    y = xyz[, .(lon, lat)],
+    method = "bilinear"
+  )
 
   # Compute elevation differences between provided points elevation and reference
   # Dem at position 74 (ID column + 36 reference layers + 36 lapse rate layers + 1 dem layer)

@@ -65,7 +65,12 @@
 #' @examples
 #' if (FALSE) {
 #'   # data frame of arbitrary points
-#'   my_points <- data.frame(lon = c(-127.7300, -127.7500), lat = c(55.34114, 55.25), elev = c(711, 500), id = 1:2)
+#'   my_points <- data.frame(
+#'     lon = c(-127.7300, -127.7500),
+#'      lat = c(55.34114, 55.25),
+#'       elev = c(711, 500),
+#'        id = 1:2
+#'   )
 #'
 #'   # generate the input data
 #'   my_data <- plot_timeSeries_input(my_points)
@@ -83,7 +88,9 @@
 #'   plot_timeSeries(my_data, var1 = "Tmax_sm", var2 = "Tmax_wt", simplify = FALSE)
 #'
 #'   # compare global climate models
-#'   plot_timeSeries(my_data, gcms = list_gcms()[c(7, 13)], pal = "gcms", ssps = list_ssps()[2], showmean = FALSE, compile = FALSE, simplify = FALSE, endlabel = "gcms", mar = c(3, 3, 0.1, 6), showObserved = FALSE)
+#'   plot_timeSeries(my_data, gcms = list_gcms()[c(7, 13)], pal = "gcms", ssps = list_ssps()[2],
+#'                   showmean = FALSE, compile = FALSE, simplify = FALSE, endlabel = "gcms",
+#'                   mar = c(3, 3, 0.1, 6), showObserved = FALSE)
 #'
 #'   # export plot to a temporary directory, including a title
 #'   figDir <- tempdir()

@@ -52,8 +52,7 @@ can be obtained with \code{\link[=list_vars]{list_vars()}}. Definitions can be f
 
 \item{nthread}{integer. Number of parallel threads to use to do computations. Default to 1L.}
 
-\item{out_spatial}{logical. Should a SpatVector be returned instead of a
-\code{data.frame}.}
+\item{out_spatial}{logical. Should a \code{SpatVector} be returned instead of a \code{data.frame}.}
 
 \item{plot}{character. If \code{out_spatial} is TRUE, the name of a variable to plot.
 If the variable exists in \code{reference}, then its reference values will also be plotted.
@@ -97,10 +96,13 @@ gcm_raw <- input_gcms(dbCon, thebb, list_gcms()[3], list_ssps()[1], period = lis
 # downscale the GCM data
 gcm_downscaled <- downscale_core(xyz = xyz, refmap = refmap, gcms = gcm_raw, vars = c("MAT", "PAS"))
 
-# create an input of uniform warming of 2 degrees Celsius and no precipitation change, for use as a null comparison to the GCM warming
+# create an input of uniform warming of 2 degrees Celsius and no precipitation change,
+# for use as a null comparison to the GCM warming
 null <- gcm_raw #' use the gcm input object as a template
 names(null) <- "null_2C"
-names(null[[1]]) <- sapply(strsplit(names(null[[1]]), "_"), function(x) paste("null2C", x[2], x[3], "NA", "NA", "NA", "NA", sep = "_"))
+names(null[[1]]) <- sapply(strsplit(names(null[[1]]), "_"), function(x) {
+  paste("null2C", x[2], x[3], "NA", "NA", "NA", "NA", sep = "_")
+})
 for (var in names(null[[1]])) {
   values(null[[1]][[var]]) <- if (length(grep("PPT", var) == 1)) 1 else 2
 } #' repopulate with the null values
