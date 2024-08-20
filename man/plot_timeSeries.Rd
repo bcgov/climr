@@ -61,8 +61,8 @@ input table defined by \code{X}.}
 
 \item{cex}{Numeric. The magnification factor for text size. Default is 1.}
 
-\item{mar}{A numerical vector of length 4, giving the margin sizes in number of lines of text: c(bottom, left,
-top, right). The default is c(3,3,0.1,4).}
+\item{mar}{A numerical vector of length 4, giving the margin sizes in number of lines of text:
+c(bottom, left, top, right). The default is \code{c(3, 3, 0.1, 4)}.}
 
 \item{showmean}{logical. Plot the ensemble mean time series. Multi-model ensemble means are
 calculated from the mean of simulations for each model.}
@@ -91,7 +91,8 @@ to indicate the global climate model.}
 
 \item{yearlines}{logical. Add vertical lines on every fifth year as a visual reference}
 
-\item{legend_pos}{character. Position of the legend. Viable options are \code{c("bottomright", "bottomleft", "topleft", "topright")}.}
+\item{legend_pos}{character. Position of the legend. Viable options are
+\code{c("bottomright", "bottomleft", "topleft", "topright")}.}
 }
 \value{
 NULL. Draws a plot in the active graphics device.

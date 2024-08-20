@@ -31,9 +31,8 @@
 #'   # use the input to create a plot
 #'   plot_timeSeries(my_data, var1 = "Tmin_sm")
 #' }
-#' #'
+#'
 #' @export
-
 plot_timeSeries_input <- function(
     xyz,
     gcms = list_gcms(),

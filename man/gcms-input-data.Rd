@@ -59,7 +59,9 @@ are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
 \item{cache}{logical. Specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 
-\item{run_nm}{character. \code{NULL} or length >= 1. Name of specified run(s) to return, instead of using \code{max_run}. Use the \verb{list_runs_*()} functions to list available runs.Defaults to \code{NULL}.}
+\item{run_nm}{character. \code{NULL} or length >= 1. Name of specified run(s) to return,
+instead of using \code{max_run}.
+Use the \verb{list_runs_*()} functions to list available runs.Defaults to \code{NULL}.}
 
 \item{years}{Numeric or character vector in \code{2020:2100}. Defaults to \code{2020:2030}.
 See \code{\link[=list_gcm_ssp_years]{list_gcm_ssp_years()}} for available years.}

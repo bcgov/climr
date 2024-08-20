@@ -79,5 +79,5 @@ if (FALSE) {
   # use the input to create a plot
   plot_timeSeries(my_data, var1 = "Tmin_sm")
 }
-#'
+
 }

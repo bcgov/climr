@@ -28,8 +28,7 @@
 #' @template vars
 #' @param ppt_lr logical. Apply elevation adjustment to precipitation. Default to FALSE.
 #' @param nthread integer. Number of parallel threads to use to do computations. Default to 1L.
-#' @param out_spatial logical. Should a SpatVector be returned instead of a
-#'   `data.frame`.
+#' @param out_spatial logical. Should a `SpatVector` be returned instead of a `data.frame`.
 #' @param plot character. If `out_spatial` is TRUE, the name of a variable to plot.
 #'   If the variable exists in `reference`, then its reference values will also be plotted.
 #'   Otherwise, reference January total precipitation (PPT01) values will be plotted.
@@ -232,7 +231,7 @@ downscale_core <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NU
 #' @return A `data.table`.
 #'
 #' @import data.table
-#' @importFrom terra crop ext xres yres extract
+#' @importFrom terra crop ext extract xres yres
 #' @noRd
 downscale_ <- function(xyz, refmap, gcms, gcm_ssp_ts, gcm_hist_ts,
                        obs, obs_ts, return_refperiod,
@@ -404,7 +403,6 @@ downscale_ <- function(xyz, refmap, gcms, gcm_ssp_ts, gcm_hist_ts,
   return(res)
 }
 
-
 #' Wrapper function for `downscale_` for parallelising
 #'
 #' @inheritParams downscale
@@ -496,7 +494,6 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
 
   # Create match set to match with res names
 
-
   labels <- vapply(
     strsplit(nm, "_"),
     function(x) {
@@ -583,7 +580,6 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
 
   return(climaterast)
 }
-
 
 #' Add ID columns back to `downscale` output.
 #'
