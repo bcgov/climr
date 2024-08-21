@@ -2,16 +2,52 @@
 
 #' Return package local cache path
 #'
-#' @details By default, it uses [tools::R_user_dir()]. The cache location can be
-#' set using the `climr.cache.path` option with `options("climr.cache.path" = "your_path")`.
+#' @details By default, it uses [tools::R_user_dir()].
+#' The cache location can be set using the `CLIMR_CACHE_PATH` environment variable,
+#' or using the `climr.cache.path` option. The value set via the option takes precedence.
 #'
 #' @return character. The full path of the package local cache.
+#' 
+#' @examples
+#' \dontshow{
+#'   ## record previous settings for post-example cleanup
+#'   prev_envvar <- Sys.getenv("CLIMR_CACHE_PATH")
+#'   prev_opts <- getOption("climr.cache.path")
+#' }
+#' cache_path() ## the current cache path
+#' 
+#' ## set via environment variable
+#' Sys.setenv(CLIMR_CACHE_PATH = file.path(tempdir(), "climr-cache"))
+#' cache_path() ## e.g., /tmp/Rtmpbo9VC7/climr-cache
+#' 
+#' ## set via option (takes precedence over envvar)
+#' options(climr.cache.path = file.path(tempdir(), "climr-cache-2"))
+#' cache_path() ## e.g., /tmp/Rtmpbo9VC7/climr-cache-2
+#' 
+#' \dontshow{
+#'   ## unset/cleanup
+#'   if (nzchar(prev_envvar)) {
+#'     Sys.unsetenv("CLIMR_CACHE_PATH")
+#'   } else {
+#'     Sys.setenv(CLIMR_CACHE_PATH = prev_envvar)
+#'   }
+#'   options(prev_opts)
+#' }
 #'
 #' @export
 #' @rdname Caching
 #' @importFrom tools R_user_dir
 cache_path <- function() {
-  getOption("climr.cache.path", default = R_user_dir("climr", "cache"))
+  opt_name <- "climr.cache.path"
+  envvar_name <- toupper(opt_name) %>% gsub("[.]", "_", x = .)
+  envvar_val <- Sys.getenv(envvar_name, unset = "")
+  
+  if (nzchar(envvar_val)) {
+    opt_val <- envvar_val
+  } else {
+    opt_val <- R_user_dir("climr", "cache") ## default
+  }
+  getOption(opt_name, default = opt_val)
 }
 
 #' Check if package local cache exists
