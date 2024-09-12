@@ -1,3 +1,9 @@
+# `climr` 0.1.2
+
+## Bug Fixes
+
+-   Fixed a bug that caused failure in downloads of gcm time series. 
+
 # `climr` 0.1.1
 
 ## Bug Fixes
