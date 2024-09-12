@@ -20,8 +20,7 @@ plot_timeSeries_input(
 \item{xyz}{a \code{data.frame} with the following columns "long", "lat", "elev",
 and a unique "id". Any extra columns will be ignored and not output.}
 
-\item{gcms}{character. Vector of global climate model names. Options
-are \code{\link[=list_gcms]{list_gcms()}}. Defaults to \code{NULL}.}
+\item{gcms}{character. Vector of global climate model names. Options are \code{\link[=list_gcms]{list_gcms()}}.}
 
 \item{ssps}{character. Vector of SSP-RCP scenarios (representative concentration pathways paired with shared socioeconomic pathways).
 Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to all scenarios available.}
@@ -33,19 +32,16 @@ are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 \item{obs_ts_dataset}{character. The dataset to use for observational time series data. Options
 are \code{"climatena"} for the ClimateNA gridded time series or \code{"cru.gpcc"} for the combined Climatic
 Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset
-(for precipitation). Defaults to \code{NULL}.}
+(for precipitation).}
 
 \item{obs_years}{integer. Vector of years to obtain individual years or time
-series of observational climate data. Default \code{NULL}. See \code{\link[=list_obs_years]{list_obs_years()}}
-for available years.}
+series of observational climate data. See \code{\link[=list_obs_years]{list_obs_years()}} for available years.}
 
 \item{gcm_hist_years}{character.  Timeseries years for GCM simulations of the
-historical scenario. See \code{\link[=list_gcm_hist_years]{list_gcm_hist_years()}} for available years.
-Defaults to \code{NULL}.}
+historical scenario. See \code{\link[=list_gcm_hist_years]{list_gcm_hist_years()}} for available years.}
 
 \item{gcm_ssp_years}{character. Timeseries years for GCM simulations of future
-scenarios specified by \code{ssps}. See \code{\link[=list_gcm_ssp_years]{list_gcm_ssp_years()}} for available years.
-Defaults to \code{NULL}.}
+scenarios specified by \code{ssps}. See \code{\link[=list_gcm_ssp_years]{list_gcm_ssp_years()}} for available years.}
 
 \item{vars}{character. A vector of climate variables to compute. Supported variables
 can be obtained with \code{\link[=list_vars]{list_vars()}}. Definitions can be found in this package
