@@ -765,7 +765,8 @@ process_one_gcmts_fast <- function(gcm_nm, ssps, period, max_run, dbnames = dbna
         t_array = split(as.data.frame(t2[,!c("fullnm","row")]), t2$fullnm)
         t3 <- abind(t_array, along = 3)
         gcm_rast <- rast(t3)
-        ext(gcm_rast) <- ext(template)
+        ext_temp <- ext(template)
+        ext(gcm_rast) <- ext_temp
         names(gcm_rast) <- paste0(gcm_nm,"_", names(t_array))
         
         if (cache) {
