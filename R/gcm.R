@@ -23,7 +23,7 @@
 #'
 #' @seealso [downscale_core()]
 #'
-#' @importFrom terra rast writeRaster ext nlyr
+#' @importFrom terra rast writeRaster ext nlyr values
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @importFrom uuid UUIDgenerate
@@ -101,7 +101,7 @@ input_gcms <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(
 #' @details This function returns a list with one slot for each requested GCM. Rasters inside the list contain anomalies for all runs and years.
 #' In general this function should only be used in combination with [`downscale_core()`].
 #'
-#' @importFrom terra rast writeRaster ext nlyr
+#' @importFrom terra rast writeRaster ext nlyr values
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @import uuid
@@ -157,7 +157,7 @@ input_gcm_hist <- function(dbCon, bbox = NULL, gcms = list_gcms(),
 #' In general this function should only be used in combination with [`downscale_core()`]. Note that if you request multiple runs, multiple SSPs, and a lot of years,
 #' it will take a while to download the data (there's lot of it).
 #'
-#' @importFrom terra rast writeRaster ext nlyr
+#' @importFrom terra rast writeRaster ext nlyr values
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @importFrom dplyr tbl sql collect mutate
