@@ -33,33 +33,29 @@ Other options are one of \code{\link[=list_refmaps]{list_refmaps()}}, which will
 reference map for all points.}
 
 \item{obs_periods}{character. Which historical period for observational climate
-data, averaged over this period. Options are \code{\link[=list_obs_periods]{list_obs_periods()}}. Default \code{NULL}}
+data, averaged over this period. Options are \code{\link[=list_obs_periods]{list_obs_periods()}}.}
 
 \item{obs_years}{integer. Vector of years to obtain individual years or time
-series of observational climate data. Default \code{NULL}. See \code{\link[=list_obs_years]{list_obs_years()}}
-for available years.}
+series of observational climate data. See \code{\link[=list_obs_years]{list_obs_years()}} for available years.}
 
 \item{obs_ts_dataset}{character. The dataset to use for observational time series data. Options
 are \code{"climatena"} for the ClimateNA gridded time series or \code{"cru.gpcc"} for the combined Climatic
 Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset
-(for precipitation). Defaults to \code{NULL}.}
+(for precipitation).}
 
-\item{gcms}{character. Vector of global climate model names. Options
-are \code{\link[=list_gcms]{list_gcms()}}. Defaults to \code{NULL}.}
+\item{gcms}{character. Vector of global climate model names. Options are \code{\link[=list_gcms]{list_gcms()}}.}
 
 \item{ssps}{character. Vector of SSP-RCP scenarios (representative concentration pathways paired with shared socioeconomic pathways).
 Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to all scenarios available.}
 
 \item{gcm_periods}{character. 20-year reference periods for GCM simulations.
-Options are \code{\link[=list_gcm_periods]{list_gcm_periods()}}. Defaults to \code{NULL}.}
+Options are \code{\link[=list_gcm_periods]{list_gcm_periods()}}.}
 
 \item{gcm_ssp_years}{character. Timeseries years for GCM simulations of future
-scenarios specified by \code{ssps}. See \code{\link[=list_gcm_ssp_years]{list_gcm_ssp_years()}} for available years.
-Defaults to \code{NULL}.}
+scenarios specified by \code{ssps}. See \code{\link[=list_gcm_ssp_years]{list_gcm_ssp_years()}} for available years.}
 
 \item{gcm_hist_years}{character.  Timeseries years for GCM simulations of the
-historical scenario. See \code{\link[=list_gcm_hist_years]{list_gcm_hist_years()}} for available years.
-Defaults to \code{NULL}.}
+historical scenario. See \code{\link[=list_gcm_hist_years]{list_gcm_hist_years()}} for available years.}
 
 \item{max_run}{integer. Maximum number of model runs to include.
 A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they

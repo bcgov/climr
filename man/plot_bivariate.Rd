@@ -34,8 +34,7 @@ and a unique "id". Any extra columns will be ignored and not output.}
 \item{period_focal}{character. The 20-year period for which to plot the ensemble
 detail. options are \code{list_gcm_periods()}.}
 
-\item{gcms}{character. Vector of global climate model names. Options
-are \code{\link[=list_gcms]{list_gcms()}}. Defaults to \code{NULL}.}
+\item{gcms}{character. Vector of global climate model names. Options are \code{\link[=list_gcms]{list_gcms()}}.}
 
 \item{ssp}{character. A single SSP-RCP scenario (representative concentration pathways paired with shared socioeconomic pathways).
 Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to SSP2-4.5.}
@@ -44,7 +43,7 @@ Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to SSP2-4.5.}
 Options are \code{list_obs_periods()}.}
 
 \item{gcm_periods}{character. 20-year reference periods for GCM simulations.
-Options are \code{\link[=list_gcm_periods]{list_gcm_periods()}}. Defaults to \code{NULL}.}
+Options are \code{\link[=list_gcm_periods]{list_gcm_periods()}}.}
 
 \item{max_run}{integer. Maximum number of model runs to include.
 A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they

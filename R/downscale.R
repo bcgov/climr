@@ -32,25 +32,21 @@
 #'   Other options are one of [`list_refmaps()`], which will provide a consistent
 #'   reference map for all points.
 #' @param obs_periods character. Which historical period for observational climate
-#'   data, averaged over this period. Options are [`list_obs_periods()`]. Default `NULL`
+#'   data, averaged over this period. Options are [`list_obs_periods()`].
 #' @param obs_years integer. Vector of years to obtain individual years or time
-#'   series of observational climate data. Default `NULL`. See [`list_obs_years()`]
-#'  for available years.
+#'   series of observational climate data. See [`list_obs_years()`] for available years.
 #' @param obs_ts_dataset character. The dataset to use for observational time series data. Options
 #'   are `"climatena"` for the ClimateNA gridded time series or `"cru.gpcc"` for the combined Climatic
 #'   Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset
-#'   (for precipitation). Defaults to `NULL`.
-#' @param gcms character. Vector of global climate model names. Options
-#'   are [`list_gcms()`]. Defaults to `NULL`.
+#'   (for precipitation). 
+#' @param gcms character. Vector of global climate model names. Options are [`list_gcms()`]. 
 #' @template ssps
 #' @param gcm_periods character. 20-year reference periods for GCM simulations.
-#'   Options are [`list_gcm_periods()`]. Defaults to `NULL`.
+#'   Options are [`list_gcm_periods()`]. 
 #' @param gcm_ssp_years character. Timeseries years for GCM simulations of future
 #'   scenarios specified by `ssps`. See [`list_gcm_ssp_years()`] for available years.
-#'   Defaults to `NULL`.
 #' @param gcm_hist_years character.  Timeseries years for GCM simulations of the
 #'   historical scenario. See [`list_gcm_hist_years()`] for available years.
-#'   Defaults to `NULL`.
 #' @template max_run
 #' @template run_nm
 #' @param cache logical. Cache data locally? Default `TRUE`

@@ -15,25 +15,24 @@
 #' @param refmap `SpatRaster`. Outputs from [`input_refmap()`]. The high-resolution
 #'   climate maps for use as the downscaling baseline.
 #' @param gcms `list` of `SpatRasters`. Outputs from [`input_gcms()`]. Global
-#'   climate model data for 20-year reference periods to be downscaled. Default to `NULL`.
+#'   climate model data for 20-year reference periods to be downscaled.
 #' @param obs `list` of `SpatRasters`. Outputs from [`input_obs()`].
-#'   Observed climate data for 20-year reference periods to be downscaled. Default to `NULL`.
+#'   Observed climate data for 20-year reference periods to be downscaled. 
 #' @param gcm_ssp_ts `list` of `SpatRasters`. Outputs from [`input_gcm_ssp()`].
-#'   Global climate model time series for ssps-rcp scenarios to be downscaled. Default to `NULL`.
+#'   Global climate model time series for ssps-rcp scenarios to be downscaled. 
 #' @param gcm_hist_ts `list` of `SpatRasters`. Outputs from [`input_gcm_hist()`].
-#'   Global climate model time series for historical scenario to be downscaled. Default to `NULL`.
+#'   Global climate model time series for historical scenario to be downscaled. 
 #' @param obs_ts `list` of `SpatRasters`. Outputs from [`input_obs_ts()`].
-#'   Observed climate time series to be downscaled. Default to `NULL`.
-#' @param return_refperiod logical. Return downscaled reference period (1961-1990)? Default `TRUE`.
+#'   Observed climate time series to be downscaled. 
+#' @param return_refperiod logical. Return downscaled reference period (1961-1990)? 
 #' @template vars
-#' @param ppt_lr logical. Apply elevation adjustment to precipitation. Default to FALSE.
-#' @param nthread integer. Number of parallel threads to use to do computations. Default to 1L.
+#' @param ppt_lr logical. Apply elevation adjustment to precipitation. 
+#' @param nthread integer. Number of parallel threads to use to do computations. 
 #' @param out_spatial logical. Should a SpatVector be returned instead of a
 #'   `data.frame`.
 #' @param plot character. If `out_spatial` is TRUE, the name of a variable to plot.
 #'   If the variable exists in `reference`, then its reference values will also be plotted.
 #'   Otherwise, reference January total precipitation (PPT01) values will be plotted.
-#'   Defaults to no plotting (NULL).
 #'
 #' @import data.table
 #' @importFrom terra extract rast sources ext xres yres crop plot as.polygons setValues
