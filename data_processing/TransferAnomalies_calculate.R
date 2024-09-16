@@ -6,7 +6,6 @@
 
 library(terra)
 library(rworldxtra)
-library(RColorBrewer)
 data("countriesHigh")
 
 monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12")
@@ -29,13 +28,15 @@ counter=0 #counter for total iterations
 for(e in 1:3){
   element <- elements.cru[e]
   if(element!="pre"){
-    dir <- "//objectstore2.nrs.bcgov/ffec/TimeSeries_gridded_monthly/cru_ts4.05"
+    # dir <- "//objectstore2.nrs.bcgov/ffec/TimeSeries_gridded_monthly/cru_ts4.08" 
+    dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/cru_ts4.08" #loading locally because it takes forever on object storage
     files <- list.files(dir, pattern="\\.nc$")
     r <- rast(paste(dir, files[grep(element, files)], sep="/"))
   } else {
-    dir <- "//objectstore2.nrs.bcgov/ffec/TimeSeries_gridded_monthly/GPCC"
+    # dir <- "//objectstore2.nrs.bcgov/ffec/TimeSeries_gridded_monthly/GPCC"
+    dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/GPCC" #loading locally because it takes forever on object storage
     files <- list.files(dir, pattern="\\.nc$")
-    file <- files[13]
+    file <- files[1]
     r <- rast(paste(dir, file, sep="/"))
     r <- rotate(r)
   }
@@ -104,7 +105,7 @@ for(e in 1:3){
 #-----------------------------------------
 # Plot the anomalies for quality check
 elements <- c("Tmin", "Tmax", "Pr")
-e=2
+e=1
 m=7
 for(e in 1:3){
   anom <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
@@ -115,7 +116,7 @@ for(e in 1:3){
     # lim <- quantile(abs(values(X)), .99, na.rm=T)
       lim <- 2
       breaks <- seq(0-lim, lim, 0.1)
-      colscheme <- colorRampPalette(rev(brewer.pal(11, "RdBu")))(length(breaks)-1)
+      colscheme <- colorRampPalette(hcl.colors(5,"Blue-Red 3"))(length(breaks)-1)
       X[X>lim] <- lim
       X[X < 0-lim] <- 0-lim
       plot(X, col=colscheme, breaks=breaks, main=paste(month.name[m], elements[e]), axes=F, type="continuous")
@@ -124,32 +125,4 @@ for(e in 1:3){
 }
 
 plot(X)
-
-#-----------------------------------------
-# spot check the time series
-element <- elements.cru[e]
-dir <- "//objectstore2.nrs.bcgov/ffec/TimeSeries_gridded_monthly/cru_ts4.05"
-files <- list.files(dir, pattern="\\.nc$")
-r <- rast(paste(dir, files[grep(element, files)], sep="/"))
-
-r <- crop(r, studyarea)
-r <- mask(r, buff.na)
-# plot(r[[1]])
-
-# reduce to selected month
-temp <- r[[which(substr(time(r),6,7)==monthcodes[m])]]
-names(temp) <- substr(time(temp),1,4)
-
-# extract the time series for a single location
-point <- vect(matrix(c(-105, 70), 1))
-plot(point, add=T)
-ts <- extract(temp, point, id=F)
-ts.x <- names(ts)[2:121]
-ts.y <- as.numeric(ts[2:121])
-ts.n <- as.numeric(ts[122:length(ts)])
-
-plot(ts.x, ts.y)
-lines(c(1961,1990), rep(mean(ts.y[ts.x%in%1961:1990]),2))
-lines(c(2001,2020), rep(mean(ts.y[ts.x%in%2001:2020]),2))
-
 
