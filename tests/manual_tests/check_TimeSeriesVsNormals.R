@@ -405,8 +405,8 @@ dev.off()
 #-----------------------------------------
 
 #calculate the ahccd anomalies
-stn <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/AHCCD/AHCCD_BCAB_location.csv")
-ahccd <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/AHCCD/AHCCD_BCAB.csv")
+stn <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/AHCCD/AHCCD_location.csv")
+ahccd <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/AHCCD/AHCCD.csv")
 ahccd <- ahccd[,- "tmean"]
 names(ahccd) <- c("id", "year", "month", "Tmin", "Tmax", "PPT")
 
