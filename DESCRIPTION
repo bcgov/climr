@@ -1,5 +1,5 @@
 Package: climr
-Title: Downscaling climate data in R
+Title: An R package of downscaled monthly climate data for North America
 Version: 0.1.1.0001
 Date: 12-09-2024
 Authors@R: c(
