@@ -50,6 +50,7 @@
 #' @template max_run
 #' @template run_nm
 #' @param cache logical. Cache data locally? Default `TRUE`
+#' @param local logical. Is the postgres database local? Default `FALSE`
 #' @param ... other arguments passed to [`downscale_core()`]. Namely: `return_refperiod`,
 #'   `vars`, `out_spatial` and `plot`
 
@@ -110,7 +111,9 @@ downscale <- function(xyz, which_refmap = "auto",
                       gcm_periods = NULL, gcm_ssp_years = NULL,
                       gcm_hist_years = NULL, max_run = 0L,
                       run_nm = NULL,
-                      cache = TRUE, ...) {
+                      cache = TRUE,
+                      local = FALSE,
+                      ...) {
   message("Welcome to climr!")
 
   ## checks
@@ -123,7 +126,7 @@ downscale <- function(xyz, which_refmap = "auto",
   expectedCols <- c("lon", "lat", "elev", "id")
   xyz <- .checkXYZ(copy(xyz), expectedCols)
 
-  dbCon <- data_connect()
+  dbCon <- data_connect(local = local)
   thebb <- get_bb(xyz) ## get bounding box based on input points
 
   rmCols <- setdiff(names(xyz), expectedCols)
