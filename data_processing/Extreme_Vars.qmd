@@ -48,21 +48,48 @@ bio_stats <- dcast(temp, id ~ variable + Quantile)
 
 ## CMD Variables
 
-```{r}
-calc_cmd <- function(vals){
-  res <- numeric(length(vals))
-  res[1] <- vals[1]
-  for(i in 2:length(vals)){
-    prev <- res[i-1]
+```{Rcpp}
+#include <Rcpp.h>
+using namespace Rcpp;
+using namespace std;
+
+// [[Rcpp::export]]
+NumericVector cmd_sum(NumericVector vals, double cutoff){
+  NumericVector res = NumericVector(vals.size());
+  res[0] = vals[0];
+  double prev, tmp;
+  for(int i = 1; i < vals.size(); i++){
+    prev = res[i-1];
     if(vals[i] < 0){
-      if(prev > 500) prev <- 500
+      if(prev > cutoff){
+        prev = cutoff;
+      }
     }
-    tmp <- prev + vals[i]
-    if(tmp < 0) tmp <- 0
-    res[i] <- tmp
+    tmp = prev + vals[i];
+    if(tmp < 0){
+      tmp = 0;
+    }
+    res[i] = tmp;
   }
-  return(res)
+  return(res);
 }
+```
+
+```{r}
+# calc_cmd <- function(vals){
+#   res <- numeric(length(vals))
+#   res[1] <- vals[1]
+#   for(i in 2:length(vals)){
+#     prev <- res[i-1]
+#     if(vals[i] < 0){
+#       if(prev > 500) prev <- 500
+#     }
+#     tmp <- prev + vals[i]
+#     if(tmp < 0) tmp <- 0
+#     res[i] <- tmp
+#   }
+#   return(res)
+# }
 ```
 
 ```{r}
@@ -83,7 +110,7 @@ cmd_res <- res2[Var == "CMD",.(id,PERIOD,Var,Month,value)]
 setorder(cmd_res, id, PERIOD, Month)
 cmd_res[precip_recharge, precip_sum := precip_sum, on = c("id","PERIOD","Month")]
 cmd_res[!is.na(precip_sum),value := value - precip_sum]
-cmd_res[,cmd_sum := calc_cmd(value), by = .(id)]
+cmd_res[,cmd_sum := cmd_sum(value, cutoff = 500), by = .(id)]
 
 cmd_res[,Date := as.Date(paste0(PERIOD,"-",Month,"-01"))]
 
