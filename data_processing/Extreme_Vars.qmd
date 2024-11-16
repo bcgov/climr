@@ -52,21 +52,48 @@ bio_stats <- dcast(temp, id ~ variable + Quantile)
 
 ## CMD Variables
 
-```{r}
-calc_cmd <- function(vals){
-  res <- numeric(length(vals))
-  res[1] <- vals[1]
-  for(i in 2:length(vals)){
-    prev <- res[i-1]
+```{Rcpp}
+#include <Rcpp.h>
+using namespace Rcpp;
+using namespace std;
+
+// [[Rcpp::export]]
+NumericVector cmd_sum(NumericVector vals, double cutoff){
+  NumericVector res = NumericVector(vals.size());
+  res[0] = vals[0];
+  double prev, tmp;
+  for(int i = 1; i < vals.size(); i++){
+    prev = res[i-1];
     if(vals[i] < 0){
-      if(prev > 500) prev <- 500
+      if(prev > cutoff){
+        prev = cutoff;
+      }
     }
-    tmp <- prev + vals[i]
-    if(tmp < 0) tmp <- 0
-    res[i] <- tmp
+    tmp = prev + vals[i];
+    if(tmp < 0){
+      tmp = 0;
+    }
+    res[i] = tmp;
   }
-  return(res)
+  return(res);
 }
+```
+
+```{r}
+# calc_cmd <- function(vals){
+#   res <- numeric(length(vals))
+#   res[1] <- vals[1]
+#   for(i in 2:length(vals)){
+#     prev <- res[i-1]
+#     if(vals[i] < 0){
+#       if(prev > 500) prev <- 500
+#     }
+#     tmp <- prev + vals[i]
+#     if(tmp < 0) tmp <- 0
+#     res[i] <- tmp
+#   }
+#   return(res)
+# }
 ```
 
 ```{r}
@@ -87,7 +114,7 @@ cmd_res <- res2[Var == "CMD",.(id,PERIOD,Var,Month,value)]
 setorder(cmd_res, id, PERIOD, Month)
 cmd_res[precip_recharge, precip_sum := precip_sum, on = c("id","PERIOD","Month")]
 cmd_res[!is.na(precip_sum),value := value - precip_sum]
-cmd_res[,cmd_sum := calc_cmd(value), by = .(id)]
+cmd_res[,cmd_sum := cmd_sum(value, cutoff = 500), by = .(id)]
 
 cmd_res[,Date := as.Date(paste0(PERIOD,"-",Month,"-01"))]
 
@@ -116,7 +143,7 @@ ggplot(cmd.temp, aes(x = Date, y = cmd_sum)) +
 cmd_max_ann <- cmd_res[,.(CMD_Max = max(cmd_sum)), by = .(id, PERIOD)]
 
 ##three year rolling sum of cmd max
-cmd_max_ann[,CMD_3yr := frollsum(CMD_Max, n = 3), by = .(id)]
+cmd_max_ann[,CMD_3yr := frollsum(CMD_Max, n = 3), by = .(id)] ## maximum value
 
 ## number of months with drought
 cmd_drought_md <- cmd_res[cmd_sum > 600, .(CMD_Drought_MD = .N), by = .(id)]
@@ -134,10 +161,12 @@ cmd_max_nrm <- cmd_max_ann[,.(CMD_Max_01 = quantile(CMD_Max,0.01),
                               CMD_Max_5 = quantile(CMD_Max,0.5),
                               CMD_Max_99 = quantile(CMD_Max,0.99)),
                            by = .(id)]
+cmd_3yr <- cmd_max_ann[,.(CMD_Max3yr = max(CMD_3yr, na.rm = T)), by = .(id)]
 all_normal <- merge(bio_stats, cmd_max_nrm, by = "id", all = T)
 all_normal <- merge(all_normal, hdr_25, by = "id",all = T)
 all_normal <- merge(all_normal, hdr_30, by = "id", all = T)
 all_normal <- merge(all_normal, hdr_35, by = "id", all = T)
+
 all_normal <- merge(all_normal, cmd_drought_md, by = "id", all = T)
 all_normal <- merge(all_normal, cmd_drought_vd, by = "id", all = T)
 all_normal <- merge(all_normal, cmd_drought_ed, by = "id", all = T)
@@ -154,4 +183,178 @@ all_normal <- all_normal %>% mutate(zone = str_extract(id, "([:A-Z]+)"))
 ggplot(all_normal, aes(x = id, y = CMD_Drought_ED, fill = zone)) +
   geom_col() +
    facet_wrap(~zone, scales = "free_x")
+
+```
+
+```{r}
+
+make_extreme_vars <- function(pnts){
+  bio_vars <- c("MAT","MWMT","MCMT","TD","MAP","MSP","AHM","SHM","DDsub0","DD5","DDsub18","DD18",
+              "NFFD","FFP","bFFP","eFFP","PAS","EMT","EXT","Eref","CMD","RH","CMI",
+              "Tmax_at", "Tmax_sm", "Tmax_sp", "Tmax_wt", 
+              "Tmin_at", "Tmin_sm", "Tmin_sp", "Tmin_wt",
+              "PPT_at", "PPT_sm", "PPT_sp", "PPT_wt")
+  cmd_vars <- list_vars("Monthly")[grep("CMD|PPT|Tmax",list_vars("Monthly"))]
+  res <- downscale(pnts, which_refmap = "refmap_climr", 
+                 obs_years = 1961:1990, 
+                 obs_ts_dataset = "cru.gpcc", 
+                 vars = c(bio_vars, cmd_vars))
+  res <- res[!is.na(DATASET),]
+  
+  ##quantiles
+  bio_stats <- res[,lapply(.SD, function(x) quantile(x, c(0.01,0.5,0.99))),
+                 .SDcols = bio_vars, 
+                 by = .(id)]
+  bio_stats[,Quantile := rep(c("01","50","99"),nrow(pnts))]
+  temp <- melt(bio_stats, id.vars = c("id","Quantile"))
+  bio_stats <- dcast(temp, id ~ variable + Quantile)
+  
+  ##CMD vars
+  vars_tmp <- c("id","DATASET","PERIOD",cmd_vars)
+  res2 <- res[,..vars_tmp]
+  res2 <- melt(res2, id.vars = c("id","DATASET","PERIOD"))
+  res2[,c("Var","Month") := tstrsplit(variable,"_")]
+  res2[,Month := as.numeric(Month)]
+  res_precip <- res2[Var == "PPT" & Month %in% c(10,11,12,1,2,3),.(id,PERIOD,Month,value)]
+  setorder(res_precip, id, PERIOD, Month)
+  precip_recharge <- res_precip[,.(precip_sum = sum(value)), by = .(id,PERIOD)]
+  precip_recharge[,Month := 3]
+  
+  cmd_res <- res2[Var == "CMD",.(id,PERIOD,Var,Month,value)]
+  setorder(cmd_res, id, PERIOD, Month)
+  cmd_res[precip_recharge, precip_sum := precip_sum, on = c("id","PERIOD","Month")]
+  cmd_res[!is.na(precip_sum),value := value - precip_sum]
+  cmd_res[,cmd_sum := cmd_sum(value, cutoff = 500), by = .(id)] ##this line uses the C++ function
+  
+  cmd_res[,Date := as.Date(paste0(PERIOD,"-",Month,"-01"))]
+  t_res <- res2[Var == "Tmax",.(id,PERIOD,Var,Month,value)]
+  setorder(t_res, id, PERIOD, Month)
+  cmd_res[t_res, tmax := i.value, on = c("id","PERIOD","Month")]
+  
+  ##summarise variables
+  ##yearly CMD_sum max
+  cmd_max_ann <- cmd_res[,.(CMD_Max = max(cmd_sum)), by = .(id, PERIOD)]
+  
+  ##three year rolling sum of cmd max
+  cmd_max_ann[,CMD_3yr := frollsum(CMD_Max, n = 3), by = .(id)] ## maximum value
+  
+  ## number of months with drought
+cmd_drought_md <- cmd_res[cmd_sum > 600, .(CMD_Drought_MD = .N), by = .(id)]
+cmd_drought_vd <- cmd_res[cmd_sum > 800, .(CMD_Drought_VD = .N), by = .(id)]
+cmd_drought_ed <- cmd_res[cmd_sum > 1000, .(CMD_Drought_ED = .N), by = .(id)]
+cmd_drought_xd <- cmd_res[cmd_sum > 1200, .(CMD_Drought_XD = .N), by = .(id)]
+  
+  ##number of months with heat drought
+  hdr_25 <- cmd_res[cmd_sum > 600 & tmax > 25, .(HDR_25 = .N), by = .(id)]
+  hdr_30 <- cmd_res[cmd_sum > 600 & tmax > 30, .(HDR_30 = .N), by = .(id)]
+  hdr_35 <- cmd_res[cmd_sum > 600 & tmax > 35, .(HDR_35 = .N), by = .(id)]
+  
+  ##normal period CMD_sum statistics
+  cmd_max_nrm <- cmd_max_ann[,.(CMD_Max_01 = quantile(CMD_Max,0.01),
+                                CMD_Max_5 = quantile(CMD_Max,0.5),
+                                CMD_Max_99 = quantile(CMD_Max,0.99)),
+                             by = .(id)]
+  cmd_3yr <- cmd_max_ann[,.(CMD_Max3yr = max(CMD_3yr, na.rm = T)), by = .(id)]
+  all_normal <- merge(bio_stats, cmd_max_nrm, by = "id", all = T)
+  all_normal <- merge(all_normal, hdr_25, by = "id",all = T)
+  all_normal <- merge(all_normal, hdr_30, by = "id", all = T)
+  all_normal <- merge(all_normal, hdr_35, by = "id", all = T)
+  #all_normal <- merge(all_normal, cmd_drought, by = "id", all = T)
+  all_normal <- merge(all_normal, cmd_3yr, by = "id", all = T)
+  all_normal <- merge(all_normal, cmd_drought_md, by = "id", all = T)
+all_normal <- merge(all_normal, cmd_drought_vd, by = "id", all = T)
+all_normal <- merge(all_normal, cmd_drought_ed, by = "id", all = T)
+all_normal <- merge(all_normal, cmd_drought_xd, by = "id", all = T)
+  #setnafill(all_normal, fill = 0, cols = names(all_normal[-1]))
+  
+  all_normal[is.na(all_normal)] <- 0
+  return(all_normal)
+}
+```
+
+```{r}
+make_extreme_vars_fut <- function(pnts, period = 2041:2060, gcm = list_gcms()[1]){
+  bio_vars <- c("MAT","MWMT","MCMT","TD","MAP","MSP","AHM","SHM","DDsub0","DD5","DDsub18","DD18",
+              "NFFD","FFP","bFFP","eFFP","PAS","EMT","EXT","Eref","CMD","RH","CMI",
+              "Tmax_at", "Tmax_sm", "Tmax_sp", "Tmax_wt", 
+              "Tmin_at", "Tmin_sm", "Tmin_sp", "Tmin_wt",
+              "PPT_at", "PPT_sm", "PPT_sp", "PPT_wt")
+  cmd_vars <- list_vars("Monthly")[grep("CMD|PPT|Tmax",list_vars("Monthly"))]
+  res <- downscale(pnts, which_refmap = "refmap_climr", 
+                 gcms = gcm,
+                 ssps = list_ssps()[2],
+                 gcm_ssp_years = period,
+                 max_run = 3L,
+                 vars = c(bio_vars, cmd_vars))
+  res <- res[!is.na(GCM),][RUN != "ensembleMean",]
+  
+  ##quantiles
+  bio_stats <- res[,lapply(.SD, function(x) quantile(x, c(0.01,0.5,0.99))),
+                 .SDcols = bio_vars, 
+                 by = .(id, GCM, RUN)]
+  bio_stats[,Quantile := rep(c("01","50","99"),nrow(bio_stats)/3)]
+  temp <- melt(bio_stats, id.vars = c("id","GCM","RUN", "Quantile"))
+  bio_stats <- dcast(temp, id + GCM + RUN ~ variable + Quantile)
+  
+  ##CMD vars
+  vars_tmp <- c("id","GCM","RUN","PERIOD",cmd_vars)
+  res2 <- res[,..vars_tmp]
+  res2 <- melt(res2, id.vars = c("id","GCM","RUN","PERIOD"))
+  res2[,c("Var","Month") := tstrsplit(variable,"_")]
+  res2[,Month := as.numeric(Month)]
+  res_precip <- res2[Var == "PPT" & Month %in% c(10,11,12,1,2,3),.(id,Month,GCM, RUN,PERIOD,value)]
+  setorder(res_precip, id,GCM,RUN,PERIOD, Month)
+  precip_recharge <- res_precip[,.(precip_sum = sum(value)), by = .(id,GCM,RUN,PERIOD)]
+  precip_recharge[,Month := 3]
+  
+  cmd_res <- res2[Var == "CMD",.(id,GCM,RUN,PERIOD,Var,Month,value)]
+  setorder(cmd_res, id, GCM,RUN,PERIOD, Month)
+  cmd_res[precip_recharge, precip_sum := precip_sum, on = c("id","GCM","RUN","PERIOD","Month")]
+  cmd_res[!is.na(precip_sum),value := value - precip_sum]
+  cmd_res[,cmd_sum := cmd_sum(value, cutoff = 500), by = .(id,GCM,RUN)] ##this line uses the C++ function
+  
+  cmd_res[,Date := as.Date(paste0(PERIOD,"-",Month,"-01"))]
+  t_res <- res2[Var == "Tmax",.(id,GCM,RUN,PERIOD,Var,Month,value)]
+  setorder(t_res, id,GCM,RUN, PERIOD, Month)
+  cmd_res[t_res, tmax := i.value, on = c("id","GCM","RUN","PERIOD","Month")]
+  
+  ##summarise variables
+  ##yearly CMD_sum max
+  cmd_max_ann <- cmd_res[,.(CMD_Max = max(cmd_sum)), by = .(id,GCM,RUN, PERIOD)]
+  
+  ##three year rolling sum of cmd max
+  cmd_max_ann[,CMD_3yr := frollsum(CMD_Max, n = 3), by = .(id,GCM,RUN)] ## maximum value
+  
+  ## number of months with drought
+  cmd_drought <- cmd_res[cmd_sum > 600, .(CMD_Drought = .N), by = .(id,GCM,RUN)]
+  
+  ##number of months with heat drought
+  hdr_25 <- cmd_res[cmd_sum > 600 & tmax > 25, .(HDR_25 = .N), by = .(id,GCM,RUN)]
+  hdr_30 <- cmd_res[cmd_sum > 600 & tmax > 30, .(HDR_30 = .N), by = .(id,GCM,RUN)]
+  hdr_35 <- cmd_res[cmd_sum > 600 & tmax > 35, .(HDR_35 = .N), by = .(id,GCM,RUN)]
+  
+  ##normal period CMD_sum statistics
+  cmd_max_nrm <- cmd_max_ann[,.(CMD_Max_01 = quantile(CMD_Max,0.01),
+                                CMD_Max_5 = quantile(CMD_Max,0.5),
+                                CMD_Max_99 = quantile(CMD_Max,0.99)),
+                             by = .(id,GCM,RUN)]
+  cmd_3yr <- cmd_max_ann[,.(CMD_Max3yr = max(CMD_3yr, na.rm = T)), by = .(id,GCM,RUN)]
+  all_normal <- merge(bio_stats, cmd_max_nrm, by = c("id","GCM","RUN"), all = T)
+  all_normal <- merge(all_normal, hdr_25, by = c("id","GCM","RUN"),all = T)
+  all_normal <- merge(all_normal, hdr_30, by = c("id","GCM","RUN"), all = T)
+  all_normal <- merge(all_normal, hdr_35, by = c("id","GCM","RUN"), all = T)
+  all_normal <- merge(all_normal, cmd_drought, by = c("id","GCM","RUN"), all = T)
+  all_normal <- merge(all_normal, cmd_3yr, by = c("id","GCM","RUN"), all = T)
+  #setnafill(all_normal, fill = 0, cols = names(all_normal[-1]))
+  
+  all_normal[is.na(all_normal)] <- 0
+  return(all_normal)
+}
+```
+
+## Test Functions
+
+```{r}
+dat_fut <- make_extreme_vars_fut(pnts, period = 2041:2060, gcm = list_gcms()[1])
+
 ```
