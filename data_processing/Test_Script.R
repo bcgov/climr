@@ -1,8 +1,95 @@
 library(data.table)
-
 library(terra)
 library(climr)
+library(RPostgres)
 
+dbCon <- data_connect()
+bbox <- c(55,51.5,-115,-128)
+
+cache_clear("reference")
+climna <- input_refmap(dbCon, bbox)
+plot(climna[[15]])
+
+pnts <- data.table(lon = c(-127.18, -123.46, -125), lat = c(54.89, 48.78, 48.3), elev = c(540,67, 102), id = 1:3)
+pnts <- data.table(lon = c(-121.20225,-126.39689,-117.97568,-127.29956,-127.12704,-118.7898,-123.45617,-123.37194), 
+                   lat = c(50.77239,54.73596,50.28127,50.28127,54.83288,50.24118,48.79616,52.49457), 
+                   elev = c(588,985,1067,55,563,799,306,1103), 
+                   id = c("BGxm1","SBSmc2","ICHmw2","CWHvm1","SBSdk","ICHxm1","CDFmm","SBPSdc"))
+name <- "normal_composite"
+bands <- 1:73
+
+dbGetTiles <- function(dbCon, name, pnts, rast = "rast", bands = 1:73){
+  
+  pnts[,mls := paste0("(",lon," ",lat,")")]
+  wkt_str <- paste0("MULTIPOINT(", paste(pnts$mls, collapse = ", "),")")
+  qry <- paste0("select rid as id,
+            st_xmax(st_envelope(rast)) as xmx,
+            st_xmin(st_envelope(rast)) as xmn,
+            st_ymax(st_envelope(rast)) as ymx,
+            st_ymin(st_envelope(rast)) as ymn,
+            st_width(rast) as cols,
+            st_height(rast) as rows
+            from
+            ", name," 
+            WHERE ST_Intersects(
+              rast,ST_SetSRID(
+                ST_GeomFromText('",wkt_str,"'),
+                4326
+              )
+            )
+            ")
+  
+  info <- dbGetQuery(dbCon,qry)
+  
+  bandqs1 <- paste0("UNNEST(ST_Dumpvalues(rast, ", bands, ")) as vals_", bands)
+  
+  qry2 <- paste0("select rid, ", 
+         paste(bandqs1, collapse = ", "),
+         " from ", name,
+         " where rid IN (",paste(info$id, collapse = ", "),")")
+  r_values <- dbGetQuery(dbCon,qry2)
+  
+  rast_vals <- suppressWarnings(melt(r_values, id.vars = c("rid")))
+  out_list <- list()
+  for(tile in unique(info$id)){
+    info_tl <- info[info$id == tile,]
+    rout <- rast(
+      nrows = info_tl$rows, ncols = info_tl$cols, xmin = info_tl$xmn,
+      xmax = info_tl$xmx, ymin = info_tl$ymn, ymax = info_tl$ymx, nlyrs = length(bands),
+      crs = paste0("EPSG:", 4326), vals = rast_vals$value[rast_vals$rid == tile]
+    )
+    out_list[[as.character(tile)]] <- rout
+  }
+  
+  rsrc <- sprc(out_list)
+  rast_res <- merge(rsrc)
+  return(rast_res)
+}
+
+out <- dbGetTiles(dbCon, "\"gcm_mpi-esm1-2-hr\"", pnts)
+plot(out[[15]])
+out <- dbGetTiles(dbCon, "normal_composite", pnts)
+plot(out[[15]])
+
+
+varsl = c("DD5", "DDsub0_at", "DDsub0_wt", "PPT_05", "PPT_06", "PPT_07", "PPT_08",
+          "PPT_09", "CMD", "PPT_at", "PPT_wt", "CMD_07", "SHM", "AHM", "NFFD", "PAS", 
+          "CMI", "Tmax_sm", "TD", "PPT_sm", "DD5_sp", "PPT_sp", "PPT_sm", "Tmax_at", "Tmax_wt", "Tmax_sp", "Tmax_sm",
+          "Tmin_at", "Tmin_wt", "Tmin_sp", "Tmin_sm")
+varsl = unique(varsl)
+
+cache_clear()
+load("my_grid.Rdata")
+setDT(my_grid)
+my_grid <- my_grid[lat < 60,]
+clim.bc <- downscale(
+  xyz = my_grid,   which_refmap = "auto",
+  obs_periods = "2001_2020", 
+  vars = varsl)
+
+
+
+bc_pnts <- c(59.9987500001111, 48.3126388889072, -114.057083333295, -138.998750000111)
 
 wlr <- rast("../Common_Files/composite_WNA_dem.tif")
 plot(wlr)
@@ -17,6 +104,10 @@ db <- data_connect()
 bbox <- get_bb(my_grid)
 bbox2 <- c(20,14.83,-80,-120)
 refmap <- input_refmap(db, bbox)
+
+db <- data_connect()
+refmap_na <- input_refmap(db, bbox = bc_pnts, reference = "refmap_climr")
+plot(refmap_na$Tmax_07)
 
 plot(refmap$Tmax_07)
 
