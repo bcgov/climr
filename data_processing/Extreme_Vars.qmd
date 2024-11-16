@@ -146,10 +146,11 @@ cmd_max_ann <- cmd_res[,.(CMD_Max = max(cmd_sum)), by = .(id, PERIOD)]
 cmd_max_ann[,CMD_3yr := frollsum(CMD_Max, n = 3), by = .(id)] ## maximum value
 
 ## number of months with drought
-cmd_drought_md <- cmd_res[cmd_sum > 600, .(CMD_Drought_MD = .N), by = .(id)]
-cmd_drought_vd <- cmd_res[cmd_sum > 800, .(CMD_Drought_VD = .N), by = .(id)]
-cmd_drought_ed <- cmd_res[cmd_sum > 1000, .(CMD_Drought_ED = .N), by = .(id)]
-cmd_drought_xd <- cmd_res[cmd_sum > 1200, .(CMD_Drought_XD = .N), by = .(id)]
+cmd_grow <- cmd_res %>% filter(Month %in% c(4:9))
+cmd_drought_md <- cmd_grow[cmd_sum > 600, .(CMD_Drought_MD = .N), by = .(id)]
+cmd_drought_vd <- cmd_grow[cmd_sum > 800, .(CMD_Drought_VD = .N), by = .(id)]
+cmd_drought_ed <- cmd_grow[cmd_sum > 1000, .(CMD_Drought_ED = .N), by = .(id)]
+cmd_drought_xd <- cmd_grow[cmd_sum > 1200, .(CMD_Drought_XD = .N), by = .(id)]
 
 ##number of months with heat drought
 hdr_25 <- cmd_res[cmd_sum > 600 & tmax > 25, .(HDR_25 = .N), by = .(id)]
@@ -180,7 +181,7 @@ all_normal <- all_normal %>% mutate(zone = str_extract(id, "([:A-Z]+)"))
 ```{r ggplot of drought evens}
 
 #ggplot of CMD_Drought
-ggplot(all_normal, aes(x = id, y = CMD_Drought_ED, fill = zone)) +
+ggplot(all_normal, aes(x = id, y = CMD_Drought_VD, fill = zone)) +
   geom_col() +
    facet_wrap(~zone, scales = "free_x")
 
@@ -239,10 +240,11 @@ make_extreme_vars <- function(pnts){
   cmd_max_ann[,CMD_3yr := frollsum(CMD_Max, n = 3), by = .(id)] ## maximum value
   
   ## number of months with drought
-cmd_drought_md <- cmd_res[cmd_sum > 600, .(CMD_Drought_MD = .N), by = .(id)]
-cmd_drought_vd <- cmd_res[cmd_sum > 800, .(CMD_Drought_VD = .N), by = .(id)]
-cmd_drought_ed <- cmd_res[cmd_sum > 1000, .(CMD_Drought_ED = .N), by = .(id)]
-cmd_drought_xd <- cmd_res[cmd_sum > 1200, .(CMD_Drought_XD = .N), by = .(id)]
+cmd_grow <- cmd_res %>% filter(Month %in% c(4:9))
+cmd_drought_md <- cmd_grow[cmd_sum > 600, .(CMD_Drought_MD = .N), by = .(id)]
+cmd_drought_vd <- cmd_grow[cmd_sum > 800, .(CMD_Drought_VD = .N), by = .(id)]
+cmd_drought_ed <- cmd_grow[cmd_sum > 1000, .(CMD_Drought_ED = .N), by = .(id)]
+cmd_drought_xd <- cmd_grow[cmd_sum > 1200, .(CMD_Drought_XD = .N), by = .(id)]
   
   ##number of months with heat drought
   hdr_25 <- cmd_res[cmd_sum > 600 & tmax > 25, .(HDR_25 = .N), by = .(id)]
