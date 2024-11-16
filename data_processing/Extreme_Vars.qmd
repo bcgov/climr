@@ -122,18 +122,22 @@ cmd_res[,Date := as.Date(paste0(PERIOD,"-",Month,"-01"))]
 
 ## Plot CMD Sum
 
-```{r}
+```{r heatdrought, fig.cap = "Heat drought events for each site."}
+#| label: fig-heatdrought
+#| fig-cap: "CMD heat sum and heat drought events"
+#| fig-height: 12
+#| warning: false
 t_res <- res2[Var == "Tmax",.(id,PERIOD,Var,Month,value)]
 setorder(t_res, id, PERIOD, Month)
 cmd_res[t_res, tmax := i.value, on = c("id","PERIOD","Month")]
 
-cmd.temp <- cmd_res %>% filter(grepl("IDFd", id))
-temp <- cmd_res[cmd_sum > 600 & tmax > 30,] %>% filter(grepl("IDFd", id))
+cmd.temp <- cmd_res %>% filter(grepl("IDFx", id))
+temp <- cmd_res[cmd_sum > 800 & tmax > 30,] %>% filter(grepl("IDFx", id))
 
 ggplot(cmd.temp, aes(x = Date, y = cmd_sum)) +
   geom_line() +
-  geom_point(data = temp)+
-  facet_wrap(~id, ncol = 1)
+  geom_point(data = temp, color = "red", size = 3)+
+  facet_wrap(~id, ncol = 4)
 ```
 
 ## Normal Period Variables
@@ -153,10 +157,14 @@ cmd_drought_ed <- cmd_grow[cmd_sum > 1000, .(CMD_Drought_ED = .N), by = .(id)]
 cmd_drought_xd <- cmd_grow[cmd_sum > 1200, .(CMD_Drought_XD = .N), by = .(id)]
 
 ##number of months with heat drought
-hdr_25 <- cmd_res[cmd_sum > 600 & tmax > 25, .(HDR_25 = .N), by = .(id)]
-hdr_30 <- cmd_res[cmd_sum > 600 & tmax > 30, .(HDR_30 = .N), by = .(id)]
-hdr_35 <- cmd_res[cmd_sum > 600 & tmax > 35, .(HDR_35 = .N), by = .(id)]
+hdr_md_25 <- cmd_res[cmd_sum > 600 & tmax > 25, .(HDR_25 = .N), by = .(id)]
+hdr_md_30 <- cmd_res[cmd_sum > 600 & tmax > 30, .(HDR_30 = .N), by = .(id)]
+hdr_md_35 <- cmd_res[cmd_sum > 600 & tmax > 35, .(HDR_35 = .N), by = .(id)]
 
+##number of months with heat drought
+hdr_ed_25 <- cmd_res[cmd_sum > 1000 & tmax > 25, .(HDR_25 = .N), by = .(id)]
+hdr_ed_30 <- cmd_res[cmd_sum > 1000 & tmax > 30, .(HDR_30 = .N), by = .(id)]
+hdr_ed_35 <- cmd_res[cmd_sum > 1000 & tmax > 35, .(HDR_35 = .N), by = .(id)]
 ##normal period CMD_sum statistics
 cmd_max_nrm <- cmd_max_ann[,.(CMD_Max_01 = quantile(CMD_Max,0.01),
                               CMD_Max_5 = quantile(CMD_Max,0.5),
@@ -164,9 +172,15 @@ cmd_max_nrm <- cmd_max_ann[,.(CMD_Max_01 = quantile(CMD_Max,0.01),
                            by = .(id)]
 cmd_3yr <- cmd_max_ann[,.(CMD_Max3yr = max(CMD_3yr, na.rm = T)), by = .(id)]
 all_normal <- merge(bio_stats, cmd_max_nrm, by = "id", all = T)
-all_normal <- merge(all_normal, hdr_25, by = "id",all = T)
-all_normal <- merge(all_normal, hdr_30, by = "id", all = T)
-all_normal <- merge(all_normal, hdr_35, by = "id", all = T)
+all_normal <- merge(all_normal, hdr_md_25, by = "id",all = T)
+all_normal <- merge(all_normal, hdr_md_30, by = "id", all = T)
+all_normal <- merge(all_normal, hdr_md_35, by = "id", all = T)
+
+all_normal <- merge(all_normal, hdr_ed_25, by = "id",all = T)
+all_normal <- merge(all_normal, hdr_ed_30, by = "id", all = T)
+all_normal <- merge(all_normal, hdr_ed_35, by = "id", all = T)
+
+
 
 all_normal <- merge(all_normal, cmd_drought_md, by = "id", all = T)
 all_normal <- merge(all_normal, cmd_drought_vd, by = "id", all = T)
@@ -178,16 +192,40 @@ all_normal[is.na(all_normal)] <- 0
 all_normal <- all_normal %>% mutate(zone = str_extract(id, "([:A-Z]+)"))
 ```
 
-```{r ggplot of drought evens}
+```{r ggplot of drought events}
+#| label: fig-md_droughtmonths
+#| fig-cap: "Months of moderate drought by Zone"
+#| fig-width: 8
+#| fig-height: 12
+#| out-width: 8in
+#| out-height: 12in
 
-#ggplot of CMD_Drought
-ggplot(all_normal, aes(x = id, y = CMD_Drought_VD, fill = zone)) +
+reduced_normal <- all_normal %>% filter(zone %in% c("IDF", "ICH","PP","MS","BG","SBPS", "GBD"))
+
+ggplot(reduced_normal, aes(x = id, y = CMD_Drought_MD, fill = zone)) +
   geom_col() +
-   facet_wrap(~zone, scales = "free_x")
+   facet_wrap(~zone, scales = "free_x", ncol=3) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```
 
-```{r}
+```{r ggplot of drought events}
+#| label: fig-ex_droughtmonths
+#| fig-cap: "Months of excessive drought by Zone"
+#| fig-width: 8
+#| fig-height: 12
+#| out-width: 8in
+#| out-height: 12in
+
+reduced_normal <- all_normal %>% filter(zone %in% c("IDF", "ICH","PP","MS","BG","SBPS", "GBD"))
+ggplot(reduced_normal, aes(x = id, y = CMD_Drought_ED, fill = zone)) +
+  geom_col() +
+   facet_wrap(~zone, scales = "free_x", ncol=2) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+```{r  func1, echo = FALSE}
 
 make_extreme_vars <- function(pnts){
   bio_vars <- c("MAT","MWMT","MCMT","TD","MAP","MSP","AHM","SHM","DDsub0","DD5","DDsub18","DD18",
@@ -274,7 +312,7 @@ all_normal <- merge(all_normal, cmd_drought_xd, by = "id", all = T)
 }
 ```
 
-```{r}
+```{r  func2, echo = FALSE}
 make_extreme_vars_fut <- function(pnts, period = 2041:2060, gcm = list_gcms()[1]){
   bio_vars <- c("MAT","MWMT","MCMT","TD","MAP","MSP","AHM","SHM","DDsub0","DD5","DDsub18","DD18",
               "NFFD","FFP","bFFP","eFFP","PAS","EMT","EXT","Eref","CMD","RH","CMI",
@@ -354,9 +392,9 @@ make_extreme_vars_fut <- function(pnts, period = 2041:2060, gcm = list_gcms()[1]
 }
 ```
 
-## Test Functions
 
-```{r}
-dat_fut <- make_extreme_vars_fut(pnts, period = 2041:2060, gcm = list_gcms()[1])
 
-```
+```{r test, echo = FALSE}}
+# dat_fut <- make_extreme_vars_fut(pnts, period = 2041:2060, gcm = list_gcms()[1])
+# 
+# ```
