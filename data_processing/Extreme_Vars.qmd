@@ -2,7 +2,7 @@
 title: "Extreme Climate Variables"
 author: "Kiri Daust"
 format: html
-editor: visual
+editor: source
 ---
 
 ## Load Data
@@ -11,8 +11,12 @@ editor: visual
 library(climr)
 library(data.table)
 library(ggplot2)
+require(tidyverse)
 
-pnts <- data.table(lon = c(-121.20225,-126.39689,-117.97568,-127.29956,-127.12704,-118.7898,-123.45617,-123.37194), lat = c(50.77239,54.73596,50.28127,50.28127,54.83288,50.24118,48.79616,52.49457), elev = c(588,985,1067,55,563,799,306,1103), id = c("BGxm1","SBSmc2","ICHmw2","CWHvm1","SBSdk","ICHxm1","CDFmm","SBPSdc"))
+# pnts <- data.table(lon = c(-121.20225,-126.39689,-117.97568,-127.29956,-127.12704,-118.7898,-123.45617,-123.37194), lat = c(50.77239,54.73596,50.28127,50.28127,54.83288,50.24118,48.79616,52.49457), elev = c(588,985,1067,55,563,799,306,1103), id = c("BGxh1","SBSmc2","ICHmw2","CWHvm1","SBSdk","ICHxm1","CDFmm","SBPSdc"))
+pnts <- fread("D:/OneDrive - Government of BC/WNA_BGC - Future Forest Ecosystems Centre/WNA_v13_200_rndpts_15Nov.csv")
+pnts <- pnts |> rename(lon = xcoord, lat = ycoord, elev = Elev1, id = BGC ) %>% 
+  group_by(id) %>% slice(1)
 
 ```
 
@@ -96,9 +100,10 @@ t_res <- res2[Var == "Tmax",.(id,PERIOD,Var,Month,value)]
 setorder(t_res, id, PERIOD, Month)
 cmd_res[t_res, tmax := i.value, on = c("id","PERIOD","Month")]
 
-temp <- cmd_res[cmd_sum > 600 & tmax > 30,]
+cmd.temp <- cmd_res %>% filter(grepl("IDFd", id))
+temp <- cmd_res[cmd_sum > 600 & tmax > 30,] %>% filter(grepl("IDFd", id))
 
-ggplot(cmd_res, aes(x = Date, y = cmd_sum)) +
+ggplot(cmd.temp, aes(x = Date, y = cmd_sum)) +
   geom_line() +
   geom_point(data = temp)+
   facet_wrap(~id, ncol = 1)
@@ -114,7 +119,10 @@ cmd_max_ann <- cmd_res[,.(CMD_Max = max(cmd_sum)), by = .(id, PERIOD)]
 cmd_max_ann[,CMD_3yr := frollsum(CMD_Max, n = 3), by = .(id)]
 
 ## number of months with drought
-cmd_drought <- cmd_res[cmd_sum > 600, .(CMD_Drought = .N), by = .(id)]
+cmd_drought_md <- cmd_res[cmd_sum > 600, .(CMD_Drought_MD = .N), by = .(id)]
+cmd_drought_vd <- cmd_res[cmd_sum > 800, .(CMD_Drought_VD = .N), by = .(id)]
+cmd_drought_ed <- cmd_res[cmd_sum > 1000, .(CMD_Drought_ED = .N), by = .(id)]
+cmd_drought_xd <- cmd_res[cmd_sum > 1200, .(CMD_Drought_XD = .N), by = .(id)]
 
 ##number of months with heat drought
 hdr_25 <- cmd_res[cmd_sum > 600 & tmax > 25, .(HDR_25 = .N), by = .(id)]
@@ -130,8 +138,20 @@ all_normal <- merge(bio_stats, cmd_max_nrm, by = "id", all = T)
 all_normal <- merge(all_normal, hdr_25, by = "id",all = T)
 all_normal <- merge(all_normal, hdr_30, by = "id", all = T)
 all_normal <- merge(all_normal, hdr_35, by = "id", all = T)
-all_normal <- merge(all_normal, cmd_drought, by = "id", all = T)
-setnafill(all_normal, fill = 0, cols = names(all_normal[-1]))
+all_normal <- merge(all_normal, cmd_drought_md, by = "id", all = T)
+all_normal <- merge(all_normal, cmd_drought_vd, by = "id", all = T)
+all_normal <- merge(all_normal, cmd_drought_ed, by = "id", all = T)
+all_normal <- merge(all_normal, cmd_drought_xd, by = "id", all = T)
+#setnafill(all_normal, fill = 0, cols = names(all_normal[-1]))
 
 all_normal[is.na(all_normal)] <- 0
+all_normal <- all_normal %>% mutate(zone = str_extract(id, "([:A-Z]+)"))
+```
+
+```{r ggplot of drought evens}
+
+#ggplot of CMD_Drought
+ggplot(all_normal, aes(x = id, y = CMD_Drought_ED, fill = zone)) +
+  geom_col() +
+   facet_wrap(~zone, scales = "free_x")
 ```
