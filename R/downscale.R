@@ -51,6 +51,7 @@
 #' @template run_nm
 #' @param cache logical. Cache data locally? Default `TRUE`
 #' @param local logical. Is the postgres database local? Default `FALSE`
+#' @param indiv_tiles logical. Only download necessary tiles instead of full bounding box? This will generally be faster, but doesn't cache.
 #' @param ... other arguments passed to [`downscale_core()`]. Namely: `return_refperiod`,
 #'   `vars`, `out_spatial` and `plot`
 
@@ -113,6 +114,7 @@ downscale <- function(xyz, which_refmap = "auto",
                       run_nm = NULL,
                       cache = TRUE,
                       local = FALSE,
+                      indiv_tiles = FALSE,
                       ...) {
   message("Welcome to climr!")
 
@@ -157,7 +159,7 @@ downscale <- function(xyz, which_refmap = "auto",
 
   message("Getting normals...")
   if(which_refmap %in% c("refmap_climatena","refmap_prism","refmap_climr")){
-    reference <- input_refmap(dbCon = dbCon, reference = which_refmap, bbox = thebb, cache = cache)
+    reference <- input_refmap(dbCon = dbCon, reference = which_refmap, bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
   } else {
     # message("Normals not specified, using highest resolution available for each point")
     rastFile <- system.file("extdata", "wna_outline.tif", package = "climr")
@@ -173,9 +175,9 @@ downscale <- function(xyz, which_refmap = "auto",
       xyz <- xyz[!is.na(pnts$PPT_01), ]
       thebb_bc <- get_bb(xyz)
       message("for BC...")
-      reference <- input_refmap(dbCon = dbCon, reference = "refmap_prism", bbox = thebb_bc, cache = cache)
+      reference <- input_refmap(dbCon = dbCon, reference = "refmap_prism", bbox = thebb_bc, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
     } else {
-      reference <- input_refmap(dbCon = dbCon, reference = "refmap_climatena", bbox = thebb, cache = cache)
+      reference <- input_refmap(dbCon = dbCon, reference = "refmap_climatena", bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
     }
   }
 
@@ -257,7 +259,7 @@ downscale <- function(xyz, which_refmap = "auto",
     na_xyz <- xyz_save[!xyz_save[, 4] %in% bc_ids, ]
     thebb <- get_bb(na_xyz)
     message("Now North America...")
-    reference <- input_refmap(dbCon = dbCon, reference = "refmap_climatena", bbox = thebb, cache = cache)
+    reference <- input_refmap(dbCon = dbCon, reference = "refmap_climatena", bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
 
     results_na <- downscale_core(
       xyz = na_xyz,

@@ -3,6 +3,7 @@
 export(cache_clear)
 export(cache_path)
 export(data_connect)
+export(dbGetTiles)
 export(downscale)
 export(downscale_core)
 export(get_bb)

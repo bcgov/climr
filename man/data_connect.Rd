@@ -4,7 +4,7 @@
 \alias{data_connect}
 \title{Connect to PostGIS database}
 \usage{
-data_connect()
+data_connect(local = FALSE)
 }
 \value{
 pool object of database connection

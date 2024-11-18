@@ -15,6 +15,9 @@ pnts <- data.table(lon = c(-121.20225,-126.39689,-117.97568,-127.29956,-127.1270
                    lat = c(50.77239,54.73596,50.28127,50.28127,54.83288,50.24118,48.79616,52.49457), 
                    elev = c(588,985,1067,55,563,799,306,1103), 
                    id = c("BGxm1","SBSmc2","ICHmw2","CWHvm1","SBSdk","ICHxm1","CDFmm","SBPSdc"))
+
+res <- downscale(pnts, obs_years = 1961:1990, obs_ts_dataset = "cru.gpcc", indiv_tiles = TRUE)
+
 name <- "normal_composite"
 bands <- 1:73
 
