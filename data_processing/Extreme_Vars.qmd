@@ -13,7 +13,7 @@ library(data.table)
 library(ggplot2)
 require(tidyverse)
 
-# pnts <- data.table(lon = c(-121.20225,-126.39689,-117.97568,-127.29956,-127.12704,-118.7898,-123.45617,-123.37194), lat = c(50.77239,54.73596,50.28127,50.28127,54.83288,50.24118,48.79616,52.49457), elev = c(588,985,1067,55,563,799,306,1103), id = c("BGxh1","SBSmc2","ICHmw2","CWHvm1","SBSdk","ICHxm1","CDFmm","SBPSdc"))
+pnts <- data.table(lon = c(-121.20225,-126.39689,-117.97568,-127.29956,-127.12704,-118.7898,-123.45617,-123.37194), lat = c(50.77239,54.73596,50.28127,50.28127,54.83288,50.24118,48.79616,52.49457), elev = c(588,985,1067,55,563,799,306,1103), id = c("BGxh1","SBSmc2","ICHmw2","CWHvm1","SBSdk","ICHxm1","CDFmm","SBPSdc"))
 pnts <- fread("D:/OneDrive - Government of BC/WNA_BGC - Future Forest Ecosystems Centre/WNA_v13_200_rndpts_15Nov.csv")
 pnts <- pnts |> rename(lon = xcoord, lat = ycoord, elev = Elev1, id = BGC ) %>% 
   group_by(id) %>% slice(1)
@@ -225,6 +225,8 @@ ggplot(reduced_normal, aes(x = id, y = CMD_Drought_ED, fill = zone)) +
 
 ```
 
+## Function for normal period vars
+
 ```{r  func1, echo = FALSE}
 
 make_extreme_vars <- function(pnts){
@@ -278,16 +280,25 @@ make_extreme_vars <- function(pnts){
   cmd_max_ann[,CMD_3yr := frollsum(CMD_Max, n = 3), by = .(id)] ## maximum value
   
   ## number of months with drought
-cmd_grow <- cmd_res %>% filter(Month %in% c(4:9))
-cmd_drought_md <- cmd_grow[cmd_sum > 600, .(CMD_Drought_MD = .N), by = .(id)]
-cmd_drought_vd <- cmd_grow[cmd_sum > 800, .(CMD_Drought_VD = .N), by = .(id)]
-cmd_drought_ed <- cmd_grow[cmd_sum > 1000, .(CMD_Drought_ED = .N), by = .(id)]
-cmd_drought_xd <- cmd_grow[cmd_sum > 1200, .(CMD_Drought_XD = .N), by = .(id)]
+  cmd_grow <- cmd_res[Month %in% c(4:9),]
+  cmd_drought_md <- cmd_grow[cmd_sum > 600, .(CMD_Drought_MD = .N), by = .(id)]
+  cmd_drought_vd <- cmd_grow[cmd_sum > 800, .(CMD_Drought_VD = .N), by = .(id)]
+  cmd_drought_ed <- cmd_grow[cmd_sum > 1000, .(CMD_Drought_ED = .N), by = .(id)]
+  cmd_drought_xd <- cmd_grow[cmd_sum > 1200, .(CMD_Drought_XD = .N), by = .(id)]
   
   ##number of months with heat drought
-  hdr_25 <- cmd_res[cmd_sum > 600 & tmax > 25, .(HDR_25 = .N), by = .(id)]
-  hdr_30 <- cmd_res[cmd_sum > 600 & tmax > 30, .(HDR_30 = .N), by = .(id)]
-  hdr_35 <- cmd_res[cmd_sum > 600 & tmax > 35, .(HDR_35 = .N), by = .(id)]
+  hdr_md_25 <- cmd_res[cmd_sum > 600 & tmax > 25, .(HDR_MD_25 = .N), by = .(id)]
+  hdr_md_30 <- cmd_res[cmd_sum > 600 & tmax > 30, .(HDR_MD_30 = .N), by = .(id)]
+  hdr_md_35 <- cmd_res[cmd_sum > 600 & tmax > 35, .(HDR_MD_35 = .N), by = .(id)]
+  
+  hdr_ed_25 <- cmd_res[cmd_sum > 1000 & tmax > 25, .(HDR_ED_25 = .N), by = .(id)]
+  hdr_ed_30 <- cmd_res[cmd_sum > 1000 & tmax > 30, .(HDR_ED_30 = .N), by = .(id)]
+  hdr_ed_35 <- cmd_res[cmd_sum > 1000 & tmax > 35, .(HDR_ED_35 = .N), by = .(id)]
+  
+  hdr_xd_25 <- cmd_res[cmd_sum > 1200 & tmax > 25, .(HDR_XD_25 = .N), by = .(id)]
+  hdr_xd_30 <- cmd_res[cmd_sum > 1200 & tmax > 30, .(HDR_XD_30 = .N), by = .(id)]
+  hdr_xd_35 <- cmd_res[cmd_sum > 1200 & tmax > 35, .(HDR_XD_35 = .N), by = .(id)]
+  
   
   ##normal period CMD_sum statistics
   cmd_max_nrm <- cmd_max_ann[,.(CMD_Max_01 = quantile(CMD_Max,0.01),
@@ -296,20 +307,31 @@ cmd_drought_xd <- cmd_grow[cmd_sum > 1200, .(CMD_Drought_XD = .N), by = .(id)]
                              by = .(id)]
   cmd_3yr <- cmd_max_ann[,.(CMD_Max3yr = max(CMD_3yr, na.rm = T)), by = .(id)]
   all_normal <- merge(bio_stats, cmd_max_nrm, by = "id", all = T)
-  all_normal <- merge(all_normal, hdr_25, by = "id",all = T)
-  all_normal <- merge(all_normal, hdr_30, by = "id", all = T)
-  all_normal <- merge(all_normal, hdr_35, by = "id", all = T)
+  all_normal <- merge(all_normal, hdr_md_25, by = "id",all = T)
+  all_normal <- merge(all_normal, hdr_md_30, by = "id", all = T)
+  all_normal <- merge(all_normal, hdr_md_35, by = "id", all = T)
+  all_normal <- merge(all_normal, hdr_ed_25, by = "id",all = T)
+  all_normal <- merge(all_normal, hdr_ed_30, by = "id", all = T)
+  all_normal <- merge(all_normal, hdr_ed_35, by = "id", all = T)
+  all_normal <- merge(all_normal, hdr_xd_25, by = "id",all = T)
+  all_normal <- merge(all_normal, hdr_xd_30, by = "id", all = T)
+  all_normal <- merge(all_normal, hdr_xd_35, by = "id", all = T)
   #all_normal <- merge(all_normal, cmd_drought, by = "id", all = T)
   all_normal <- merge(all_normal, cmd_3yr, by = "id", all = T)
   all_normal <- merge(all_normal, cmd_drought_md, by = "id", all = T)
-all_normal <- merge(all_normal, cmd_drought_vd, by = "id", all = T)
-all_normal <- merge(all_normal, cmd_drought_ed, by = "id", all = T)
-all_normal <- merge(all_normal, cmd_drought_xd, by = "id", all = T)
-  #setnafill(all_normal, fill = 0, cols = names(all_normal[-1]))
-  
+  all_normal <- merge(all_normal, cmd_drought_vd, by = "id", all = T)
+  all_normal <- merge(all_normal, cmd_drought_ed, by = "id", all = T)
+  all_normal <- merge(all_normal, cmd_drought_xd, by = "id", all = T)
+
   all_normal[is.na(all_normal)] <- 0
   return(all_normal)
 }
+```
+
+### Test Function
+
+```{r}
+dat <- make_extreme_vars(pnts)
 ```
 
 ```{r  func2, echo = FALSE}
@@ -366,12 +388,25 @@ make_extreme_vars_fut <- function(pnts, period = 2041:2060, gcm = list_gcms()[1]
   cmd_max_ann[,CMD_3yr := frollsum(CMD_Max, n = 3), by = .(id,GCM,RUN)] ## maximum value
   
   ## number of months with drought
-  cmd_drought <- cmd_res[cmd_sum > 600, .(CMD_Drought = .N), by = .(id,GCM,RUN)]
+  cmd_grow <- cmd_res[Month %in% c(4:9),]
+  cmd_drought_md <- cmd_grow[cmd_sum > 600, .(CMD_Drought_MD = .N), by = .(id,GCM,RUN)]
+  cmd_drought_vd <- cmd_grow[cmd_sum > 800, .(CMD_Drought_VD = .N), by = .(id,GCM,RUN)]
+  cmd_drought_ed <- cmd_grow[cmd_sum > 1000, .(CMD_Drought_ED = .N), by = .(id,GCM,RUN)]
+  cmd_drought_xd <- cmd_grow[cmd_sum > 1200, .(CMD_Drought_XD = .N), by = .(id,GCM,RUN)]
   
   ##number of months with heat drought
-  hdr_25 <- cmd_res[cmd_sum > 600 & tmax > 25, .(HDR_25 = .N), by = .(id,GCM,RUN)]
-  hdr_30 <- cmd_res[cmd_sum > 600 & tmax > 30, .(HDR_30 = .N), by = .(id,GCM,RUN)]
-  hdr_35 <- cmd_res[cmd_sum > 600 & tmax > 35, .(HDR_35 = .N), by = .(id,GCM,RUN)]
+  
+  hdr_md_25 <- cmd_grow[cmd_sum > 600 & tmax > 25, .(HDR_MD_25 = .N), by = .(id,GCM,RUN)]
+  hdr_md_30 <- cmd_grow[cmd_sum > 600 & tmax > 30, .(HDR_MD_30 = .N), by = .(id,GCM,RUN)]
+  hdr_md_35 <- cmd_grow[cmd_sum > 600 & tmax > 35, .(HDR_MD_35 = .N), by = .(id,GCM,RUN)]
+  
+  hdr_ed_25 <- cmd_grow[cmd_sum > 1000 & tmax > 25, .(HDR_ED_25 = .N), by = .(id,GCM,RUN)]
+  hdr_ed_30 <- cmd_grow[cmd_sum > 1000 & tmax > 30, .(HDR_ED_30 = .N), by = .(id,GCM,RUN)]
+  hdr_ed_35 <- cmd_grow[cmd_sum > 1000 & tmax > 35, .(HDR_ED_35 = .N), by = .(id,GCM,RUN)]
+  
+  hdr_xd_25 <- cmd_grow[cmd_sum > 1200 & tmax > 25, .(HDR_XD_25 = .N), by = .(id,GCM,RUN)]
+  hdr_xd_30 <- cmd_grow[cmd_sum > 1200 & tmax > 30, .(HDR_XD_30 = .N), by = .(id,GCM,RUN)]
+  hdr_xd_35 <- cmd_grow[cmd_sum > 1200 & tmax > 35, .(HDR_XD_35 = .N), by = .(id,GCM,RUN)]
   
   ##normal period CMD_sum statistics
   cmd_max_nrm <- cmd_max_ann[,.(CMD_Max_01 = quantile(CMD_Max,0.01),
@@ -380,10 +415,20 @@ make_extreme_vars_fut <- function(pnts, period = 2041:2060, gcm = list_gcms()[1]
                              by = .(id,GCM,RUN)]
   cmd_3yr <- cmd_max_ann[,.(CMD_Max3yr = max(CMD_3yr, na.rm = T)), by = .(id,GCM,RUN)]
   all_normal <- merge(bio_stats, cmd_max_nrm, by = c("id","GCM","RUN"), all = T)
-  all_normal <- merge(all_normal, hdr_25, by = c("id","GCM","RUN"),all = T)
-  all_normal <- merge(all_normal, hdr_30, by = c("id","GCM","RUN"), all = T)
-  all_normal <- merge(all_normal, hdr_35, by = c("id","GCM","RUN"), all = T)
-  all_normal <- merge(all_normal, cmd_drought, by = c("id","GCM","RUN"), all = T)
+  all_normal <- merge(all_normal, hdr_md_25, by = c("id","GCM","RUN"),all = T)
+  all_normal <- merge(all_normal, hdr_md_30, by = c("id","GCM","RUN"), all = T)
+  all_normal <- merge(all_normal, hdr_md_35, by = c("id","GCM","RUN"), all = T)
+  all_normal <- merge(all_normal, hdr_ed_25, by = c("id","GCM","RUN"),all = T)
+  all_normal <- merge(all_normal, hdr_ed_30, by = c("id","GCM","RUN"), all = T)
+  all_normal <- merge(all_normal, hdr_ed_35, by = c("id","GCM","RUN"), all = T)
+  all_normal <- merge(all_normal, hdr_xd_25, by = c("id","GCM","RUN"),all = T)
+  all_normal <- merge(all_normal, hdr_xd_30, by = c("id","GCM","RUN"), all = T)
+  all_normal <- merge(all_normal, hdr_xd_35, by = c("id","GCM","RUN"), all = T)
+
+  all_normal <- merge(all_normal, cmd_drought_md, by = c("id","GCM","RUN"), all = T)
+  all_normal <- merge(all_normal, cmd_drought_vd, by = c("id","GCM","RUN"), all = T)
+  all_normal <- merge(all_normal, cmd_drought_ed, by = c("id","GCM","RUN"), all = T)
+  all_normal <- merge(all_normal, cmd_drought_xd, by = c("id","GCM","RUN"), all = T)
   all_normal <- merge(all_normal, cmd_3yr, by = c("id","GCM","RUN"), all = T)
   #setnafill(all_normal, fill = 0, cols = names(all_normal[-1]))
   
@@ -392,9 +437,4 @@ make_extreme_vars_fut <- function(pnts, period = 2041:2060, gcm = list_gcms()[1]
 }
 ```
 
-
-
-```{r test, echo = FALSE}}
-# dat_fut <- make_extreme_vars_fut(pnts, period = 2041:2060, gcm = list_gcms()[1])
-# 
-# ```
+`{r test, echo = FALSE}} # dat_fut <- make_extreme_vars_fut(pnts, period = 2041:2060, gcm = list_gcms()[1]) #  #`
