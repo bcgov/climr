@@ -24,7 +24,7 @@
 #' @importFrom uuid UUIDgenerate
 #' @rdname input_refmap
 #' @export
-input_refmap <- function(dbCon, bbox, reference = "refmap_climatena", cache = TRUE) {
+input_refmap <- function(dbCon, bbox, reference = "refmap_climatena", cache = TRUE, indiv_tiles = FALSE, xyz = NULL) {
   ## checks
   if (is(reference, "character")) {
     # match.arg(reference, list_refmaps()) ## temporarily disable
@@ -92,9 +92,14 @@ input_refmap <- function(dbCon, bbox, reference = "refmap_climatena", cache = TR
   }
 
   if (needDownload) {
-    
+     
     message("Downloading new data...")
-    res <- pgGetTerra(dbCon, rmap_nm, tile = TRUE, boundary = bbox, bands = 1:73)
+    if(indiv_tiles){
+      cache <- FALSE
+      res <- dbGetTiles(dbCon, rmap_nm, pnts = xyz, bands = 1:73)
+    }else{
+      res <- pgGetTerra(dbCon, rmap_nm, tile = TRUE, boundary = bbox, bands = 1:73)
+    }
     names(res) <- c(
       "PPT_01", "PPT_02", "PPT_03", "PPT_04", "PPT_05", "PPT_06", "PPT_07",
       "PPT_08", "PPT_09", "PPT_10", "PPT_11", "PPT_12", "Tmax_01", "Tmax_02",

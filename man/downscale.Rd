@@ -18,6 +18,8 @@ downscale(
   max_run = 0L,
   run_nm = NULL,
   cache = TRUE,
+  local = FALSE,
+  indiv_tiles = FALSE,
   ...
 )
 }
@@ -64,6 +66,10 @@ are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 \item{run_nm}{character. \code{NULL} or length >= 1. Name of specified run(s) to return, instead of using \code{max_run}. Use the \verb{list_runs_*()} functions to list available runs.Defaults to \code{NULL}.}
 
 \item{cache}{logical. Cache data locally? Default \code{TRUE}}
+
+\item{local}{logical. Is the postgres database local? Default \code{FALSE}}
+
+\item{indiv_tiles}{logical. Only download necessary tiles instead of full bounding box? This will generally be faster, but doesn't cache.}
 
 \item{...}{other arguments passed to \code{\link[=downscale_core]{downscale_core()}}. Namely: \code{return_refperiod},
 \code{vars}, \code{out_spatial} and \code{plot}}
