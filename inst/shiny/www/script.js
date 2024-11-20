@@ -1,0 +1,1 @@
+Shiny.addCustomMessageHandler("jsCode",function(message){eval(message.code);});
