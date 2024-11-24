@@ -187,14 +187,19 @@ plot_bivariate <- function(
       # Legend
       s <- c(show_observed, show_runs, TRUE, show_trajectories, show_ensMean)
       legend(legend_pos,
-        legend = c("Observed climate (2001-2020)", "individual GCM simulation", "GCM mean", "GCM mean trajectory", "Ensemble mean")[s],
-        pch = c(22, 21, 21, 16, 43)[s],
-        pt.cex = c(2, .8, 2, 0.5, 2.2)[s],
-        pt.bg = c("gray", "gray", "gray", NA, NA)[s],
-        col = c(1, 1, 1, "gray", "gray")[s],
-        lty = c(NA, NA, NA, 1, NA)[s],
-        lwd = c(NA, NA, NA, 2, NA)[s],
-        bty = "n", cex = 0.8
+             legend = c("Observed climate (2001-2020)", 
+                        paste0("Individual GCM simulation (", gsub("_", "-", period_focal), ")"), 
+                        paste0("GCM mean (", gsub("_", "-", period_focal), ")"), 
+                        paste0("GCM mean trajectory (2001-2100)"), 
+                        paste0("Ensemble mean (", gsub("_", "-", period_focal), ")")
+             )[s],
+             pch = c(22, 21, 21, 16, 43)[s],
+             pt.cex = c(2, .8, 2, 0.5, 2.2)[s],
+             pt.bg = c("gray", "gray", "gray", NA, NA)[s],
+             col = c(1, 1, 1, "gray", "gray")[s],
+             lty = c(NA, NA, NA, 1, NA)[s],
+             lwd = c(NA, NA, NA, 2, NA)[s],
+             bty = "n", cex = 0.8
       )
     } else {
       if (!requireNamespace("plotly", quietly = TRUE)) {
