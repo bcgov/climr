@@ -120,6 +120,7 @@ ts <- extract(temp, point, id=F)
 ts.x <- names(ts)[2:123]
 ts.y <- as.numeric(ts[2:123])
 ts.n <- as.numeric(ts[124:length(ts)])
+ref.cru <- mean(ts.y[ts.x%in%1961:1990])
 
 ## climateNA time series from climr Data
 points <- data.frame(lon = c(-120), lat = c(50), elev = c(1385), id = 1)
@@ -138,7 +139,6 @@ ts.y.climatena <- ts.y.climatena + (ref.cru - ref.climatena) # shift to cru base
 ## plot comparing CRU and climateNA time series. 
 par(mar = c(4,4,0.5,0.5), mgp = c(1.75, 0.25, 0))
 plot(ts.x, ts.y)
-ref.cru <- mean(ts.y[ts.x%in%1961:1990])
 lines(1902:2020,ts.y.climatena, col="red")
 lines(c(1961,1990), rep(mean(ts.y.climatena[ts.x.climatena%in%1961:1990]),2), col="red")
 lines(c(2001,2020), rep(mean(ts.y.climatena[ts.x.climatena%in%2001:2020]),2), col="red")
