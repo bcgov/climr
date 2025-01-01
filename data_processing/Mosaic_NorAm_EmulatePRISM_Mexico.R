@@ -1,8 +1,8 @@
 
 # creation of a composite climatology (mosaic) for north america, from PRISM and daymet
-# use ML to create a synthetic "prism-like" climatology outside the PRISM area. 
+# use ML to create a synthetic "prism-like" blend between PRISM and Daymet in northern mexico 
 # Colin Mahony 
-# Jan 1, 2024
+# Jan 1, 2025
 
 library(terra)
 library(data.table)
@@ -147,7 +147,7 @@ for(e in 1:length(elements)){
     # plot(clim.pred)
     
     # write the raster
-    writeRaster(clim.pred, paste("outputs/composite_nMex_1981_2010_", elements[e], monthcodes[m], ".tif", sep=""), overwrite=T)
+    writeRaster(clim.pred, paste("//objectstore2.nrs.bcgov/ffec/Climatologies/composite_nMex/composite_nMex_1981_2010_", elements[e], monthcodes[m], ".tif", sep=""), overwrite=T)
     
     print(monthcodes[m])  
   }

@@ -1,8 +1,11 @@
 
-# creation of a composite climatology (mosaic) for north america, from PRISM and worldclim
-# use ML to create a synthetic "prism-like" climatology outside the PRISM area. 
+# creation of a composite climatology (mosaic) for north america, from PRISM and Daymet
+# use ML to create a synthetic "prism-like" climatology for the baja peninsula.
+# this was an additional step added to the climr NorAm mosaic because the nMex prediction 
+# had produce poor precipitation results for the colorado river delta and because Daymet 
+# precip on the baja peninsula has gridding artefacts.
 # Colin Mahony 
-# Jan 1, 2024
+# Jan 1, 2025
 
 library(terra)
 library(data.table)
@@ -159,7 +162,7 @@ for(e in 1:length(elements)){
     clim.pred <- mosaic(clim.pred*(1-weights), worldclim.addarea*weights, fun="sum")
     
     # write the raster
-    writeRaster(clim.pred, paste("outputs/composite_baja_1981_2010_", elements[e], monthcodes[m], ".tif", sep=""), overwrite=T)
+    writeRaster(clim.pred, paste("//objectstore2.nrs.bcgov/ffec/Climatologies/composite_baja/composite_baja_1981_2010_", elements[e], monthcodes[m], ".tif", sep=""), overwrite=T)
     
     print(monthcodes[m])  
   }

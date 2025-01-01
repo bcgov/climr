@@ -350,8 +350,7 @@ for(e in 1:3){
     #-----------------------
     # blend in the Machine learning composite for the Baja peninsula
     
-    # dir <- paste("//objectstore2.nrs.bcgov/ffec/Climatologies/composite_baja/", sep="")
-    dir <- paste("C:/Users/CMAHONY/OneDrive - Government of BC/Projects/2024_intercomparison/outputs/", sep="")
+    dir <- paste("//objectstore2.nrs.bcgov/ffec/Climatologies/composite_baja/", sep="")
     file <- paste("composite_baja_1981_2010_", elements[e], monthcodes[m], ".tif", sep="")
     baja <- rast(paste(dir, file, sep=""))
     baja <- project(baja, comp)
@@ -474,6 +473,7 @@ map <- leaflet() %>%
     options = layersControlOptions(collapsed = FALSE)
   )
 map
+
 
 # coastline buffering QA
 map <- leaflet() %>%

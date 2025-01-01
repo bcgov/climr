@@ -189,7 +189,7 @@ m <- 1
     # plot(clim.pred)
     
     # write the raster
-    writeRaster(clim.pred, paste("outputs/composite_arcticCoast_1981_2010_", elements[e], monthcodes[m], ".tif", sep=""), overwrite=T)
+    writeRaster(clim.pred, paste("//objectstore2.nrs.bcgov/ffec/Climatologies/composite_arcticCoast/composite_arcticCoast_1981_2010_", elements[e], monthcodes[m], ".tif", sep=""), overwrite=T)
     
     print(monthcodes[m])  
   }
