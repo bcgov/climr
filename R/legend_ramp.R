@@ -25,12 +25,25 @@
 #' @importFrom scales rescale
 #'
 #' @return NULL. A plot of the legend is drawn in the current plotting device. The function does not return any value.
+#' 
 #' @examples
+#' dem <- get(data("dem_vancouver")) |> unwrap() ## get the sample digital elevation model (dem) provided with `climr`
+#' grid <- as.data.frame(dem, cells = TRUE, xy = TRUE) ## convert the DEM to a data.frame
+#' colnames(grid) <- c("id", "lon", "lat", "elev") # rename column names to what climr expects
+#' ds_out <- downscale(grid, which_refmap = "refmap_prism") ## A simple climr query. This will return the observed 1961-1990 normals for the raster grid points. 
+#' clim <- rast(dem) # use the DEM as a template raster
+#' clim[ds_out[, id]] <- ds_out[, get(var)] # populate the raster cells with the 2001-2020 annual precipitation (MAP) values, using the `id` field as the link. 
+#' clim <- log2(clim) # log-transform precipitation for more meaningful scaling
+#' inc=diff(range(values(clim)))/500 #increment for the ramp
+#' breaks=seq(min(values(clim))-inc, max(values(clim))+inc, inc) # color breaks
+#' ColScheme <- rev(hcl.colors(length(breaks)-1, "GnBu")) # color scheme
+#' plot(clim, col=ColScheme, breaks=breaks, legend=F, main="", mar=NA)
+#' legend_ramp(clim, title = paste(var, "(mm)"), ColScheme = ColScheme, breaks = breaks, pos=c(0.05, 0.45, 0.1, 0.125), log = 2, horizontal = TRUE)
 #'
 #' @export
 
-# Function for plotting a logarithmic legend
-log.legend <- function(r, title, ColScheme, breaks,
+# Function for plotting a color ramp legend with optional log scaling
+legend_ramp <- function(r, title, ColScheme, breaks,
                        pos = c(0.2, 0.23, 0.1, 0.5), 
                        log = NULL, 
                        horizontal = FALSE, 
@@ -47,7 +60,7 @@ log.legend <- function(r, title, ColScheme, breaks,
   
   # Define legend values and labels
   legend.values <- pretty(r)[-c(1, length(pretty(r)))]
-  legend.labels <- if(is.null(log)) legend.values else log^legend.values 
+  legend.labels <- if(is.null(log)) legend.values else round(log^legend.values) 
   
   if (horizontal) {
     # Horizontal legend setup
@@ -65,16 +78,18 @@ log.legend <- function(r, title, ColScheme, breaks,
     # Add the labels
     text(
       x = label_positions,         # X-axis positions for labels
-      y = ymin - diff(ext(r)[3:4]) / 100,  # Slightly below the legend
+      y = ymin,  
       labels = legend.labels,
+      pos = 1,
       adj = 0.5                    # Centered alignment
     )
     
     # Add the title
     text(
       x = (xmin + xmax) / 2,       # Centered horizontally on the legend
-      y = ymax + diff(ext(r)[3:4]) / (50/title.height),  # Slightly above the legend
+      y = ymax,
       labels = title,
+      pos = 3,
       adj = 0.5,                  # Centered alignment
       font = 2                    # Bold font
     )
@@ -94,10 +109,10 @@ log.legend <- function(r, title, ColScheme, breaks,
     
     # Add the labels
     text(
-      x = xmax + diff(ext(r)[1:2]) / 100,         # Slightly to the right of the legend
+      x = xmax,         # Slightly to the right of the legend
       y = label_positions,                      # Y-axis positions for labels
       labels = legend.labels,
-      adj = 0                                   # Left alignment
+      pos = 4
     )
     
     # Add a rotated title
@@ -106,7 +121,6 @@ log.legend <- function(r, title, ColScheme, breaks,
       y = (ymin + ymax) / 2,                    # Centered vertically on the legend
       labels = title,   
       srt = 90,                                 # Rotate text 90 degrees
-      adj = 0.5,                                # Centered alignment
       font = 2                                  # Bold font
     )
   }
