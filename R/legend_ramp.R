@@ -1,0 +1,117 @@
+
+#' Legend for color ramp maps 
+#'
+#' This function plots a map legend that handles logarithmic scaling
+#'
+#' @param r A spatial raster object, typically from the `terra` package.
+#' @param title Character. The title for the legend.
+#' @param ColScheme Character vector. Specifies the colors used for the legend. Typically corresponds 
+#'   to the color scheme applied to the raster data visualization.
+#' @param breaks Numeric vector. Defines the breakpoints for the legend, determining how the range 
+#'   of the raster is divided into intervals corresponding to the colors in `ColScheme`.
+#' @param pos Numeric vector of length 4. Defines the position of the legend as 
+#'   proportions of the raster extent. The format is `c(xmin, xmax, ymin, ymax)`.
+#' @param log Numeric or NULL. The base of the logarithm used to compute legend labels. 
+#'   If `NULL`, values are displayed as-is.
+#' @param horizontal Logical. Should the legend be drawn horizontally? Default is `FALSE`.
+#' @param title.height Numeric. Scaling factor for the height of the legend title relative to the legend size.
+#'
+#' @details
+#' The function uses the extent of the raster object to determine the positioning and size of 
+#' the legend. The legend can be oriented either horizontally or vertically, and logarithmic 
+#' scaling is applied to the labels if the `log` parameter is specified.
+#'
+#' @importFrom terra ext
+#' @importFrom scales rescale
+#'
+#' @return NULL. A plot of the legend is drawn in the current plotting device. The function does not return any value.
+#' @examples
+#'
+#' @export
+
+# Function for plotting a logarithmic legend
+log.legend <- function(r, title, ColScheme, breaks,
+                       pos = c(0.2, 0.23, 0.1, 0.5), 
+                       log = NULL, 
+                       horizontal = FALSE, 
+                       title.height = 1) {
+  
+  # Define legend position
+  xmin <- ext(r)[1] + diff(ext(r)[1:2]) * pos[1]  # Left boundary of the legend
+  xmax <- ext(r)[1] + diff(ext(r)[1:2]) * pos[2]  # Right boundary of the legend
+  ymin <- ext(r)[3] + diff(ext(r)[3:4]) * pos[3]  # Bottom boundary of the legend
+  ymax <- ext(r)[3] + diff(ext(r)[3:4]) * pos[4]  # Top boundary of the legend
+  
+  # Draw the color ramp
+  n_colors <- length(ColScheme)
+  
+  # Define legend values and labels
+  legend.values <- pretty(r)[-c(1, length(pretty(r)))]
+  legend.labels <- if(is.null(log)) legend.values else log^legend.values 
+  
+  if (horizontal) {
+    # Horizontal legend setup
+    x_positions <- seq(xmin, xmax, length.out = n_colors + 1)
+    rect(
+      head(x_positions, -1), ymin,  # Left edges
+      tail(x_positions, -1), ymax,  # Right edges
+      col = ColScheme,
+      border = NA
+    )
+    
+    # Map legend values to positions on the x-axis
+    label_positions <- scales::rescale(legend.values, to = c(xmin, xmax), from = range(breaks))
+    
+    # Add the labels
+    text(
+      x = label_positions,         # X-axis positions for labels
+      y = ymin - diff(ext(r)[3:4]) / 100,  # Slightly below the legend
+      labels = legend.labels,
+      adj = 0.5                    # Centered alignment
+    )
+    
+    # Add the title
+    text(
+      x = (xmin + xmax) / 2,       # Centered horizontally on the legend
+      y = ymax + diff(ext(r)[3:4]) / (50/title.height),  # Slightly above the legend
+      labels = title,
+      adj = 0.5,                  # Centered alignment
+      font = 2                    # Bold font
+    )
+    
+  } else {
+    # Vertical legend setup
+    y_positions <- seq(ymin, ymax, length.out = n_colors + 1)
+    rect(
+      xmin, head(y_positions, -1),  # Bottom edges
+      xmax, tail(y_positions, -1),  # Top edges
+      col = ColScheme,
+      border = NA
+    )
+    
+    # Map legend values to positions on the y-axis
+    label_positions <- scales::rescale(legend.values, to = c(ymin, ymax), from = range(breaks))
+    
+    # Add the labels
+    text(
+      x = xmax + diff(ext(r)[1:2]) / 100,         # Slightly to the right of the legend
+      y = label_positions,                      # Y-axis positions for labels
+      labels = legend.labels,
+      adj = 0                                   # Left alignment
+    )
+    
+    # Add a rotated title
+    text(
+      x = xmin - diff(ext(r)[1:2]) / (50/title.height),        # Slightly to the left of the legend
+      y = (ymin + ymax) / 2,                    # Centered vertically on the legend
+      labels = title,   
+      srt = 90,                                 # Rotate text 90 degrees
+      adj = 0.5,                                # Centered alignment
+      font = 2                                  # Bold font
+    )
+  }
+  
+  # Draw a border around the legend
+  rect(xmin, ymin, xmax, ymax, col = NA)
+  
+}
