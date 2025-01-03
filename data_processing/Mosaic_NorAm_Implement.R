@@ -34,20 +34,19 @@ studyarea <- ext(c(-170, -52, 14, 83.5))
 # dem <- aggregate(dem.bc, 3)
 # dem <- extend(dem, studyarea) # start with the BC DEM and extend it to the full study area range
 # dem <- crop(dem, studyarea) # if the dem had an extent already outside the study area
-# dem.noram <- rast("//objectstore2.nrs.bcgov/ffec/DEM/DEM_NorAm/NA_Elevation/data/northamerica/northamerica_elevation_cec_2023.tif") #250m dem downloaded from http://www.cec.org/north-american-environmental-atlas/elevation-2023/
-# dem.noram <- project(dem.noram, dem, method="near") #project 250m source dem to the study area grid. method="near" to preserve elevation variance 
-# dem <- dem.noram  
+# # dem.noram <- rast("//objectstore2.nrs.bcgov/ffec/DEM/DEM_NorAm/NA_Elevation/data/northamerica/northamerica_elevation_cec_2023.tif") #250m dem downloaded from http://www.cec.org/north-american-environmental-atlas/elevation-2023/
+# dem.noram <- rast("C:/Users/CMAHONY/OneDrive - Government of BC/Data/DEM/northamerica_elevation_cec_2023.tif") # option to use a local copy for faster processing.
+# # dem.noram <- project(dem.noram, dem, method="near") #project 250m source dem to the study area grid. method="near" to preserve elevation variance
+# dem.noram <- project(dem.noram, dem) #project 250m source dem to the study area grid. ended up using bilinear interpolation because method="near" produces underestimation of lapse rates later in the workflow. 
+# dem <- dem.noram
 # dem[is.na(dem)] <- 0
 # writeRaster(dem, paste("//objectstore2.nrs.bcgov/ffec/Climatologies/climr_mosaic/climr_mosaic_dem.tif", sep=""), overwrite=T)
-land <- dem.noram
-values(land)[!is.finite(values(land))] <- NA
-values(land)[is.finite(values(land))] <- 1
-writeRaster(land, paste("//objectstore2.nrs.bcgov/ffec/Climatologies/climr_mosaic/climr_mosaic_land.tif", sep=""), overwrite=T)
+# land <- dem.noram
+# values(land)[!is.finite(values(land))] <- NA
+# values(land)[is.finite(values(land))] <- 1
+# writeRaster(land, paste("//objectstore2.nrs.bcgov/ffec/Climatologies/climr_mosaic/climr_mosaic_land.tif", sep=""), overwrite=T)
 dem <- rast("//objectstore2.nrs.bcgov/ffec/Climatologies/climr_mosaic/climr_mosaic_dem.tif")
 land <- rast("//objectstore2.nrs.bcgov/ffec/Climatologies/climr_mosaic/climr_mosaic_land.tif")
-
-# rm(dem.noram)
-plot(dem)
 
 # lat and lon rasters
 lon <- init(dem, 'x')
@@ -97,13 +96,33 @@ blend.west <- blend.east-0.5
 ext.blend <- c(blend.west, blend.east, blend.north, blend.south)
 weights.ak <- weightSurface(lat, lon, ext.blend)
 
+
 #-----------------
-# bc
+# BC
 
 # start with BC PRISM area
 dir <- paste("//objectstore2.nrs.bcgov/ffec/Climatologies/PRISM_BC/", sep="")
 temp <- rast(paste(dir, list.files(dir, pattern=paste(c("tmin", "tmax", "pr")[1],".*._", 1, ".tif", sep="")), sep=""))
 temp <- project(temp, dem)
+
+# create a graduated buffer along the computational divide
+d=20 # number of steps
+k=1 # width of steps (km)
+bdy.buffer <- temp
+values(bdy.buffer) <- 0
+buffer.area <- ext(c(-121, -113.8, 48.95, 53.81))
+sebc <- crop(temp, buffer.area) #crop down for computational efficiency
+bdy.buffer <- crop(bdy.buffer, buffer.area) #crop down for computational efficiency
+plot(sebc)
+for(i in k*(1:d)){
+  bdy.buffer <- bdy.buffer + buffer(sebc, i*2*1000)
+  print(i)
+}
+bdy.buffer <- bdy.buffer/d
+bdy.buffer <- extend(bdy.buffer, dem, fill=0)
+plot(bdy.buffer)
+
+# convert the bc area to binary
 values(temp)[!is.na(values(temp))] <- 1
 values(temp)[is.na(values(temp))] <- 0
 
@@ -115,10 +134,20 @@ weights2 <- weightSurface(lat, lon, c(-120, -120.5, 53.81, 53.81))
 
 # blend at 49th parallel
 weights3 <- weightSurface(lat, lon, c(-100, -100, 49, 49.25))
+# plot(weights3)
 
-weights.bc <- temp - weights1 - weights2 - weights3
+# blend for southern Vancouver island
+weights4 <- weightSurface(lat, lon, c(-122.95, -122.7625, 48.15, 48))
+weights4[lat >= 50] <- 0
+# plot(weights4)
+
+weights.bc <- temp - weights1 - weights2 - weights3 - bdy.buffer
 weights.bc[weights.bc>1] <- 1
 weights.bc[weights.bc<0] <- 0
+weights.bc <- weights.bc + weights4
+weights.bc[weights.bc>1] <- 1
+weights.bc[weights.bc<0] <- 0
+# plot(temp, xlim=c(-142, -110), ylim=c(48, 61))
 plot(weights.bc, xlim=c(-142, -110), ylim=c(48, 61))
 
 #-----------------
@@ -384,6 +413,10 @@ values(gan.project)[!is.na(values(gan.project))] <- 2
 comp <- merge(comp, gan.project)
 plot(comp)
 
+values(prism.bc)[!is.na(values(prism.bc))] <- 7
+comp <- mosaic(comp*(1-weights.bc), prism.bc*weights.bc, fun="sum")
+plot(comp)
+
 values(nmex)[!is.na(values(nmex))] <- 3
 comp <- merge(comp, nmex)
 plot(comp)
@@ -411,15 +444,15 @@ comp.final <- cover(ocean, comp)
 comp.final <- mask(comp.final, comp)
 plot(comp.final)
 
-dir <- paste("//objectstore2.nrs.bcgov/ffec/Climatologies/PRISM_BC/", sep="")
-prism.bc <- rast(paste(dir, list.files(dir, pattern=paste(c("tmin", "tmax", "pr")[e],".*._", m, ".tif", sep="")), sep=""))
-values(prism.bc)[!is.finite(values(prism.bc))] <- NA
-prism.bc <- project(prism.bc, comp)
-values(prism.bc)[!is.na(values(prism.bc))] <- 7
-comp.final <- cover(prism.bc, comp.final)
-plot(comp.final)
+# dir <- paste("//objectstore2.nrs.bcgov/ffec/Climatologies/PRISM_BC/", sep="")
+# prism.bc <- rast(paste(dir, list.files(dir, pattern=paste(c("tmin", "tmax", "pr")[e],".*._", m, ".tif", sep="")), sep=""))
+# values(prism.bc)[!is.finite(values(prism.bc))] <- NA
+# prism.bc <- project(prism.bc, comp)
+# values(prism.bc)[!is.na(values(prism.bc))] <- 7
+# comp.final <- cover(prism.bc, comp.final)
+# plot(comp.final)
 
-png(filename=paste("results/climr_mosaic_dataSources.png", sep=""), 
+png(filename=paste("vignettes/climr_mosaic_dataSources.png", sep=""), 
     type="cairo", units="in", width=9.5, height=8.5, pointsize=12, res=300)
 par(mar=c(0,0,0,0))
 plot(comp.final, col = hcl.colors(99, "Grays"), legend=F, axes=F)
