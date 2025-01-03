@@ -59,8 +59,11 @@ legend_ramp <- function(r, title, ColScheme, breaks,
   n_colors <- length(ColScheme)
   
   # Define legend values and labels
-  legend.values <- pretty(r)[-c(1, length(pretty(r)))]
+  legend.values <- pretty(breaks)
+  legend.values <- legend.values[which(legend.values >= min(breaks) & legend.values <= max(breaks) )]
   legend.labels <- if(is.null(log)) legend.values else round(log^legend.values) 
+  
+  par(xpd=TRUE) # allow plotting outside the plotting window. 
   
   if (horizontal) {
     # Horizontal legend setup
@@ -127,5 +130,7 @@ legend_ramp <- function(r, title, ColScheme, breaks,
   
   # Draw a border around the legend
   rect(xmin, ymin, xmax, ymax, col = NA)
+  
+  par(xpd=FALSE) # reset to default
   
 }
