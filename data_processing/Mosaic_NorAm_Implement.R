@@ -452,7 +452,7 @@ plot(comp.final)
 # comp.final <- cover(prism.bc, comp.final)
 # plot(comp.final)
 
-png(filename=paste("vignettes/climr_mosaic_dataSources.png", sep=""), 
+png(filename=paste("vignettes/plots_mosaic/climr_mosaic_dataSources.png", sep=""), 
     type="cairo", units="in", width=9.5, height=8.5, pointsize=12, res=300)
 par(mar=c(0,0,0,0))
 plot(comp.final, col = hcl.colors(99, "Grays"), legend=F, axes=F)
@@ -460,8 +460,8 @@ text(-90, 45, "Daymet", font=2)
 text(-115, 40, "US\nPRISM", font=2)
 text(-126, 57, "BC\nPRISM", font=2)
 text(-150, 65, "AK\nPRISM", font=2)
-text(-130, 65, "GAN\nPrediction", font=2, col="grey95")
-text(-115.5, 29.5, "Random Forest\nPrediction", font=2, pos=2)
+text(-130, 65, "PRISM\nemulator", font=2, col="grey95")
+text(-115.5, 29.5, "Predictive\nblending", font=2, pos=2)
 text(-75, 35, "20km coastal\nbuffer", font=2, pos=4)
 dev.off()
 

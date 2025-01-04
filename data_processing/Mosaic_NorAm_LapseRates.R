@@ -9,8 +9,8 @@ monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11"
 elements <- c("Tmin", "Tmax", "Pr")
 
 
-# dir <- "//objectstore2.nrs.bcgov/ffec/Climatologies/climr_mosaic/"
-dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/climr_mosaic/" # option to use a local copy for faster processing
+dir <- "//objectstore2.nrs.bcgov/ffec/Climatologies/climr_mosaic/"
+# dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/climr_mosaic/" # option to use a local copy for faster processing
 files <- list.files(dir, pattern=paste(".*.tif", sep=""))
 dem <- rast(paste(dir, "climr_mosaic_dem.tif", sep=""))
 clim <- rast(paste(dir, files[1:36], sep=""))
@@ -23,6 +23,7 @@ names(lapse) <- paste0("lr_", names(clim))
 combined <- c(clim, lapse, dem)
 
 writeRaster(combined, "//objectstore2.nrs.bcgov/ffec/Climatologies/climr_mosaic/climr_mosaic.tif", overwrite=T)
+# writeRaster(combined, "C:/Users/CMAHONY/OneDrive - Government of BC/Data/climr_mosaic/climr_mosaic.tif", overwrite=T)
 
 # -----------------------------------
 # evaluate
