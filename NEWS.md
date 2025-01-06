@@ -4,6 +4,11 @@
 
 -   Fixed a bug that caused failure in downloads of gcm time series. 
 
+## Enhancements
+
+-   Expanded the climr mosaic of 1981-2010 gridded climatologies to the full North American domain. 
+-   New function `legend_ramp()` for simplified legend plotting on color ramp maps, including accommodation of logarithmic scaling. 
+
 # `climr` 0.1.1
 
 ## Bug Fixes
