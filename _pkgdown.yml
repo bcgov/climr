@@ -29,6 +29,7 @@ articles:
   desc: "Climate downscaling methods used in `climr`"
   contents:
   - methods_downscaling
+  - methods_mosaic
   - methods_ensembleSelection
   - lapse_rates
 - title: "Guidance"
