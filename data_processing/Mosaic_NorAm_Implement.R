@@ -26,7 +26,7 @@ weightSurface <- function(lat, lon, ext){ # ext is c(lon.start, lon.end, lat.sta
   return(weights)
 }
 
-studyarea <- ext(c(-170, -52, 14, 83.5))
+studyarea <- ext(c(-179.0625, -52, 14, 83.5))
 
 # study area DEM (create, write, and read)
 # dir <- paste("//objectstore2.nrs.bcgov/ffec/Climatologies/PRISM_BC/", sep="")
@@ -405,6 +405,8 @@ for(e in 1:3){
 # Map showing the data sources
 #-----------------------------
 
+plotarea <- ext(c(-170, -52, 14, 83.5))
+
 plot(gan.project, col="gray")
 comp <- dem
 values(comp) <- NA
@@ -442,6 +444,7 @@ ocean[lat>47 & lat<49 & lon > (-123.5) & lon < (-122)] <- NA
 
 comp.final <- cover(ocean, comp)
 comp.final <- mask(comp.final, comp)
+comp.final <- crop(comp.final, plotarea)
 plot(comp.final)
 
 # dir <- paste("//objectstore2.nrs.bcgov/ffec/Climatologies/PRISM_BC/", sep="")
