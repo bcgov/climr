@@ -26,6 +26,22 @@ knitr::include_graphics("plots_mosaic/climr_mosaic_1981_2010_Tmax07.png")
 
 ## Introduction
 
+Despite the availability of high-quality gridded climatologies (climate maps) for BC and the continental US (the PRISM maps), seamless high-quality climate maps of North America are not currently available. Existing seamless maps made with a consistent methodology across North America (WorldClim, Daymet, and CHELSA) exhibit unnacceptable artefacts in the complex topography of the western Cordillera. Analysts conducting cross-border studies are faced with the dilemma of introducing boundary artefacts associated with combining high-quality and low-quality products from different jurisdictions, or alternatively foregoing high-quality climate data to achieve cross-border continuity from a lower-quality product. 
+
+The need for a relatively seamless mosaic of the best available gridded climatologies motivated the development of the ClimateNA mosaic of 1961-1990 normals for North America (@wang2016), which has been widely used for over a decade as part of the ClimateNA downscaling product. During the development of climr, we identified several opportunities to complement the ClimateNA mosaic with an alternative mosaic: 
+
+- Incorporate the recently developed 800m-resolution PRISM maps for Alaska [(Daly et al. 2018)](https://prism.oregonstate.edu/projects/public/alaska/report/ak_final_report_8110.pdf); 
+
+- Use predictive models to blend outside the boundaries of PRISM products, to avoid degrading these high-quality products with blending to lower-quality products within their domains; 
+
+- Compile source climatologies exclusively of the 1981-2010 period, to avoid artefacts associated with adjusting for different normal periods in the source data; 
+
+- Use a single product (Daymet) for central and eastern North America to provide users with a seamless map for cross-border analyses in that region; and
+
+- Compile a mosaic at higher resolution (2.5km instead of ClimateNA's 4km map) to preserve complex elevation relationships (e.g. valley inversions) and precipitation patterns.
+
+In this article, we describe the method for development of the climr mosaic of 1981-2010 North American Climatologies. We highlight some regions where this new mosaic provides substantial improvement over the ClimateNA mosaic. However, there are many regions where the ClimateNA mosaic provides complementary information. For example, ClimateNA provides a mosaic of the US PRISM and Worldclim maps for eastern North America, which users may deem preferable to climr's Daymet climatology for some purposes. Also, since the ClimateNA maps are stored at lower resolution (4km instead of climr's 2.5km), their download speed and cache size is 2.5 times less than the climr mosaic. For these reasons, `climr::downscale()` provides the option to downscale using either the climr mosaic or the ClimateNA mosaic (`which_refmap = c("refmap_climr", "refmap_climatena")`). 
+
 ## Methods
 
 The climr mosaic is a composite of the 1981-2010 gridded climate maps from the following sources ([Figure 1](#fig1)): 
@@ -100,7 +116,7 @@ knitr::include_graphics("plots_mosaic/mosaics_compare_bcab_Tmax07.png")
 
 ### BC-US border
 
-The BC and US PRISM products are highly compatible for precipitation and Tmax, and generally result in a seamless transition at the 49th parallel [Figure 5](#fig5). Since precipitation is not elevation-adjusted by default in climr, aggregating the climr mosaic to 2.5km resolution results in a blurring of the PRISM precipitation map (Figure 5, center panel). We are not aware of observational or theoretical evidence to support precipitation gradients at less than 3km resolution in BC, except in dry valleys where virga (evaporation of precipitation as it falls) could contribute to elevational gradients in precipitation. As a result, this blurring in the climr mosaic likely is generally acceptable. ClimateNA does apply elevation adjustment to precipitation, as shown in the bottom panel of Figure 5, which results in some valleys being drier than the original PRISM product. The climr `downscale()` function provides an option for elevation adjustment of precipitation (`ppt_lr = TRUE`).  
+The BC and US PRISM products are highly compatible for precipitation and Tmax, and generally result in a seamless transition at the 49th parallel [Figure 5](#fig5). Since precipitation is not elevation-adjusted by default in climr, aggregating the climr mosaic to 2.5km resolution results in a blurring of the PRISM precipitation map (Figure 5, center panel). We are not aware of observational or theoretical evidence to support precipitation gradients at less than 3km resolution in BC, except in dry valleys where virga (evaporation of precipitation as it falls) could contribute to elevational gradients in precipitation. As a result, this blurring in the climr mosaic likely is generally acceptable. ClimateNA does apply elevation adjustment to precipitation, as shown in the bottom panel of Figure 5, which results in some valleys being drier than the original PRISM product. The climr `downscale()` function provides an option for elevation adjustment of precipitation (`ppt_lr = TRUE`) in both the climr and ClimateNA mosaics.  
 
 <div id="fig5">
 ```{r, echo=FALSE, fig.cap = "Figure 5. Comparison of climr and ClimateNA mosaics to source data for January precipitation along the boundary of southern BC and Washington State.", results='asis', out.width = "100%"}
@@ -110,8 +126,7 @@ knitr::include_graphics("plots_mosaic/mosaics_compare_bcus_Pr01.png")
 
 The BC and US PRISM products are significantly different for Tmin, as shown in [Figure 6](#fig6) (top panel) for January Tmin. The BC PRISM generally exhibits straightforward negative lapse rates (warm valleys, cold mountaintops), while the US PRISM exhibits complex elevational temperature gradients (warm-cool-warm-cool with elevation) in eastern and western portions of the image. This is likely an unintended artefact of the two-layer atmosphere technique employed in the US PRISM as a way of modeling valley inversions (cold valleys, warm midslopes, cold mountaintops). We investigate the evidence for the US PRISM Tmin gradients in a [separate section](#apparent-tmin-artefacts-in-the-us-prism) of this article. We did not find compelling evidence for these gradients based on station data, but are following up with the developers of the US PRISM. 
 
-Assuming that the US PRISM Tmin gradients are an artefact, some reduction in their prominence is desirable, and will contribute to more coherence between the BC and US components of the climr mosaic. Two aspects of the mosaic method contribute to a dampening of the Tmin gradients. First, the PRISM emulator was used to blend the BC and US PRISM between 48^o^N and 49^o^N. Second, the aggregation of the mosaic from 800m PRISM resolution to 2.5km resolution smooths the sharp gradient reversals. The recalculation of the climr mosaic at 800m resolution removes the gradient reversals, but does result in some regions with very low lapse rates (Figure 6, centre panel). These effects are also evident in the ClimateNA mosaic (Figure 6, bottom panel) but the 4km resolution of the ClimateNA mosaic results in removal of non-artefactual features, such as the Columbia River valley and its tributaries at the far right of the image. 
-
+Assuming that the US PRISM Tmin gradients are an artefact, some reduction in their prominence is desirable, and will contribute to more coherence between the BC and US components of the climr mosaic. Two aspects of the mosaic method contribute to a dampening of the Tmin gradients. First, the PRISM emulator was used to blend the BC and US PRISM between 48^o^N and 49^o^N. Second, the aggregation of the mosaic from 800m PRISM resolution to 2.5km resolution smooths the sharp gradient reversals. The recalculation of the climr mosaic at 800m resolution removes the gradient reversals, but does result in some regions with very low lapse rates (Figure 6, centre panel). These effects are also evident in the ClimateNA mosaic (Figure 6, bottom panel) but the 4km resolution of the ClimateNA mosaic results in loss of non-artefactual features, such as the Columbia River valley and its tributaries at the far right of the image. 
 
 <div id="fig6">
 ```{r, echo=FALSE, fig.cap = "Figure 6. Comparison of climr and ClimateNA mosaics to source data for July Tmin along the boundary of southern BC and Washington State.", results='asis', out.width = "100%"}
@@ -119,17 +134,21 @@ knitr::include_graphics("plots_mosaic/mosaics_compare_bcus_Tmin07.png")
 ```
 </div> 
 
-
 ### Alberta-US border
+
+Daymet and PRISM precipitation have a different character over the prairies ([Figure 7](#fig7)). PRISM precipitation is smooth, with blotches due to variability between weather stations. Daymet precipitation does not have obvious station artefacts, but has fine-scale features such as drier coulees/ravines that may or may not reflect reality (e.g., due to virga). To the extent that cross-border consistency is important to downstream analyses, it is beneficial to have a consistent product (Daymet) or method (PRISM) in the mosaic where possible. Providing both the ClimateNA and climr mosaics in climr gives users the option to select a product that best meets their needs. 
+
+The climr and ClimateNA mosaics both have an apparent discontinuity in January precipitation across the Canada-US Border. This discontinuity is also present in December and February. Since Daymet applies a consistent method across the border, this discontinuity is not simply a blending artefact. We have not yet established the reason for this effect and whether it is real. 
 
 <div id="fig7">
 ```{r, echo=FALSE, fig.cap = "Figure 7. Comparison of climr and ClimateNA mosaics to source data for July Precipitation along the Alberta-US boundary.", results='asis', out.width = "100%"}
-knitr::include_graphics("plots_mosaic/mosaics_compare_Prairies_Pr07.png")
+knitr::include_graphics("plots_mosaic/mosaics_compare_Prairies_Pr01.png")
 ```
 </div> 
 
-
 ### US-Mexico border
+
+Predictive blending is able to create a visually seamless transition from the US PRISM to Daymet over northwestern Mexico ([Figure 8](#fig8)). The climatology of January precipitation in the climr mosaic is drier than in the ClimateNA mosaic along the west coast of mainland Mexico and in the Colorado river delta at the north end of the Gulf of California. We have not yet evaluated which is more consistent with station observations.  
 
 <div id="fig8">
 ```{r, echo=FALSE, fig.cap = "Figure 8. Comparison of climr and ClimateNA mosaics to source data for January Precipitation along the US-Mexico boundary.", results='asis', out.width = "100%"}
@@ -137,29 +156,33 @@ knitr::include_graphics("plots_mosaic/mosaics_compare_nMex_Pr01.png")
 ```
 </div> 
 
-
 ## Discussion and known Issues
 
+Evaluation and refinement of the climr mosaic is ongoing. This section discusses known issues that require further work. 
 
 ### Apparent Tmin artefacts in the US PRISM
 
+As noted above, the US PRISM maps exhibit a double reversal of Tmin lapse rates (warm-cool-warm-cool with increasing elevation) in many regions of Montana, Idaho, and Washington State. This pattern contradicts the BC PRISM, resulting in poor cross-border compatibility of the two products. The US PRISM pattern may be an unintended artefact of the two-layer atmosphere technique, in which different lapse rates are possible above and below an altitude of 250m above a regional base elevation (@daly2008). 
+
+To investigate whether there is evidence for the double reversal, we compared elevation-Tmin relationships of station data and PRISM in four regions spanning the BC-US Border. The comparison for January Tmin is shown in [Figure 9](#fig9). In the West Kootenay region of BC (region 1), the station data strongly supports the monotonic negative lapse rate of ~-5^o^C/km employed by the BC PRISM. In the BC Rocky Mountains (Region 2), the station data is more ambiguous, and the BC PRISM uses a weaker monotonic lapse rate of ~-2^o^C/km in the southern portion of this region. South of the border in Washington State (Region 3), There are two groups of stations. Stations below 1100m elevation demonstrate a strong lapse rate of ~-5^o^C/km consistent with the Region 1 stations. The stations above 1100m are ambiguous. The US PRISM applies a strong lapse rate at these elevations (visible in the grey dots) requiring a double reversal of lapse rates. However, the station data would also be consistent with a weak lapse rate above 1100m, requiring no lapse rate reversals. We investigated other months, and smaller subregions of regions 3 and 4, and found no compelling evidence for a double reversal of lapse rates. 
+
+We are following up with the developers of the US PRISM to determine the credibility of the US PRISM Tmin. In the meantime, it seems reasonable to simplify the lapse rates by aggregating the climr mosaic to 2.5km. 
+
 <div id="fig9">
-```{r, echo=FALSE, fig.cap = "Figure 9. Evaluation of January Tmin lapse rates in the BC PRISM (areas 1 & 2) and US PRISM (areas 3 and 4). Black dots on the map are weather station locations. Bottom panels show the relationship of temperature to elevation in the PRISM grid cells (grey dots) and stations (black dots) within each of the four numbered square areas on the map. The lapse rate provided is a linear best fit to the station data.", results='asis', out.width = "100%"}
+```{r, echo=FALSE, fig.cap = "Figure 9. Evaluation of January Tmin lapse rates in the BC PRISM (areas 1 & 2) and US PRISM (areas 3 and 4). Black dots on the map are weather station locations. Bottom panels show the relationship of temperature to elevation in the PRISM grid cells (grey dots) and stations (black dots) within each of the four numbered square areas on the map. The line and stated slope are a linear best fit to the station data.", results='asis', out.width = "100%"}
 knitr::include_graphics("plots_mosaic/prism_US_lapserates_raw_Tmin01.png")
-```
-</div> 
-
-
-
-<div id="fig10">
-```{r, echo=FALSE, fig.cap = "Figure 10. As in Figure above, but zoomed in on the US PRISM in Area 4, located primarily in Montana State.", results='asis', out.width = "100%"}
-knitr::include_graphics("plots_mosaic/prism_US_lapserates_raw_Montana_Tmin01.png")
 ```
 </div> 
 
 ### Extrapolation uncertainty in the PRISM emulator
 
+The GAN models are trained on the PRISM climate map for BC and Alaska. Prediction into distant areas of the Yukon and Northwest Territories is an extrapolation subject to error associated with novel climate regimes. To estimate extrapolation uncertainty, we trained three GAN models each for March, June, October, and December. Since the models are stochastic, the intermodel variation likely is an indicator of novel conditions (combinations of predictor values such as topography and climate). In the example of June precipitation ([Figure 10](#fig10)), there generally is very low intermodel variation in the training areas of BC and Alaska and high intermodel variation in the MacKenzie mountains. While we chose a single model prediction for the climr mosaic, this analysis of prediction variability indicates that there are spatially variable patterns of extrapolation error in the climr mosaic for Yukon and NWT. We intend to provide users with uncertainty maps in future versions of climr, and to refine our selection of GAN models to conserve the annual cycle of climatic variation at each location. 
 
+<div id="fig10">
+```{r, echo=FALSE, fig.cap = "Figure 10. Standard deviation of June precipitation predictions from three deep learning models in the western arctic. Darker colors indicate higher variability, which likely is a proxy for prediction uncertainty.", results='asis', out.width = "80%"}
+knitr::include_graphics("plots_mosaic/GAN_stdev_PPT06.png")
+```
+</div> 
 
 
 ## References
