@@ -29,7 +29,7 @@ dem <- merge(dem.us, dem.bc)
 #---------------------------------
 
 e <- 1
-m <- 3
+m <- 1
 
 for(m in c(1,3,7,10)){
   
@@ -201,7 +201,7 @@ for(m in c(1,3,7,10)){
   
   # mat <- cbind(c(1,2,4), c(1,3,5)); layout(mat)
   mat <- rbind(c(1,1,1,1), c(1,1,1,1), c(1,1,1,1), c(2,3,4,5)); layout(mat)
-  par(mar=c(2,1,1,0.5), mgp=c(1.75, 0.25, 0))
+  par(mar=c(1,1,1,0.5), mgp=c(1.5, 0.25, 0))
   
   plot(crop(tn.o, plotarea), legend=TRUE, type="continuous", col=rev(hcl.colors(99, "RdBu")), 
        main=paste(month.name[m], elements[e], "(\u00b0C)", sep=" "))
@@ -212,7 +212,7 @@ for(m in c(1,3,7,10)){
     text(point.look[i,1]+box.size*0.8/latFactor, point.look[i,2]+box.size*0.8, i, cex=3, font=2)
   }
   
-  par(mar=c(4,3,1,1), mgp=c(1.75, 0.25, 0))
+  par(mar=c(4,3,2,1), mgp=c(1.75, 0.25, 0))
   for(i in 1:dim(point.look)[1]){
     box.look <- ext(c(point.look[i,1]+box.size*c(-1, 1)/latFactor, point.look[i,2]+box.size*c(-1, 1)))
     el.look <- values(crop(stn.el.o.raster, box.look))
@@ -227,7 +227,14 @@ for(m in c(1,3,7,10)){
     lm <- lm(tn.look~el.look)
     abline(lm)
     mtext(i, adj=0.95, line = -2.5, side=3, cex=1.5, font=2)
-    mtext(paste("lapse =", round(lm$coefficients[2]*1000, 1), "(\u00b0C)/km"), adj=0.05, line = -1.5, side=1, cex = 0.6)
+    mtext(paste("slope =", round(lm$coefficients[2]*1000, 1), "\u00b0C/km"), adj=0.05, line = -1.5, side=1, cex = 0.6)
+    if(i==1){
+      par(xpd=T)
+      xpos <- min(dem.look, na.rm = T)
+      ypos <- max(prism.look, na.rm = T)+diff(range(prism.look, na.rm = T))*0.35
+      legend(x=xpos, y=ypos, legend = c("PRISM", "Stations"), pch=16, pt.cex = c(0.5, 1), col = c("gray", 1), bty="n")
+      par(xpd=F)
+    }
   }
   # not much evidence for inversion effects even in january
   dev.off()
@@ -247,7 +254,7 @@ for(m in c(1,3,7,10)){
   
   # mat <- cbind(c(1,2,4), c(1,3,5)); layout(mat)
   mat <- rbind(c(1,1,1,1), c(1,1,1,1), c(1,1,1,1), c(2,3,4,5)); layout(mat)
-  par(mar=c(2,1,1,0.5), mgp=c(1.75, 0.25, 0))
+  par(mar=c(1,1,1,0.5), mgp=c(1.5, 0.25, 0))
   
   plot(crop(tn.o, plotarea), legend=TRUE, type="continuous", col=rev(hcl.colors(99, "RdBu")), 
        main=paste(month.name[m], elements[e], "(\u00b0C)", sep=" "))
@@ -257,7 +264,7 @@ for(m in c(1,3,7,10)){
     plot(box.look, add=T)
     text(point.look[i,1]+box.size*0.8/latFactor, point.look[i,2]+box.size*0.8, paste0("4.",i), cex=3, font=2)
   }
-  par(mar=c(4,3,1,1), mgp=c(1.75, 0.25, 0))
+  par(mar=c(4,3,2,1), mgp=c(1.75, 0.25, 0))
   for(i in 1:dim(point.look)[1]){
     box.look <- ext(c(point.look[i,1]+box.size*c(-1, 1)/latFactor, point.look[i,2]+box.size*c(-1, 1)))
     el.look <- values(crop(stn.el.o.raster, box.look))
@@ -272,7 +279,14 @@ for(m in c(1,3,7,10)){
     lm <- lm(tn.look~el.look)
     abline(lm)
     mtext(paste0("4.",i), adj=0.95, line = -2.5, side=3, cex=1.5, font=2)
-    mtext(paste("lapse =", round(lm$coefficients[2]*1000, 1), "(\u00b0C)/km"), adj=0.05, line = -1.5, side=1, cex = 0.6)
+    mtext(paste("slope =", round(lm$coefficients[2]*1000, 1), "\u00b0C/km"), adj=0.05, line = -1.5, side=1, cex = 0.6)
+    if(i==1){
+      par(xpd=T)
+      xpos <- min(dem.look, na.rm = T)
+      ypos <- max(prism.look, na.rm = T)+diff(range(prism.look, na.rm = T))*0.35
+      legend(x=xpos, y=ypos, legend = c("PRISM", "Stations"), pch=16, pt.cex = c(0.5, 1), col = c("gray", 1), bty="n")
+      par(xpd=F)
+    }
   }
   # no evidence for inverse-tilda effect
   
