@@ -32,7 +32,7 @@ calc_bFFP <- function(td, NFFD, t_min_list) {
 
 #' Calculate eFFP
 #'
-#' bFFP : Day of the year on which the Frost-Free Period ends
+#' eFFP : Day of the year on which the Frost-Free Period ends
 #'
 #' @template NFFD
 #' @template t_min_list
