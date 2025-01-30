@@ -1,21 +1,7 @@
 #!/bin/bash
 
-# Add Docker's official GPG key:
-sudo apt-get update
-sudo apt-get install ca-certificates curl
-sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-
-# Add the repository to Apt sources:
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update
-
 # Install R and docker
-sudo apt-get install -qq -y r-base libcurl4-openssl-dev docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo apt-get install -qq -y r-base libcurl4-openssl-dev gdal-bin proj-bin
 
 # Should probably create your own data processing pipeline to ingest climate data
 sudo Rscript -e 'if (!requireNamespace("curl", quietly = TRUE)) install.packages("curl")'
@@ -60,8 +46,8 @@ urls <- expand.grid(
     "CMI01","CMI02","CMI03","CMI04","CMI05","CMI06","CMI07","CMI08","CMI09","CMI10","CMI11","CMI12") |> paste("tif", sep = ".")
 ) |> apply(1, paste0, collapse = "/")
 
-unlink("/opt/climatena", recursive = TRUE)
-destfiles <- gsub("https://media.forestry.ubc.ca/ClimateNA", "/opt/climatena", urls, fixed = TRUE)
+unlink("/var/www/html/climr-tif", recursive = TRUE)
+destfiles <- gsub("https://media.forestry.ubc.ca/ClimateNA", "/var/www/html/climr-tif", urls, fixed = TRUE)
 dirname(destfiles) |> unique() |> lapply(dir.create, recursive = TRUE, showWarnings = FALSE) |> unlist() |> all()
 
 res <- curl::multi_download(urls, destfiles)
@@ -72,43 +58,24 @@ if (length(failed)) {
   unlink(res$destfile[failed])
 }'
 
-cd /opt/climatena/WNA/800m/Normal_1981_2010MSY
-mkdir mbtiles
+cd /var/www/html/climr-tif/WNA/800m/Normal_1981_2010MSY
+mkdir compress
 
-# Create mbtiles in WEBP format and add lower zoom level via gdaladdo (powers of 2 - 5 levels)
+# Recompress tif using LERC, adjust MAX_Z_ERROR for higher compression when it will be supported by geotiff.js
+# and included in georaster-layer-for-leaflet release.
+# Currently georaster-layer-for-leaflet is 3.10.0 in leafem and geotiff supports LZW : 
+# https://gdal.org/en/stable/drivers/raster/gtiff.html#configuration-options
+# for file in *.tif; do
+#     gdal_translate -co COMPRESS=LERC_ZSTD -co MAX_Z_ERROR=0.5 --quiet "$file" "compress/$file"
+# done &
+
+# Using available compression in geotiff.js
+# https://github.com/GeoTIFF/georaster-layer-for-leaflet/issues/151
+# https://github.com/r-spatial/leafem/commit/01a1202dcdc22316b50eb575a8c5da04d4270f4c
+# Currently 0.2.3 which relies on geotiff.js 1.0.0-beta13
 for file in *.tif; do
-    gdal_translate "$file" "mbtiles/${file%.tif}.mbtiles" -of MBTiles -co TILE_FORMAT=WEBP > /dev/null && gdaladdo "mbtiles/${file%.tif}.mbtiles" 2 4 8 16 32 > /dev/null
-done # &
-# export PID=$!
-# top -p $PID
-cd mbtiles
-
-# Create config.json
-#----
-echo '{
-  "options": {
-    "paths": {
-      "root": "/usr/src/app/node_modules/tileserver-gl-styles",
-      "fonts": "fonts",
-      "styles": "styles",
-      "mbtiles": "/data",
-      "pmtiles": "/data"
-    }
-  },
-  "styles": {},
-  "data": {' > config.json
-for file in *.mbtiles; do
-  filename="${file%.mbtiles}"
-  echo "    \"$filename\": {
-      \"mbtiles\": \"$file\"
-    }," >> config.json
+    gdal_translate -co COMPRESS=LZW -co PREDICTOR=2 -b 1 --quiet "$file" "compress/$file"
 done
-# Remove the last comma if exists
-sed -i '$ s/,$//' config.json
-echo '  }
-}' >> config.json
-#----
 
-# $(pwd) should be /opt/climatena/WNA/800m/Normal_1981_2010MSY/mbtiles
-docker run --rm -it -v $(pwd):/data -p 8080:8080 maptiler/tileserver-gl --config ./config.json --verbose &
-# docker container list
+mv compress/* ./
+rm -R compress
