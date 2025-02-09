@@ -1,7 +1,6 @@
 
 
 
-
 find_intersect_xy <- function(x, y1, y2){
   coef_1 <- coef(lm(y1~x))
   coef_2 <- coef(lm(y2~x))
@@ -11,21 +10,42 @@ find_intersect_xy <- function(x, y1, y2){
 } 
 
 
+find_intersect_wet_period <- function(x, y_precip_rel){
+
+  if (x == 1){
+    cbind(matrix(data = c(1, y_precip_rel[1])), 
+          find_intersect_xy(1:2, y1 = c(50, 50), y2 = y_precip_rel[1:2]))
+
+  } else if (x == 12){
+    cbind(find_intersect_xy(11:12, y1 = c(50, 50), y2 = y_precip_rel[11:12]), 
+          matrix(data = c(12, y_precip_rel[12])))
+  } else{
+    cbind(find_intersect_xy((x-1):x, y1 = c(50, 50), y2 = y_precip_rel[(x-1):x]), 
+          find_intersect_xy(x:(x+1), y1 = c(50, 50), y2 = y_precip_rel[x:(x+1)]))
+  }
+
+}
 
 # Make Graph continuous between Dec and Jan ? 
 # Create zone above 100?  --> wet period
 # Separate Sure Frost vs Probable Frost (we are currently based on average temp (sure forst) instead of Tmin (probable frost))
 # Add info on top of Graph 
 
-
+#' @importFrom data.table fcase fifelse
+#' @importFrom ggplot2 aes geom_hline geom_line geom_ribbon ggplot geom_polygon
+#' @importFrom ggplot2 scale_x_continuous scale_y_continuous sec_axis
+#' @importFrom ggplot2 annotate coord_cartesian labs theme_classic
 plot_climate_diagram <- function(temp, precip, elev = NULL, period = NULL, location = NULL){
   
+  #TODO: handle cases with missing months? 
   month <- 1:12
   
   # when monthly precipitation is greater than 100 mm, the scale is increased from 2 mm/Celsius to 20 mm/Celsius to avoid too high diagrams in very wet locations.
-  y_precip_rel <- ifelse(precip > 100, (precip-100)/20+50, precip/2)
+  y_precip_rel <- fifelse(precip > 100, (precip-100)/20 + 50, precip/2)
   
-  period_type <- ifelse(y_precip_rel > temp, ifelse(precip > 100, 'Wet' ,'Humid'), 'Dry')
+  period_type <- fcase(precip > 100, 'Wet',
+                       y_precip_rel > temp, 'Humid', 
+                       default = 'Dry')
   
   humid_period_switch <- c(FALSE, (y_precip_rel[2:12] > temp[2:12]) != (y_precip_rel[1:11] > temp[1:11])) #TODO 1st value not necessarily FALSE ?
   
@@ -43,7 +63,7 @@ plot_climate_diagram <- function(temp, precip, elev = NULL, period = NULL, locat
     period_type = "Humid"
   )
   
-  which_dry <- which(period_type %in% c('Dry'))
+  which_dry <- which(period_type == 'Dry')
   df_dry = data.frame(
     month = c(intersections[1,],  month[which_dry]),                        
     y_precip = c(intersections[2,],  y_precip_rel[which_dry]), 
@@ -51,26 +71,9 @@ plot_climate_diagram <- function(temp, precip, elev = NULL, period = NULL, locat
     period_type = "Dry"
   )
   
-  which_wet <- which(precip>100)
-  
-  #TODO Handle case when more than 1 continyous points above 100 
-  intersections_100 <- cbind(vapply(which_wet, \(x) find_intersect_xy((x-1):x, y1 = c(50, 50), y2 = y_precip_rel[(x-1):x]), numeric(2)), 
-                             vapply(which_wet, \(x) find_intersect_xy(x:(x+1), y1 = c(50, 50), y2 = y_precip_rel[x:(x+1)]), numeric(2)))
-  
-  intersections_100 <- data.frame(intersect_x = intersections_100[1,], intersect_y = intersections_100[2,])
-  
-  
-  df_wet <- data.frame(
-    month = c(month[which_wet], intersections_100$intersect_x),
-    y_precip = c(y_precip_rel[which_wet], intersections_100$intersect_y), 
-    y_100 = 50
-  )
-  
   
   all_info <- unique(rbind(df_humid, df_dry))
-  
-  title <- paste0(location, " (", elev, "m)")
-  
+   
   gg <- ggplot(data = all_info, mapping = aes(x = month)) + 
     geom_line(aes(month, y_temp), colour = 'red') + 
     geom_line(aes(month, y_precip), colour = 'blue') + 
@@ -78,16 +81,40 @@ plot_climate_diagram <- function(temp, precip, elev = NULL, period = NULL, locat
     geom_hline(yintercept = 0) +
     geom_ribbon(data = all_info[which(all_info$period_type %in% c('Humid', 'Wet')),], aes(ymax = y_precip, ymin = y_temp), fill = "blue", alpha = 0.25) +
     geom_ribbon(data = all_info[which(all_info$period_type == "Dry"),], aes(ymax = y_temp, ymin = y_precip), fill = "red", alpha = 0.25) +
-    geom_ribbon(data = df_wet, aes(ymax = y_precip, ymin = y_100), fill = 'black', alpha = 0.50) +
     scale_x_continuous(breaks = 1:12, labels = c('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'), name = 'Month') +
     scale_y_continuous("Temperature (C)", sec.axis = sec_axis(transform = ~(.*2)*(.<=100)+(20*(.-100)+100)*(.>100), name = "Precipitation (mm)")) +
     coord_cartesian(xlim = c(1,12), ylim = c(min(-2, temp), max(y_precip_rel, temp, 50)), clip = 'off', expand = FALSE ) + #, expand = FALSE to start at Jan
     annotate("text", x = 11.75, y = max(y_precip_rel, temp, 50)+4, label = paste0(trunc(sum(precip)), " mm")) + 
     annotate("text", x = 10, y = max(y_precip_rel, temp, 50)+4, label = paste0(trunc(mean(temp)*10)/10, " C")) + 
-    labs(title = title, subtitle = paste0("(", period, ")")) +
+    labs(title = 'Walter-Lieth Climate Diagram', subtitle = ifelse(is.null(elev),"",paste0("(", elev, "m)"))) +
     theme_classic()
   
+  # Add Wet Periods (precip > 100) ----
+  if (any(period_type == 'Wet')){
+
+    which_wet <- which(period_type == 'Wet')
+
+    #Handle case where January or December are Wet 
+    #TODO adjust this if we want jan & dec to be continuous
+
+    intersections_100 <- do.call(cbind, lapply(which_wet, find_intersect_wet_period, y_precip_rel = y_precip_rel))
+
+    #intersections_100 <- cbind(vapply(which_wet, \(x) find_intersect_xy((x-1):x, y1 = c(50, 50), y2 = y_precip_rel[(x-1):x]), numeric(2)), 
+    #                           vapply(which_wet, \(x) find_intersect_xy(x:(x+1), y1 = c(50, 50), y2 = y_precip_rel[x:(x+1)]), numeric(2)))
+
+    intersections_100 <- data.frame(intersect_x = intersections_100[1,], intersect_y = intersections_100[2,])
+
+    df_wet <- data.frame(
+      month = c(month[which_wet], intersections_100$intersect_x),
+      y_precip = c(y_precip_rel[which_wet], intersections_100$intersect_y), 
+      y_100 = 50
+    )
+    
+    gg <- gg + geom_ribbon(data = df_wet, aes(ymax = y_precip, ymin = y_100), fill = 'black', alpha = 0.50) 
+  }
   
+
+  # Add Freeze Periods  ----
   freeze <- which(temp < 0)
    
   for(i in seq_along(freeze)){
@@ -106,17 +133,72 @@ plot_climate_diagram <- function(temp, precip, elev = NULL, period = NULL, locat
 temp <- c(14, 14, 17, 20, 24, 28, 31, 31, 27, 23, 18, 15)
 precip <- c(93.1, 62.1, 58.8, 46.6, 45.9, 23.1, 11.2, 18.9, 73.8, 68, 155.3, 76.3)
 library(ggplot2)
+library(data.table)
 
-plot_climate_diagram(temp = temp, precip = precip,  elev = 25, period = '1961-2009', location = 'Napoli')
+plot_climate_diagram(temp = temp, precip = precip,  elev = 25)
 
 plot_climate_diagram(temp = c(-3, 14, 17, 20, 24, 28, 31, 31, 27, 23, 18, -5), 
                      precip = c(93.1, 62.1, 58.8, 46.6, 45.9, 23.1, 11.2, 18.9, 73.8, 68, 155.3, 76.3), 
-                     elev = 25, 
-                     period = '1961-2009', 
-                     location = 'Napoli')
+                     elev = 25 
+                     )
 
 # Current nmaes in repo 
 ##PPT
 ##Tmin
 ##Tmax
+
+
+
+#Tests: 
+## Wet periods ----
+# - 1 month precip > 100 
+temp <- c(14, 14, 17, 20, 24, 28, 31, 31, 27, 23, 18, 15)
+precip <- c(93.1, 62.1, 58.8, 46.6, 45.9, 23.1, 11.2, 18.9, 73.8, 68, 155.3, 76.3)
+plot_climate_diagram(temp = temp, precip = precip,  elev = 25)
+# - 0 month precip > 100
+temp <- c(14, 14, 17, 20, 24, 28, 31, 31, 27, 23, 18, 15)
+precip <- c(93.1, 62.1, 58.8, 46.6, 45.9, 23.1, 11.2, 18.9, 73.8, 68, 99.3, 76.3)
+plot_climate_diagram(temp = temp, precip = precip,  elev = 25)
+# - 2 month precip > 100 (non-contiguous)
+temp <- c(14, 14, 17, 20, 24, 28, 31, 31, 27, 23, 18, 15)
+precip <- c(93.1, 150.3, 58.8, 46.6, 45.9, 23.1, 11.2, 18.9, 73.8, 68, 155.3, 76.3)
+plot_climate_diagram(temp = temp, precip = precip,  elev = 25)
+# - 2 month precip > 100 (contiguous)
+temp <- c(14, 14, 17, 20, 24, 28, 31, 31, 27, 23, 18, 15)
+precip <- c(93.1, 150.3, 58.8, 46.6, 45.9, 23.1, 11.2, 18.9, 73.8, 130.3, 155.3, 76.3)
+plot_climate_diagram(temp = temp, precip = precip,  elev = 25)
+# - 3 months precip > 100 (contiguous)
+temp <- c(14, 14, 17, 20, 24, 28, 31, 31, 27, 23, 18, 15)
+precip <- c(93.1, 150.3, 58.8, 46.6, 45.9, 23.1, 11.2, 18.9, 120, 130.3, 155.3, 76.3)
+plot_climate_diagram(temp = temp, precip = precip,  elev = 25)
+# - Jan + Dec precip > 100 (contiguous)
+temp <- c(14, 14, 17, 20, 24, 28, 31, 31, 27, 23, 18, 15)
+precip <- c(130, 62.1, 58.8, 46.6, 45.9, 23.1, 11.2, 18.9, 73.8, 68, 90, 155.3)
+plot_climate_diagram(temp = temp, precip = precip,  elev = 25)
+
+
+
+
+# months with freeze ----
+# - Jan + Dec 
+temp <- c(-3, 14, 17, 20, 24, 28, 31, 31, 27, 23, 18, -5)
+precip <- c(93.1, 62.1, 58.8, 46.6, 45.9, 23.1, 11.2, 18.9, 73.8, 68, 155.3, 76.3)
+plot_climate_diagram(temp = temp, precip = precip,  elev = 25)
+# - Jan + Feb 
+temp <- c(-3, -1, 17, 20, 24, 28, 31, 31, 27, 23, 18, 10)
+precip <- c(93.1, 62.1, 58.8, 46.6, 45.9, 23.1, 11.2, 18.9, 73.8, 68, 155.3, 76.3)
+plot_climate_diagram(temp = temp, precip = precip,  elev = 25)
+
+
+
+
+## All Dry
+
+## All Humid 
+
+## All Wet
+
+
+# Dry en Jan - Dec
+
 
