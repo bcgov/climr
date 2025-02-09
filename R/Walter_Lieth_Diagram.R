@@ -9,19 +9,51 @@ find_intersect_xy <- function(x, y1, y2){
   c(inter_x, as.numeric(coef_1[1] + inter_x*coef_1[2]))
 } 
 
+find_intersect_humid_dry <- function(temp, y_precip_rel){
+
+  #Compare to previous month to know if period type changed between months.
+  ## January won't change because it has no prior state so we assign FALSE.
+  period_type_change <- c(FALSE, (y_precip_rel[-1] > temp[-1]) != (y_precip_rel[-12] > temp[-12]))
+
+  intersect_xy <- vapply(which(period_type_change), \(x) find_intersect_xy((x-1):x, y1=temp[(x-1):x], y2=y_precip_rel[(x-1):x]), numeric(2))
+
+  data.frame(x = intersect_xy[1,], y = intersect_xy[2,])
+
+}
 
 find_intersect_wet_period <- function(x, y_precip_rel){
 
+
   if (x == 1){
-    cbind(matrix(data = c(1, y_precip_rel[1])), 
+    if (y_precip_rel[2] > 50){ # We don't cross threshold between 1 and 2
+      matrix(data = c(1, y_precip_rel[1]))
+    } else{
+      cbind(matrix(data = c(1, y_precip_rel[1])), 
           find_intersect_xy(1:2, y1 = c(50, 50), y2 = y_precip_rel[1:2]))
+    }
 
   } else if (x == 12){
-    cbind(find_intersect_xy(11:12, y1 = c(50, 50), y2 = y_precip_rel[11:12]), 
+    if (y_precip_rel[11] > 50){ # We don't cross threshold between 11 and 12
+      matrix(data = c(12, y_precip_rel[12]))
+    } else {
+      cbind(find_intersect_xy(11:12, y1 = c(50, 50), y2 = y_precip_rel[11:12]), 
           matrix(data = c(12, y_precip_rel[12])))
+    }
+    
   } else{
-    cbind(find_intersect_xy((x-1):x, y1 = c(50, 50), y2 = y_precip_rel[(x-1):x]), 
+    if (y_precip_rel[x-1] < 50 & y_precip_rel[x+1] < 50){
+      cbind(find_intersect_xy((x-1):x, y1 = c(50, 50), y2 = y_precip_rel[(x-1):x]), 
           find_intersect_xy(x:(x+1), y1 = c(50, 50), y2 = y_precip_rel[x:(x+1)]))
+    } else if (y_precip_rel[x-1] < 50 & y_precip_rel[x+1] > 50) {
+      cbind(find_intersect_xy((x-1):x, y1 = c(50, 50), y2 = y_precip_rel[(x-1):x]), 
+          matrix(data = c(x, y_precip_rel[x])))
+    } else if (y_precip_rel[x-1] > 50 & y_precip_rel[x+1] < 50) {
+      cbind(matrix(data = c(x, y_precip_rel[x])), 
+          find_intersect_xy(x:(x+1), y1 = c(50, 50), y2 = y_precip_rel[x:(x+1)]))
+    } else {
+      matrix(data = c(x, y_precip_rel[x]))
+    }
+    
   }
 
 }
@@ -47,30 +79,19 @@ plot_climate_diagram <- function(temp, precip, elev = NULL, period = NULL, locat
                        y_precip_rel > temp, 'Humid', 
                        default = 'Dry')
   
-  humid_period_switch <- c(FALSE, (y_precip_rel[2:12] > temp[2:12]) != (y_precip_rel[1:11] > temp[1:11])) #TODO 1st value not necessarily FALSE ?
+  monthly_df <- data.frame(month = month, y_precip = y_precip_rel, y_temp = temp, period_type = period_type)
   
-  intersections <- vapply(which(humid_period_switch), 
-                          \(x) find_intersect_xy((x-1):x, y1=temp[(x-1):x], y2=y_precip_rel[(x-1):x]), 
-                          numeric(2))
+  intersect_xy <- find_intersect_humid_dry(temp, y_precip_rel)
   
-  
-  which_humid <- which(period_type %in% c('Humid', 'Wet'))
-  
-  df_humid = data.frame(
-    month = c(intersections[1,],  month[which_humid]),                        
-    y_precip = c(intersections[2,],  y_precip_rel[which_humid]), 
-    y_temp = c(intersections[2,],  temp[which_humid]), 
-    period_type = "Humid"
-  )
-  
-  which_dry <- which(period_type == 'Dry')
-  df_dry = data.frame(
-    month = c(intersections[1,],  month[which_dry]),                        
-    y_precip = c(intersections[2,],  y_precip_rel[which_dry]), 
-    y_temp = c(intersections[2,],  temp[which_dry]), 
-    period_type = "Dry"
-  )
-  
+  if (nrow(intersect_xy)){
+    intersect_df <- data.frame(month = intersect_xy$x, y_precip = intersect_xy$y, y_temp = intersect_xy$y)
+
+    df_humid <- rbind(monthly_df[which(period_type %in% c('Humid', 'Wet')),], cbind(intersect_df, period_type = 'Humid'))
+    df_dry <- rbind(monthly_df[which(period_type == 'Dry'),], cbind(intersect_df, period_type = 'Dry'))
+  } else {
+    df_humid <- monthly_df[which(period_type %in% c('Humid', 'Wet')),]
+    df_dry <- monthly_df[which(period_type == 'Dry'),]
+  }
   
   all_info <- unique(rbind(df_humid, df_dry))
    
@@ -193,12 +214,25 @@ plot_climate_diagram(temp = temp, precip = precip,  elev = 25)
 
 
 ## All Dry
-
+temp <- c(22, 22, 23, 25, 27, 28, 31, 31, 27, 23, 22, 19)
+precip <- c(20, 21, 32, 30, 35, 20, 28, 31, 36, 34, 35, 30)
+plot_climate_diagram(temp = temp, precip = precip,  elev = 25)
 ## All Humid 
-
+temp <- c(22, 22, 23, 25, 27, 28, 31, 31, 27, 23, 22, 19)
+precip <- c(50, 56, 60, 70, 80, 85, 70, 75, 79, 83, 82, 91)
+plot_climate_diagram(temp = temp, precip = precip,  elev = 25)
 ## All Wet
-
+temp <- c(22, 22, 23, 25, 27, 28, 31, 31, 27, 23, 22, 19)
+precip <- c(150, 156, 160, 170, 180, 185, 170, 175, 179, 183, 182, 191)
+plot_climate_diagram(temp = temp, precip = precip,  elev = 25)
 
 # Dry en Jan - Dec
+temp <- c(28, 14, 17, 20, 24, 28, 31, 31, 27, 23, 18, 28)
+precip <- c(40, 62.1, 58.8, 46.6, 45.9, 23.1, 11.2, 18.9, 73.8, 68, 20, 40)
+plot_climate_diagram(temp = temp, precip = precip,  elev = 25)
+
+
+
+
 
 
