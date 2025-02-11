@@ -21,7 +21,7 @@ buff.na <- buffer(bdy.na, width=50000) # buffer coastline
 
 # ClimateNA
 #low res dem for north america
-anom <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
+anom <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.from.1961_1990.to.2001_2020.", elements[1], ".tif"))
 dem <- rast("//objectstore2.nrs.bcgov/ffec/DEM/DEM_NorAm/dem_noram_lowres.tif")
 dem <- project(dem, anom, method="mode") 
 my_grid <- as.data.frame(dem, cells = TRUE, xy = TRUE)
@@ -40,11 +40,11 @@ anom.climna[, c(1, 2, 3, 4, 5) := ref.climna[, c(1, 2, 3, 4, 5), with = FALSE]]
 
 
 # ==========================================
-# two-panel comparison of CRU and climr anomaly to 2001-2020
+# three-panel comparison of CRU and climr anomaly to 2001-2020
 # ==========================================
 
 
-element.names <- c("mean daily minimum temperature (K)", "mean daily maximum temperature (K)", " precipitation (%)")
+element.names <- c("mean daily minimum temperature (K)", "mean daily maximum temperature (K)", "precipitation (%)")
 
 dem.lcc <- rast("C:/Users/CMAHONY/OneDrive - Government of BC/Projects/2021_CMIP6Eval_NA/inputs//dem.na.lcc.tif")
 ipccregions.lcc <- vect("C:\\Users\\CMAHONY\\OneDrive - Government of BC\\Shiny_Apps\\cmip6-NA-eval\\data\\ipccregions_lcc.shp")
@@ -58,7 +58,7 @@ anom.cru <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.f
 
 for(m in 1:12){
   
-png(filename=paste("vignettes/CRUvsclimrvsClimateNA_2Panel", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=6.5, height=4.5, pointsize=10, res=300)
+png(filename=paste("vignettes/CRUvsclimrvsClimateNA_3Panel", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=6.5, height=4.5, pointsize=10, res=300)
 # pdf(file=paste("results//CMIP6Eval.Fig3", metric,"pdf",sep="."), width=7.5, height=14, pointsize=12)
 
 mat <- matrix(c(7,1,2,7,3,4,7,5,6), 3)
@@ -87,13 +87,13 @@ for(source in c("cru.gpcc", "climr", "climatena")){
   if(source=="cru.gpcc"){
     X <- anom.cru[[m]]
   } else if(source=="climr") {
-    # dir <- "//objectstore2.nrs.bcgov/ffec/new_monthly_blended_climate_data/blended_monthly_tmi_tmx_prcp_ts_NA_1901_2024/"
-    dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/new_monthly_blended_climate_data/blended_monthly_tmi_tmx_prcp_ts_NA_1901_2024/"
-    file <- list.files(dir, pattern = paste0("*.", month.abb[m], "_", c("tmin", "tmax", "prcp")[e], ".*"))
+    # dir <- "//objectstore2.nrs.bcgov/ffec/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/"
+    dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/"
+    file <- list.files(dir, pattern = paste0(c("tmin", "tmax", "prcp")[e], ".*._", monthcodes[m], "_.*"))
     ts.climr <- rast(paste0(dir, file))
-    ts.years <- substr(names(ts.climr), 1,4)
-    ref.climr <- mean(ts.climr[[ts.years%in%1961:1990]])
-    curr.climr <- mean(ts.climr[[ts.years%in%2001:2020]])
+    ts.years <- substr(time(ts.climr), 1,4)
+    ref.climr <- mean(ts.climr[[ts.years%in%1961:1990]])+1 
+    curr.climr <- mean(ts.climr[[ts.years%in%2001:2020]])+1
     anom.climr <- if(e==3) curr.climr / ref.climr else curr.climr - ref.climr
     X <- anom.climr
   } else {
