@@ -32,12 +32,19 @@ write.csv(climna_grid, "C:/Users/CMAHONY/OneDrive - Government of BC/Data/Climat
 ref.climna <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/ClimateNA_v750/noramLow_Normal_1961_1990MP.csv")
 y2001.climna <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/ClimateNA_v750/noramLow_Decade_2001_2010MP.csv")
 y2011.climna <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/ClimateNA_v750/noramLow_Decade_2011_2020MP.csv")
+y1981.climna <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/ClimateNA_v750/noramLow_Normal_1981_2010MP.csv")
 recent.climna <- (y2001.climna + y2011.climna)/2
 anom.climna <- recent.climna - ref.climna
 ppt_columns <- grep("PPT", names(anom.climna), value = TRUE)
 anom.climna[, (ppt_columns) := recent.climna[, .SD, .SDcols = ppt_columns] / ref.climna[, .SD, .SDcols = ppt_columns]]
 anom.climna[, c(1, 2, 3, 4, 5) := ref.climna[, c(1, 2, 3, 4, 5), with = FALSE]]
+anom.climna.1981 <- ref.climna - y1981.climna
+anom.climna.1981[, (ppt_columns) := ref.climna[, .SD, .SDcols = ppt_columns] / y1981.climna[, .SD, .SDcols = ppt_columns]]
+anom.climna.1981[, c(1, 2, 3, 4, 5) := ref.climna[, c(1, 2, 3, 4, 5), with = FALSE]]
 
+values(X) <- NA
+X[anom.climna.1981[, id1]] <- anom.climna.1981[,5]
+plot(X)
 
 # ==========================================
 # three-panel comparison of CRU and climr anomaly to 2001-2020
@@ -54,11 +61,11 @@ e=1
 m=2
 
 for(e in 1:3){
-anom.cru <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
+anom.cru <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/CRUGPCC_2024/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
 
 for(m in 1:12){
   
-png(filename=paste("vignettes/CRUvsclimrvsClimateNA_3Panel", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=6.5, height=4.5, pointsize=10, res=300)
+png(filename=paste("vignettes/plots_timeseries/CRUvsclimrvsClimateNA_3Panel", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=6.5, height=4.5, pointsize=10, res=300)
 # pdf(file=paste("results//CMIP6Eval.Fig3", metric,"pdf",sep="."), width=7.5, height=14, pointsize=12)
 
 mat <- matrix(c(7,1,2,7,3,4,7,5,6), 3)
@@ -92,9 +99,9 @@ for(source in c("cru.gpcc", "climr", "climatena")){
     file <- list.files(dir, pattern = paste0(c("tmin", "tmax", "prcp")[e], ".*._", monthcodes[m], "_.*"))
     ts.climr <- rast(paste0(dir, file))
     ts.years <- substr(time(ts.climr), 1,4)
-    ref.climr <- mean(ts.climr[[ts.years%in%1961:1990]])+1 
-    curr.climr <- mean(ts.climr[[ts.years%in%2001:2020]])+1
-    anom.climr <- if(e==3) curr.climr / ref.climr else curr.climr - ref.climr
+    ref.climr <- mean(ts.climr[[ts.years%in%1961:1990]]) 
+    curr.climr <- mean(ts.climr[[ts.years%in%2001:2020]])
+    anom.climr <- if(e==3) (curr.climr+1) / (ref.climr+1) else curr.climr - ref.climr
     X <- anom.climr
   } else {
     X <- dem # use the DEM as a template raster
@@ -130,6 +137,89 @@ print(e)
 }
 
 # ==========================================
+# three-panel comparison of CRU and climr anomaly to from 1981-2010 to 1961-1990
+# ==========================================
+
+
+element.names <- c("mean daily minimum temperature (K)", "mean daily maximum temperature (K)", "precipitation (%)")
+
+dem.lcc <- rast("C:/Users/CMAHONY/OneDrive - Government of BC/Projects/2021_CMIP6Eval_NA/inputs//dem.na.lcc.tif")
+ipccregions.lcc <- vect("C:\\Users\\CMAHONY\\OneDrive - Government of BC\\Shiny_Apps\\cmip6-NA-eval\\data\\ipccregions_lcc.shp")
+bdy.lcc <- project(bdy.na, ipccregions.lcc)
+
+e=1
+m=2
+
+for(e in 1:3){
+  anom.cru <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/CRUGPCC_2024/delta.from.1981_2010.to.1961_1990.", elements[e], ".tif"))
+  anom.climr <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.from.1981_2010.to.1961_1990.", elements[e], ".tif"))
+  
+  for(m in 1:12){
+    
+    png(filename=paste("vignettes/plots_timeseries/CRUvsclimrvsClimateNA_3Panel_1981rev", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=6.5, height=4.5, pointsize=10, res=300)
+
+    mat <- matrix(c(7,1,2,7,3,4,7,5,6), 3)
+    layout(mat, widths=c(1,1,1), heights=c(0.2, .05 ,1))
+    
+    sequence <- 1:12
+    
+    par(mar=c(0.1,0.1,0.1,0.1))
+    
+    lim.upper <- if(elements[e]=="Pr") 1 else 3
+    lim.lower <- if(elements[e]=="Pr") -1 else -3
+    
+    inc=(lim.upper-lim.lower)/100
+    breaks=seq(lim.lower, lim.upper+inc, inc)
+    colscheme <- colorRampPalette(if(elements[e]=="Pr") rev(hcl.colors(5,"Blue-Red 3")) else hcl.colors(5,"Blue-Red 3"))(length(breaks)-1)
+    
+    pct <- if(elements[e]=="Pr") 100 else 1
+    
+    for(source in c("cru.gpcc", "climr", "climatena")){
+      
+      source.name <- if(source=="climr") "climr blend" else if(source=="climatena") "ClimateNA" else if(elements[e]=="Pr") "GPCC" else "CRU"
+      plot(1, type="n", axes=F, xlab="", ylab="")  
+      text(1,1, source.name, font=2,cex=1.35)  
+      
+      par(mar=c(0.1,0.1,0.1,0.1))
+      if(source=="cru.gpcc"){
+        X <- anom.cru[[m]]
+      } else if(source=="climr") {
+        X <- anom.climr[[m]]
+        X <- project(X, anom.cru)
+      } else {
+        X <- dem # use the DEM as a template raster
+        X[anom.climna.1981[, id1]] <- anom.climna.1981[,get(paste0(c("Tmin", "Tmax", "PPT")[e], monthcodes[m]))]
+      }     
+      
+      X <- project(X, dem.lcc)
+      X <- crop(X, ipccregions.lcc)
+      X <- mask(X, ipccregions.lcc)
+      if(e==3) X <- log2(X)
+      X[X>lim.upper] <- lim.upper
+      X[X < lim.lower] <- lim.lower
+      
+      image(X, col=colscheme, breaks=breaks, xaxt="n", yaxt="n", bty="n")
+      lines(bdy.lcc)
+      
+      print(source)
+    }
+    
+    ## legend
+    plot(1, type="n", axes=F, xlab="", ylab="", xlim=c(0,1), ylim=c(0,1))  
+    xl <- 0.2; yb <- 0.3; xr <- 0.8; yt <- 0.5
+    rect(head(seq(xl,xr,(xr-xl)/length(colscheme)),-1), yb,  tail(seq(xl,xr,(xr-xl)/length(colscheme)),-1),  yt,  border=NA, col=colscheme)
+    rect(xl,  yb,  xr,  yt)
+    labels <- if(elements[e]=="Pr") paste(round(2^seq(lim.lower,lim.upper,(lim.upper-lim.lower)/2), 2)*pct-pct, "%", sep="") else round(seq(lim.lower,lim.upper,(lim.upper-lim.lower)/2), 2)*pct
+    text(seq(xl,xr,(xr-xl)/(length(labels)-1)),rep(yb,length(labels)),labels,pos=1,cex=1.5,font=1, offset=0.5)
+    text(mean(c(xl,xr)), yt+0.01, paste("Difference in", month.name[m], element.names[e], "\n1981-2010 to 1961-1990"), pos=3, cex=1.5, font=2)
+    
+    dev.off()
+    print(m)
+  }
+  print(e)
+}
+
+# ==========================================
 # multipanel comparison of CRU and climr blend
 # ==========================================
 
@@ -139,8 +229,7 @@ element.names <- c("mean daily\nminimum temperature (K)", "mean daily\nmaximum t
 dem.lcc <- rast("C:/Users/CMAHONY/OneDrive - Government of BC/Projects/2021_CMIP6Eval_NA/inputs//dem.na.lcc.tif")
 ipccregions.lcc <- vect("C:\\Users\\CMAHONY\\OneDrive - Government of BC\\Shiny_Apps\\cmip6-NA-eval\\data\\ipccregions_lcc.shp")
 
-png(filename=paste("vignettes/CRUvsClimateNA_Diffplots", "png",sep="."), type="cairo", units="in", width=6.5, height=15, pointsize=10, res=300)
-# pdf(file=paste("results//CMIP6Eval.Fig3", metric,"pdf",sep="."), width=7.5, height=14, pointsize=12)
+png(filename=paste("vignettes/plots_timeseries/CRUvsClimateNA_Diffplots", "png",sep="."), type="cairo", units="in", width=6.5, height=15, pointsize=10, res=300)
 
 mat <- matrix(0:(13*9-1), 13)
 mat[,8:9] <- mat[,6:7]+2
@@ -275,9 +364,8 @@ for(e in 1:3){
   m=2
   for(m in 1:12){
     
-    png(filename=paste("vignettes/CRUvsClimateNA_BCAB", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=6.5, height=3.3, pointsize=10, res=300)
-    # pdf(file=paste("results//CMIP6Eval.Fig3", metric,"pdf",sep="."), width=7.5, height=14, pointsize=12)
-    
+    png(filename=paste("vignettes/plots_timeseries/CRUvsClimateNA_BCAB", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=6.5, height=3.3, pointsize=10, res=300)
+
     mat <- matrix(c(5,1,2,5,3,4), 3)
     layout(mat, widths=c(1,1), heights=c(0.3, .05 ,1))
     
@@ -400,7 +488,7 @@ ts.y.cru <- unname(unlist(clim[clim$PERIOD %in% 1901:2020 & DATASET == "cru.gpcc
 ts.ref <- mean(ts.y.climatena[ts.x.climatena%in%1961:1990])
 
 ## plot comparing CRU and climateNA time series with AHCCD station data. 
-png(filename=paste("vignettes/CRUvsClimateNA_ts", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=6.5, height=4, pointsize=10, res=300)
+png(filename=paste("vignettes/plots_timeseries/CRUvsClimateNA_ts", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=6.5, height=4, pointsize=10, res=300)
 
 par(mar = c(2,3,0.5,0.5), mgp = c(1.75, 0.25, 0), mfrow=c(1,1))
 ylim <- range(ts.y.climatena, na.rm = T) + c(-1.5,1.5)
@@ -487,7 +575,7 @@ for(e in 1:3){
   m=2
   for(m in c(1,2,4,7,10)){
     
-    png(filename=paste("vignettes/ERA5vsClimateNA_BCAB", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=6.5, height=3.3, pointsize=10, res=300)
+    png(filename=paste("vignettes/plots_timeseries/ERA5vsClimateNA_BCAB", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=6.5, height=3.3, pointsize=10, res=300)
 
     mat <- matrix(c(5,1,2,5,3,4), 3)
     layout(mat, widths=c(1,1), heights=c(0.3, .05 ,1))
