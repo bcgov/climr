@@ -1,50 +1,41 @@
 #' @noRd
 calc_DD_m_above <- function(tm, k, a, b, t0, beta, c) {
-  DD_m <- numeric(length(tm))
-
-  # when k is missing Tm will always be above the negative temperatures used for k
+  # when k is missing tm will always be above the negative temperatures used for k
   # Sign reversed in paper
   # Reverse parameters b and t0 from paper
-  i <- which(tm < k)
-  DD_m[i] <- a / (1 + exp(-(tm[i] - t0) / b))
-  i <- which(tm >= k)
-  DD_m[i] <- c + beta * tm[i]
-
-  DD_m[is.na(tm)] <- tm[is.na(tm)] ## use tm[is.na(tm)] to respect NA type
-
+  if (is.na(k) || is.na(a) || is.na(b) || is.na(t0) || is.na(beta) || is.na(c)) {
+    return(tm * 0)
+  }
+  test1 <- tm < k
+  DD_m <- test1 * (a / (1 + exp(-(tm - t0) / b))) + (!test1) * (c + beta * tm)
   return(DD_m)
 }
 
 #' @noRd
 calc_DD_m_below <- function(tm, k, a, b, t0, beta, c) {
-  DD_m <- numeric(length(tm))
-
-  # when k is missing Tm will always be above the negative temperatures used for k
+  # when k is missing tm will always be above the negative temperatures used for k
   # Sign reversed in paper
   # Reverse parameters b and t0 from paper
-  i <- which(tm > k)
-  DD_m[i] <- a / (1 + exp(-(tm[i] - t0) / b))
-  i <- which(tm <= k)
-  DD_m[i] <- c + beta * tm[i]
-
-  DD_m[is.na(tm)] <- tm[is.na(tm)] ## use tm[is.na(tm)] to respect NA type
-
+  if (is.na(k) || is.na(a) || is.na(b) || is.na(t0) || is.na(beta) || is.na(c)) {
+    return(tm * 0)
+  }
+  test1 <- tm > k
+  DD_m <- test1 * (a / (1 + exp(-(tm - t0) / b))) + (!test1) * (c + beta * tm)
   return(DD_m)
 }
 
-
-#' Calculate Degree-Day Below 0 (DD<0)
+# Calculate Degree-Day Below 0 (DD<0)
+#' @title Climate variables calculation
 #'
 #' @template m
 #' @template tm
-#'
-#' @return numeric. Degree-Days Below 0
-#'
+#' @param region character. One of either "All", "West", "East".
 #' @examples
 #' \dontrun{
 #' climr:::calc_DD_below_0(2, -14)
 #' }
-#' @noRd
+#' @export
+#' @rdname climatevar
 calc_DD_below_0 <- function(m, tm) {
   if (FALSE) {
     Month <- k <- a <- b <- T0 <- beta <- c <- NULL
@@ -62,18 +53,12 @@ calc_DD_below_0 <- function(m, tm) {
 }
 
 #' Calculate Degree-Day Above 5 (DD>5)
-#'
-#' @template m
-#' @template tm
-#' @param region character. One of either "All", "West", "East".
-#'
-#' @return numeric. Degree-Days Above 5
-#'
 #' @examples
 #' \dontrun{
 #' climr:::calc_DD_above_5(2, -14, "All")
 #' }
-#' @noRd
+#' @export
+#' @rdname climatevar
 calc_DD_above_5 <- function(m, tm, region) {
   if (FALSE) {
     Month <- Region <- k <- a <- b <- T0 <- beta <- c <- NULL
@@ -95,17 +80,12 @@ calc_DD_above_5 <- function(m, tm, region) {
 }
 
 #' Calculate Degree-Day Below 18 (DD<18)
-#'
-#' @template m
-#' @template tm
-#'
-#' @return numeric. Degree-Days Below 18
-#'
 #' @examples
 #' \dontrun{
 #' climr:::calc_DD_below_18(2, -14)
 #' }
-#' @noRd
+#' @export
+#' @rdname climatevar
 calc_DD_below_18 <- function(m, tm) {
   if (FALSE) {
     Month <- k <- a <- b <- T0 <- beta <- c <- NULL
@@ -124,18 +104,12 @@ calc_DD_below_18 <- function(m, tm) {
 
 
 #' Calculate Degree-Day Above 18 (DD>18)
-#'
-#' @template m
-#' @template tm
-#' @param region character. One of either "All", "South west", "The rest".
-#'
-#' @return numeric. Degree-Days Above 18
-#'
 #' @examples
 #' \dontrun{
 #' climr:::calc_DD_above_18(2, -14, "All")
 #' }
-#' @noRd
+#' @export
+#' @rdname climatevar
 calc_DD_above_18 <- function(m, tm, region) {
   if (FALSE) {
     Month <- Region <- k <- a <- b <- T0 <- beta <- c <- NULL
