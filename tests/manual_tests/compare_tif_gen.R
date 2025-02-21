@@ -1,3 +1,7 @@
+library(curl)
+library(climr)
+library(terra)
+
 # ClimateNA tif dir
 dir1 <- "../climna-tif/WNA/800m/Normal_1981_2010MSY"
 # Testing dir
@@ -5,7 +9,6 @@ dir2 <- "../climna-tif/test"
 
 # --- Download tif in ClimateNA folder
 
-library(curl)
 urls <- expand.grid(
   "https://media.forestry.ubc.ca",
   "ClimateNA",
@@ -70,7 +73,7 @@ file.copy(file.path(dir1, f), file.path(dir2, gsub("([0-9]{2})", "_\\1", f)))
 
 # --- Add elevation matching raster and latitute
 
-get_elev_raster(
+climr::get_elev_raster(
   r = file.path(dir1, f[1]),
   elev = "northamerica_elevation_cec_2023.tif",
   out = file.path(dir2, "elev.tif"),
@@ -78,7 +81,7 @@ get_elev_raster(
   datatype="FLT4S",
   overwrite = TRUE
 )
-get_latitude_raster(
+climr::get_latitude_raster(
   r = file.path(dir1, f[1]),
   out = file.path(dir2, "lat.tif"),
   gdal = "PREDICTOR=2",
