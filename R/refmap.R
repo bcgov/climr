@@ -24,7 +24,7 @@
 #' @importFrom uuid UUIDgenerate
 #' @rdname input_refmap
 #' @export
-input_refmap <- function(dbCon, bbox, reference = "refmap_climatena", cache = TRUE, indiv_tiles = FALSE, xyz = NULL) {
+input_refmap <- function(dbCon, bbox, reference = "refmap_climr", cache = TRUE, indiv_tiles = FALSE, xyz = NULL) {
   ## checks
   if (is(reference, "character")) {
     # match.arg(reference, list_refmaps()) ## temporarily disable
@@ -49,9 +49,9 @@ input_refmap <- function(dbCon, bbox, reference = "refmap_climatena", cache = TR
   if (!grepl("normal", reference)) {
     rmap_nm <- switch(reference,
                       refmap_prism = "normal_bc",
-                      refmap_climr = "normal_composite",
+                      refmap_climr = "refmap_climr",
                       refmap_climatena = "normal_na",
-                      auto = "normal_composite"
+                      auto = "refmap_climr"
     )
   } else {
     rmap_nm <- reference
@@ -93,7 +93,7 @@ input_refmap <- function(dbCon, bbox, reference = "refmap_climatena", cache = TR
 
   if (needDownload) {
      
-    message("Downloading new data...")
+    message("Downloading new data from ",rmap_nm,"...")
     if(indiv_tiles){
       cache <- FALSE
       res <- dbGetTiles(dbCon, rmap_nm, pnts = xyz, bands = 1:73)

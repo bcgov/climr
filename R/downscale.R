@@ -154,9 +154,6 @@ downscale <- function(xyz, which_refmap = "auto",
 
   xyz[, id_orig := NULL]
 
-  ## input needs to be a data.frame, not data.table. This is something we could change in the future
-  # xyz <- as.data.frame(xyz)
-
   message("Getting normals...")
   if(which_refmap %in% c("refmap_climatena","refmap_prism","refmap_climr")){
     reference <- input_refmap(dbCon = dbCon, reference = which_refmap, bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
