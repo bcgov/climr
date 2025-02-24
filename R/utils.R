@@ -127,6 +127,7 @@ get_latitude_raster <- function(r, out = NULL, ...) {
     # Initialize a new raster with the latitude values computed for each cell
     lat_raster <- terra::init(r, fun = lat_fun)
   }
+  names(lat_raster) <- "latitude"
   if (!is.null(out)) {
     terra::writeRaster(lat_raster, out, ...)
     return(invisible(lat_raster))
@@ -151,6 +152,7 @@ get_elev_raster <- function(r, elev, out = NULL, ...) {
   elev <- terra::rast(elev)
   r <- terra::rast(r)
   prj <- terra::project(elev, r, method = "near")
+  names(prj) <- "elevation"
   if (!is.null(out)) {
     terra::writeRaster(prj, out, ...)
     return(invisible(prj))
