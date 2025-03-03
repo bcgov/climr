@@ -21,9 +21,11 @@ buff.na <- buffer(bdy.na, width=50000) # buffer coastline
 
 # ClimateNA
 #low res dem for north america
-anom <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.from.1961_1990.to.2001_2020.", elements[1], ".tif"))
+dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/"
+files <- list.files(dir, pattern = paste0(c("tmin", "tmax", "prcp"), "_.*"))
+temp <- rast(paste0(dir, files[1]))
 dem <- rast("//objectstore2.nrs.bcgov/ffec/DEM/DEM_NorAm/dem_noram_lowres.tif")
-dem <- project(dem, anom, method="mode") 
+dem <- project(dem, temp, method="mode") 
 my_grid <- as.data.frame(dem, cells = TRUE, xy = TRUE)
 climna_grid <- my_grid[,c(1,1,3,2,4)]
 colnames(climna_grid) <- c("id1", "id2", "lat", "lon", "el") # rename column names to what climr expects
@@ -42,10 +44,6 @@ anom.climna.1981 <- ref.climna - y1981.climna
 anom.climna.1981[, (ppt_columns) := ref.climna[, .SD, .SDcols = ppt_columns] / y1981.climna[, .SD, .SDcols = ppt_columns]]
 anom.climna.1981[, c(1, 2, 3, 4, 5) := ref.climna[, c(1, 2, 3, 4, 5), with = FALSE]]
 
-values(X) <- NA
-X[anom.climna.1981[, id1]] <- anom.climna.1981[,5]
-plot(X)
-
 # ==========================================
 # three-panel comparison of CRU and climr anomaly to 2001-2020
 # ==========================================
@@ -62,14 +60,15 @@ m=2
 
 for(e in 1:3){
 anom.cru <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/CRUGPCC_2024/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
+anom.climr <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
 
 for(m in 1:12){
   
-png(filename=paste("vignettes/plots_timeseries/CRUvsclimrvsClimateNA_3Panel", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=6.5, height=4.5, pointsize=10, res=300)
+png(filename=paste("vignettes/plots_timeseries/CRUvsclimrvsClimateNA_3Panel_30arcminute", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=6.5, height=3.5, pointsize=10, res=300)
 # pdf(file=paste("results//CMIP6Eval.Fig3", metric,"pdf",sep="."), width=7.5, height=14, pointsize=12)
 
 mat <- matrix(c(7,1,2,7,3,4,7,5,6), 3)
-layout(mat, widths=c(1,1,1), heights=c(0.2, .05 ,1))
+layout(mat, widths=c(1,1,1), heights=c(0.275, .05 ,1))
 
 sequence <- 1:12
 
@@ -94,15 +93,17 @@ for(source in c("cru.gpcc", "climr", "climatena")){
   if(source=="cru.gpcc"){
     X <- anom.cru[[m]]
   } else if(source=="climr") {
-    # dir <- "//objectstore2.nrs.bcgov/ffec/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/"
-    dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/"
-    file <- list.files(dir, pattern = paste0(c("tmin", "tmax", "prcp")[e], ".*._", monthcodes[m], "_.*"))
-    ts.climr <- rast(paste0(dir, file))
-    ts.years <- substr(time(ts.climr), 1,4)
-    ref.climr <- mean(ts.climr[[ts.years%in%1961:1990]]) 
-    curr.climr <- mean(ts.climr[[ts.years%in%2001:2020]])
-    anom.climr <- if(e==3) (curr.climr+1) / (ref.climr+1) else curr.climr - ref.climr
-    X <- anom.climr
+    # # dir <- "//objectstore2.nrs.bcgov/ffec/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/"
+    # dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/"
+    # file <- list.files(dir, pattern = paste0(c("tmin", "tmax", "prcp")[e], ".*._", monthcodes[m], "_.*"))
+    # ts.climr <- rast(paste0(dir, file))
+    # ts.years <- substr(time(ts.climr), 1,4)
+    # ref.climr <- mean(ts.climr[[ts.years%in%1961:1990]]) 
+    # curr.climr <- mean(ts.climr[[ts.years%in%2001:2020]])
+    # anom.climr <- if(e==3) (curr.climr+1) / (ref.climr+1) else curr.climr - ref.climr
+    # X <- anom.climr
+    X <- anom.climr[[m]]
+    X <- project(X, anom.cru)
   } else {
     X <- dem # use the DEM as a template raster
     X[anom.climna[, id1]] <- anom.climna[,get(paste0(c("Tmin", "Tmax", "PPT")[e], monthcodes[m]))]
@@ -116,7 +117,7 @@ X <- project(X, dem.lcc)
   X[X < lim.lower] <- lim.lower
   
   image(X, col=colscheme, breaks=breaks, xaxt="n", yaxt="n", bty="n")
-  lines(bdy.lcc)
+  lines(bdy.lcc, lwd=0.4)
   
   print(source)
 }
@@ -156,10 +157,10 @@ for(e in 1:3){
   
   for(m in 1:12){
     
-    png(filename=paste("vignettes/plots_timeseries/CRUvsclimrvsClimateNA_3Panel_1981rev", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=6.5, height=4.5, pointsize=10, res=300)
+    png(filename=paste("vignettes/plots_timeseries/CRUvsclimrvsClimateNA_3Panel_1981rev_30arcminute", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=6.5, height=3.5, pointsize=10, res=300)
 
     mat <- matrix(c(7,1,2,7,3,4,7,5,6), 3)
-    layout(mat, widths=c(1,1,1), heights=c(0.2, .05 ,1))
+    layout(mat, widths=c(1,1,1), heights=c(0.275, .05 ,1))
     
     sequence <- 1:12
     
@@ -184,6 +185,15 @@ for(e in 1:3){
       if(source=="cru.gpcc"){
         X <- anom.cru[[m]]
       } else if(source=="climr") {
+        # # dir <- "//objectstore2.nrs.bcgov/ffec/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/"
+        # dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/"
+        # file <- list.files(dir, pattern = paste0(c("tmin", "tmax", "prcp")[e], ".*._", monthcodes[m], "_.*"))
+        # ts.climr <- rast(paste0(dir, file))
+        # ts.years <- substr(time(ts.climr), 1,4)
+        # ref.climr <- mean(ts.climr[[ts.years%in%1981:2010]]) 
+        # curr.climr <- mean(ts.climr[[ts.years%in%1961:1990]])
+        # anom.climr <- if(e==3) (curr.climr+1) / (ref.climr+1) else curr.climr - ref.climr
+        # X <- anom.climr
         X <- anom.climr[[m]]
         X <- project(X, anom.cru)
       } else {
@@ -199,7 +209,7 @@ for(e in 1:3){
       X[X < lim.lower] <- lim.lower
       
       image(X, col=colscheme, breaks=breaks, xaxt="n", yaxt="n", bty="n")
-      lines(bdy.lcc)
+      lines(bdy.lcc, lwd=0.4)
       
       print(source)
     }
