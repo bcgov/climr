@@ -8,6 +8,7 @@ library(terra)
 library(rworldxtra)
 data("countriesHigh")
 
+# function to read CRU .dtb files of source station observations. 
 read_cru_dtb <- function(filepath) {
   # Read all lines into a vector
   lines <- readLines(filepath)
