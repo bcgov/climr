@@ -82,7 +82,7 @@ input_gcms <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(
 #' @rdname gcms-input-data
 #' @export
 input_gcms_db <- function(
-  conn,
+  dbCon,
   gcms = list_gcms(),
   ssps = list_ssps(),
   period = list_gcm_periods(),
@@ -125,10 +125,10 @@ input_gcms_db <- function(
       ) |>
       DBI::SQL()
 
-    layerinfo <- DBI::dbGetQuery(conn, q) |> data.table::setDT()
+    layerinfo <- DBI::dbGetQuery(dbCon, q) |> data.table::setDT()
     layerinfo[, var_nm := paste(mod, var, month, scenario, run, period, sep = "_")]
     list(
-      gcm_rast = gcmcode,
+      tbl = gcmcode,
       layers = layerinfo[, list(var_nm, laynum)]
     )
   })
@@ -190,7 +190,7 @@ input_gcm_hist <- function(dbCon, bbox = NULL, gcms = list_gcms(),
 #' @rdname gcms-input-data
 #' @export
 input_gcm_hist_db <- function(
-  conn,
+  dbCon,
   gcms = list_gcms(),
   years = 1901:2014,
   max_run = 0L,
@@ -221,10 +221,10 @@ input_gcm_hist_db <- function(
       ) |>
       DBI::SQL()
 
-    layerinfo <- DBI::dbGetQuery(conn, q) |> data.table::setDT()
+    layerinfo <- DBI::dbGetQuery(dbCon, q) |> data.table::setDT()
     layerinfo[, var_nm := paste(mod, var, month, run, year, sep = "_")]
     list(
-      gcm_rast = gcmcode,
+      tbl = gcmcode,
       layers = layerinfo[, list(var_nm, laynum)]
     )
   })
@@ -306,7 +306,7 @@ input_gcm_ssp <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ss
 #' @rdname gcms-input-data
 #' @export
 input_gcm_ssp_db <- function(
-  conn,
+  dbCon,
   gcms = list_gcms(),
   ssps = list_ssps(),
   years = 2020:2030,
@@ -351,11 +351,11 @@ input_gcm_ssp_db <- function(
       ) |>
       DBI::SQL()
   
-    layerinfo <- DBI::dbGetQuery(conn, q) |> data.table::setDT()
+    layerinfo <- DBI::dbGetQuery(dbCon, q) |> data.table::setDT()
     layerinfo[, var_nm := gsub("PPT", x[["var"]], var_nm)]
   
     list(
-      gcm_rast = gcmcode,
+      tbl = gcmcode,
       layers = layerinfo
     )
   })
