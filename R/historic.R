@@ -120,6 +120,29 @@ input_obs <- function(dbCon, bbox = NULL, period = list_obs_periods(), cache = T
   return(hist_rast)
 }
 
+#' @rdname hist-input-data
+#' @export
+input_obs_db <- function(conn, period = list_obs_periods()) {
+
+  dbnames2 <- structure(list(
+    PERIOD = c("2001_2020"),
+    dbname = c("historic_periods")
+  ), class = "data.frame", row.names = c(NA, -1L))
+
+  dbcode <- dbnames2$dbname[dbnames2$PERIOD %in% period]
+
+  q <- "select var_nm, laynum from historic_layers where period in (%s)" |>
+    sprintf(
+      paste0("'", period, "'", collapse = ",")
+    ) |> DBI::SQL()
+  layerinfo <- DBI::dbGetQuery(conn, q) |>
+    data.table::setDT()
+  hist_rast <- list(hist_rast = dbcode, layers = layerinfo[, list(var_nm, laynum)])
+  attr(hist_rast, "builder") <- "climr"
+  return(hist_rast)
+
+}
+
 
 #' Retrieve observational anomalies for specified years
 #' @description
@@ -167,6 +190,32 @@ input_obs_ts <- function(dbCon, dataset = c("cru.gpcc", "climatena"), bbox = NUL
   # attr(hist_rast, "builder") <- "climr"
   # names(hist_rast) <- paste(years[1], tail(years, 1), sep = ":")
   # return(hist_rast)
+}
+
+#' @rdname hist-input-data
+#' @export
+input_obs_ts_db <- function(conn, dataset = c("cru.gpcc", "climatena"), years = 2010:2022) {
+
+  res <- lapply(dataset, function(d) {
+    if (is.na(m <- match(d, dbnames_hist_obs$dataset))) return(NULL)
+    q <- "select var_nm, period, laynum from %s_layers where period in (%s)" |>
+      sprintf(
+        dbnames_hist_obs[["dbname"]][m],
+        paste0("'", years, "'", collapse = ",")
+      ) |> DBI::SQL()
+    layerinfo <- DBI::dbGetQuery(conn, q) |> 
+      data.table::setDT()
+    layerinfo[, var_nm := paste(d, var_nm, period, sep = "_")] 
+    list(
+      hist_rast = d,
+      layers = layerinfo[, list(var_nm, laynum)]
+    )
+  })
+
+  res <- res[!sapply(res, is.null)] ## remove NULL
+  attr(res, "builder") <- "climr"
+  return(res)
+
 }
 
 process_one_historicts <- function(dataset, years, dbCon, bbox, dbnames = dbnames_hist_obs, cache) {
