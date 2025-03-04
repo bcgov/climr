@@ -693,7 +693,6 @@ unpackRasters <- function(ras) {
   return(xyz)
 }
 
-
 #' Check `downscale_core` arguments
 #'
 #' @inheritParams downscale_core

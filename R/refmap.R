@@ -174,7 +174,10 @@ input_refmap_db <- function(reference = "refmap_climatena") {
     "dem2_WNA"
   ))
   layers[, laynum := seq_along(var_nm)]
-  res <- list(normal = rmap_nm, layers = layers)
+  res <- list(
+    tbl = rmap_nm,
+    layers = layers
+  )
   attr(res, "builder") <- "climr"
   return(res)
 

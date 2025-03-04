@@ -2,9 +2,22 @@
 % Please edit documentation in R/plot_timeSeries_input.R
 \name{plot_timeSeries_input}
 \alias{plot_timeSeries_input}
+\alias{plot_timeSeries_input_db}
 \title{Input data for the time series climate change plot}
 \usage{
 plot_timeSeries_input(
+  xyz,
+  gcms = list_gcms(),
+  ssps = list_ssps(),
+  max_run = 10,
+  obs_ts_dataset = c("cru.gpcc", "climatena"),
+  obs_years = list_obs_years(),
+  gcm_hist_years = list_gcm_hist_years(),
+  gcm_ssp_years = list_gcm_ssp_years(),
+  vars = list_vars()
+)
+
+plot_timeSeries_input_db(
   xyz,
   gcms = list_gcms(),
   ssps = list_ssps(),
