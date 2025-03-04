@@ -169,10 +169,10 @@ downscale <- function(xyz, which_refmap = "auto",
     }
     bc_outline <- rast(rastFile)
     pnts <- extract(bc_outline, xyz[, .(lon, lat)], method = "simple")
-    bc_ids <- xyz[["id"]][!is.na(pnts$PPT_01)]
+    bc_ids <- xyz[["id"]][!is.na(pnts[[2]])]
     if (length(bc_ids) >= 1) {
       xyz_save <- xyz
-      xyz <- xyz[!is.na(pnts$PPT_01), ]
+      xyz <- xyz[!is.na(pnts[[2]]), ]
       thebb_bc <- get_bb(xyz)
       message("for BC...")
       reference <- input_refmap(dbCon = dbCon, reference = "refmap_prism", bbox = thebb_bc, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
@@ -278,6 +278,155 @@ downscale <- function(xyz, which_refmap = "auto",
 
     return(res_all)
   }
+}
+
+#' @param conn A database connection to climr-database
+#' @rdname downscale
+#' @export
+downscale_db <- function(
+  xyz,
+  which_refmap = "auto",
+  obs_periods = NULL,
+  obs_years = NULL,
+  obs_ts_dataset = NULL,
+  gcms = NULL,
+  ssps = NULL,
+  gcm_periods = NULL,
+  gcm_ssp_years = NULL,
+  gcm_hist_years = NULL,
+  max_run = 0L,
+  run_nm = NULL,
+  local = FALSE,
+  ...
+) {
+  ## checks
+  .checkDwnsclArgs(
+    xyz, which_refmap, obs_periods, obs_years, obs_ts_dataset,
+    gcms, ssps, gcm_periods, gcm_ssp_years,
+    gcm_hist_years, max_run, run_nm
+  )
+  
+  expectedCols <- c("lon", "lat", "elev", "id")
+  xyz <- .checkXYZ(copy(xyz), expectedCols)
+  conn <- data_connect(local = local)
+  on.exit({poolClose(dbCon)}, add = TRUE)
+ 
+  rmCols <- setdiff(names(xyz), expectedCols)
+  if (length(rmCols)) { ## remove extraneous columns
+    warnings("Extra columns will be ignored")
+    xyz <- xyz[, ..expectedCols]
+  }
+
+  if(which_refmap %in% c("refmap_climatena","refmap_prism","refmap_climr")){
+    reference <- input_refmap_db(reference = which_refmap)
+  } else {
+    # message("Normals not specified, using highest resolution available for each point")
+    rastFile <- system.file("extdata", "wna_outline.tif", package = "climr")
+    ## if package is loaded with devtools::load_all, file won't be found and we need to pass .libPaths
+    if (rastFile == "") {
+      rastFile <- system.file("extdata", "wna_outline.tif", package = "climr", lib.loc = .libPaths())
+    }
+    bc_outline <- terra::rast(rastFile)
+    pnts <- terra::extract(bc_outline, xyz[, list(lon, lat)], method = "simple")
+    bc_ids <- xyz[["id"]][!is.na(pnts[[2]])]
+    if (length(bc_ids) >= 1) {
+      xyz_save <- xyz
+      xyz <- xyz[!is.na(pnts[[2]]), ]
+      reference <- input_refmap_db(reference = "refmap_prism")
+    } else {
+      reference <- input_refmap_db(reference = "refmap_climatena")
+    }
+  }
+
+  if (!is.null(obs_periods)) {
+    obs_periods <- input_obs_db(conn = conn, period = obs_periods)
+  }
+  if (!is.null(obs_years)) {
+    obs_years <- input_obs_ts_db(conn = conn, dataset = obs_ts_dataset, years = obs_years)
+  }
+
+  if (!is.null(gcms)) {
+    if (!is.null(gcm_periods)) {
+      gcm_ssp_periods <- input_gcms_db(
+        conn = conn,
+        gcms = gcms,
+        ssps = ssps,
+        period = gcm_periods,
+        max_run = max_run,
+        run_nm = run_nm
+      )
+    } else {
+      gcm_ssp_periods <- NULL
+    }
+    if (!is.null(gcm_ssp_years)) {
+      gcm_ssp_ts <- input_gcm_ssp_db(
+        conn = conn,
+        gcms = gcms,
+        ssps = ssps,
+        years = gcm_ssp_years,
+        max_run = max_run,
+        run_nm = run_nm
+      )
+    } else {
+      gcm_ssp_ts <- NULL
+    }
+    if (!is.null(gcm_hist_years)) {
+      gcm_hist_ts <- input_gcm_hist_db(
+        conn = conn,
+        gcms = gcms,
+        years = gcm_hist_years,
+        max_run = max_run,
+        run_nm = run_nm
+      )
+    } else {
+      gcm_hist_ts <- NULL
+    }
+  } else {
+    gcm_ssp_periods <- gcm_ssp_ts <- gcm_hist_ts <- NULL
+  }
+
+  write_xyz <- function(xyz) {
+    tbl <- "tmp_xyz"
+    DBI::dbWriteTable(conn, tbl, xyz, temporary = TRUE, overwrite = TRUE)
+    DBI::dbExecute(conn, "ALTER TABLE tmp_xyz ADD COLUMN IF NOT EXISTS geom GEOMETRY(Point, 4326)")
+    DBI::dbExecute(conn, "UPDATE tmp_xyz SET geom = ST_SetSRID(ST_MakePoint(lon, lat), 4326)")
+    return(tbl)
+  }
+  
+  message("Downscaling...")
+  results <- downscale_db_core(
+    conn = conn,
+    xyz = write_xyz(xyz),
+    refmap = reference,
+    obs = obs_periods,
+    obs_ts = obs_years,
+    gcms = gcm_ssp_periods,
+    gcm_ssp_ts = gcm_ssp_ts,
+    gcm_hist_ts = gcm_hist_ts,
+    ...
+  )
+
+  if (which_refmap != "auto" || length(bc_ids) < 1 || length(bc_ids) == nrow(xyz_save)) return(results)
+  
+  na_xyz <- xyz_save[!xyz_save[, 4] %in% bc_ids, ]
+  reference <- input_refmap_db(reference = "refmap_climatena")
+
+  message("Downscaling (Again)...")
+  results_na <- downscale_db_core(
+    conn = conn,
+    xyz = write_xyz(na_xyz),
+    refmap = reference,
+    obs = obs_periods,
+    obs_ts = obs_years,
+    gcms = gcm_ssp_periods,
+    gcm_ssp_ts = gcm_ssp_ts,
+    gcm_hist_ts = gcm_hist_ts,
+    ...
+  )
+
+  res_all <- rbind(results, results_na)
+  return(res_all)
+
 }
 
 
