@@ -1,86 +1,7 @@
-#' Change-factor downscaling of user-supplied climate data
-#'
-#' @description
-#' `downscale_core()` is the engine for [`downscale()`].
-#' It takes user-supplied high- and low-resolution rasters as input and downscales to user-specified point locations.
-#' While less user-friendly than [`downscale()`], `downscale_core()` is more flexible in that users can supply their
-#' own raster inputs. For example, a user could supply their own high-resolution climate map, instead of what is
-#' available in climr, as the input to `refmap`. Another example is in downscaling a uniform warming level, as shown
-#' in the example for this function.
-#'
-#' @details
-#' We recommend [`downscale()`] for most purposes.
-#'
-#' @template xyz
-#' @param refmap `SpatRaster`. Outputs from [`input_refmap()`]. The high-resolution
-#'   climate maps for use as the downscaling baseline.
-#' @param gcms `list` of `SpatRasters`. Outputs from [`input_gcms()`]. Global
-#'   climate model data for 20-year reference periods to be downscaled.
-#' @param obs `list` of `SpatRasters`. Outputs from [`input_obs()`].
-#'   Observed climate data for 20-year reference periods to be downscaled. 
-#' @param gcm_ssp_ts `list` of `SpatRasters`. Outputs from [`input_gcm_ssp()`].
-#'   Global climate model time series for ssps-rcp scenarios to be downscaled. 
-#' @param gcm_hist_ts `list` of `SpatRasters`. Outputs from [`input_gcm_hist()`].
-#'   Global climate model time series for historical scenario to be downscaled. 
-#' @param obs_ts `list` of `SpatRasters`. Outputs from [`input_obs_ts()`].
-#'   Observed climate time series to be downscaled. 
-#' @param return_refperiod logical. Return downscaled reference period (1961-1990)? 
-#' @template vars
-#' @param ppt_lr logical. Apply elevation adjustment to precipitation. 
-#' @param nthread integer. Number of parallel threads to use to do computations. 
-#' @param out_spatial logical. Should a SpatVector be returned instead of a
-#'   `data.frame`.
-#' @param plot character. If `out_spatial` is TRUE, the name of a variable to plot.
-#'   If the variable exists in `reference`, then its reference values will also be plotted.
-#'   Otherwise, reference January total precipitation (PPT01) values will be plotted.
-#'
-#' @import data.table
-#' @importFrom terra extract rast sources ext xres yres crop plot as.polygons setValues
-#' @importFrom grDevices hcl.colors palette
-#' @importFrom stats complete.cases
-#'
-#' @return A `data.table` or SpatVector with downscaled climate variables. If `gcms` is NULL,
-#'   this is just the downscaled `reference` at point locations. If `gcms` is provided,
-#'   this returns a downscaled dataset for each point location, general circulation
-#'   model (GCM), shared socioeconomic pathway (SSP), run and period.
-#'
-#' @seealso [`input_gcms()`], [`input_obs()`], [`list_vars()`]
-#' 
 #' @export
-#' @examples
-#' ##
-#' library(terra)
-#' xyz <- data.frame(lon = runif(10, -130, -106), lat = runif(10, 37, 50), elev = runif(10), id = 1:10)
-#'
-#' ## get bounding box based on input points
-#' thebb <- get_bb(xyz)
-#'
-#' ## get database connection
-#' dbCon <- data_connect()
-#'
-#' # obtain the climatena 1961-1990 normals for the study area.
-#' refmap <- input_refmap(dbCon, thebb, reference = "refmap_climatena")
-#'
-#' # obtain the low-resolution climate data for a single gcm, 20-year period, and ssp scenario.
-#' gcm_raw <- input_gcms(dbCon, thebb, list_gcms()[3], list_ssps()[1], period = list_gcm_periods()[2])
-#'
-#' # downscale the GCM data
-#' gcm_downscaled <- downscale_core(xyz = xyz, refmap = refmap, gcms = gcm_raw, vars = c("MAT", "PAS"))
-#'
-#' # create an input of uniform warming of 2 degrees Celsius and no precipitation change, for use as a null comparison to the GCM warming
-#' null <- gcm_raw #' use the gcm input object as a template
-#' names(null) <- "null_2C"
-#' names(null[[1]]) <- sapply(strsplit(names(null[[1]]), "_"), function(x) paste("null2C", x[2], x[3], "NA", "NA", "NA", "NA", sep = "_"))
-#' for (var in names(null[[1]])) {
-#'   values(null[[1]][[var]]) <- if (length(grep("PPT", var) == 1)) 1 else 2
-#' } #' repopulate with the null values
-#'
-#' # downscale the null values for variables of interest
-#' null_downscaled <- downscale_core(dbCon, xyz = xyz, refmap = refmap, gcms = null, vars = c("MAT", "PAS"))
-#' pool::poolClose(dbCon)
-#'
+#' @rdname downscale_core
 downscale_db_core <- function(
-  conn,
+  dbCon,
   xyz,
   refmap,
   gcms = NULL,
@@ -102,10 +23,8 @@ downscale_db_core <- function(
     obs_ts, return_refperiod, out_spatial, plot, vars
   )
   
-  expectedCols <- c("lon", "lat", "elev", "id")
-  xyz <- .checkXYZ(copy(xyz), expectedCols)
-  
   res <- downscale_db_(
+    dbCon,
     xyz,
     refmap,
     gcms,
@@ -114,7 +33,8 @@ downscale_db_core <- function(
     obs,
     obs_ts,
     return_refperiod,
-    vars, ppt_lr
+    vars,
+    ppt_lr
   )
   
   IDcols <- names(res)[!names(res) %in% vars]
@@ -174,11 +94,10 @@ downscale_db_core <- function(
 #' @return A `data.table`.
 #'
 #' @import data.table
-#' @importFrom DBI dbWriteTable dbExecute
+#' @importFrom DBI dbWriteTable dbExecute dbGetQuery SQL
 #' @noRd
 downscale_db_ <- function(
-  conn,
-  srid,
+  dbCon,
   xyz,
   refmap,
   gcms,
@@ -214,24 +133,23 @@ downscale_db_ <- function(
   dem <- "ST_Value(rast, %s, xyz.geom, false, 'bilinear')" |> sprintf(demlyr)
 
   q <- DBI::SQL("
-    SELECT xyz.id,
-           normal.rid,
-           %s
-    FROM %s xyz, %s normal
+    SELECT %s
+    FROM \"%s\" xyz, \"%s\" normal
     CROSS JOIN LATERAL (
       SELECT (xyz.elev - %s) AS delta
     ) delta_val
-    WHERE ST_Intersects(normal.rast,xyz.geom);" |>
-    sprintf(vals, xyz, refmap$normal, dem)
+    WHERE ST_Intersects(normal.rast,xyz.geom)
+    ORDER BY xyz.id;" |>
+    sprintf(vals, xyz, refmap[["tbl"]], dem)
   )
 
-  res <- DBI::dbGetQuery(conn, q) |> data.table::setDT()
-  #TODO: FROM HERE
+  res <- DBI::dbGetQuery(dbCon, q) |> data.table::setDT()
+
   # Process one GCM stacked layers
   if (!is.null(gcms)) {
     # Process each gcms and rbind resulting tables
-    res_gcm <- rbindlist(
-      lapply(gcms, process_one_climaterast, res = res, xyz = xyz, type = "gcms"),
+    res_gcm <- data.table::rbindlist(
+      lapply(gcms, process_one_climate_db, dbCon = dbCon, res = res, xyz = xyz, type = "gcms"),
       use.names = TRUE
     )
   } else {
@@ -239,8 +157,8 @@ downscale_db_ <- function(
   }
   if (!is.null(gcm_ssp_ts)) {
     # Process each gcms and rbind resulting tables
-    res_gcmts <- rbindlist(
-      lapply(gcm_ssp_ts, process_one_climaterast, res = res, xyz = xyz, timeseries = TRUE, type = "gcms"),
+    res_gcmts <- data.table::rbindlist(
+      lapply(gcm_ssp_ts, process_one_climate_db, dbCon = dbCon, res = res, xyz = xyz, timeseries = TRUE, type = "gcms"),
       use.names = TRUE
     )
   } else {
@@ -248,8 +166,8 @@ downscale_db_ <- function(
   }
   if (!is.null(gcm_hist_ts)) {
     # Process each gcms and rbind resulting tables
-    res_gcm_hist <- rbindlist(
-      lapply(gcm_hist_ts, process_one_climaterast, res = res, xyz = xyz, type = "gcm_hist_ts"),
+    res_gcm_hist <- data.table::rbindlist(
+      lapply(gcm_hist_ts, process_one_climate_db, dbCon = dbCon, res = res, xyz = xyz, type = "gcm_hist_ts"),
       use.names = TRUE
     )
   } else {
@@ -257,8 +175,8 @@ downscale_db_ <- function(
   }
   if (!is.null(obs)) {
     # print(obs)
-    res_hist <- rbindlist(
-      lapply(obs, process_one_climaterast, res = res, xyz = xyz, type = "obs"),
+    res_hist <- data.table::rbindlist(
+      lapply(obs, process_one_climate_db, dbCon = dbCon, res = res, xyz = xyz, type = "obs"),
       use.names = TRUE
     )
   } else {
@@ -266,8 +184,8 @@ downscale_db_ <- function(
   }
   if (!is.null(obs_ts)) {
     # print(obs)
-    res_hist_ts <- rbindlist(
-      lapply(obs_ts, process_one_climaterast, res = res, xyz = xyz, timeseries = TRUE, type = "obs_ts"),
+    res_hist_ts <- data.table::rbindlist(
+      lapply(obs_ts, process_one_climate_db, dbCon = dbCon, res = res, xyz = xyz, timeseries = TRUE, type = "obs_ts"),
       use.names = TRUE
     )
   } else {
@@ -280,12 +198,12 @@ downscale_db_ <- function(
     normal_ <- res
     # Reshape (melt / dcast) to obtain final form
     # ref_dt <- tstrsplit(nm, "_")
-    ref_dt <- data.table(VAR = nm)
+    ref_dt <- data.table::data.table(VAR = nm)
     # setDT(ref_dt)
     # setnames(ref_dt, c("VAR"))
-    set(ref_dt, j = "variable", value = nm)
-    set(ref_dt, j = "PERIOD", value = "1961_1990")
-    setkey(ref_dt, "variable")
+    data.table::set(ref_dt, j = "variable", value = nm)
+    data.table::set(ref_dt, j = "PERIOD", value = "1961_1990")
+    data.table::setkey(ref_dt, "variable")
     # Set Latitude elevation and ID
     normal_[["lat"]] <- xyz[["lat"]]
     normal_[["elev"]] <- xyz[["elev"]]
@@ -329,139 +247,270 @@ downscale_db_ <- function(
 #' @return a `data.table`
 #' @noRd
 #' @importFrom stats as.formula
-process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
-  type = c("gcms", "gcm_hist_ts", "obs", "obs_ts")) {
-    type <- match.arg(type)
-    
-    # Store names for later use
-    nm <- names(climaterast)
-    
-    # Define gcms extent. res*2 To make sure we capture surrounding
-    # cells for bilinear interpolation.
-    ex <- ext(
-      c(
-        min(xyz[["lon"]]) - xres(climaterast) * 2,
-        max(xyz[["lon"]]) + xres(climaterast) * 2,
-        min(xyz[["lat"]]) - yres(climaterast) * 2,
-        max(xyz[["lat"]]) + yres(climaterast) * 2
+process_one_climaterast <- function(
+  climaterast,
+  res,
+  xyz,
+  timeseries = FALSE,
+  type = c("gcms", "gcm_hist_ts", "obs", "obs_ts")
+) {
+  type <- match.arg(type)
+  
+  # Store names for later use
+  nm <- names(climaterast)
+  
+  # Define gcms extent. res*2 To make sure we capture surrounding
+  # cells for bilinear interpolation.
+  ex <- ext(
+    c(
+      min(xyz[["lon"]]) - xres(climaterast) * 2,
+      max(xyz[["lon"]]) + xres(climaterast) * 2,
+      min(xyz[["lat"]]) - yres(climaterast) * 2,
+      max(xyz[["lat"]]) + yres(climaterast) * 2
+    )
+  )
+  # Extract gcms bilinear interpolations
+  # Cropping will reduce the size of data to load in memory
+  
+  climaterast <- crop(climaterast, ex, snap = "out")
+  gc(reset = TRUE) ## free unused memory
+  
+  climaterast <- try(extract(x = climaterast, y = xyz[, .(lon, lat)], method = "bilinear"))
+  
+  ## we may have run out of memory if there are MANY rasters
+  ## attempt to get only unique raster cell values
+  ## (i.e. xyz may be at higher res than the climaterast leading to extracting the same values many times)
+  if (is(climaterast, "try-error")) {
+    if (grepl("bad_alloc", climaterast)) {
+      message("System is out of memory to extract climate values for the supplied coordinates")
+      stop(
+        "Insufficient memory to downscale climate data for these many points/climate layers.\n",
+        "  Try reducing number of points/layers."
       )
-    )
-    # Extract gcms bilinear interpolations
-    # Cropping will reduce the size of data to load in memory
-    
-    climaterast <- crop(climaterast, ex, snap = "out")
-    gc(reset = TRUE) ## free unused memory
-    
-    climaterast <- try(extract(x = climaterast, y = xyz[, .(lon, lat)], method = "bilinear"))
-    
-    ## we may have run out of memory if there are MANY rasters
-    ## attempt to get only unique raster cell values
-    ## (i.e. xyz may be at higher res than the climaterast leading to extracting the same values many times)
-    if (is(climaterast, "try-error")) {
-      if (grepl("bad_alloc", climaterast)) {
-        message("System is out of memory to extract climate values for the supplied coordinates")
-        stop(
-          "Insufficient memory to downscale climate data for these many points/climate layers.\n",
-          "  Try reducing number of points/layers."
-        )
-      }
     }
-    
-    # else { Ceres not sure what this is for but it's always causing fails
-    #     stop("Climate value extraction failed.",
-    #          "\n   Please contact developers with a reproducible example and the error:\n",
-    #          climaterast)
-    #   }
-    
-    # Create match set to match with res names
-    
-    
-    labels <- vapply(
-      strsplit(nm, "_"),
-      function(x) {
-        paste0(x[2:3], collapse = "_")
-      },
-      character(1)
-    )
-    
-    if (type %in% c("obs")) {
-      ## Create match set to match with res names
-      labels <- nm
-    }
-    
-    # Add matching column to climaterast
-    res <- as.data.frame(res)
-    ppt_ <- grep("PPT", labels)
-    ppt_next <- ppt_ + 1L
-    climaterast[, ppt_next] <- climaterast[, ppt_next] * res[, match(labels[ppt_], names(res))] ## PPT
-    climaterast[, -c(1L, ppt_next)] <- climaterast[, -c(1L, ppt_next)] + res[, match(labels[-ppt_], names(res))] ## Temperature
-    res <- as.data.table(res)
-    climaterast <- as.data.table(climaterast)
-    
-    # Reshape (melt / dcast) to obtain final form
-    ref_dt <- tstrsplit(nm, "_")
-    
-    # Recombine PERIOD into one field
-    if (!timeseries & type == "gcms") {
-      ref_dt[[6]] <- paste(ref_dt[[6]], ref_dt[[7]], sep = "_")
-      ref_dt[7] <- NULL
-    }
-    
-    setDT(ref_dt)
-    if (type %in% c("obs", "obs_ts")) {
-      if (timeseries) {
-        setnames(ref_dt, c("DATASET", "VAR", "MONTH", "PERIOD"))
-        set(ref_dt, j = "variable", value = nm)
-      } else {
-        setnames(ref_dt, c("VAR", "MONTH"))
-        set(ref_dt, j = "variable", value = nm)
-        set(ref_dt, j = "PERIOD", value = "2001_2020")
-      }
-    }
-    
-    # Transform ref_dt to data.table for remerging
-    if (type %in% c("gcms", "gcm_hist_ts")) {
-      switch(type,
-        gcms = setnames(ref_dt, c("GCM", "VAR", "MONTH", "SSP", "RUN", "PERIOD")),
-        gcm_hist_ts = setnames(ref_dt, c("GCM", "VAR", "MONTH", "RUN", "PERIOD"))
-      )
-      set(ref_dt, j = "variable", value = nm)
-      set(ref_dt, j = "GCM", value = gsub(".", "-", ref_dt[["GCM"]], fixed = TRUE))
-    }
-    
-    setkey(ref_dt, "variable")
-    
-    # Set Latitude and possibly ID
-    climaterast[["lat"]] <- xyz[["lat"]]
-    climaterast[["elev"]] <- xyz[["elev"]]
-    climaterast[["id"]] <- xyz[["id"]]
-    
-    # Melt climaterast and set the same key for merging
-    climaterast <- melt(
-      setDT(climaterast),
-      id.vars = c("id", "lat", "elev"),
-      variable.factor = FALSE
-    )
-    setkey(climaterast, "variable")
-    
-    # Finally, dcast back to final form to get original 36 columns
-    form <- switch(type,
-      gcms = quote(id + GCM + SSP + RUN + PERIOD + lat + elev ~ VAR + MONTH),
-      gcm_hist_ts = quote(id + GCM + RUN + PERIOD + lat + elev ~ VAR + MONTH),
-      obs = quote(id + PERIOD + lat + elev ~ VAR + MONTH),
-      obs_ts = quote(id + DATASET + PERIOD + lat + elev ~ VAR + MONTH)
-    )
-    
-    climaterast <- dcast(
-      # The merge with shared keys is as simple as that
-      climaterast[ref_dt, ],
-      as.formula(form),
-      value.var = "value",
-      sep = "_"
-    )
-    
-    return(climaterast)
   }
+  
+  # else { Ceres not sure what this is for but it's always causing fails
+  #     stop("Climate value extraction failed.",
+  #          "\n   Please contact developers with a reproducible example and the error:\n",
+  #          climaterast)
+  #   }
+  
+  # Create match set to match with res names
+  
+  
+  labels <- vapply(
+    strsplit(nm, "_"),
+    function(x) {
+      paste0(x[2:3], collapse = "_")
+    },
+    character(1)
+  )
+  
+  if (type %in% c("obs")) {
+    ## Create match set to match with res names
+    labels <- nm
+  }
+  
+  # Add matching column to climaterast
+  res <- as.data.frame(res)
+  ppt_ <- grep("PPT", labels)
+  ppt_next <- ppt_ + 1L
+  climaterast[, ppt_next] <- climaterast[, ppt_next] * res[, match(labels[ppt_], names(res))] ## PPT
+  climaterast[, -c(1L, ppt_next)] <- climaterast[, -c(1L, ppt_next)] + res[, match(labels[-ppt_], names(res))] ## Temperature
+  res <- as.data.table(res)
+  climaterast <- as.data.table(climaterast)
+  
+  # Reshape (melt / dcast) to obtain final form
+  ref_dt <- tstrsplit(nm, "_")
+  
+  # Recombine PERIOD into one field
+  if (!timeseries & type == "gcms") {
+    ref_dt[[6]] <- paste(ref_dt[[6]], ref_dt[[7]], sep = "_")
+    ref_dt[7] <- NULL
+  }
+  
+  setDT(ref_dt)
+  if (type %in% c("obs", "obs_ts")) {
+    if (timeseries) {
+      setnames(ref_dt, c("DATASET", "VAR", "MONTH", "PERIOD"))
+      set(ref_dt, j = "variable", value = nm)
+    } else {
+      setnames(ref_dt, c("VAR", "MONTH"))
+      set(ref_dt, j = "variable", value = nm)
+      set(ref_dt, j = "PERIOD", value = "2001_2020")
+    }
+  }
+  
+  # Transform ref_dt to data.table for remerging
+  if (type %in% c("gcms", "gcm_hist_ts")) {
+    switch(type,
+      gcms = setnames(ref_dt, c("GCM", "VAR", "MONTH", "SSP", "RUN", "PERIOD")),
+      gcm_hist_ts = setnames(ref_dt, c("GCM", "VAR", "MONTH", "RUN", "PERIOD"))
+    )
+    set(ref_dt, j = "variable", value = nm)
+    set(ref_dt, j = "GCM", value = gsub(".", "-", ref_dt[["GCM"]], fixed = TRUE))
+  }
+  
+  setkey(ref_dt, "variable")
+  
+  # Set Latitude and possibly ID
+  climaterast[["lat"]] <- xyz[["lat"]]
+  climaterast[["elev"]] <- xyz[["elev"]]
+  climaterast[["id"]] <- xyz[["id"]]
+  
+  # Melt climaterast and set the same key for merging
+  climaterast <- melt(
+    setDT(climaterast),
+    id.vars = c("id", "lat", "elev"),
+    variable.factor = FALSE
+  )
+  setkey(climaterast, "variable")
+  
+  # Finally, dcast back to final form to get original 36 columns
+  form <- switch(type,
+    gcms = quote(id + GCM + SSP + RUN + PERIOD + lat + elev ~ VAR + MONTH),
+    gcm_hist_ts = quote(id + GCM + RUN + PERIOD + lat + elev ~ VAR + MONTH),
+    obs = quote(id + PERIOD + lat + elev ~ VAR + MONTH),
+    obs_ts = quote(id + DATASET + PERIOD + lat + elev ~ VAR + MONTH)
+  )
+  
+  climaterast <- dcast(
+    # The merge with shared keys is as simple as that
+    climaterast[ref_dt, ],
+    as.formula(form),
+    value.var = "value",
+    sep = "_"
+  )
+  
+  return(climaterast)
+}
+
+#' @noRd
+process_one_climate_db <- function(
+  dbCon,
+  r,
+  res,
+  xyz,
+  timeseries = FALSE,
+  type = c("gcms", "gcm_hist_ts", "obs", "obs_ts")
+) {
+  type <- match.arg(type)
+  
+  # Store names for later use
+  nm <- r[["layers"]][["var_nm"]]
+    
+  # Run in database
+
+  # Query building
+  vals <- "ST_Value(rast, %s, xyz.geom, false, 'bilinear') as \"%s\"" |>
+    sprintf(r[["layers"]][["laynum"]], r[["layers"]][["var_nm"]]) |>
+    paste(collapse = ",\n     ")
+
+  split_vector <- function(vec, max_len = 1664) {
+    groups <- ceiling(seq_along(vec) / max_len)
+    split(vec, groups)
+  }
+
+  gvals <- split_vector(vals)
+
+  lapply
+
+  q <- DBI::SQL("
+    SELECT %s
+    FROM \"%s\" xyz, \"%s\" tbl
+    WHERE ST_Intersects(tbl.rast,xyz.geom)
+    ORDER BY xyz.id;" |>
+    sprintf(vals, xyz, r[["tbl"]])
+  )
+  climaterast <- DBI::dbGetQuery(dbCon, q) |> data.table::setDT(key = "id") 
+    
+  labels <- vapply(
+    strsplit(nm, "_"),
+    function(x) {
+      paste0(x[2:3], collapse = "_")
+    },
+    character(1)
+  )
+  
+  if (type %in% c("obs")) {
+    ## Create match set to match with res names
+    labels <- nm
+  }
+    
+  # Add matching column to climaterast
+  res <- as.data.frame(res)
+  ppt_ <- grep("PPT", labels)
+  ppt_next <- ppt_ + 1L
+  climaterast[, ppt_next] <- climaterast[, ppt_next] * res[, match(labels[ppt_], names(res))] ## PPT
+  climaterast[, -c(1L, ppt_next)] <- climaterast[, -c(1L, ppt_next)] + res[, match(labels[-ppt_], names(res))] ## Temperature
+  res <- as.data.table(res)
+  climaterast <- as.data.table(climaterast)
+    
+  # Reshape (melt / dcast) to obtain final form
+  ref_dt <- tstrsplit(nm, "_")
+  
+  # Recombine PERIOD into one field
+  if (!timeseries & type == "gcms") {
+    ref_dt[[6]] <- paste(ref_dt[[6]], ref_dt[[7]], sep = "_")
+    ref_dt[7] <- NULL
+  }
+  
+  setDT(ref_dt)
+  if (type %in% c("obs", "obs_ts")) {
+    if (timeseries) {
+      setnames(ref_dt, c("DATASET", "VAR", "MONTH", "PERIOD"))
+      set(ref_dt, j = "variable", value = nm)
+    } else {
+      setnames(ref_dt, c("VAR", "MONTH"))
+      set(ref_dt, j = "variable", value = nm)
+      set(ref_dt, j = "PERIOD", value = "2001_2020")
+    }
+  }
+    
+  # Transform ref_dt to data.table for remerging
+  if (type %in% c("gcms", "gcm_hist_ts")) {
+    switch(type,
+      gcms = setnames(ref_dt, c("GCM", "VAR", "MONTH", "SSP", "RUN", "PERIOD")),
+      gcm_hist_ts = setnames(ref_dt, c("GCM", "VAR", "MONTH", "RUN", "PERIOD"))
+    )
+    set(ref_dt, j = "variable", value = nm)
+    set(ref_dt, j = "GCM", value = gsub(".", "-", ref_dt[["GCM"]], fixed = TRUE))
+  }
+  
+  setkey(ref_dt, "variable")
+  
+  # Set Latitude and possibly ID
+  climaterast[["lat"]] <- xyz[["lat"]]
+  climaterast[["elev"]] <- xyz[["elev"]]
+  climaterast[["id"]] <- xyz[["id"]]
+  
+  # Melt climaterast and set the same key for merging
+  climaterast <- melt(
+    setDT(climaterast),
+    id.vars = c("id", "lat", "elev"),
+    variable.factor = FALSE
+  )
+  setkey(climaterast, "variable")
+  
+  # Finally, dcast back to final form to get original 36 columns
+  form <- switch(type,
+    gcms = quote(id + GCM + SSP + RUN + PERIOD + lat + elev ~ VAR + MONTH),
+    gcm_hist_ts = quote(id + GCM + RUN + PERIOD + lat + elev ~ VAR + MONTH),
+    obs = quote(id + PERIOD + lat + elev ~ VAR + MONTH),
+    obs_ts = quote(id + DATASET + PERIOD + lat + elev ~ VAR + MONTH)
+  )
+  
+  climaterast <- dcast(
+    # The merge with shared keys is as simple as that
+    climaterast[ref_dt, ],
+    as.formula(form),
+    value.var = "value",
+    sep = "_"
+  )
+  
+  return(climaterast)
+}
     
 #' Check xyz conforms to standards
 #'
@@ -492,7 +541,7 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
   if (!inherits(xyz$id, colTypes)) {
     stop("'xyz$id' must be an column of type ", paste(colTypes, collapse = ", "))
   } else {
-    set(xyz, j = "id", as.integer(xyz[["id"]])
+    set(xyz, j = "id", value = as.integer(xyz[["id"]]))
   }
   
   return(xyz)

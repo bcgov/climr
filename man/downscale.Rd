@@ -2,6 +2,7 @@
 % Please edit documentation in R/downscale.R
 \name{downscale}
 \alias{downscale}
+\alias{downscale_db}
 \title{Self-contained change-factor downscaling of observed and simulated climate data}
 \usage{
 downscale(
@@ -20,6 +21,23 @@ downscale(
   cache = TRUE,
   local = FALSE,
   indiv_tiles = FALSE,
+  ...
+)
+
+downscale_db(
+  xyz,
+  which_refmap = "auto",
+  obs_periods = NULL,
+  obs_years = NULL,
+  obs_ts_dataset = NULL,
+  gcms = NULL,
+  ssps = NULL,
+  gcm_periods = NULL,
+  gcm_ssp_years = NULL,
+  gcm_hist_years = NULL,
+  max_run = 0L,
+  run_nm = NULL,
+  local = FALSE,
   ...
 )
 }
@@ -73,6 +91,8 @@ are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
 \item{...}{other arguments passed to \code{\link[=downscale_core]{downscale_core()}}. Namely: \code{return_refperiod},
 \code{vars}, \code{out_spatial} and \code{plot}}
+
+\item{dbCon}{A database connection to climr-database}
 }
 \value{
 \code{data.table} of downscaled climate variables for each location.

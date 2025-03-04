@@ -2,6 +2,7 @@
 % Please edit documentation in R/refmap.R
 \name{input_refmap}
 \alias{input_refmap}
+\alias{input_refmap_db}
 \title{Retrieve reference period climate maps}
 \usage{
 input_refmap(
@@ -12,6 +13,8 @@ input_refmap(
   indiv_tiles = FALSE,
   xyz = NULL
 )
+
+input_refmap_db(reference = "refmap_climatena")
 }
 \arguments{
 \item{dbCon}{A db connection object created by \code{data_connect}.}

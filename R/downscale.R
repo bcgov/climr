@@ -280,7 +280,7 @@ downscale <- function(xyz, which_refmap = "auto",
   }
 }
 
-#' @param conn A database connection to climr-database
+#' @param dbCon A database connection to climr-database
 #' @rdname downscale
 #' @export
 downscale_db <- function(
@@ -308,7 +308,7 @@ downscale_db <- function(
   
   expectedCols <- c("lon", "lat", "elev", "id")
   xyz <- .checkXYZ(copy(xyz), expectedCols)
-  conn <- data_connect(local = local)
+  dbCon <- data_connect(local = local)
   on.exit({poolClose(dbCon)}, add = TRUE)
  
   rmCols <- setdiff(names(xyz), expectedCols)
@@ -339,16 +339,16 @@ downscale_db <- function(
   }
 
   if (!is.null(obs_periods)) {
-    obs_periods <- input_obs_db(conn = conn, period = obs_periods)
+    obs_periods <- input_obs_db(dbCon = dbCon, period = obs_periods)
   }
   if (!is.null(obs_years)) {
-    obs_years <- input_obs_ts_db(conn = conn, dataset = obs_ts_dataset, years = obs_years)
+    obs_years <- input_obs_ts_db(dbCon = dbCon, dataset = obs_ts_dataset, years = obs_years)
   }
 
   if (!is.null(gcms)) {
     if (!is.null(gcm_periods)) {
       gcm_ssp_periods <- input_gcms_db(
-        conn = conn,
+        dbCon = dbCon,
         gcms = gcms,
         ssps = ssps,
         period = gcm_periods,
@@ -360,7 +360,7 @@ downscale_db <- function(
     }
     if (!is.null(gcm_ssp_years)) {
       gcm_ssp_ts <- input_gcm_ssp_db(
-        conn = conn,
+        dbCon = dbCon,
         gcms = gcms,
         ssps = ssps,
         years = gcm_ssp_years,
@@ -372,7 +372,7 @@ downscale_db <- function(
     }
     if (!is.null(gcm_hist_years)) {
       gcm_hist_ts <- input_gcm_hist_db(
-        conn = conn,
+        dbCon = dbCon,
         gcms = gcms,
         years = gcm_hist_years,
         max_run = max_run,
@@ -387,15 +387,15 @@ downscale_db <- function(
 
   write_xyz <- function(xyz) {
     tbl <- "tmp_xyz"
-    DBI::dbWriteTable(conn, tbl, xyz, temporary = TRUE, overwrite = TRUE)
-    DBI::dbExecute(conn, "ALTER TABLE tmp_xyz ADD COLUMN IF NOT EXISTS geom GEOMETRY(Point, 4326)")
-    DBI::dbExecute(conn, "UPDATE tmp_xyz SET geom = ST_SetSRID(ST_MakePoint(lon, lat), 4326)")
+    DBI::dbWriteTable(dbCon, tbl, xyz, temporary = TRUE, overwrite = TRUE)
+    DBI::dbExecute(dbCon, "ALTER TABLE tmp_xyz ADD COLUMN IF NOT EXISTS geom GEOMETRY(Point, 4326)")
+    DBI::dbExecute(dbCon, "UPDATE tmp_xyz SET geom = ST_SetSRID(ST_MakePoint(lon, lat), 4326)")
     return(tbl)
   }
   
   message("Downscaling...")
   results <- downscale_db_core(
-    conn = conn,
+    dbCon = dbCon,
     xyz = write_xyz(xyz),
     refmap = reference,
     obs = obs_periods,
@@ -413,7 +413,7 @@ downscale_db <- function(
 
   message("Downscaling (Again)...")
   results_na <- downscale_db_core(
-    conn = conn,
+    dbCon = dbCon,
     xyz = write_xyz(na_xyz),
     refmap = reference,
     obs = obs_periods,
