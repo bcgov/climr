@@ -160,3 +160,91 @@ get_elev_raster <- function(r, elev, out = NULL, ...) {
     return(prj)
   }
 }
+
+#' Bilinear interpolation point extraction from raster bands 
+#' @noRd
+extract_db <- function(dbCon, xyz, rastertbl, bands, nm, explain = FALSE) {
+  q <- DBI::SQL("
+    %s
+    WITH \"tmp_metadata\" AS (
+      SELECT m3.id,
+             m3.rid,
+             m3.xr - (m3.xcell - m3.xdir + 0.5) AS xr,
+             m3.yr - (m3.ycell - m3.ydir + 0.5) AS yr,
+             m3.xcell,
+             m3.ycell,
+             m3.xdir,
+             m3.ydir
+      FROM (
+        SELECT m2.*,
+               (CASE WHEN m2.xr < (m2.xcell + 0.5) THEN 1 ELSE 0 END)::integer AS xdir,
+               (CASE WHEN m2.yr < (m2.ycell + 0.5) THEN 1 ELSE 0 END)::integer AS ydir
+        FROM (
+          SELECT M1.*,
+                 floor(m1.xr)::integer AS xcell,
+                 floor(m1.yr)::integer AS ycell
+          FROM (
+            SELECT 
+                   p.id,
+                   r.rid,
+                   (ST_X(p.geom) - ST_UpperLeftX(r.rast))/ST_PixelWidth(r.rast) AS xr,
+                   (ST_UpperLeftY(r.rast) - ST_Y(p.geom))/abs(ST_PixelHeight(r.rast)) AS yr
+            FROM \"%s\" AS p, \"%s\" r
+            WHERE ST_Intersects(p.geom, r.rast)
+          ) AS m1
+        ) AS m2
+      ) AS m3
+    ), \"tmp_interpolation\" AS (
+      SELECT id,
+             rid,
+             (1 - xr) * (1 - yr) AS w1, 
+             (1 - yr) * xr AS w2,
+             (1 - xr) * yr AS w3,
+             xr * yr AS w4,
+             (xcell + 1 - xdir) AS x1,
+             (xcell + 2 - xdir) AS x2,
+             (ycell + 1 - ydir) AS y1,
+             (ycell + 2 - ydir) AS y2,
+             (xcell + 1)        AS cx,
+             (ycell + 1)        AS cy
+             
+      FROM \"tmp_metadata\"
+    )
+    SELECT m0.id::float AS \"ID\",
+           v.nband,
+           CASE WHEN v.valarray[cy][cx] IS NULL THEN NULL ELSE
+           (
+             coalesce(v.valarray[y1][x1], v.valarray[cy][cx]) * m0.w1 +
+             coalesce(v.valarray[y1][x2], v.valarray[cy][cx]) * m0.w2 +
+             coalesce(v.valarray[y2][x1], v.valarray[cy][cx]) * m0.w3 +
+             coalesce(v.valarray[y2][x2], v.valarray[cy][cx]) * m0.w4
+           ) END AS value
+    FROM \"tmp_interpolation\" AS m0
+    JOIN (
+      SELECT r0.rid,
+             (ST_DumpValues(r0.rast, %s, true)).*
+      FROM \"%s\" AS r0
+      WHERE r0.rid IN (SELECT DISTINCT rid FROM \"tmp_interpolation\")
+    ) AS v
+    ON v.rid = m0.rid;
+    ;" |> sprintf(
+      if (explain) "EXPLAIN (ANALYSE, VERBOSE, COSTS, TIMING, SUMMARY, MEMORY)" else "",
+      xyz,
+      rastertbl,
+      if (!length(bands)) "NULL::integer[]" else {bands |> paste0(collapse = ",") |> sprintf(fmt ="ARRAY[%s]")},
+      rastertbl
+    )
+  )
+  res <- DBI::dbGetQuery(dbCon, q) |> 
+    data.table::setDT()
+  
+  if (is.null(bands)) { bands <- res[["nband"]] |> unique() |> sort() }
+  if (is.null(nm)) { nm <- bands |> as.character() }
+  data.table::set(
+    res,
+    j = "band",
+    value = nm[match(res[["nband"]], bands)] |> factor(levels = nm)
+  )
+  res <- data.table::dcast(res, ID ~ band, value.var = "value")
+  return(res |> as.data.frame())
+}

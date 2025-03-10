@@ -96,13 +96,20 @@ input_gcms_db <- function(
   if (!is(max_run, "numeric")) {
     stop("please pass a numeric value to 'max_runs'")
   }
-
-  if (!is(cache, "logical")) {
-    stop("please pass a logical value to 'cache'")
-  }
   
   rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
   runs <- data.table::fread(file.path(rInfoPath, "gcm_periods.csv"))
+  
+  dbres <- q <- "select * from esm_layers_period where mod in (%s) and scenario in (%s) and period in (%s) and run in (%s)" |>
+    sprintf(
+      paste0("'", gcms, "'", collapse = ","),
+      paste0("'", ssps, "'", collapse = ","),
+      paste0("'", period, "'", collapse = ","),
+      paste0("'", sel_runs, "'", collapse = ",")
+    ) |>
+    DBI::SQL()
+  layerinfo <- DBI::dbGetQuery(dbCon, q) |> data.table::setDT()
+  layerinfo[, var_nm := paste(mod, var, month, scenario, run, period, sep = "_")]
   
   res <- lapply(gcms, function(gcm_nm) {
     gcmcode <- dbnames[GCM == gcm_nm, dbname]
@@ -125,11 +132,9 @@ input_gcms_db <- function(
       ) |>
       DBI::SQL()
 
-    layerinfo <- DBI::dbGetQuery(dbCon, q) |> data.table::setDT()
-    layerinfo[, var_nm := paste(mod, var, month, scenario, run, period, sep = "_")]
     list(
       tbl = gcmcode,
-      layers = layerinfo[, list(var_nm, laynum)]
+      layers = layerinfo[mod == gcm_nm, list(var_nm, laynum)]
     )
   })
 
