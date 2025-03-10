@@ -138,8 +138,10 @@ input_obs_db <- function(dbCon, period = list_obs_periods()) {
   layerinfo <- DBI::dbGetQuery(dbCon, q) |>
     data.table::setDT()
   res <- list(
-    tbl = dbcode,
-    layers = layerinfo[, list(var_nm, laynum)]
+    list(
+      tbl = dbcode,
+      layers = layerinfo[, list(var_nm, laynum)]
+    )
   )
   attr(res, "builder") <- "climr"
   return(res)
