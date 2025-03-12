@@ -161,10 +161,18 @@ get_elev_raster <- function(r, elev, out = NULL, ...) {
   }
 }
 
-#' Bilinear interpolation point extraction from raster bands 
-#' @noRd
-extract_db <- function(dbCon, xyz, rastertbl, bands, nm, explain = FALSE) {
-  q <- DBI::SQL("
+#' Bilinear interpolation point extraction from raster bands
+#' @param dbCon A postgres database connection.
+#' @param rastertbl The name of the raster table to extract from.
+#' @param bands The index number of the bands to extract.
+#' @param nm The names of the bands. Same length as bands.
+#' @param explain Get the query execution profile for performance analysis.
+#' @return A data.frame one row per point id in xyz with an ID
+#' column + one columns for each `bands` in `rastertbl` name `nm`.
+#' @export
+extract_db <- function(dbCon, rastertbl, bands = NULL, nm = NULL, explain = FALSE) {
+  if (!is.null(bands) & !is.null(nm)) stopifnot(length(bands) == length(nm))
+  q <- "
     %s
     WITH \"tmp_metadata\" AS (
       SELECT m3.id,
@@ -227,14 +235,14 @@ extract_db <- function(dbCon, xyz, rastertbl, bands, nm, explain = FALSE) {
       WHERE r0.rid IN (SELECT DISTINCT rid FROM \"tmp_interpolation\")
     ) AS v
     ON v.rid = m0.rid;
-    ;" |> sprintf(
+    ;" |>
+    sprintf(
       if (explain) "EXPLAIN (ANALYSE, VERBOSE, COSTS, TIMING, SUMMARY, MEMORY)" else "",
-      xyz,
+      "tmp_xyz",
       rastertbl,
       if (!length(bands)) "NULL::integer[]" else {bands |> paste0(collapse = ",") |> sprintf(fmt ="ARRAY[%s]")},
       rastertbl
     )
-  )
   res <- DBI::dbGetQuery(dbCon, q) |> 
     data.table::setDT()
   

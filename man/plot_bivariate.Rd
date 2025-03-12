@@ -2,6 +2,7 @@
 % Please edit documentation in R/plot_bivariate.R
 \name{plot_bivariate}
 \alias{plot_bivariate}
+\alias{plot_bivariate_db}
 \title{Bivariate climate change plots}
 \usage{
 plot_bivariate(
@@ -21,6 +22,24 @@ plot_bivariate(
   show_trajectories = TRUE,
   interactive = FALSE,
   cache = TRUE
+)
+
+plot_bivariate_db(
+  xyz,
+  xvar = "Tave_sm",
+  yvar = "PPT_sm",
+  period_focal = list_gcm_periods()[1],
+  gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)],
+  ssp = list_ssps()[2],
+  obs_period = list_obs_periods()[1],
+  gcm_periods = list_gcm_periods(),
+  max_run = 10,
+  legend_pos = "bottomleft",
+  show_runs = TRUE,
+  show_ensMean = TRUE,
+  show_observed = TRUE,
+  show_trajectories = TRUE,
+  interactive = FALSE
 )
 }
 \arguments{

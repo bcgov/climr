@@ -495,7 +495,6 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
 
   # Create match set to match with res names
 
-
   labels <- vapply(
     strsplit(nm, "_"),
     function(x) {
