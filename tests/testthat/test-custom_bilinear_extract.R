@@ -56,12 +56,12 @@ test_that("testing that the custom bilinear function works", {
   ")
   
   # Drop the table if it exists ----
-  DBI::dbExecute(dbCon, "DROP TABLE IF EXISTS test_points;")
+  DBI::dbExecute(dbCon, "DROP TABLE IF EXISTS tmp_xyz;")
   
   ### Create 5 geometry POINTs within the raster ----
   # Create a table to store the points
   DBI::dbExecute(dbCon, "
-    CREATE TABLE test_points (
+    CREATE TABLE tmp_xyz (
         id serial PRIMARY KEY,
         geom geometry(Point, 4326)
     );
@@ -69,7 +69,7 @@ test_that("testing that the custom bilinear function works", {
   
   # Insert 5 points within the raster extent (x: 0 to 10, y: -10 to 0) ----
   DBI::dbExecute(dbCon, "
-    INSERT INTO test_points (geom) VALUES
+    INSERT INTO tmp_xyz (geom) VALUES
         (ST_SetSRID(ST_MakePoint(1.1, -1.1), 4326)),
         (ST_SetSRID(ST_MakePoint(2, -2), 4326)),
         (ST_SetSRID(ST_MakePoint(3.56, -3.22), 4326)),
@@ -80,13 +80,13 @@ test_that("testing that the custom bilinear function works", {
   ### Compare the results of the function with ST_Value for each band ----
   # Query to get results from both the custom function and ST_Value
   bands <- c(1:3,8:10)
-  results_1 <- extract_db(dbCon, "test_points", "test_rasters", bands)
+  results_1 <- extract_db(dbCon, "tmp_xyz", "test_rasters", bands)
   
   results_2 <- DBI::dbGetQuery(dbCon, "
     SELECT 
-        p.id,
+        p.id \"ID\",
         %s
-    FROM test_points p
+    FROM tmp_xyz p
     CROSS JOIN test_rasters r
     WHERE r.rid = 1;
   " |> sprintf(
@@ -94,13 +94,13 @@ test_that("testing that the custom bilinear function works", {
       sprintf(bands, bands) |>
       paste0(collapse = ",")
     )
-  ) |> data.table::setDT(key = "id")
+  )
   
   testthat::expect_equal(results_1, results_2, info = "Testing that the custom SQL returns the same value as ST_Value")
   
   # Clean up by dropping test tables and disconnecting
   DBI::dbExecute(dbCon, "DROP TABLE test_rasters;")
-  DBI::dbExecute(dbCon, "DROP TABLE test_points;")
+  DBI::dbExecute(dbCon, "DROP TABLE tmp_xyz;")
   DBI::dbDisconnect(dbCon)
   
 })

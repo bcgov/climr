@@ -23,6 +23,9 @@ downscale_db_core <- function(
     obs_ts, return_refperiod, out_spatial, plot, vars
   )
   
+  expectedCols <- c("lon", "lat", "elev", "id")
+  xyz <- .checkXYZ(copy(xyz), expectedCols)
+  
   res <- downscale_db_(
     dbCon,
     xyz,
@@ -110,40 +113,55 @@ downscale_db_ <- function(
   ppt_lr = FALSE
 ) {
   
-  # Offload all it to the database
+  # Offload to database
+  res <- extract_db(dbCon, refmap[["tbl"]], bands = refmap[["layers"]][["laynum"]], nm = refmap[["layers"]][["var_nm"]])
 
-  # Locate fields position
-  demlyr <- refmap[["layers"]][grep("^dem", var_nm, ignore.case = TRUE), laynum]
-  lrlyr <- refmap[["layers"]][grep("^lr", var_nm, ignore.case = TRUE), laynum]
-  vlyr <- setdiff(refmap[["layers"]][["laynum"]], c(demlyr, lrlyr))
-  mlrlyr <- lrlyr[match(refmap[["layers"]][["var_nm"]][vlyr], refmap[["layers"]][["var_nm"]][lrlyr] |> gsub("lr_", "", x = _))]
-  pptlyr <- refmap[["layers"]][mlrlyr, grep("ppt", var_nm, ignore.case = TRUE)]
+  # Compute elevation differences between provided points elevation and reference
+  # Dem at position 74 (ID column + 36 reference layers + 36 lapse rate layers + 1 dem layer)
+  elev_delta <- xyz[["elev"]] - res[, "dem2_WNA"]
+  # print(elev_delta)
+  # print(res)
+  # Compute individual point lapse rate adjustments
+  # Lapse rate position 38:73 (ID column + 36 reference layers + 36 lapse rate layers)
+  lrCols <- grep("^lr_", names(res), value = TRUE)
+  lr <- elev_delta * res[, lrCols] ## do we need anything other than the lapse rate?
   
-  # Run in database
-
-  # Query building
-  lradj <- "+ COALESCE(delta * ST_Value(rast, %s, xyz.geom, false, 'bilinear'), 0)" |>
-    sprintf(mlrlyr)
-  if (!isTRUE(ppt_lr)) {
-    lradj[pptlyr] <- ""
+  # Replace any NAs left with 0s
+  lr[is.na(lr)] <- 0L
+  
+  # Remove lapse rates and digital elevation model from res
+  lrDemCols <- grep("^lr_|dem2_WNA", names(res), value = TRUE)
+  if (length(lrCols) == length(lrDemCols)) {
+    stop("Error 01: can't find DEM layer. Please contact developer and supply error code")
   }
-  vals <- "(ST_Value(rast, %s, xyz.geom, false, 'bilinear') %s) as \"%s\"" |>
-    sprintf(vlyr, lradj, refmap[["layers"]][["var_nm"]][vlyr]) |>
-    paste(collapse = ",\n     ")
-  dem <- "ST_Value(rast, %s, xyz.geom, false, 'bilinear')" |> sprintf(demlyr)
-
-  q <- DBI::SQL("
-    SELECT %s
-    FROM \"%s\" xyz, \"%s\" normal
-    CROSS JOIN LATERAL (
-      SELECT (xyz.elev - %s) AS delta
-    ) delta_val
-    WHERE ST_Intersects(normal.rast,xyz.geom)
-    ORDER BY xyz.id;" |>
-    sprintf(vals, xyz, refmap[["tbl"]], dem)
-  )
-
-  res <- DBI::dbGetQuery(dbCon, q) |> data.table::setDT()
+  
+  res[, lrDemCols] <- NULL
+  
+  # Combine results (ignoring ID column)
+  res <- as.data.frame(res) ## TODO: convert code below to data.table
+  if (isTRUE(ppt_lr)) {
+    notIDcols <- names(res)[which(tolower(names(res)) != "id")]
+    
+    if (any(paste0("lr_", notIDcols) != names(lr))) {
+      stop(
+        "Error 02: lapse rates and downscale output column names do not match.",
+        "\n   Please contact developers."
+      )
+    }
+    
+    res[, notIDcols] <- res[, notIDcols] + lr
+  } else {
+    notpptLRDEM <- grep("^PPT|ID|^lr_|dem2_WNA", names(res), invert = TRUE, value = TRUE)
+    lr_notpptLRDEM <- grep("^lr_PPT", names(lr), invert = TRUE, value = TRUE)
+    if (any(paste0("lr_", notpptLRDEM) != lr_notpptLRDEM)) {
+      stop(
+        "Error 02: lapse rates and downscale output column names do not match.",
+        "\n   Please contact developers."
+      )
+    }
+    res[, notpptLRDEM] <- res[, notpptLRDEM] + lr[, lr_notpptLRDEM]
+  }
+  res <- as.data.table(res)
 
   # Process one GCM stacked layers
   if (!is.null(gcms)) {
@@ -193,7 +211,6 @@ downscale_db_ <- function(
   }
   
   if (return_refperiod) {
-    xyzdb <- DBI::dbGetQuery(dbCon, "SELECT \"id\",\"lat\",\"elev\" FROM %s" |> sprintf(xyz))
     nm <- names(res)[-1]
     labels <- nm
     normal_ <- res
@@ -206,9 +223,9 @@ downscale_db_ <- function(
     data.table::set(ref_dt, j = "PERIOD", value = "1961_1990")
     data.table::setkey(ref_dt, "variable")
     # Set Latitude elevation and ID
-    normal_[["lat"]] <- xyzdb[["lat"]]
-    normal_[["elev"]] <- xyzdb[["elev"]]
-    normal_[["id"]] <- xyzdb[["id"]]
+    normal_[["lat"]] <- xyz[["lat"]]
+    normal_[["elev"]] <- xyz[["elev"]]
+    normal_[["id"]] <- xyz[["id"]]
     
     # Melt gcm_ and set the same key for merging
     normal_ <- melt(
@@ -252,8 +269,8 @@ process_one_climate_db <- function(
   nm <- r[["layers"]][["var_nm"]]
     
   # Run in database
-  climaterast <- extract_db(dbCon, xyz, r[["tbl"]], r[["layers"]][["laynum"]], nm)
-    
+  climaterast <- extract_db(dbCon, r[["tbl"]], r[["layers"]][["laynum"]], nm)
+
   labels <- vapply(
     strsplit(nm, "_"),
     function(x) {
@@ -309,11 +326,10 @@ process_one_climate_db <- function(
   
   setkey(ref_dt, "variable")
   
-  xyzdb <- DBI::dbGetQuery(dbCon, "SELECT \"id\",\"lat\",\"elev\" FROM %s ORDER by \"id\"" |> sprintf(xyz))
   # Set Latitude and possibly ID
-  climaterast[["lat"]] <- xyzdb[["lat"]]
-  climaterast[["elev"]] <- xyzdb[["elev"]]
-  climaterast[["id"]] <- xyzdb[["id"]]
+  climaterast[["lat"]] <- xyz[["lat"]]
+  climaterast[["elev"]] <- xyz[["elev"]]
+  climaterast[["id"]] <- xyz[["id"]]
   
   # Melt climaterast and set the same key for merging
   climaterast <- melt(

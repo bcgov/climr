@@ -17,22 +17,49 @@ NULL
 #' @importFrom tools R_user_dir
 #' @noRd
 .onLoad <- function(libname, pkgname) {
-  rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
 
-  dbCon <- data_connect()
-  on.exit(try(pool::poolClose(dbCon)), add = TRUE)
+  .globals[["sesscon"]] <- session_connections()
+  dbCon <- data_con()
 
   if (is.null(dbCon)) {
+    
     warning("Could not connect to server. Only cached reference periods will be available.")
+    
+    rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
+    if (dir.exists(rInfoPath)) {
+      if (file.exists(f <- file.path(rInfoPath, "gcm_periods.csv"))) {
+        .globals[["gcm_period_runs"]] <- data.table::fread(f)
+      }
+      if (file.exists(f <- file.path(rInfoPath, "gcm_ts.csv"))) {
+        .globals[["gcm_ts_runs"]] <- data.table::fread(f)
+      }
+      if (file.exists(f <- file.path(rInfoPath, "gcm_hist.csv"))) {
+        .globals[["gcm_hist_runs"]] <- data.table::fread(f)
+      }
+    }
+    
   } else {
-    dir.create(rInfoPath, recursive = TRUE, showWarnings = FALSE)
-    gcm_period_runs <- dbGetQuery(dbCon, "select distinct mod, scenario, run from esm_layers_period order by mod, scenario, run;")
-    gcm_ts_runs <- dbGetQuery(dbCon, "select distinct mod, scenario, run from esm_layers_ts order by mod, scenario, run;")
-    gcm_hist_runs <- dbGetQuery(dbCon, "select distinct mod, run from esm_layers_hist order by mod, run;")
-    fwrite(gcm_period_runs, file.path(rInfoPath, "gcm_periods.csv"))
-    fwrite(gcm_ts_runs, file.path(rInfoPath, "gcm_ts.csv"))
-    fwrite(gcm_hist_runs, file.path(rInfoPath, "gcm_hist.csv"))
+    
+    .globals[["gcm_period_runs"]] <- RPostgres::dbGetQuery(
+      dbCon, "
+      select distinct mod, scenario, run
+      from esm_layers_period order by mod, scenario, run;
+      ") |> data.table::setDT()
+    
+    .globals[["gcm_ts_runs"]] <- RPostgres::dbGetQuery(
+      dbCon,"
+      select distinct mod, scenario, run
+      from esm_layers_ts order by mod, scenario, run;
+      ") |> data.table::setDT()
+    
+    .globals[["gcm_hist_runs"]] <- RPostgres::dbGetQuery(
+      dbCon, "
+      select distinct mod, run
+      from esm_layers_hist order by mod, run;
+      ") |> data.table::setDT()
+    
   }
+  
 }
 
 # .onLoad <- function(libname, pkgname) {

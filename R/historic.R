@@ -134,7 +134,7 @@ input_obs_db <- function(dbCon, period = list_obs_periods()) {
   q <- "select var_nm, laynum from historic_layers where period in (%s)" |>
     sprintf(
       paste0("'", period, "'", collapse = ",")
-    ) |> DBI::SQL()
+    ) 
   layerinfo <- DBI::dbGetQuery(dbCon, q) |>
     data.table::setDT()
   res <- list(
@@ -207,7 +207,7 @@ input_obs_ts_db <- function(dbCon, dataset = c("cru.gpcc", "climatena"), years =
       sprintf(
         dbnames_hist_obs[["dbname"]][m],
         paste0("'", years, "'", collapse = ",")
-      ) |> DBI::SQL()
+      )
     layerinfo <- DBI::dbGetQuery(dbCon, q) |> 
       data.table::setDT()
     layerinfo[, var_nm := paste(d, var_nm, period, sep = "_")] 

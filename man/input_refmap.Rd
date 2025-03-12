@@ -8,7 +8,7 @@
 input_refmap(
   dbCon,
   bbox,
-  reference = "refmap_climatena",
+  reference = "refmap_climr",
   cache = TRUE,
   indiv_tiles = FALSE,
   xyz = NULL

@@ -47,9 +47,7 @@ list_gcm_periods <- function() {
 #' @rdname data-option-lists
 #' @export
 list_runs_ssp <- function(gcm, ssp){
-  rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
-  runs <- fread(file.path(rInfoPath, "gcm_periods.csv"))
-  runs[mod %in% gcm & scenario %in% ssp, run]
+  .globals[["gcm_period_runs"]][mod %in% gcm & scenario %in% ssp, run]
 }
 
 #' @description
@@ -61,9 +59,7 @@ list_runs_ssp <- function(gcm, ssp){
 #' @rdname data-option-lists
 #' @export
 list_runs_historic <- function(gcm){
-  rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
-  runs <- fread(file.path(rInfoPath, "gcm_hist.csv"))
-  runs[mod %in% gcm, run]
+  .globals[["gcm_hist_runs"]][mod %in% gcm, run]
 }
 
 #' @description

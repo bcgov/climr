@@ -305,8 +305,7 @@ downscale_db <- function(
   
   expectedCols <- c("lon", "lat", "elev", "id")
   xyz <- .checkXYZ(copy(xyz), expectedCols)
-  dbCon <- data_connect(local = local)
-  on.exit({poolClose(dbCon)}, add = TRUE)
+  dbCon <- data_con(if (local) "local")
  
   rmCols <- setdiff(names(xyz), expectedCols)
   if (length(rmCols)) { ## remove extraneous columns
@@ -383,11 +382,10 @@ downscale_db <- function(
   }
 
   write_xyz <- function(xyz) {
-    tbl <- "tmp_xyz"
-    DBI::dbWriteTable(dbCon, tbl, xyz, temporary = TRUE, overwrite = TRUE)
+    DBI::dbWriteTable(dbCon, "tmp_xyz", xyz, temporary = TRUE, overwrite = TRUE)
     DBI::dbExecute(dbCon, "ALTER TABLE tmp_xyz ADD COLUMN IF NOT EXISTS geom GEOMETRY(Point, 4326)")
     DBI::dbExecute(dbCon, "UPDATE tmp_xyz SET geom = ST_SetSRID(ST_MakePoint(lon, lat), 4326)")
-    return(tbl)
+    return(xyz)
   }
   
   message("Downscaling...")
