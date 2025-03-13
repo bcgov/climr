@@ -10,7 +10,7 @@ library(RColorBrewer)
 library(ranger)
 library(rworldmap)
 
-studyarea.name <- "bcus"
+studyarea.name <- "gunnison"
 
 # function for preparing data
 prep <- function(x, studyarea, element, breaks){
@@ -26,17 +26,7 @@ monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11"
 elements <- c("Tmin", "Tmax", "Pr")
 element.names <- c("Tmin (\u00b0C)", "Tmax (\u00b0C)", "precipitation (mm)")
 
-studyarea <- ext(c(-124, -118, 47, 51))
-
-# load the source STATION data for the BC prism
-dir <- "//objectstore2.nrs.bcgov/ffec/Climatologies/PRISM_BC/"
-stn.info <- fread(paste(dir, "Stations/",c("Tmin", "Tmax", "Pr")[e],"_uscdn_8110.csv", sep="")) #read in
-for (i in which(names(stn.info)%in%c(month.abb, "Annual"))) stn.info[get(names(stn.info)[i])==c(-9999), (i):=NA, ] # replace -9999 with NA
-stn.info <- stn.info[-which(El_Flag=="@"),]
-stn.data <- stn.info[,get(month.abb[m])]
-stn.data <- if(elements[e]=="Pr") log2(stn.data) else stn.data/10
-stn.info <- stn.info[is.finite(stn.data),]
-stn.data <- stn.data[is.finite(stn.data)]
+studyarea <- ext(c(-109, -104, 38, 39))
 
 #DEM
 # dir <- paste("//objectstore2.nrs.bcgov/ffec/Climatologies/climr_mosaic/", sep="")
@@ -63,18 +53,16 @@ climr.all <- downscale_core(grid, refmap = mosaic.raw, vars = list_vars(set="Mon
 pts <- as.data.frame(dem, cells=T, xy=T)
 colnames(pts) <- c("ID1", "lon", "lat", "el")
 pts$ID2 <- NA
-pts <- pts[,c(1,5,3,2,4)] #restructure for climr input
+pts <- pts[,c(1,5,3,2,4)] 
 write.csv(pts, paste0("C:/Users/CMAHONY/OneDrive - Government of BC/Data/Climatena_v750/",studyarea.name,".csv"), row.names = F)
 ## climateNA mosaic
 climatena.all <- fread(paste0("C:/Users/CMAHONY/OneDrive - Government of BC/Data/Climatena_v750/",studyarea.name,"_Normal_1981_2010MP.csv"))
 
-
-
 e <- 1
 for(e in 1:3){
-  
+
   element <- elements[e]
-  m <- 7
+  m <- 1
   for(m in c(1,7)){
     
     var <- paste0(c("Tmin", "Tmax", "PPT")[e], "_", monthcodes[m])
@@ -84,16 +72,11 @@ for(e in 1:3){
     if(element=="Pr") values(climr) <- log2(values(climr))
     values(climr)[!is.finite(values(climr))] <- NA
     
-    # climatena.climr <- dem
-    # climatena.climr[climatena.climr.all[, id]] <- climatena.climr.all[, get(var)] 
-    # if(element=="Pr") values(climatena.climr) <- log2(values(climatena.climr))
-    # values(climatena.climr)[!is.finite(values(climatena.climr))] <- NA
-    
-    # color scheme
+     # color scheme
     combined <- values(climr)
     combined <- combined[is.finite(combined)]
     inc=diff(range(combined))/500
-    breaks=seq(quantile(combined, 0)-inc, quantile(combined, 1)+inc, inc)
+    breaks=seq(quantile(combined, 0.002)-inc, quantile(combined, 0.998)+inc, inc)
     ColScheme <- colorRampPalette(if(elements[e]=="Pr") brewer.pal(9, "YlGnBu") else rev(brewer.pal(11, "RdYlBu")))(length(breaks)-1)
     ColPal <- colorBin(ColScheme, bins=breaks, na.color = "white")
     ColPal.raster <- colorBin(ColScheme, bins=breaks, na.color = "transparent")
@@ -102,12 +85,6 @@ for(e in 1:3){
     values(climr)[values(climr)<min(breaks)] <- min(breaks)
     # values(climatena.climr)[values(climatena.climr)>max(breaks)] <- max(breaks)
     # values(climatena.climr)[values(climatena.climr)<min(breaks)] <- min(breaks)
-    
-    # load the BC PRISM  data for the variable
-    dir <- paste("//objectstore2.nrs.bcgov/ffec/Climatologies/PRISM_BC/", sep="")
-    file <- list.files(dir, pattern=paste(c("tmin", "tmax", "pr")[e],"_.*._",m, ".tif", sep=""))
-    prism.bc <- rast(paste(dir, file, sep=""))
-    prism.bc <- prep(prism.bc, studyarea=studyarea, element=elements[e], breaks=breaks)
     
     # load the US PRISM (1981-2010) data for the variable
     dir <- paste("//objectstore2.nrs.bcgov/ffec/Climatologies/PRISM_US/PRISM_",c("tmin", "tmax", "ppt")[e] ,"_30yr_normal_1981_2010_800m_all_files_asc/", sep="")
@@ -144,29 +121,27 @@ for(e in 1:3){
     
     # =============================================
     # Comparison for BC-US Border
+    plotarea <- ext(c(-108.5, -104.7, 38, 39))
     
     sources <- c("prism.bc", "prism.us", "daymet", "prism.canw", "worldclim", "chelsa", "climatena","climr")
     source.names <- c("BC PRISM", "US PRISM", "Daymet", "W. Can. PRISM", "WorldClim", "CHELSA", "ClimateNA", "climr composite")
-    plotarea <- ext(c(-122.5, -118, 48.4, 49.4))
     
     png(filename=paste("tests/manual_tests/plots/mosaics_compare_",studyarea.name,"_", elements[e], monthcodes[m], ".png", sep=""), type="cairo", units="in", width=9, height=8.75, pointsize=14, res=600)
     
     par(mfrow=c(3,1), mar=c(0.5,0.5,0.5,5))
     
-    X <- merge(prism.bc, project(prism.us,prism.bc))
+    source <- "prism.us"
+    X <- get(source)
     X <- crop(X, plotarea)
     plot(X, col=ColScheme, breaks=breaks, type="continuous", axes=F, box=T, legend=F, mar=NA)
     legend_ramp(X, title = paste(month.name[m], element.names[e]), ColScheme = ColScheme, breaks = breaks, pos=c(1.035, 1.055, 0, 1), log = if(e==3) 2 else NULL, horizontal = FALSE)
-    # points(stn.info$Long, stn.info$Lat, bg=ColScheme[cut(stn.data, breaks = breaks)], pch=21, cex=1.5)
-    mtext("BC PRISM", side=3, adj=0.025, font=2, line=-2)
     mtext("US PRISM", side=1, adj=0.025, font=2, line=-2)
-    
+
     source <- "climr"
     X <- get(source)
     X <- crop(X, plotarea)
     plot(X, col=ColScheme, breaks=breaks, type="continuous", axes=F, box=T, legend=F, mar=NA)
     legend_ramp(X, title = paste(month.name[m], element.names[e]), ColScheme = ColScheme, breaks = breaks, pos=c(1.035, 1.055, 0, 1), log = if(e==3) 2 else NULL, horizontal = FALSE)
-    # points(stn.info$Long, stn.info$Lat, bg=ColScheme[cut(stn.data, breaks = breaks)], pch=21, cex=1.5)
     mtext("climr mosaic", side=1, adj=0.025, font=2, line=-2)
     
     source <- "climatena"
@@ -174,7 +149,6 @@ for(e in 1:3){
     X <- crop(X, plotarea)
     plot(X, col=ColScheme, breaks=breaks, type="continuous", axes=F, box=T, legend=F, mar=NA)
     legend_ramp(X, title = paste(month.name[m], element.names[e]), ColScheme = ColScheme, breaks = breaks, pos=c(1.035, 1.055, 0, 1), log = if(e==3) 2 else NULL, horizontal = FALSE)
-    # points(stn.info$Long, stn.info$Lat, bg=ColScheme[cut(stn.data, breaks = breaks)], pch=21, cex=1.5)
     mtext("ClimateNA mosaic", side=1, adj=0.025, font=2, line=-2)
     
     dev.off()
