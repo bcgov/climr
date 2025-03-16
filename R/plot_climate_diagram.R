@@ -2,7 +2,7 @@
 
 #' @param temp vector of temperatures (in Celsius) for each month
 #' @param precip vector of precipitation (in mm) for each month
-#' @param elev elevation (in m)s
+#' @param elev elevation (in m). Optional, if NULL no elevation will be shown in output. 
 #' 
 #' @importFrom data.table fcase fifelse
 #' @importFrom ggplot2 aes geom_hline geom_line geom_ribbon ggplot geom_polygon

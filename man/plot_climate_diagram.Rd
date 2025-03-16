@@ -11,7 +11,7 @@ plot_climate_diagram(temp, precip, elev = NULL)
 
 \item{precip}{vector of precipitation (in mm) for each month}
 
-\item{elev}{elevation (in m)s}
+\item{elev}{elevation (in m). Optional, if NULL no elevation will be shown in output.}
 }
 \description{
 Plot Climate Diagram
