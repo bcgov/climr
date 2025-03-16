@@ -1,3 +1,9 @@
+# `climr` 0.1.2
+
+## Enhancements
+
+-   New function `plot_climate_diagram()` to generate a Walter-Lieth climate diagram. s
+
 # `climr` 0.1.1
 
 ## Bug Fixes
