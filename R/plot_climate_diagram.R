@@ -1,5 +1,3 @@
-# TODO ? Make Graph continuous between Dec and Jan 
-
 #' Plot Climate Diagram
 
 #' @param temp vector of temperatures (in Celsius) for each month
@@ -23,6 +21,11 @@
 #' 
 plot_climate_diagram <- function(temp, precip, elev = NULL){
   
+  #Remove CRAN check warnings
+  if (FALSE) {
+    y_temp <- y_precip <- y_100 <- x <- y <- NULL
+  }
+
   stopifnot(length(temp)==12)
   stopifnot(length(precip)==12)
   stopifnot(!anyNA(c(temp, precip)))
@@ -71,8 +74,6 @@ plot_climate_diagram <- function(temp, precip, elev = NULL){
   if (any(period_type == 'Wet')){
 
     which_wet <- which(period_type == 'Wet')
-
-    #TODO adjust this if we want jan & dec to be continuous
 
     intersections_100 <- do.call(cbind, lapply(which_wet, find_intersect_wet_period, y_precip_rel = y_precip_rel))
     intersections_100 <- data.frame(intersect_x = intersections_100[1,], intersect_y = intersections_100[2,])
@@ -141,6 +142,7 @@ find_intersect_wet_period <- function(x, y_precip_rel){
   }
 }
 
+#' @importFrom stats coef lm
 find_intersect_xy <- function(x, y1, y2){
   coef_1 <- coef(lm(y1~x))
   coef_2 <- coef(lm(y2~x))

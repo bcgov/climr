@@ -43,9 +43,8 @@ Imports:
     uuid,
     dplyr,
     abind,
-    dbplyr
+    ggplot2
 Suggests: 
-    ggplot2,
     knitr,
     parallel,
     plotly,
