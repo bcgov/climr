@@ -164,17 +164,20 @@ get_elev_raster <- function(r, elev, out = NULL, ...) {
 #' Bilinear interpolation point extraction from raster bands
 #' @param dbCon A postgres database connection.
 #' @param rastertbl The name of the raster table to extract from.
-#' @param bands The index number of the bands to extract.
-#' @param nm The names of the bands. Same length as bands.
-#' @param explain Get the query execution profile for performance analysis.
+#' @param layers A data.table with column `var_nm` (names of the bands) and
+#' `laynum` (index number of the bands to extract).
 #' @return A data.frame one row per point id in xyz with an ID
 #' column + one columns for each `bands` in `rastertbl` name `nm`.
 #' @export
-extract_db <- function(dbCon, rastertbl, bands = NULL, nm = NULL, explain = FALSE) {
-  if (!is.null(bands) & !is.null(nm)) stopifnot(length(bands) == length(nm))
+extract_db <- function(
+  dbCon,
+  rastertbl,
+  layers = data.table::data.table(var_nm = character(), laynum = integer())
+) {
+  colorder <- c("ID", layers[["var_nm"]])
+  layers <- layers[order(laynum)]
   q <- "
-    %s
-    WITH \"tmp_metadata\" AS (
+    WITH tmp_metadata AS (
       SELECT m3.id,
              m3.rid,
              m3.xr - (m3.xcell - m3.xdir + 0.5) AS xr,
@@ -197,12 +200,13 @@ extract_db <- function(dbCon, rastertbl, bands = NULL, nm = NULL, explain = FALS
                    r.rid,
                    (ST_X(p.geom) - ST_UpperLeftX(r.rast))/ST_PixelWidth(r.rast) AS xr,
                    (ST_UpperLeftY(r.rast) - ST_Y(p.geom))/abs(ST_PixelHeight(r.rast)) AS yr
-            FROM \"%s\" AS p, \"%s\" r
-            WHERE ST_Intersects(p.geom, r.rast)
+            FROM tmp_xyz AS p, \"%s\" r
+            WHERE ST_Intersects(p.geom, ST_ConvexHull(r.rast))
           ) AS m1
         ) AS m2
       ) AS m3
-    ), \"tmp_interpolation\" AS (
+    ), 
+    tmp_interpolation AS (
       SELECT id,
              rid,
              (1 - xr) * (1 - yr) AS w1, 
@@ -216,7 +220,7 @@ extract_db <- function(dbCon, rastertbl, bands = NULL, nm = NULL, explain = FALS
              (xcell + 1)        AS cx,
              (ycell + 1)        AS cy
              
-      FROM \"tmp_metadata\"
+      FROM tmp_metadata
     )
     SELECT m0.id::float AS \"ID\",
            v.nband,
@@ -227,32 +231,170 @@ extract_db <- function(dbCon, rastertbl, bands = NULL, nm = NULL, explain = FALS
              coalesce(v.valarray[y2][x1], v.valarray[cy][cx]) * m0.w3 +
              coalesce(v.valarray[y2][x2], v.valarray[cy][cx]) * m0.w4
            ) END AS value
-    FROM \"tmp_interpolation\" AS m0
+    FROM tmp_interpolation AS m0
     JOIN (
       SELECT r0.rid,
              (ST_DumpValues(r0.rast, %s, true)).*
       FROM \"%s\" AS r0
-      WHERE r0.rid IN (SELECT DISTINCT rid FROM \"tmp_interpolation\")
+      WHERE r0.rid IN (SELECT DISTINCT rid FROM tmp_interpolation)
     ) AS v
     ON v.rid = m0.rid;
     ;" |>
     sprintf(
-      if (explain) "EXPLAIN (ANALYSE, VERBOSE, COSTS, TIMING, SUMMARY, MEMORY)" else "",
-      "tmp_xyz",
       rastertbl,
-      if (!length(bands)) "NULL::integer[]" else {bands |> paste0(collapse = ",") |> sprintf(fmt ="ARRAY[%s]")},
+      if (!length(layers[["laynum"]])) "NULL::integer[]" else {
+        layers[["laynum"]] |> paste0(collapse = ",") |> sprintf(fmt ="ARRAY[%s]")
+      },
       rastertbl
     )
   res <- DBI::dbGetQuery(dbCon, q) |> 
     data.table::setDT()
-  
-  if (is.null(bands)) { bands <- res[["nband"]] |> unique() |> sort() }
-  if (is.null(nm)) { nm <- bands |> as.character() }
+
+  uniqb <- res[["nband"]] |> unique() |> sort()
+  if (!nrow(layers)) {
+    layers <- data.table::data.table(
+      var_nm = as.character(uniqb),
+      laynum = uniqb
+    )
+  }
+  if (length(misband <- setdiff(layers[["laynum"]], uniqb))) {
+    stop(
+      "Not all requested bands were in table `%s`. [Bands: %s]" |>
+        sprintf(rastertbl, paste0(misband, collapse = ","))
+    )
+  }
   data.table::set(
     res,
     j = "band",
-    value = nm[match(res[["nband"]], bands)] |> factor(levels = nm)
+    value = layers[["var_nm"]][match(res[["nband"]], layers[["laynum"]])]
   )
   res <- data.table::dcast(res, ID ~ band, value.var = "value")
+  data.table::setcolorder(res, colorder)
   return(res |> as.data.frame())
 }
+
+
+#TODO: reorder sprintf var
+#TODO: make sure to return NULL for points outside rast
+#TODO: single band union for metadata then exploit dump
+#TODO: FInish downscale integration into app and return values
+
+# -- Extract pixel sizes from a representative tile (assuming uniform pixel size across tiles)
+# WITH pixel_sizes AS (
+#   SELECT ST_PixelWidth(rast) AS pw, 
+#          ABS(ST_PixelHeight(rast)) AS ph
+#   FROM \"%s\"
+#   LIMIT 1
+# ),
+# -- Identify tiles intersecting an expanded box around each point
+# point_tiles AS (
+#   SELECT p.id,
+#          ARRAY_AGG(r.rid) AS rids,
+#          MAX(CASE WHEN ST_Intersects(ST_ConvexHull(r.rast, p.geom) AS local THEN rid END)
+#   FROM tmp_xyz p,
+#        \"%s\" r,
+#        pixel_sizes ps
+#   -- WHERE ST_Intersects(ST_ConvexHull(r.rast), ST_Expand(p.geom, ps.pw / 2, ps.ph / 2))
+#   WHERE ST_Intersects(ST_ConvexHull(r.rast), p.geom)
+#   GROUP BY p.id
+# ),
+# -- Single tile points (array_length(rids,1) = 1)
+# single_tile_points AS (
+#   SELECT pt.id, 
+#          pt.rids[1] AS rid
+#   FROM point_tiles pt
+#   WHERE ARRAY_LENGTH(pt.rids,1) = 1
+# ),
+# -- Two tile points (array_length(rids,1) = 2)
+# two_tile_points AS (
+#   SELECT pt.id,
+#          pt.rids
+#   FROM point_tiles pt
+#   WHERE ARRAY_LENGTH(pt.rids,1) = 2
+# ),
+# -- Four tile points (array_length(rids,1) = 2)
+# four_tile_points AS (
+#   SELECT pt.id, 
+#          pt.rids
+#   FROM point_tiles pt
+#   WHERE ARRAY_LENGTH(pt.rids,1) = 4
+# ),
+
+# rast_metadata AS (
+#   SELECT ST_UpperLeftX(rast) AS ulx,
+#          ST_UpperLeftY(rast) AS uly,
+#          ST_Height(rast) AS height,
+#          ST_Width(rast) AS width,
+         
+         
+#   FROM \"%s\"
+#   ORDER BY rid
+# ),
+# -- Metadata single tile points
+# tmp_metadata_stp AS (
+#   SELECT m3.id,
+#          m3.rid,
+#          m3.xr - (m3.xcell - m3.xdir + 0.5) AS xr,
+#          m3.yr - (m3.ycell - m3.ydir + 0.5) AS yr,
+#          m3.xcell,
+#          m3.ycell,
+#          m3.xdir,
+#          m3.ydir
+#   FROM (
+#     SELECT m2.*,
+#            (CASE WHEN m2.xr < (m2.xcell + 0.5) THEN 1 ELSE 0 END)::integer AS xdir,
+#            (CASE WHEN m2.yr < (m2.ycell + 0.5) THEN 1 ELSE 0 END)::integer AS ydir
+#     FROM (
+#       SELECT M1.*,
+#              floor(m1.xr)::integer AS xcell,
+#              floor(m1.yr)::integer AS ycell
+#       FROM (
+#         SELECT 
+#                p.id,
+#                r.rid,
+#                (ST_X(p.geom) - ST_UpperLeftX(r.rast))/ps.pw AS xr,
+#                (ST_UpperLeftY(r.rast) - ST_Y(p.geom))/abs(ps.ph) AS yr
+#         FROM single_tile_points AS stp
+#         CROSS JOIN pixel_sizes AS ps
+#         JOIN %s AS p
+#           ON stp.id  = p.id
+#         JOIN %s AS r
+#           ON stp.rid = r.rid
+#       ) AS m1
+#     ) AS m2
+#   ) AS m3
+# ),
+# -- Interpolation for single tile points with clamping
+# tmp_interpolation_stp AS (
+#   SELECT id,
+#          rid,
+#          (1 - xr) * (1 - yr) AS w1, 
+#          (1 - yr) * xr AS w2,
+#          (1 - xr) * yr AS w3,
+#          xr * yr AS w4,
+#          (xcell + 1 - xdir) AS x1,
+#          (xcell + 2 - xdir) AS x2,
+#          (ycell + 1 - ydir) AS y1,
+#          (ycell + 2 - ydir) AS y2,
+#          (xcell + 1)        AS cx,
+#          (ycell + 1)        AS cy
+         
+#   FROM tmp_metadata_stp
+# )
+# SELECT m0.id::float AS \"ID\",
+#        v.nband,
+#        CASE WHEN v.valarray[cy][cx] IS NULL THEN NULL ELSE
+#        (
+#          coalesce(v.valarray[m0.y1][m0.x1], v.valarray[m0.cy][m0.cx]) * m0.w1 +
+#          coalesce(v.valarray[m0.y1][m0.x2], v.valarray[m0.cy][m0.cx]) * m0.w2 +
+#          coalesce(v.valarray[m0.y2][m0.x1], v.valarray[m0.cy][m0.cx]) * m0.w3 +
+#          coalesce(v.valarray[m0.y2][m0.x2], v.valarray[m0.cy][m0.cx]) * m0.w4
+#        ) END AS value
+# FROM tmp_interpolation_stp AS m0
+# JOIN (
+#   SELECT r0.rid,
+#          (ST_DumpValues(r0.rast, %s, true)).*
+#   FROM %s AS r0
+#   WHERE r0.rid IN (SELECT DISTINCT rid FROM single_tile_points)
+# ) AS v
+# ON v.rid = m0.rid

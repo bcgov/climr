@@ -114,7 +114,7 @@ downscale_db_ <- function(
 ) {
   
   # Offload to database
-  res <- extract_db(dbCon, refmap[["tbl"]], bands = refmap[["layers"]][["laynum"]], nm = refmap[["layers"]][["var_nm"]])
+  res <- extract_db(dbCon, refmap[["tbl"]], layers = refmap[["layers"]])
 
   # Compute elevation differences between provided points elevation and reference
   # Dem at position 74 (ID column + 36 reference layers + 36 lapse rate layers + 1 dem layer)
@@ -267,9 +267,9 @@ process_one_climate_db <- function(
   
   # Store names for later use
   nm <- r[["layers"]][["var_nm"]]
-    
+
   # Run in database
-  climaterast <- extract_db(dbCon, r[["tbl"]], r[["layers"]][["laynum"]], nm)
+  climaterast <- extract_db(dbCon, r[["tbl"]], r[["layers"]])
 
   labels <- vapply(
     strsplit(nm, "_"),
@@ -286,10 +286,14 @@ process_one_climate_db <- function(
     
   # Add matching column to climaterast
   res <- as.data.frame(res)
+  # Locate PPT columns in labels 
   ppt_ <- grep("PPT", labels)
-  ppt_next <- ppt_ + 1L
-  climaterast[, ppt_next] <- climaterast[, ppt_next] * res[, match(labels[ppt_], names(res))] ## PPT
-  climaterast[, -c(1L, ppt_next)] <- climaterast[, -c(1L, ppt_next)] + res[, match(labels[-ppt_], names(res))] ## Temperature
+  # Labels does not have ID column, position in climaterast will be offset by 1
+  ppt_offset <- ppt_ + 1L
+  if (length(ppt_offet)) {
+    climaterast[, ppt_offset] <- climaterast[, ppt_offset] * res[, match(labels[ppt_], names(res))] ## PPT
+  }
+  climaterast[, -c(1L, ppt_offset)] <- climaterast[, -c(1L, ppt_offset)] + res[, match(labels[-ppt_], names(res))] ## Temperatures
   res <- as.data.table(res)
   climaterast <- as.data.table(climaterast)
     
