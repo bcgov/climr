@@ -28,37 +28,36 @@ and a unique "id". Any extra columns will be ignored and not output.}
 climate maps for use as the downscaling baseline.}
 
 \item{gcms}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=input_gcms]{input_gcms()}}. Global
-climate model data for 20-year reference periods to be downscaled. Default to \code{NULL}.}
+climate model data for 20-year reference periods to be downscaled.}
 
 \item{obs}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=input_obs]{input_obs()}}.
-Observed climate data for 20-year reference periods to be downscaled. Default to \code{NULL}.}
+Observed climate data for 20-year reference periods to be downscaled.}
 
 \item{gcm_ssp_ts}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=input_gcm_ssp]{input_gcm_ssp()}}.
-Global climate model time series for ssps-rcp scenarios to be downscaled. Default to \code{NULL}.}
+Global climate model time series for ssps-rcp scenarios to be downscaled.}
 
 \item{gcm_hist_ts}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=input_gcm_hist]{input_gcm_hist()}}.
-Global climate model time series for historical scenario to be downscaled. Default to \code{NULL}.}
+Global climate model time series for historical scenario to be downscaled.}
 
 \item{obs_ts}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=input_obs_ts]{input_obs_ts()}}.
-Observed climate time series to be downscaled. Default to \code{NULL}.}
+Observed climate time series to be downscaled.}
 
-\item{return_refperiod}{logical. Return downscaled reference period (1961-1990)? Default \code{TRUE}.}
+\item{return_refperiod}{logical. Return downscaled reference period (1961-1990)?}
 
 \item{vars}{character. A vector of climate variables to compute. Supported variables
 can be obtained with \code{\link[=list_vars]{list_vars()}}. Definitions can be found in this package
 \code{variables} dataset. Default to monthly PPT, Tmax, Tmin.}
 
-\item{ppt_lr}{logical. Apply elevation adjustment to precipitation. Default to FALSE.}
+\item{ppt_lr}{logical. Apply elevation adjustment to precipitation.}
 
-\item{nthread}{integer. Number of parallel threads to use to do computations. Default to 1L.}
+\item{nthread}{integer. Number of parallel threads to use to do computations.}
 
 \item{out_spatial}{logical. Should a SpatVector be returned instead of a
 \code{data.frame}.}
 
 \item{plot}{character. If \code{out_spatial} is TRUE, the name of a variable to plot.
 If the variable exists in \code{reference}, then its reference values will also be plotted.
-Otherwise, reference January total precipitation (PPT01) values will be plotted.
-Defaults to no plotting (NULL).}
+Otherwise, reference January total precipitation (PPT01) values will be plotted.}
 }
 \value{
 A \code{data.table} or SpatVector with downscaled climate variables. If \code{gcms} is NULL,
