@@ -79,8 +79,15 @@ test_that("testing that the custom bilinear function works", {
   
   ### Compare the results of the function with ST_Value for each band ----
   # Query to get results from both the custom function and ST_Value
-  bands <- c(1:3,8:10)
-  results_1 <- extract_db(dbCon, "tmp_xyz", "test_rasters", bands)
+  bands <- c(3:1,10:8)
+  results_1 <- extract_db(
+    dbCon,
+    "test_rasters",
+    data.table::data.table(
+      var_nm = as.character(bands),
+      laynum = bands
+    )
+  )
   
   results_2 <- DBI::dbGetQuery(dbCon, "
     SELECT 
