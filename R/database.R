@@ -6,37 +6,49 @@
 #' @importFrom RPostgres Postgres
 #'
 #' @export
-data_connect <- function() {
-  pool <- tryCatch(
-    {
-      dbPool(
-        drv = Postgres(),
-        dbname = "climr",
-        host = "146.190.244.244",
-        port = 5432,
-        user = "climr_client",
-        password = "PowerOfBEC2023"
-      )
-    },
-    error = function(e) {
-      tryCatch(
-        {
-          dbPool(
-            drv = Postgres(),
-            dbname = "climr",
-            host = "146.190.244.244",
-            port = 5432,
-            user = "climr_client",
-            password = "PowerOfBEC2023"
-          )
-        },
-        error = function(f) {
-          warning("Could not connect to database. Will try using cached data.")
-          NULL
-        }
-      )
-    }
-  )
+data_connect <- function(local = FALSE) {
+  if(local){
+    pool <- dbPool(
+      drv = Postgres(),
+      dbname = "climr",
+      host = "localhost",
+      port = 5432,
+      user = "postgres",
+      password = "climrserver"
+    )
+  }else{
+    pool <- tryCatch(
+      {
+        dbPool(
+          drv = Postgres(),
+          dbname = "climr",
+          host = "146.190.244.244",
+          port = 5432,
+          user = "climr_client",
+          password = "PowerOfBEC2023"
+        )
+      },
+      error = function(e) {
+        tryCatch(
+          {
+            dbPool(
+              drv = Postgres(),
+              dbname = "climr",
+              host = "146.190.244.244",
+              port = 5432,
+              user = "climr_client",
+              password = "PowerOfBEC2023"
+            )
+          },
+          error = function(f) {
+            warning("Could not connect to database. Will try using cached data.")
+            NULL
+          }
+        )
+      }
+    )
+  }
+  
   return(pool)
 }
 

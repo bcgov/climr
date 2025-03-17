@@ -114,7 +114,7 @@ ds_out <- downscale(
 )
 
 ## populate the raster grid with the downscaled climate values
-my_clim <- rast(dem_vancouver) # use the DEM as a template raster
+my_clim <- dem_vancouver # use the DEM as a template raster
 my_clim[ds_out[PERIOD == "2001_2020", id]] <- ds_out[PERIOD == "2001_2020", MAT] # populate the raster cells with the 2001-2020 mean annual temperature (MAT) values, using the `id` field as the link. 
 
 plot(my_clim, main = "2001-2020 mean annual temperature (MAT)")

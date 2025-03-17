@@ -38,7 +38,7 @@ list_gcm_periods <- function() {
 
 
 #' @description
-#' lists available runs for a given GCM/ssp.
+#' `list_runs_ssp` lists available runs for a given GCM/ssp.
 #' @param gcm Name of GCM. Must be one of the elements in list_gcms().
 #' @param ssp Name of scenario Must be one of the elements in list_ssps().
 #' @importFrom data.table fread
@@ -53,7 +53,7 @@ list_runs_ssp <- function(gcm, ssp){
 }
 
 #' @description
-#' lists available runs from the historical simulation (1851-2014) for a specified GCM.
+#' `list_runs_historic` lists available runs from the historical simulation (1851-2014) for a specified GCM.
 #' @param gcm Name of GCM
 #' @importFrom data.table fread
 #' @importFrom tools R_user_dir

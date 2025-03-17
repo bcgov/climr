@@ -122,6 +122,67 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
   return(rout)
 }
 
+#' Download individual raster tiles from PostGIS
+#' @template conn
+#' @param name character. Table name in database.
+#' @param pnts data.table of point locations with columns `lon` and `lat`
+#' @template bands
+
+#' @return A `SpatRaster`
+#'
+#' @import data.table
+#' @importFrom terra rast merge sprc
+#' @importFrom RPostgres dbGetQuery
+#' @importFrom DBI dbGetQuery
+#' @export
+dbGetTiles <- function(conn, name, pnts, bands = 1:73){
+  
+  pnts[,mls := paste0("(",lon," ",lat,")")]
+  wkt_str <- paste0("MULTIPOINT(", paste(pnts$mls, collapse = ", "),")")
+  qry <- paste0("select rid as id,
+            st_xmax(st_envelope(rast)) as xmx,
+            st_xmin(st_envelope(rast)) as xmn,
+            st_ymax(st_envelope(rast)) as ymx,
+            st_ymin(st_envelope(rast)) as ymn,
+            st_width(rast) as cols,
+            st_height(rast) as rows
+            from
+            \"", name,"\" 
+            WHERE ST_Intersects(
+              rast,ST_SetSRID(
+                ST_GeomFromText('",wkt_str,"'),
+                4326
+              )
+            )
+            ")
+  
+  info <- dbGetQuery(conn,qry)
+  
+  bandqs1 <- paste0("UNNEST(ST_Dumpvalues(rast, ", bands, ")) as vals_", bands)
+  
+  qry2 <- paste0("select rid, ", 
+                 paste(bandqs1, collapse = ", "),
+                 " from \"", name,
+                 "\" where rid IN (",paste(info$id, collapse = ", "),")")
+  r_values <- dbGetQuery(conn,qry2)
+  
+  rast_vals <- suppressWarnings(melt(r_values, id.vars = c("rid")))
+  out_list <- list()
+  for(tile in unique(info$id)){
+    info_tl <- info[info$id == tile,]
+    rout <- rast(
+      nrows = info_tl$rows, ncols = info_tl$cols, xmin = info_tl$xmn,
+      xmax = info_tl$xmx, ymin = info_tl$ymn, ymax = info_tl$ymx, nlyrs = length(bands),
+      crs = paste0("EPSG:", 4326), vals = rast_vals$value[rast_vals$rid == tile]
+    )
+    out_list[[as.character(tile)]] <- rout
+  }
+  
+  rsrc <- sprc(out_list)
+  rast_res <- merge(rsrc)
+  return(rast_res)
+}
+
 # library(foreach)
 # dbExtractNormal <- function(dbCon, points, bands = 1:73) {
 #

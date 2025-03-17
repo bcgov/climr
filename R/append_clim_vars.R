@@ -717,5 +717,5 @@ append_clim_vars <- function(dt, vars) {
   }
 
   # Reorder to match vars
-  setcolorder(dt, c(names(dt)[names(dt) %in% c("id", "DATASET", "GCM", "SSP", "RUN", "PERIOD")], vars))
+  setcolorder(dt, c(names(dt)[names(dt) %in% c("id", "DATASET", "GCM", "SSP", "RUN", "PERIOD")], unique(vars)))
 }

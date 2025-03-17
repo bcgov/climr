@@ -32,28 +32,26 @@
 #'   Other options are one of [`list_refmaps()`], which will provide a consistent
 #'   reference map for all points.
 #' @param obs_periods character. Which historical period for observational climate
-#'   data, averaged over this period. Options are [`list_obs_periods()`]. Default `NULL`
+#'   data, averaged over this period. Options are [`list_obs_periods()`].
 #' @param obs_years integer. Vector of years to obtain individual years or time
-#'   series of observational climate data. Default `NULL`. See [`list_obs_years()`]
-#'  for available years.
+#'   series of observational climate data. See [`list_obs_years()`] for available years.
 #' @param obs_ts_dataset character. The dataset to use for observational time series data. Options
 #'   are `"climatena"` for the ClimateNA gridded time series or `"cru.gpcc"` for the combined Climatic
 #'   Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset
-#'   (for precipitation). Defaults to `NULL`.
-#' @param gcms character. Vector of global climate model names. Options
-#'   are [`list_gcms()`]. Defaults to `NULL`.
+#'   (for precipitation). 
+#' @param gcms character. Vector of global climate model names. Options are [`list_gcms()`]. 
 #' @template ssps
 #' @param gcm_periods character. 20-year reference periods for GCM simulations.
-#'   Options are [`list_gcm_periods()`]. Defaults to `NULL`.
+#'   Options are [`list_gcm_periods()`]. 
 #' @param gcm_ssp_years character. Timeseries years for GCM simulations of future
 #'   scenarios specified by `ssps`. See [`list_gcm_ssp_years()`] for available years.
-#'   Defaults to `NULL`.
 #' @param gcm_hist_years character.  Timeseries years for GCM simulations of the
 #'   historical scenario. See [`list_gcm_hist_years()`] for available years.
-#'   Defaults to `NULL`.
 #' @template max_run
 #' @template run_nm
 #' @param cache logical. Cache data locally? Default `TRUE`
+#' @param local logical. Is the postgres database local? Default `FALSE`
+#' @param indiv_tiles logical. Only download necessary tiles instead of full bounding box? This will generally be faster, but doesn't cache.
 #' @param ... other arguments passed to [`downscale_core()`]. Namely: `return_refperiod`,
 #'   `vars`, `out_spatial` and `plot`
 
@@ -114,7 +112,10 @@ downscale <- function(xyz, which_refmap = "auto",
                       gcm_periods = NULL, gcm_ssp_years = NULL,
                       gcm_hist_years = NULL, max_run = 0L,
                       run_nm = NULL,
-                      cache = TRUE, ...) {
+                      cache = TRUE,
+                      local = FALSE,
+                      indiv_tiles = FALSE,
+                      ...) {
   message("Welcome to climr!")
 
   ## checks
@@ -127,7 +128,7 @@ downscale <- function(xyz, which_refmap = "auto",
   expectedCols <- c("lon", "lat", "elev", "id")
   xyz <- .checkXYZ(copy(xyz), expectedCols)
 
-  dbCon <- data_connect()
+  dbCon <- data_connect(local = local)
   thebb <- get_bb(xyz) ## get bounding box based on input points
 
   rmCols <- setdiff(names(xyz), expectedCols)
@@ -153,12 +154,9 @@ downscale <- function(xyz, which_refmap = "auto",
 
   xyz[, id_orig := NULL]
 
-  ## input needs to be a data.frame, not data.table. This is something we could change in the future
-  # xyz <- as.data.frame(xyz)
-
   message("Getting normals...")
   if(which_refmap %in% c("refmap_climatena","refmap_prism","refmap_climr")){
-    reference <- input_refmap(dbCon = dbCon, reference = which_refmap, bbox = thebb, cache = cache)
+    reference <- input_refmap(dbCon = dbCon, reference = which_refmap, bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
   } else {
     # message("Normals not specified, using highest resolution available for each point")
     rastFile <- system.file("extdata", "wna_outline.tif", package = "climr")
@@ -174,9 +172,9 @@ downscale <- function(xyz, which_refmap = "auto",
       xyz <- xyz[!is.na(pnts$PPT_01), ]
       thebb_bc <- get_bb(xyz)
       message("for BC...")
-      reference <- input_refmap(dbCon = dbCon, reference = "refmap_prism", bbox = thebb_bc, cache = cache)
+      reference <- input_refmap(dbCon = dbCon, reference = "refmap_prism", bbox = thebb_bc, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
     } else {
-      reference <- input_refmap(dbCon = dbCon, reference = "refmap_climatena", bbox = thebb, cache = cache)
+      reference <- input_refmap(dbCon = dbCon, reference = "refmap_climatena", bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
     }
   }
 
@@ -258,7 +256,7 @@ downscale <- function(xyz, which_refmap = "auto",
     na_xyz <- xyz_save[!xyz_save[, 4] %in% bc_ids, ]
     thebb <- get_bb(na_xyz)
     message("Now North America...")
-    reference <- input_refmap(dbCon = dbCon, reference = "refmap_climatena", bbox = thebb, cache = cache)
+    reference <- input_refmap(dbCon = dbCon, reference = "refmap_climatena", bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
 
     results_na <- downscale_core(
       xyz = na_xyz,

@@ -27,12 +27,49 @@ d <- rast(files)
 #               "Tmax08", "Tmax09", "Tmax10", "Tmax11", "Tmax12", "Tmin01", "Tmin02", "Tmin03", "Tmin04",
 #               "Tmin05", "Tmin06", "Tmin07", "Tmin08", "Tmin09", "Tmin10", "Tmin11", "Tmin12")
 
+
+library(terra)
+library(data.table)
 dem <- rast("../climatena/InputFiles/na4000.asc")
+temp <- as.data.frame(dem, xy = TRUE, cells = TRUE, na.rm = TRUE)
+colnames(temp) <- c("ID1","Long","Lat","El")
+setDT(temp)
+temp[,ID2 := ID1]
+setcolorder(temp,  c("ID1","ID2","Lat","Long","El"))
+setnames(temp, c("ID1","ID2","lat","long","el"))
+fwrite(temp, "climNA_4km_grid.csv")
+
+dat <- fread("climNA_4km_grid_Normal_1961_1990MP.csv")
+dat <- dat[Tmax07 > -100,]
+plot(dem)
+values(dem) <- NA
+dem[dat$ID1] <- dat$Tmax07
+plot(dem)
+
+###create layers
+vars <- colnames(dat)[-c(1:5)]
+vars <- vars[!grepl("Rad|Tave",vars)]
+vars <- c("PPT01", "PPT02", "PPT03", 
+          "PPT04", "PPT05", "PPT06", "PPT07", "PPT08", "PPT09", "PPT10", 
+          "PPT11", "PPT12","Tmax01", "Tmax02", "Tmax03", "Tmax04", "Tmax05", "Tmax06", 
+          "Tmax07", "Tmax08", "Tmax09", "Tmax10", "Tmax11", "Tmax12", "Tmin01", 
+          "Tmin02", "Tmin03", "Tmin04", "Tmin05", "Tmin06", "Tmin07", "Tmin08", 
+          "Tmin09", "Tmin10", "Tmin11", "Tmin12")
 #r <- r[[grep("PPT|Tmin|Tmax", names(r))]]
+r_temp <- copy(dem)
+for(var in vars){
+  cat(".")
+  values(r_temp) <- NA
+  r_temp[dat$ID1] <- dat[,get(var)]
+  names(r_temp) <- var
+  add(dem) <- r_temp
+}
+dem <- dem[[-1]]
+d <- rast("../climatena/InputFiles/na4000.asc")
 
 lr <- lapse_rate(
-  reference = d,
-  dem = dem,
+  reference = dem,
+  dem = d,
   NA_replace = TRUE,
   nthread = 4,
   rasterize = TRUE
@@ -41,8 +78,8 @@ names(lr) <- paste0("lr_",names(lr))
 
 # Actual writing
 terra::writeRaster(
-  c(d, lr, dem),
-  file.path("../Common_Files/climatena_wlrdem.tif"),
+  c(dem, lr, d),
+  file.path("../Common_Files/climatena4km_wlrdem.tif"),
   overwrite = TRUE,
   gdal="COMPRESS=NONE"
 )
@@ -68,7 +105,7 @@ plot(curr_per[[35]])
 scp_upload(session, paste0("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climr/inputs_pkg/historic/Historic_2001_2020/2001_2020.tif"), to = "/share")
 pgisfn <- paste0("raster2pgsql -s 4326 -I -C -M 2001_2020.tif -t 6x6 historic_periods > 2001_2020.sql")
 
-"GTIFF_DIRECT_IO=YES raster2pgsql -s 4326 -I -M composite_wna_wlrdem.tif -t 50x50 normal_composite > normal_composite.sql &"
+"GTIFF_DIRECT_IO=YES raster2pgsql -s 4326 -I -M climr_mosiac_wlrdem_compressed.tif -t 50x50 refmap_climr > climr_mosaic.sql &"
 
 
 metadt <- data.table(period = "2001_2020",fullnm = names(curr_per))

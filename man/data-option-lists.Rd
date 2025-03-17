@@ -55,9 +55,9 @@ a character vector.
 
 \code{list_gcm_periods} lists available 20-year normal periods for GCM simulations.
 
-lists available runs for a given GCM/ssp.
+\code{list_runs_ssp} lists available runs for a given GCM/ssp.
 
-lists available runs from the historical simulation (1851-2014) for a specified GCM.
+\code{list_runs_historic} lists available runs from the historical simulation (1851-2014) for a specified GCM.
 
 \code{list_refmaps} lists available reference maps of gridded climate normals
 

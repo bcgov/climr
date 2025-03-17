@@ -4,7 +4,14 @@
 \alias{input_refmap}
 \title{Retrieve reference period climate maps}
 \usage{
-input_refmap(dbCon, bbox, reference = "refmap_climatena", cache = TRUE)
+input_refmap(
+  dbCon,
+  bbox,
+  reference = "refmap_climatena",
+  cache = TRUE,
+  indiv_tiles = FALSE,
+  xyz = NULL
+)
 }
 \arguments{
 \item{dbCon}{A db connection object created by \code{data_connect}.}
