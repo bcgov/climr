@@ -181,7 +181,7 @@ extract_db <- function(
 ) {
   colorder <- c("ID", layers[["var_nm"]])
   layers <- layers[order(laynum)]
-  if (!is.null(VAR)) {
+  if (!is.null(VAR) && length(VAR)) {
     rastertbl <- vapply(
       tolower(VAR),
       FUN = gsub,
@@ -190,7 +190,7 @@ extract_db <- function(
       x = rastertbl
     )
     for (v in VAR[-1]) {
-      colorder <- c(colorder, gsub(head(VAR, 1), v, layers[["var_nm"]]))
+      colorder <- c(colorder, gsub(VAR[1], v, layers[["var_nm"]], fixed = TRUE))
     }
   }
   bands <- {
@@ -299,8 +299,8 @@ extract_db <- function(
       var_nm = as.character(uniqb),
       laynum = uniqb
     )
-    if (!is.null(VAR)) {
-      layers[["var_nm"]] <- paste(head(VAR, 1L), layers[["var_nm"]], sep = "_")
+    if (!is.null(VAR) && length(VAR)) {
+      layers[["var_nm"]] <- paste(VAR[1], layers[["var_nm"]], sep = "_")
     }
   }
   if (length(misband <- setdiff(layers[["laynum"]], uniqb))) {
@@ -314,13 +314,16 @@ extract_db <- function(
     j = "band",
     value = layers[["var_nm"]][match(res[["nband"]], layers[["laynum"]])]
   )
-  if (!is.null(VAR)) {
+  if (!is.null(VAR) && length(VAR)) {
     res[, band := stringi::stri_replace_all_fixed(
       str = band,
-      pattern = head(VAR,1),
+      pattern = VAR[1],
       replacement = var,
       vectorize_all = TRUE
     )]
+  }
+  if (any(duplicated(res[,list(ID, band)]))) {
+    warning("Overlapping raster in table. [%s]" |> sprintf(rastertbl))
   }
   res <- data.table::dcast(res, ID ~ band, value.var = "value")
   data.table::setcolorder(res, colorder)

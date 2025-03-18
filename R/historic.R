@@ -212,7 +212,7 @@ input_obs_ts_db <- function(dbCon, dataset = c("cru.gpcc", "climatena"), years =
       data.table::setDT()
     layerinfo[, var_nm := paste(d, var_nm, period, sep = "_")] 
     list(
-      tbl = d,
+      tbl = dbnames_hist_obs[["dbname"]][m],
       layers = layerinfo[, list(var_nm, laynum)]
     )
   })

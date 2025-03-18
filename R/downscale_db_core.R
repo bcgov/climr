@@ -267,9 +267,9 @@ process_one_climate_db <- function(
   
   # Store names for later use
   nm <- r[["layers"]][["var_nm"]]
-  if (!is.null(r[["VAR"]])) {
+  if (!is.null(r[["VAR"]]) && length(r[["VAR"]])) {
     for (v in r[["VAR"]][-1]) {
-      nm <- c(nm, gsub(head(VAR, 1), v, r[["layers"]][["var_nm"]]))
+      nm <- c(nm, gsub(r[["VAR"]][1], v, r[["layers"]][["var_nm"]], fixed = TRUE))
     }
   }
 
