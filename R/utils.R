@@ -81,12 +81,13 @@ tif_folder_gen <- function(dir, overwrite = FALSE) {
   }
   for (nm in names(.calc_def)) {
     tnm <- "%s.tif" |> sprintf(nm)
-    f <- file.path(dir, tnm)
-    if (file.exists(f) && !overwrite) next
+    fnm <- file.path(dir, tnm)
+    if (file.exists(fnm) && !overwrite) next
+    unlink(fnm)
     r <- .calc_def[[nm]](v)
     names(r) <- nm
-    terra::writeRaster(r, f, gdal=c("PREDICTOR=2"), datatype="FLT4S", overwrite = TRUE)
-    tif <- c(tif, setNames(f, tnm))
+    terra::writeRaster(x = r, filename = fnm, gdal=c("PREDICTOR=2"), datatype="FLT4S", overwrite = TRUE)
+    tif <- c(tif, setNames(fnm, tnm))
   }
 }
 
