@@ -317,10 +317,6 @@ input_gcm_ssp_db <- function(
   if (nrow(dbnames_ts) < 1) stop("That isn't a valid GCM")
  
   runs <- .globals[["gcm_ts_runs"]]
-  vars <- c("PPT", "Tmin", "Tmax")
-  gcmsv <- expand.grid(gcm_nm = gcms, var = vars) |>
-    apply(1, list) |>
-    unlist(recursive = FALSE)
   
   q <-  "
   select fullnm as var_nm, laynum, run, mod
@@ -335,11 +331,10 @@ input_gcm_ssp_db <- function(
     )
   layerinfo <- DBI::dbGetQuery(dbCon, q) |> data.table::setDT()
 
-  res <- lapply(gcmsv, function(x) {
-    if (!x[["gcm_nm"]] %in% dbnames_ts[["GCM"]]) return()
-    gcmcode <- dbnames_ts[GCM == x[["gcm_nm"]], dbname] |>
-      gsub("VAR", tolower(x[["var"]]), x = _)
-    runs <- sort(unique(runs[mod == x[["gcm_nm"]] & scenario %in% ssps, run]))
+  res <- lapply(gcms, function(gcm_nm) {
+    if (!gcm_nm %in% dbnames_ts[["GCM"]]) return()
+    gcmcode <- dbnames_ts[GCM == gcm_nm, dbname]
+    runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssps, run]))
     if (length(runs) < 1) {
       warning("That GCM isn't in our database yet.")
       return()
@@ -356,7 +351,8 @@ input_gcm_ssp_db <- function(
   
     list(
       tbl = gcmcode,
-      layers = layerinfo[mod %in% x[["gcm_nm"]] & run %in% sel_runs, list(var_nm = gsub("PPT", x[["var"]], var_nm), laynum)]
+      layers = layerinfo[mod %in% gcm_nm & run %in% sel_runs, list(var_nm, laynum)],
+      VAR = c("PPT", "Tmin", "Tmax")
     )
   })
     

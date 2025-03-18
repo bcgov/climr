@@ -267,9 +267,15 @@ process_one_climate_db <- function(
   
   # Store names for later use
   nm <- r[["layers"]][["var_nm"]]
+  if (!is.null(r[["VAR"]])) {
+    for (v in r[["VAR"]][-1]) {
+      nm <- c(nm, gsub(head(VAR, 1), v, r[["layers"]][["var_nm"]]))
+    }
+  }
 
   # Run in database
-  climaterast <- extract_db(dbCon, r[["tbl"]], r[["layers"]])
+  cat("Processing... %s\n"|> sprintf(r[["tbl"]]))
+  climaterast <- extract_db(dbCon, r[["tbl"]], r[["layers"]], r[["VAR"]])
 
   labels <- vapply(
     strsplit(nm, "_"),
@@ -290,9 +296,7 @@ process_one_climate_db <- function(
   ppt_ <- grep("PPT", labels)
   # Labels does not have ID column, position in climaterast will be offset by 1
   ppt_offset <- ppt_ + 1L
-  if (length(ppt_offet)) {
-    climaterast[, ppt_offset] <- climaterast[, ppt_offset] * res[, match(labels[ppt_], names(res))] ## PPT
-  }
+  climaterast[, ppt_offset] <- climaterast[, ppt_offset] * res[, match(labels[ppt_], names(res))] ## PPT
   climaterast[, -c(1L, ppt_offset)] <- climaterast[, -c(1L, ppt_offset)] + res[, match(labels[-ppt_], names(res))] ## Temperatures
   res <- as.data.table(res)
   climaterast <- as.data.table(climaterast)
