@@ -4,20 +4,24 @@
 \alias{extract_db}
 \title{Bilinear interpolation point extraction from raster bands}
 \usage{
-extract_db(dbCon, xyz, rastertbl, bands = NULL, nm = NULL, explain = FALSE)
+extract_db(
+  dbCon,
+  rastertbl,
+  layers = data.table::data.table(var_nm = character(), laynum = integer()),
+  VAR = NULL
+)
 }
 \arguments{
 \item{dbCon}{A postgres database connection.}
 
-\item{xyz}{The name of the temporary point table in the database.}
-
 \item{rastertbl}{The name of the raster table to extract from.}
 
-\item{bands}{The index number of the bands to extract.}
+\item{layers}{A data.table with column \code{var_nm} (names of the bands) and}
 
-\item{nm}{The names of the bands. Same length as bands.}
-
-\item{explain}{Get the query execution profile for performance analysis.}
+\item{VAR}{In case of rasters split across different tables. One VAR in each.
+The first VAR will be used for replacement in labels names. Assuming all
+tables have the same structure, only different VAR in them.
+\code{laynum} (index number of the bands to extract).}
 }
 \value{
 A data.frame one row per point id in xyz with an ID
