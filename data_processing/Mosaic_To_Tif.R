@@ -1,3 +1,5 @@
+# Need ram
+
 library(terra)
 
 # Local
@@ -17,16 +19,16 @@ mask <- terra::rast(tif_mask)
 for (nm in grep("^Tmin|^Tmax|^PPT", names(r), value = TRUE)) {
   r[[nm]] |>
     terra::mask(mask) |>
-    terra::writeRaster(file.path(dir_out, paste0(nm, ".tif")), gdal = "PREDICTOR=2", overwrite = TRUE)
+    terra::writeRaster(filename = file.path(dir_out, paste0(nm, ".tif")), gdal = "PREDICTOR=2", overwrite = TRUE)
 }
 
 nm <- grep("elev", names(r), value = TRUE)
 r[[nm]] |>
   terra::mask(mask) |>
-  terra::writeRaster(, file.path(dir_out, "elev.tif"), gdal = "PREDICTOR=2", overwrite = TRUE)
+  terra::writeRaster(filename = file.path(dir_out, "elev.tif"), gdal = "PREDICTOR=2", overwrite = TRUE)
 
 climr::get_latitude_raster(r[[1]]) |> 
   terra::mask(mask) |>
-  terra::writeRaster(out = file.path(dir_out, "lat.tif"), gdal = "PREDICTOR=2", overwrite = TRUE)
+  terra::writeRaster(filename = file.path(dir_out, "lat.tif"), gdal = "PREDICTOR=2", overwrite = TRUE)
 
 climr::tif_folder_gen(dir_out, overwrite = TRUE)
