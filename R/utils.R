@@ -165,18 +165,42 @@ get_elev_raster <- function(r, elev, out = NULL, ...) {
 #' @param dbCon A postgres database connection.
 #' @param rastertbl The name of the raster table to extract from.
 #' @param layers A data.table with column `var_nm` (names of the bands) and
+#' @param VAR In case of rasters split across different tables. One VAR in each.
+#' The first VAR will be used for replacement in labels names. Assuming all
+#' tables have the same structure, only different VAR in them.
 #' `laynum` (index number of the bands to extract).
 #' @return A data.frame one row per point id in xyz with an ID
 #' column + one columns for each `bands` in `rastertbl` name `nm`.
+#' @importFrom stringi stri_replace_all_fixed
 #' @export
 extract_db <- function(
   dbCon,
   rastertbl,
-  layers = data.table::data.table(var_nm = character(), laynum = integer())
+  layers = data.table::data.table(var_nm = character(), laynum = integer()),
+  VAR = NULL
 ) {
   colorder <- c("ID", layers[["var_nm"]])
   layers <- layers[order(laynum)]
-  q <- "
+  if (!is.null(VAR)) {
+    rastertbl <- vapply(
+      tolower(VAR),
+      FUN = gsub,
+      FUN.VALUE = character(1),
+      pattern = "VAR",
+      x = rastertbl
+    )
+    for (v in VAR[-1]) {
+      colorder <- c(colorder, gsub(head(VAR, 1), v, layers[["var_nm"]]))
+    }
+  }
+  bands <- {
+    if (!length(layers[["laynum"]])) {
+      "NULL::integer[]"
+    } else {
+      layers[["laynum"]] |> paste0(collapse = ",") |> sprintf(fmt ="ARRAY[%s]")
+    }
+  }
+  q <- paste0("
     WITH tmp_metadata AS (
       SELECT m3.id,
              m3.rid,
@@ -221,7 +245,8 @@ extract_db <- function(
              (ycell + 1)        AS cy
              
       FROM tmp_metadata
-    )
+    )" |> sprintf(rastertbl[1])
+    , if (is.null(VAR)) {"
     SELECT m0.id::float AS \"ID\",
            v.nband,
            CASE WHEN v.valarray[cy][cx] IS NULL THEN NULL ELSE
@@ -238,15 +263,33 @@ extract_db <- function(
       FROM \"%s\" AS r0
       WHERE r0.rid IN (SELECT DISTINCT rid FROM tmp_interpolation)
     ) AS v
-    ON v.rid = m0.rid;
-    ;" |>
-    sprintf(
-      rastertbl,
-      if (!length(layers[["laynum"]])) "NULL::integer[]" else {
-        layers[["laynum"]] |> paste0(collapse = ",") |> sprintf(fmt ="ARRAY[%s]")
-      },
-      rastertbl
-    )
+    ON v.rid = m0.rid" |> sprintf(bands, rastertbl[1])
+    } else { 
+      paste0(collapse = "\n UNION ALL",
+      "
+    SELECT m0.id::float AS \"ID\",
+           v.nband,
+           '%s' AS var,
+           CASE WHEN v.valarray[cy][cx] IS NULL THEN NULL ELSE
+           (
+             coalesce(v.valarray[y1][x1], v.valarray[cy][cx]) * m0.w1 +
+             coalesce(v.valarray[y1][x2], v.valarray[cy][cx]) * m0.w2 +
+             coalesce(v.valarray[y2][x1], v.valarray[cy][cx]) * m0.w3 +
+             coalesce(v.valarray[y2][x2], v.valarray[cy][cx]) * m0.w4
+           ) END AS value
+    FROM tmp_interpolation AS m0
+    JOIN (
+      SELECT r0.rid,
+             (ST_DumpValues(r0.rast, %s, true)).*
+      FROM \"%s\" AS r0
+      WHERE r0.rid IN (SELECT DISTINCT rid FROM tmp_interpolation)
+    ) AS v
+    ON v.rid = m0.rid" |> sprintf(VAR, bands, rastertbl)
+      )
+    },
+    ";"
+  )
+
   res <- DBI::dbGetQuery(dbCon, q) |> 
     data.table::setDT()
 
@@ -256,11 +299,14 @@ extract_db <- function(
       var_nm = as.character(uniqb),
       laynum = uniqb
     )
+    if (!is.null(VAR)) {
+      layers[["var_nm"]] <- paste(head(VAR, 1L), layers[["var_nm"]], sep = "_")
+    }
   }
   if (length(misband <- setdiff(layers[["laynum"]], uniqb))) {
     stop(
       "Not all requested bands were in table `%s`. [Bands: %s]" |>
-        sprintf(rastertbl, paste0(misband, collapse = ","))
+        sprintf(rastertbl[1], paste0(misband, collapse = ","))
     )
   }
   data.table::set(
@@ -268,6 +314,14 @@ extract_db <- function(
     j = "band",
     value = layers[["var_nm"]][match(res[["nband"]], layers[["laynum"]])]
   )
+  if (!is.null(VAR)) {
+    res[, band := stringi::stri_replace_all_fixed(
+      str = band,
+      pattern = head(VAR,1),
+      replacement = var,
+      vectorize_all = TRUE
+    )]
+  }
   res <- data.table::dcast(res, ID ~ band, value.var = "value")
   data.table::setcolorder(res, colorder)
   return(res |> as.data.frame())
