@@ -43,7 +43,8 @@ Imports:
     uuid,
     dplyr,
     abind,
-    dbplyr
+    dbplyr,
+    stringi
 Suggests: 
     ggplot2,
     knitr,
