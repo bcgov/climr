@@ -293,7 +293,6 @@ downscale_db <- function(
   gcm_hist_years = NULL,
   max_run = 0L,
   run_nm = NULL,
-  local = FALSE,
   ...
 ) {
   ## checks
