@@ -20,8 +20,13 @@ http://www.cec.org/files/atlas_layers/0_reference/0_03_elevation/elevation_tif.z
 Create an elevation raster from a template raster
 }
 \examples{
-r <- terra::rast(nrows=108, ncols=21, xmin=0, xmax=10)
+r <- terra::rast(
+  nrows=108, ncols=21,
+  xmin=5.75, xmax=6.5,
+  ymin = 49.5, ymax = 50,
+  crs = "EPSG:4326"
+)
 elev <- system.file("ex/elev.tif", package="terra") |> terra::rast()
-get_elev_raster(r, elev, out = "elev.tif", gdal = "PREDICTOR=2", datatype="FLT4S", overwrite = TRUE)
-
+get_elev_raster(r, elev)
 }
+\keyword{internal}

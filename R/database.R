@@ -1,7 +1,7 @@
 #' Connect to PostGIS database
 #'
 #' @return pool object of database connection
-#'
+#' @param local A logical. Use a local database. Default `FALSE`.
 #' @importFrom pool dbPool
 #' @importFrom RPostgres Postgres
 #'
@@ -55,6 +55,7 @@ data_connect <- function(local = FALSE) {
 #' List connections in cache
 #' @param profile Either `climr-db-user` or `local`.
 #' @rdname data_con
+#' @importFrom utils modifyList
 #' @export
 data_con <- function(profile = c("climr-db-user", "local")) {
   profile <- match.arg(profile)
@@ -65,7 +66,7 @@ data_con <- function(profile = c("climr-db-user", "local")) {
       dbname = "climr",
       port = 5432
     )
-    args <- modifyList(default_args, connection_creds(profile))
+    args <- utils::modifyList(default_args, connection_creds(profile))
     con <- do.call(RPostgres::dbConnect, args)
   }
   .globals[["sesscon"]]$set(profile, con)

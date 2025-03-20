@@ -134,6 +134,7 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
 #' @importFrom terra rast merge sprc
 #' @importFrom RPostgres dbGetQuery
 #' @importFrom DBI dbGetQuery
+#' @keywords internal
 #' @export
 dbGetTiles <- function(conn, name, pnts, bands = 1:73){
   

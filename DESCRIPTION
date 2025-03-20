@@ -1,7 +1,7 @@
 Package: climr
 Title: An R package of downscaled monthly climate data for North America
-Version: 0.1.1.0002
-Date: 12-09-2024
+Version: 0.1.1.9000
+Date: 19-03-2025
 Authors@R: c(
     person("Kiri", "Daust", , "kiri.daust@gov.bc.ca", role = c("aut", "cre")),
     person("Colin", "Mahony", , "Colin.Mahony@gov.bc.ca", role = "aut",
@@ -57,6 +57,7 @@ Suggests:
     withr
 VignetteBuilder: 
     knitr
+URL: https://bcgov.github.io/climr
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true

@@ -17,5 +17,6 @@ get_latitude_raster(r, out = NULL, ...)
 Create a latitude raster
 }
 \examples{
-get_latitude_raster("Tmin_01.tif", out = "alt.tif", gdal = "PREDICTOR=2", datatype="FLT4S", overwrite = TRUE)
+get_latitude_raster(system.file("ex/elev.tif", package="terra") |> terra::rast())
 }
+\keyword{internal}

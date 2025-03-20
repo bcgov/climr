@@ -26,6 +26,11 @@ Can be obtained from \code{\link[=list_refmaps]{list_refmaps()}}. For \code{Spat
 names PPT01:PPT12, Tmax01:Tmax12 and Tmin01:Tmin12. Defaults to \code{list_refmaps()[1]}.}
 
 \item{cache}{logical. Specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
+
+\item{indiv_tiles}{logical. Only download necessary tiles instead of full bounding box?}
+
+\item{xyz}{a \code{data.frame} with the following columns "long", "lat", "elev",
+and a unique "id". Any extra columns will be ignored and not output.}
 }
 \value{
 A \code{SpatRaster} containing reference period climatologies, lapse rates

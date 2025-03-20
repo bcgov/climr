@@ -57,6 +57,12 @@ reference:
   - input_gcm_hist
   - input_obs
   - input_obs_ts
+  - input_refmap_db
+  - input_gcms_db
+  - input_gcm_ssp_db
+  - input_gcm_hist_db
+  - input_obs_db
+  - input_obs_ts_db
 - title: "Database and caching"
   desc: > 
     Functions for interacting with the PostGIS server
@@ -65,6 +71,7 @@ reference:
   - cache_clear
   - cache_path
   - data_connect
+  - data_con
   - pgGetTerra
 - title: "Utilities"
   desc: >
@@ -73,8 +80,12 @@ reference:
   - plot_bivariate
   - plot_timeSeries  
   - plot_timeSeries_input
+  - plot_bivariate_db
+  - plot_timeSeries_input_db
+  - plot_ensemble
   - get_bb
   - lapse_rate
+  - legend_ramp
 - title: "Data"
   desc: >
     Available climate variables and functions listing available data.
@@ -87,7 +98,8 @@ reference:
   - list_gcms
   - list_gcm_periods
   - list_ssps
-  - list_run 
+  - list_runs_ssp
+  - list_runs_historic
   - list_vars
   - xyzDT
   - BECz_vancouver

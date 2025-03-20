@@ -30,3 +30,4 @@ column + one columns for each \code{bands} in \code{rastertbl} name \code{nm}.
 \description{
 Bilinear interpolation point extraction from raster bands
 }
+\keyword{internal}

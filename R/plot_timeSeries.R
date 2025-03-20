@@ -1,10 +1,13 @@
 #' Time series plots of climate change
 #'
 #' @description
-#' Time series plots of 20th and 21st century climate change for user-selected locations and climate variables.
+#' Time series plots of 20th and 21st century climate change for user-selected
+#' locations and climate variables.
+#' 
 #' The purposes of the plot are to:
 #' \enumerate{
-#'   \item view differences in interannual variability and climate change trends among global climate models (GCMs),
+#'   \item view differences in interannual variability and climate change trends among global
+#' climate models (GCMs),
 #'   \item view the differences between multiple simulations of each model,
 #'   \item compare simulated and observed climate change from 1901 to present, and
 #'   \item compare time series of two different variables.
@@ -12,17 +15,18 @@
 #' All global climate model anomalies are bias-corrected to the 1961-1990 reference period normals.
 #'
 #' @details
-#' The input table `X` provides climate data for a single location or the average of multiple locations.
-#' The purpose of conducting the generation of the input table in a separate function is to allow users
-#' to make multiple calls to [`plot_timeSeries()`] without needing to generate the inputs each time.
+#' The input table `X` provides climate data for a single location or the average of multiple
+#' locations. The purpose of conducting the generation of the input table in a separate function is
+#' to allow users to make multiple calls to [`plot_timeSeries()`] without needing to generate the
+#' inputs each time.
 #'
 #' Some combinations of `var1` and `var2` are not compatible or meaningful.
-#' Examples of meaningful combinations are winter vs summer values of the same climate var or minimum vs.
-#' maximum temperatures.
+#' Examples of meaningful combinations are winter vs summer values of the same climate var
+#' or minimum vs. maximum temperatures.
 #'
-#' Downloads of GCM time series take some time. The `plot_timeSeries_input()` function can take ~5 minutes
-#' to run for the first time it is called for a location. Once the time series are cached, they
-#' don't need to be downloaded again.
+#' Downloads of GCM time series take some time. The `plot_timeSeries_input()` function can take
+#' ~5 minutes to run for the first time it is called for a location. Once the time series are
+#' cached, they don't need to be downloaded again.
 #'
 #' @param X  A `data.table` object produced using the function [`plot_timeSeries_input()`]. This
 #' table can include more models, scenarios, and variables than are used in individual calls to
@@ -38,8 +42,8 @@
 #' the y axis is the range of all values of `var1` (and `var2` if applicable) in the
 #' input table defined by `X`.
 #' @param cex Numeric. The magnification factor for text size. Default is 1.
-#' @param mar A numerical vector of length 4, giving the margin sizes in number of lines of text: c(bottom, left,
-#' top, right). The default is c(3,3,0.1,4).
+#' @param mar A numerical vector of length 4, giving the margin sizes in number of lines of text:
+#' c(bottom, left, top, right). The default is c(3,3,0.1,4).
 #' @param showmean logical. Plot the ensemble mean time series. Multi-model ensemble means are
 #' calculated from the mean of simulations for each model.
 #' @param compile logical. Compile multiple global climate models into a multi-model ensemble.
@@ -65,7 +69,12 @@
 #' @examples
 #' if (FALSE) {
 #'   # data frame of arbitrary points
-#'   my_points <- data.frame(lon = c(-127.7300, -127.7500), lat = c(55.34114, 55.25), elev = c(711, 500), id = 1:2)
+#'   my_points <- data.frame(
+#'     lon = c(-127.7300, -127.7500),
+#'     lat = c(55.34114, 55.25),
+#'     elev = c(711, 500),
+#'     id = 1:2
+#'   )
 #'
 #'   # generate the input data
 #'   my_data <- plot_timeSeries_input(my_points)
@@ -83,7 +92,18 @@
 #'   plot_timeSeries(my_data, var1 = "Tmax_sm", var2 = "Tmax_wt", simplify = FALSE)
 #'
 #'   # compare global climate models
-#'   plot_timeSeries(my_data, gcms = list_gcms()[c(7, 13)], pal = "gcms", ssps = list_ssps()[2], showmean = FALSE, compile = FALSE, simplify = FALSE, endlabel = "gcms", mar = c(3, 3, 0.1, 6), showObserved = FALSE)
+#'   plot_timeSeries(
+#'     my_data,
+#'     gcms = list_gcms()[c(7, 13)],
+#'     pal = "gcms",
+#'     ssps = list_ssps()[2],
+#'     showmean = FALSE,
+#'     compile = FALSE,
+#'     simplify = FALSE,
+#'     endlabel = "gcms",
+#'     mar = c(3, 3, 0.1, 6),
+#'     showObserved = FALSE
+#'   )
 #'
 #'   # export plot to a temporary directory, including a title
 #'   figDir <- tempdir()
@@ -204,7 +224,7 @@ plot_timeSeries <- function(
     
     if (compile) { # this plots a single envelope for the ensemble as a whole
       temp.data <- X[GCM %in% gcms, c("PERIOD", "SSP", "RUN", var), with = FALSE]
-      plot.ensemble(temp.data,
+      plot_ensemble(temp.data,
                     var = var, var2 = var2,
                     refline = refline, showmean = showmean,
                     endlabel = endlabel, element = element,
@@ -218,7 +238,7 @@ plot_timeSeries <- function(
     } else {
       for (gcm in gcms) { # this plots of individual GCM ensembles.
         temp.data <- X[GCM == gcm, c("PERIOD", "SSP", "RUN", var), with = FALSE]
-        plot.ensemble(temp.data,
+        plot_ensemble(temp.data,
                       var = var, var2 = var2,
                       refline = refline, showmean = showmean,
                       endlabel = endlabel, element = element,
@@ -345,7 +365,7 @@ plot_timeSeries <- function(
 #'
 #' @importFrom graphics polygon
 #' @importFrom stats smooth.spline
-plot.ensemble <- function(x, var, scenarios.selected, scenarios,
+plot_ensemble <- function(x, var, scenarios.selected, scenarios,
                           showrange = TRUE, simplify = TRUE, gcm = NULL,
                           pal, pal.scenario, pal.gcms, refline = FALSE, showmean = TRUE,
                           endlabel = "change", element,
@@ -521,8 +541,8 @@ plot.ensemble <- function(x, var, scenarios.selected, scenarios,
 #' function for specifying the color
 #'
 #' @param scenario TODO
-#' @inheritParams plot.ensemble
-
+#' @inheritParams plot_ensemble
+#' @keywords internal
 colSelect <- function(scenario, gcm, pal.scenario, scenarios, pal, pal.gcms) {
   if (is.null(gcm)) {
     col <- pal.scenario[which(scenarios == scenario)]

@@ -103,9 +103,9 @@ list_vars <- function(set = c("All", "Monthly", "Seasonal", "Annual"), only_extr
   }
   set <- match.arg(set, several.ok = TRUE)
   if ("All" %in% set) {
-    res <- variables[["Code"]]
+    res <- climr::variables[["Code"]]
   } else {
-    res <- variables[["Code"]][variables[["Category"]] %in% set]
+    res <- climr::variables[["Code"]][climr::variables[["Category"]] %in% set]
   }
   if (isTRUE(only_extra)) {
     res <- res[!grepl("(^PPT|^Tmax|^Tmin)", res)]

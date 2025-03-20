@@ -23,3 +23,4 @@ and "gcms", for use when comparing GCMs.}
 \description{
 function for specifying the color
 }
+\keyword{internal}

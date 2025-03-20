@@ -23,4 +23,5 @@
 ^logo\.svg$
 ^logo_icon\.png$
 ^man-roxygen$
-^debug___.R$
+^CODE_OF_CONDUCT.md$
+^CONTRIBUTING.md$

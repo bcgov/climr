@@ -36,6 +36,7 @@ calc_DD_m_below <- function(tm, k, a, b, t0, beta, c) {
 #' }
 #' @export
 #' @rdname climatevar
+#' @keywords internal
 calc_DD_below_0 <- function(m, tm) {
   if (FALSE) {
     Month <- k <- a <- b <- T0 <- beta <- c <- NULL

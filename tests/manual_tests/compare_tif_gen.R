@@ -74,16 +74,16 @@ file.copy(file.path(dir1, f), file.path(dir2, gsub("([0-9]{2})", "_\\1", f)))
 # --- Add elevation matching raster and latitute
 
 climr::get_elev_raster(
-  r = file.path(dir1, f[1]),
-  elev = "northamerica_elevation_cec_2023.tif",
+  r = file.path(dir1, f[1]) |> terra::rast(),
+  elev = "northamerica_elevation_cec_2023.tif" |> terra::rast(),
   out = file.path(dir2, "elev.tif"),
   gdal = "PREDICTOR=2",
   datatype="FLT4S",
   overwrite = TRUE
 )
 climr::get_latitude_raster(
-  r = file.path(dir1, f[1]),
-  out = file.path(dir2, "lat.tif"),
+  r = file.path(dir1, f[1]) |> terra::rast(),
+  out = file.path(dir2, "lat.tif") |> terra::rast(),
   gdal = "PREDICTOR=2",
   datatype="FLT4S",
   overwrite = TRUE
