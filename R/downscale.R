@@ -159,10 +159,10 @@ downscale <- function(xyz, which_refmap = "auto",
     reference <- input_refmap(dbCon = dbCon, reference = which_refmap, bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
   } else {
     # message("Normals not specified, using highest resolution available for each point")
-    rastFile <- system.file("extdata", "wna_outline.tif", package = "climr")
+    rastFile <- system.file("extdata", "bc_outline.tif", package = "climr")
     ## if package is loaded with devtools::load_all, file won't be found and we need to pass .libPaths
     if (rastFile == "") {
-      rastFile <- system.file("extdata", "wna_outline.tif", package = "climr", lib.loc = .libPaths())
+      rastFile <- system.file("extdata", "bc_outline.tif", package = "climr", lib.loc = .libPaths())
     }
     bc_outline <- rast(rastFile)
     pnts <- extract(bc_outline, xyz[, .(lon, lat)], method = "simple")
@@ -316,10 +316,10 @@ downscale_db <- function(
     reference <- input_refmap_db(reference = which_refmap)
   } else {
     # message("Normals not specified, using highest resolution available for each point")
-    rastFile <- system.file("extdata", "wna_outline.tif", package = "climr")
+    rastFile <- system.file("extdata", "bc_outline.tif", package = "climr")
     ## if package is loaded with devtools::load_all, file won't be found and we need to pass .libPaths
     if (rastFile == "") {
-      rastFile <- system.file("extdata", "wna_outline.tif", package = "climr", lib.loc = .libPaths())
+      rastFile <- system.file("extdata", "bc_outline.tif", package = "climr", lib.loc = .libPaths())
     }
     bc_outline <- terra::rast(rastFile)
     pnts <- terra::extract(bc_outline, xyz[, list(lon, lat)], method = "simple")
@@ -387,10 +387,12 @@ downscale_db <- function(
     return(xyz)
   }
   
+  write_xyz(xyz)
+  
   message("Downscaling...")
   results <- downscale_db_core(
     dbCon = dbCon,
-    xyz = write_xyz(xyz),
+    xyz = xyz,
     refmap = reference,
     obs = obs_periods,
     obs_ts = obs_years,
@@ -404,11 +406,13 @@ downscale_db <- function(
   
   na_xyz <- xyz_save[!xyz_save[, 4] %in% bc_ids, ]
   reference <- input_refmap_db(reference = "refmap_climatena")
+  
+  write_xyz(na_xyz)
 
   message("Downscaling (Again)...")
   results_na <- downscale_db_core(
     dbCon = dbCon,
-    xyz = write_xyz(na_xyz),
+    xyz = na_xyz,
     refmap = reference,
     obs = obs_periods,
     obs_ts = obs_years,
