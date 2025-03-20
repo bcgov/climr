@@ -265,6 +265,7 @@ input_gcm_hist_db <- function(
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @importFrom dplyr tbl sql collect mutate
+#' @importFrom dbplyr db_collect
 #' @import uuid
 #' @import data.table
 #' @import abind

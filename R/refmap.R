@@ -8,6 +8,8 @@
 #' @template bbox
 #' @template reference
 #' @template cache
+#' @template xyz
+#' @param indiv_tiles logical. Only download necessary tiles instead of full bounding box?
 #'
 #' @return A `SpatRaster` containing reference period climatologies, lapse rates
 #'   and digital elevation model layers, that can be used with [`downscale_core()`].

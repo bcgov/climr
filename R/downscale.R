@@ -51,13 +51,13 @@
 #' @template run_nm
 #' @param cache logical. Cache data locally? Default `TRUE`
 #' @param local logical. Is the postgres database local? Default `FALSE`
-#' @param indiv_tiles logical. Only download necessary tiles instead of full bounding box? This will generally be faster, but doesn't cache.
+#' @param indiv_tiles logical. Only download necessary tiles instead of full bounding box?
+#' This will generally be faster, but doesn't cache.
 #' @param ... other arguments passed to [`downscale_core()`]. Namely: `return_refperiod`,
 #'   `vars`, `out_spatial` and `plot`
-
+#'   
 #' @return `data.table` of downscaled climate variables for each location.
 #'   All outputs are returned in one table.
-
 #' @importFrom sf st_as_sf st_join
 #' @importFrom pool poolClose
 #' @importFrom terra rast extract sources ext xres yres crop
@@ -277,7 +277,6 @@ downscale <- function(xyz, which_refmap = "auto",
   }
 }
 
-#' @param dbCon A database connection to climr-database
 #' @rdname downscale
 #' @export
 downscale_db <- function(
@@ -293,6 +292,7 @@ downscale_db <- function(
   gcm_hist_years = NULL,
   max_run = 0L,
   run_nm = NULL,
+  local = FALSE,
   ...
 ) {
   ## checks

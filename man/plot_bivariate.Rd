@@ -117,7 +117,7 @@ my_points <- data.frame(
   lon = c(-123.4404, -123.5064, -124.2317),
   lat = c(48.52631, 48.46807, 49.21999),
   elev = c(52, 103, 357),
-  id = LETTERS[1:3]
+  id = seq_len(3)
 )
 
 # draw the plot

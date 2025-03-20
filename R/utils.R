@@ -72,6 +72,9 @@ get_bb <- function(in_xyz) {
 #' Process a tif folder of TminXX.tif, TmaxXX.tif, PPTXX.tif
 #' to create a set of climate variables tifs
 #' @param dir A folder path.
+#' @param overwrite A logical. Replace existing files. Default to `FALSE`.
+#' @importFrom stats setNames
+#' @keywords internal
 #' @export
 tif_folder_gen <- function(dir, overwrite = FALSE) {
   tif <- list.files(dir, full.names = TRUE)
@@ -96,7 +99,8 @@ tif_folder_gen <- function(dir, overwrite = FALSE) {
 #' @param out A file path out for `terra::writeRaster`. Default NULL.
 #' @param ... Additional parameters to `terra::writeRaster`.
 #' @examples
-#' get_latitude_raster("Tmin_01.tif", out = "alt.tif", gdal = "PREDICTOR=2", datatype="FLT4S", overwrite = TRUE)
+#' get_latitude_raster(system.file("ex/elev.tif", package="terra") |> terra::rast())
+#' @keywords internal
 #' @export
 get_latitude_raster <- function(r, out = NULL, ...) {
   r <- terra::rast(r)
@@ -144,14 +148,17 @@ get_latitude_raster <- function(r, out = NULL, ...) {
 #' @param out A file path out for `terra::writeRaster`. Default NULL.
 #' @param ... Additional parameters to `terra::writeRaster`.
 #' @examples
-#' r <- terra::rast(nrows=108, ncols=21, xmin=0, xmax=10)
+#' r <- terra::rast(
+#'   nrows=108, ncols=21,
+#'   xmin=5.75, xmax=6.5,
+#'   ymin = 49.5, ymax = 50,
+#'   crs = "EPSG:4326"
+#' )
 #' elev <- system.file("ex/elev.tif", package="terra") |> terra::rast()
-#' get_elev_raster(r, elev, out = "elev.tif", gdal = "PREDICTOR=2", datatype="FLT4S", overwrite = TRUE)
-#' 
+#' get_elev_raster(r, elev)
+#' @keywords internal
 #' @export
 get_elev_raster <- function(r, elev, out = NULL, ...) {
-  elev <- terra::rast(elev)
-  r <- terra::rast(r)
   prj <- terra::project(elev, r, method = "near")
   names(prj) <- "elevation"
   if (!is.null(out)) {
@@ -173,6 +180,7 @@ get_elev_raster <- function(r, elev, out = NULL, ...) {
 #' @return A data.frame one row per point id in xyz with an ID
 #' column + one columns for each `bands` in `rastertbl` name `nm`.
 #' @importFrom stringi stri_replace_all_fixed
+#' @keywords internal
 #' @export
 extract_db <- function(
   dbCon,
@@ -304,7 +312,10 @@ extract_db <- function(
       layers[["var_nm"]] <- paste(VAR[1], layers[["var_nm"]], sep = "_")
     }
   }
-  if (length(misband <- setdiff(layers[["laynum"]], uniqb))) {
+  if (nrow(res) && length(misband <- setdiff(layers[["laynum"]], uniqb))) {
+    if (length(misband) > 10) {
+      misband <- c(utils::head(misband, 10), "...")
+    }
     stop(
       "Not all requested bands were in table `%s`. [Bands: %s]" |>
         sprintf(rastertbl[1], paste0(misband, collapse = ","))

@@ -9,8 +9,11 @@ tif_folder_gen(dir, overwrite = FALSE)
 }
 \arguments{
 \item{dir}{A folder path.}
+
+\item{overwrite}{A logical. Replace existing files. Default to \code{FALSE}.}
 }
 \description{
 Process a tif folder of TminXX.tif, TmaxXX.tif, PPTXX.tif
 to create a set of climate variables tifs
 }
+\keyword{internal}

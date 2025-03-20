@@ -37,6 +37,7 @@ downscale_db(
   gcm_hist_years = NULL,
   max_run = 0L,
   run_nm = NULL,
+  local = FALSE,
   ...
 )
 }
@@ -86,12 +87,11 @@ are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
 \item{local}{logical. Is the postgres database local? Default \code{FALSE}}
 
-\item{indiv_tiles}{logical. Only download necessary tiles instead of full bounding box? This will generally be faster, but doesn't cache.}
+\item{indiv_tiles}{logical. Only download necessary tiles instead of full bounding box?
+This will generally be faster, but doesn't cache.}
 
 \item{...}{other arguments passed to \code{\link[=downscale_core]{downscale_core()}}. Namely: \code{return_refperiod},
 \code{vars}, \code{out_spatial} and \code{plot}}
-
-\item{dbCon}{A database connection to climr-database}
 }
 \value{
 \code{data.table} of downscaled climate variables for each location.

@@ -2,11 +2,12 @@
 #'
 #' @description
 #' `downscale_core()` is the engine for [`downscale()`].
-#' It takes user-supplied high- and low-resolution rasters as input and downscales to user-specified point locations.
-#' While less user-friendly than [`downscale()`], `downscale_core()` is more flexible in that users can supply their
-#' own raster inputs. For example, a user could supply their own high-resolution climate map, instead of what is
-#' available in climr, as the input to `refmap`. Another example is in downscaling a uniform warming level, as shown
-#' in the example for this function.
+#' It takes user-supplied high- and low-resolution rasters as input and downscales to user-specified
+#' point locations. While less user-friendly than [`downscale()`], `downscale_core()` is more
+#' flexible in that users can supply their own raster inputs. For example, a user could supply their
+#' own high-resolution climate map, instead of what is available in climr, as the input to `refmap`.
+#' Another example is in downscaling a uniform warming level, as shown in the example for this
+#' function.
 #'
 #' @details
 #' We recommend [`downscale()`] for most purposes.
@@ -33,7 +34,8 @@
 #' @param plot character. If `out_spatial` is TRUE, the name of a variable to plot.
 #'   If the variable exists in `reference`, then its reference values will also be plotted.
 #'   Otherwise, reference January total precipitation (PPT01) values will be plotted.
-#'
+#' @param dbCon For database implementation, a connection to `climr` database.
+#' 
 #' @import data.table
 #' @importFrom terra extract rast sources ext xres yres crop plot as.polygons setValues
 #' @importFrom grDevices hcl.colors palette
@@ -50,7 +52,11 @@
 #' @examples
 #' ##
 #' library(terra)
-#' xyz <- data.frame(lon = runif(10, -130, -106), lat = runif(10, 37, 50), elev = runif(10), id = 1:10)
+#' xyz <- data.frame(
+#'   lon = runif(10, -130, -106),
+#'   lat = runif(10, 37, 50),
+#'   elev = runif(10), id = 1:10
+#' )
 #'
 #' ## get bounding box based on input points
 #' thebb <- get_bb(xyz)
@@ -62,15 +68,29 @@
 #' refmap <- input_refmap(dbCon, thebb, reference = "refmap_climatena")
 #'
 #' # obtain the low-resolution climate data for a single gcm, 20-year period, and ssp scenario.
-#' gcm_raw <- input_gcms(dbCon, thebb, list_gcms()[3], list_ssps()[1], period = list_gcm_periods()[2])
+#' gcm_raw <- input_gcms(
+#'   dbCon,
+#'   thebb,
+#'   list_gcms()[3],
+#'   list_ssps()[1],
+#'   period = list_gcm_periods()[2]
+#' )
 #'
 #' # downscale the GCM data
-#' gcm_downscaled <- downscale_core(xyz = xyz, refmap = refmap, gcms = gcm_raw, vars = c("MAT", "PAS"))
+#' gcm_downscaled <- downscale_core(
+#'   xyz = xyz,
+#'   refmap = refmap,
+#'   gcms = gcm_raw,
+#'   vars = c("MAT", "PAS")
+#' )
 #'
-#' # create an input of uniform warming of 2 degrees Celsius and no precipitation change, for use as a null comparison to the GCM warming
+#' # create an input of uniform warming of 2 degrees Celsius and no precipitation change, for use as
+#' # a null comparison to the GCM warming
 #' null <- gcm_raw #' use the gcm input object as a template
 #' names(null) <- "null_2C"
-#' names(null[[1]]) <- sapply(strsplit(names(null[[1]]), "_"), function(x) paste("null2C", x[2], x[3], "NA", "NA", "NA", "NA", sep = "_"))
+#' names(null[[1]]) <- sapply(
+#'   strsplit(names(null[[1]]), "_"),
+#'    function(x) paste("null2C", x[2], x[3], "NA", "NA", "NA", "NA", sep = "_"))
 #' for (var in names(null[[1]])) {
 #'   values(null[[1]][[var]]) <- if (length(grep("PPT", var) == 1)) 1 else 2
 #' } #' repopulate with the null values

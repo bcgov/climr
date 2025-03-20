@@ -11,7 +11,7 @@ test_that("test downscale", {
     ),
     lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
     elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
-    id = LETTERS[1:8]
+    id = seq_len(8)
   )
 
   ## get bounding box based on input points
@@ -106,7 +106,7 @@ test_that("test downscale", {
 #     lon = c(-127.70),
 #     lat = c(55.35),
 #     elev = c(291L),
-#     id = LETTERS[1]
+#     id = seq_len(1)
 #   )
 # 
 #   ## get bounding box based on input points

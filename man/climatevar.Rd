@@ -174,3 +174,4 @@ climr::calc_RH(tmmin = 10, tmmax = 40)
 \references{
 Hogg, E.H. (1997). Temporal scaling of moisture and the forest-grassland boundary in western Canada. Agricultural and Forest Meteorology, Research on Forest Environmental Influences in a Changing World, 84, 115–122.
 }
+\keyword{internal}

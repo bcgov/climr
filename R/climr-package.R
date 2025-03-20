@@ -7,7 +7,13 @@ NULL
 
 .onAttach <- function(libname, pkgname) {
   packageStartupMessage(
-    "Welcome to climr 0.1.1!"
+    do.call(
+      sprintf,
+      c(
+        list(fmt = "Welcome to climr %s.%s.%s!"),
+        utils::packageVersion("climr") |> unlist() |> head(3) |> as.list()
+      )
+    )
   )
 }
 
@@ -15,6 +21,7 @@ NULL
 #' @importFrom data.table fwrite
 #' @importFrom RPostgres dbGetQuery
 #' @importFrom tools R_user_dir
+#' @importFrom utils packageVersion
 #' @noRd
 .onLoad <- function(libname, pkgname) {
 
