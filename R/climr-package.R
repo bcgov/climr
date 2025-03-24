@@ -26,7 +26,7 @@ NULL
 .onLoad <- function(libname, pkgname) {
 
   .globals[["sesscon"]] <- session_connections()
-  dbCon <- data_con()
+  dbCon <- tryCatch(data_con(), error = \(e) NULL)
 
   if (is.null(dbCon)) {
     
