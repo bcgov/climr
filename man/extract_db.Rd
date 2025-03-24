@@ -8,7 +8,8 @@ extract_db(
   dbCon,
   rastertbl,
   layers = data.table::data.table(var_nm = character(), laynum = integer()),
-  VAR = NULL
+  VAR = NULL,
+  hull = NULL
 )
 }
 \arguments{
@@ -20,7 +21,10 @@ extract_db(
 
 \item{VAR}{In case of rasters split across different tables. One VAR in each.
 The first VAR will be used for replacement in labels names. Assuming all
-tables have the same structure, only different VAR in them.
+tables have the same structure, only different VAR in them.}
+
+\item{hull}{An optional hull well-known text geometry to prefilter
+raster table before merging points projected in srid 4326.
 \code{laynum} (index number of the bands to extract).}
 }
 \value{
