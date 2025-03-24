@@ -8,6 +8,8 @@
 
 -   Expanded the climr mosaic of 1981-2010 gridded climatologies to the full North American domain. 
 -   New function `legend_ramp()` for simplified legend plotting on color ramp maps, including accommodation of logarithmic scaling. 
+-   New function `plot_climate_diagram()` to generate a Walter-Lieth climate diagram.
+
 
 # `climr` 0.1.1
 
