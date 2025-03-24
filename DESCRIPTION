@@ -44,9 +44,9 @@ Imports:
     dplyr,
     abind,
     dbplyr,
-    stringi
+    stringi,
+    ggplot2
 Suggests: 
-    ggplot2,
     knitr,
     parallel,
     plotly,
@@ -54,6 +54,7 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0),
     utils,
+    vdiffr,
     withr
 VignetteBuilder: 
     knitr
