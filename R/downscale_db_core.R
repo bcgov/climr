@@ -114,7 +114,13 @@ downscale_db_ <- function(
 ) {
   
   # Offload to database
-  res <- extract_db(dbCon, refmap[["tbl"]], layers = refmap[["layers"]])
+  message("Extracting [%s] bands from %s"|> sprintf(format(nrow(refmap[["layers"]]), big.mark = ","), refmap[["tbl"]]))
+  res <- extract_db(
+    dbCon = dbCon,
+    rastertbl = refmap[["tbl"]],
+    layers = refmap[["layers"]],
+    hull = attr(xyz, "hull")
+  )
 
   # Compute elevation differences between provided points elevation and reference
   # Dem at position 74 (ID column + 36 reference layers + 36 lapse rate layers + 1 dem layer)
@@ -274,8 +280,14 @@ process_one_climate_db <- function(
   }
 
   # Run in database
-  cat("Processing... %s\n"|> sprintf(r[["tbl"]]))
-  climaterast <- extract_db(dbCon, r[["tbl"]], r[["layers"]], r[["VAR"]])
+  message("Extracting [%s] bands from %s"|> sprintf(format(nrow(r[["layers"]]), big.mark = ","), r[["tbl"]]))
+  climaterast <- extract_db(
+    dbCon = dbCon,
+    rastertbl = r[["tbl"]],
+    layers = r[["layers"]],
+    VAR = r[["VAR"]],
+    hull = attr(xyz, "hull")
+  )
 
   labels <- vapply(
     strsplit(nm, "_"),

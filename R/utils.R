@@ -355,6 +355,7 @@ extract_db <- function(
     j = "band",
     value = layers[["var_nm"]][match(res[["nband"]], layers[["laynum"]])]
   )
+  
   if (!is.null(VAR) && length(VAR)) {
     res[, band := stringi::stri_replace_all_fixed(
       str = band,
@@ -363,10 +364,16 @@ extract_db <- function(
       vectorize_all = TRUE
     )]
   }
-  if (any(duplicated(res[,list(ID, band)]))) {
-    warning("Overlapping raster in table. [%s]" |> sprintf(rastertbl))
-  }
   res <- data.table::dcast(res, ID ~ band, value.var = "value")
+  
+  if (length(missnm <- setdiff(colorder, names(res)))) {
+    suppressWarnings({
+      data.table::setalloccol(res, length(missnm))
+      data.table::set(res, j = missnm, value = NA_real_)
+    })
+    warning("Possibly missing requested bands from %s replaced with NA" |> sprintf(rastertbl[1]))
+  }
+  
   data.table::setcolorder(res, colorder)
   
   if (nrow(res) != {nxyz <- DBI::dbGetQuery(dbCon, "SELECT COUNT(1) FROM tmp_xyz")[[1]]}) {

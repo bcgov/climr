@@ -304,6 +304,11 @@ downscale_db <- function(
   
   expectedCols <- c("lon", "lat", "elev", "id")
   xyz <- .checkXYZ(copy(xyz), expectedCols)
+  if (is.null(attr(xyz, "hull"))) {
+    attr(xyz, "hull") <- terra::vect(xyz, geom = c("lon", "lat"), crs = "EPSG:4326") |>
+      terra::convHull() |>
+      terra::geom(wkt = TRUE)
+  }
   dbCon <- data_con(if (local) "local")
  
   rmCols <- setdiff(names(xyz), expectedCols)
