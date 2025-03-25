@@ -44,12 +44,12 @@ Imports:
     dplyr,
     abind,
     dbplyr,
+    plotly,
     stringi,
     ggplot2
 Suggests: 
     knitr,
     parallel,
-    plotly,
     remotes,
     rmarkdown,
     testthat (>= 3.0.0),

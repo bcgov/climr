@@ -10,11 +10,11 @@ plot_climate_stripes(
 )
 }
 \arguments{
+\item{X}{A \code{data.table} object that contains the change in temperature relative to the average
+and the corresponding years.}
+
 \item{mode}{A character string. Either \code{warming_stripes}, \code{labelled_stripes}, \code{bars} or
 \code{bars_with_scale}.}
-
-\item{x}{A \code{data.table} object that contains the change in temperature relative to the average
-and the corresponding years.}
 }
 \value{
 plotly object, Draws a plot in the active graphics device.
