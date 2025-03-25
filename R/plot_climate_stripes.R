@@ -4,7 +4,7 @@
 #' Plot temperature change relative to average over time 
 #'
 #'
-#' @param x A `data.table` object that contains the change in temperature relative to the average
+#' @param X A `data.table` object that contains the change in temperature relative to the average
 #' and the corresponding years.
 #' @param mode A character string. Either `warming_stripes`, `labelled_stripes`, `bars` or 
 #' `bars_with_scale`.
@@ -16,9 +16,12 @@
 #' if (FALSE) {
 #' }
 #'
-#' @import plotly
+#' @importFrom plotly plot_ly
+#' @importFrom grDevices colorRamp rgb
+#' @importFrom stats runif
 #' @import data.table
 #' @importFrom scales rescale
+#' @importFrom graphics layout
 #'
 #' @export
 plot_climate_stripes <- function(X, mode = c("warming_stripes", "labelled_stripes", "bars", "bars_with_scale")) {
@@ -51,7 +54,7 @@ plot_climate_stripes <- function(X, mode = c("warming_stripes", "labelled_stripe
   if (mode %in% "bars") {
     plot_ly(X) |>
       add_bars(x = ~x, y = ~y, marker = list(color = ~marker_color)) |>
-      layout(title = list(text = paste0("Global temperature have increase by over ", X[, round(max(y)- min(y),1)], "°C")),bargap = 0, xaxis = list(visible = FALSE), yaxis = list(visible = FALSE))
+      layout(title = list(text = paste0("Global temperature have increase by over ", X[, round(max(y)- min(y),1)], "\u00B0C")),bargap = 0, xaxis = list(visible = FALSE), yaxis = list(visible = FALSE))
     
   }
   if (mode %in% "bars_with_scale") {
