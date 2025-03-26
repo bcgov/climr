@@ -113,7 +113,7 @@ downscale_core <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NU
     )
     
     if (inherits(xyz, "SpatRaster")) {
-      el <- grep("elev", names(xyz), ignore.case = TRUE)
+      el <- grep("elev|dem", names(xyz), ignore.case = TRUE)
       if (length(el)) {
         message("Elevation layer found in xyz raster in layer. [%s]" |> sprintf(el))
       } else {
@@ -468,11 +468,8 @@ downscale_.SpatRaster <- function(xyz, refmap, gcms, gcm_ssp_ts, gcm_hist_ts,
     stop("Error 01: can't find DEM layer. Please contact developer and supply error code")
   }
   
-  if ("elev" %in% names(xyz)) {
-    elev_delta <- xyz[["elev"]] - res[["dem2_WNA"]] 
-  } else {
-    elev_delta <- res[["dem2_WNA"]] * 0
-  }
+  # will give weird results if xyz is not an elev raster
+  elev_delta <- xyz[["elev"]] - res[["dem2_WNA"]] 
   
   lr <- elev_delta * terra::subset(res, lrCols)
   names(lr) <- lrCols
