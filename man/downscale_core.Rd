@@ -18,7 +18,8 @@ downscale_core(
   ppt_lr = FALSE,
   nthread = 1L,
   out_spatial = FALSE,
-  plot = NULL
+  plot = NULL,
+  skip_check = FALSE
 )
 
 downscale_db_core(
@@ -39,8 +40,8 @@ downscale_db_core(
 )
 }
 \arguments{
-\item{xyz}{a \code{data.frame} with the following columns "long", "lat", "elev",
-and a unique "id". Any extra columns will be ignored and not output.}
+\item{xyz}{a \code{terra::SpatRaster} or a \code{data.frame} with the following columns
+"long", "lat", "elev", and a unique "id". Any extra columns will be ignored and not output.}
 
 \item{refmap}{\code{SpatRaster}. Outputs from \code{\link[=input_refmap]{input_refmap()}}. The high-resolution
 climate maps for use as the downscaling baseline.}
@@ -68,7 +69,8 @@ can be obtained with \code{\link[=list_vars]{list_vars()}}. Definitions can be f
 
 \item{ppt_lr}{logical. Apply elevation adjustment to precipitation.}
 
-\item{nthread}{integer. Number of parallel threads to use to do computations.}
+\item{nthread}{integer. Number of parallel threads to use to do computations. Only supported
+for table of points.}
 
 \item{out_spatial}{logical. Should a SpatVector be returned instead of a
 \code{data.frame}.}
@@ -77,13 +79,15 @@ can be obtained with \code{\link[=list_vars]{list_vars()}}. Definitions can be f
 If the variable exists in \code{reference}, then its reference values will also be plotted.
 Otherwise, reference January total precipitation (PPT01) values will be plotted.}
 
+\item{skip_check}{A boolean. Skip checks if coming from downscale.}
+
 \item{dbCon}{For database implementation, a connection to \code{climr} database.}
 }
 \value{
-A \code{data.table} or SpatVector with downscaled climate variables. If \code{gcms} is NULL,
-this is just the downscaled \code{reference} at point locations. If \code{gcms} is provided,
-this returns a downscaled dataset for each point location, general circulation
-model (GCM), shared socioeconomic pathway (SSP), run and period.
+A SpatRaster, a \code{data.table} or SpatVector with downscaled climate variables.
+If \code{gcms} is NULL, this is just the downscaled \code{reference} at point locations.
+If \code{gcms} is provided, this returns a downscaled dataset for each point location,
+general circulation model (GCM), shared socioeconomic pathway (SSP), run and period.
 }
 \description{
 \code{downscale_core()} is the engine for \code{\link[=downscale]{downscale()}}.

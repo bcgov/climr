@@ -28,12 +28,14 @@
 #' @param return_refperiod logical. Return downscaled reference period (1961-1990)? 
 #' @template vars
 #' @param ppt_lr logical. Apply elevation adjustment to precipitation. 
-#' @param nthread integer. Number of parallel threads to use to do computations. 
+#' @param nthread integer. Number of parallel threads to use to do computations. Only supported
+#' for table of points.
 #' @param out_spatial logical. Should a SpatVector be returned instead of a
 #'   `data.frame`.
 #' @param plot character. If `out_spatial` is TRUE, the name of a variable to plot.
 #'   If the variable exists in `reference`, then its reference values will also be plotted.
 #'   Otherwise, reference January total precipitation (PPT01) values will be plotted.
+#' @param skip_check A boolean. Skip checks if coming from downscale.
 #' @param dbCon For database implementation, a connection to `climr` database.
 #' 
 #' @import data.table
@@ -41,10 +43,10 @@
 #' @importFrom grDevices hcl.colors palette
 #' @importFrom stats complete.cases
 #'
-#' @return A `data.table` or SpatVector with downscaled climate variables. If `gcms` is NULL,
-#'   this is just the downscaled `reference` at point locations. If `gcms` is provided,
-#'   this returns a downscaled dataset for each point location, general circulation
-#'   model (GCM), shared socioeconomic pathway (SSP), run and period.
+#' @return A SpatRaster, a `data.table` or SpatVector with downscaled climate variables.
+#'   If `gcms` is NULL, this is just the downscaled `reference` at point locations.
+#'   If `gcms` is provided, this returns a downscaled dataset for each point location,
+#'   general circulation model (GCM), shared socioeconomic pathway (SSP), run and period.
 #'
 #' @seealso [`input_gcms()`], [`input_obs()`], [`list_vars()`]
 #'
@@ -102,19 +104,36 @@
 downscale_core <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NULL,
                            gcm_hist_ts = NULL, obs_ts = NULL, return_refperiod = TRUE,
                            vars = sort(sprintf(c("PPT_%02d", "Tmax_%02d", "Tmin_%02d"), sort(rep(1:12, 3)))),
-                           ppt_lr = FALSE, nthread = 1L, out_spatial = FALSE, plot = NULL) {
+                           ppt_lr = FALSE, nthread = 1L, out_spatial = FALSE, plot = NULL, skip_check = FALSE) {
   ## checks
-  .checkDwnsclCoreArgs(
-    xyz, refmap, gcms, obs, gcm_ssp_ts, gcm_hist_ts,
-    obs_ts, return_refperiod, out_spatial, plot, vars
-  )
-
-  expectedCols <- c("lon", "lat", "elev", "id")
-  xyz <- .checkXYZ(copy(xyz), expectedCols)
-  get_bb(xyz) # we don't need a bbox, but this the projection of xyz
+  if (!skip_check) {
+    .checkDwnsclCoreArgs(
+      xyz, refmap, gcms, obs, gcm_ssp_ts, gcm_hist_ts,
+      obs_ts, return_refperiod, out_spatial, plot, vars
+    )
+    
+    if (inherits(xyz, "SpatRaster")) {
+      el <- grep("elev", names(xyz), ignore.case = TRUE)
+      if (length(el)) {
+        message("Elevation layer found in xyz raster in layer. [%s]" |> sprintf(el))
+      } else {
+        el <- 1
+        warning("No elevation layer found in xyz raster. No elevation adjustment will be performed.") 
+      }
+      xyz <- xyz[[el]]
+      names(xyz) <- "elev"
+    } else {
+      expectedCols <- c("lon", "lat", "elev", "id")
+      xyz <- .checkXYZ(copy(xyz), expectedCols)
+    } 
+  }
+  # get_bb(xyz) # we don't need a bbox, but this the projection of xyz
 
   if (isTRUE(nthread > 1L)) {
-    if (!requireNamespace("parallel", quietly = TRUE)) {
+    if (inherits(xyz, "SpatRaster")) {
+      warning("nthreads is >1 not supported for SpatRaster `xyz`.")
+      nthread <- 1L
+    } else if (!requireNamespace("parallel", quietly = TRUE)) {
       message("nthreads is >1, but 'parallel' package is not available.")
       message("Setting nthreads to 1 and running computations in sequential mode.")
       message("If you wish to parallelise please run install.packages('parallel')")
@@ -122,7 +141,7 @@ downscale_core <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NU
     }
   }
 
-  if (isTRUE(nthread > 1L)) {
+  if (!inherits(xyz, "SpatRaster") && isTRUE(nthread > 1L)) {
     message("Parallelising downscaling computations across ", nthread, " threads")
 
     # initiate cluster
@@ -193,6 +212,8 @@ downscale_core <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NU
       vars, ppt_lr
     )
   }
+  
+  if (inherits(xyz, "SpatRaster")) return(res)
 
   IDcols <- names(res)[!names(res) %in% vars]
   setkeyv(res, IDcols)
@@ -254,8 +275,16 @@ downscale_core <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NU
 #' @importFrom terra crop ext xres yres extract
 #' @noRd
 downscale_ <- function(xyz, refmap, gcms, gcm_ssp_ts, gcm_hist_ts,
+                      obs, obs_ts, return_refperiod,
+                      vars, ppt_lr = FALSE) {
+  UseMethod("downscale_", xyz)
+}
+
+#' @noRd
+downscale_.data.frame <- function(xyz, refmap, gcms, gcm_ssp_ts, gcm_hist_ts,
                        obs, obs_ts, return_refperiod,
                        vars, ppt_lr = FALSE) {
+  
   # print(xyz)
   # Define reference extent
   ex <- ext(
@@ -266,58 +295,58 @@ downscale_ <- function(xyz, refmap, gcms, gcm_ssp_ts, gcm_hist_ts,
       max(xyz[["lat"]]) + yres(refmap) * 2
     )
   )
-
+  
   # crop refmap raster (while also loading it to memory)
   refmap <- crop(refmap, ex, snap = "out")
-
+  
   # Normal value extraction
   # possible garbage output :
   # Error in (function (x)  : attempt to apply non-function
   # Error in x$.self$finalize() : attempt to apply non-function
   # Can ignore, trying to suppress messages with `shush`
   # https://github.com/rspatial/terra/issues/287
-
+  
   # stack before extracting
   res <-
     extract(
       x = refmap,
       y = xyz[, .(lon, lat)],
       method = "bilinear"
-    )
+    ) 
 
+  # Lapse rate position 38:73 (ID column + 36 reference layers + 36 lapse rate layers)    
+  lrCols <- grep("^lr_", names(res), value = TRUE)
+  lrDemCols <- grep("^lr_|dem2_WNA", names(res), value = TRUE)
+  if (length(lrCols) == length(lrDemCols)) {
+    stop("Error 01: can't find DEM layer. Please contact developer and supply error code")
+  }
+  
   # Compute elevation differences between provided points elevation and reference
   # Dem at position 74 (ID column + 36 reference layers + 36 lapse rate layers + 1 dem layer)
   elev_delta <- xyz[["elev"]] - res[, "dem2_WNA"]
   # print(elev_delta)
   # print(res)
   # Compute individual point lapse rate adjustments
-  # Lapse rate position 38:73 (ID column + 36 reference layers + 36 lapse rate layers)
-  lrCols <- grep("^lr_", names(res), value = TRUE)
   lr <- elev_delta * res[, lrCols] ## do we need anything other than the lapse rate?
-
+  
   # Replace any NAs left with 0s
   lr[is.na(lr)] <- 0L
-
+  
   # Remove lapse rates and digital elevation model from res
-  lrDemCols <- grep("^lr_|dem2_WNA", names(res), value = TRUE)
-  if (length(lrCols) == length(lrDemCols)) {
-    stop("Error 01: can't find DEM layer. Please contact developer and supply error code")
-  }
-
   res[, lrDemCols] <- NULL
-
+  
   # Combine results (ignoring ID column)
   res <- as.data.frame(res) ## TODO: convert code below to data.table
   if (isTRUE(ppt_lr)) {
     notIDcols <- names(res)[which(tolower(names(res)) != "id")]
-
+    
     if (any(paste0("lr_", notIDcols) != names(lr))) {
       stop(
         "Error 02: lapse rates and downscale output column names do not match.",
         "\n   Please contact developers."
       )
     }
-
+    
     res[, notIDcols] <- res[, notIDcols] + lr
   } else {
     notpptLRDEM <- grep("^PPT|ID|^lr_|dem2_WNA", names(res), invert = TRUE, value = TRUE)
@@ -423,6 +452,142 @@ downscale_ <- function(xyz, refmap, gcms, gcm_ssp_ts, gcm_hist_ts,
   return(res)
 }
 
+#' @noRd
+downscale_.SpatRaster <- function(xyz, refmap, gcms, gcm_ssp_ts, gcm_hist_ts,
+                                  obs, obs_ts, return_refperiod,
+                                  vars, ppt_lr = FALSE) {
+
+  if (!terra::same.crs(refmap, xyz)) {
+    refmap <- terra::project(refmap, terra::crs(xyz))
+  }
+  res <- terra::resample(refmap, xyz, method = "bilinear")
+
+  lrCols <- grep("^lr_", names(res), value = TRUE)
+  lrDemCols <- grep("^lr_|dem2_WNA", names(res), value = TRUE)
+  if (length(lrCols) == length(lrDemCols)) {
+    stop("Error 01: can't find DEM layer. Please contact developer and supply error code")
+  }
+  
+  if ("elev" %in% names(xyz)) {
+    elev_delta <- xyz[["elev"]] - res[["dem2_WNA"]] 
+  } else {
+    elev_delta <- res[["dem2_WNA"]] * 0
+  }
+  
+  lr <- elev_delta * terra::subset(res, lrCols)
+  names(lr) <- lrCols
+  # Remove lapse rates and digital elevation model from res
+  res <- terra::subset(res, setdiff(names(res), lrDemCols))
+  
+  if (any(paste0("lr_", names(res)) != names(lr))) {
+    stop(
+      "Error 02: lapse rates and downscale output column names do not match.",
+      "\n   Please contact developers."
+    )
+  }
+  
+  if (isTRUE(ppt_lr)) {
+    res <- res + lr
+  } else {
+    res <- res + lr * ((!grepl("^lr_PPT", names(lr), ignore.case = TRUE)) |> as.integer())
+  }
+  
+  # Process one GCM stacked layers
+  if (!is.null(gcms)) {
+    # Process each gcms and rbind resulting tables
+    res_gcm <- lapply(names(gcms), \(ocr) {
+        message("Processing... [%s]" |> sprintf(ocr))
+        process_one_climaterast(
+          climaterast = gcms[[ocr]],
+          res = res,
+          xyz = xyz,
+          type = "gcms"
+        )
+      }) |> do.call(what = c, args = _)
+  } else {
+    res_gcm <- NULL
+  }
+  if (!is.null(gcm_ssp_ts)) {
+    # Process each gcms and rbind resulting tables
+    res_gcmts <- lapply(names(gcm_ssp_ts), \(ocr) {
+      message("Processing... [%s]" |> sprintf(ocr))
+      process_one_climaterast(
+        climaterast = gcm_ssp_ts[[ocr]],
+        res = res,
+        xyz = xyz,
+        timeseries = TRUE,
+        type = "gcms"
+      )
+    }) |> do.call(what = c, args = _)
+  } else {
+    res_gcmts <- NULL
+  }
+  if (!is.null(gcm_hist_ts)) {
+    # Process each gcms and rbind resulting tables
+    res_gcm_hist <- lapply(names(gcm_hist_ts), \(ocr) {
+      message("Processing... [%s]" |> sprintf(ocr))
+      process_one_climaterast(
+        climaterast = gcm_hist_ts[[ocr]],
+        res = res,
+        xyz = xyz,
+        timeseries = TRUE,
+        type = "gcm_hist_ts"
+      )
+    }) |> do.call(what = c, args = _)
+  } else {
+    res_gcm_hist <- NULL
+  }
+  if (!is.null(obs)) {
+    # print(obs)
+    res_hist <- lapply(names(obs), \(ocr) {
+      message("Processing... [%s]" |> sprintf(ocr))
+      process_one_climaterast(
+        climaterast = obs[[ocr]],
+        res = res,
+        xyz = xyz,
+        type = "obs"
+      )
+    }) |> do.call(what = c, args = _)
+  } else {
+    res_hist <- NULL
+  }
+  if (!is.null(obs_ts)) {
+    # print(obs)
+    res_hist_ts <- lapply(names(obs_ts), \(ocr) {
+      message("Processing... [%s]" |> sprintf(ocr))
+      process_one_climaterast(
+        climaterast = obs_ts[[ocr]],
+        res = res,
+        xyz = xyz,
+        timeseries = TRUE,
+        type = "obs_ts"
+      )
+    }) |> do.call(what = c, args = _)
+  } else {
+    res_hist_ts <- NULL
+  }
+  
+  if (return_refperiod) {
+    names(res) <- paste("REFPERIOD", names(res), "1961_1990", sep = "_")
+  } else {
+    res <- NULL
+  }
+  
+  lat <- get_latitude_raster(xyz)
+  res <- c(res_gcm, res_gcmts, res_gcm_hist, res_hist, res_hist_ts, res, lat)
+  
+  if ("elev" %in% names(xyz)) {
+    res <- c(res, xyz[["elev"]]) 
+  }
+  
+  # print(names(res))
+  # Compute extra climate variables, assign by reference
+  message("Climate vars...")
+  res <- append_clim_vars(res, vars)
+  
+  return(res)
+}
+
 
 #' Wrapper function for `downscale_` for parallelising
 #'
@@ -458,19 +623,18 @@ threaded_downscale_ <- function(xyz, refmap, gcms, gcm_ssp_ts, gcm_hist_ts, obs,
   return(res)
 }
 
-#' TODO: fill documentation here
-#'
-#' @param climaterast TODO
-#' @param res TODO
-#' @template xyz
-#' @param timeseries TODO
-#' @param type TODO
-#'
-#' @return a `data.table`
 #' @noRd
+#' @export
 #' @importFrom stats as.formula
 process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
                                     type = c("gcms", "gcm_hist_ts", "obs", "obs_ts")) {
+  UseMethod("process_one_climaterast", res)
+}
+
+#' @export
+#' @noRd
+process_one_climaterast.data.frame <- function(climaterast, res, xyz, timeseries = FALSE,
+                                               type = c("gcms", "gcm_hist_ts", "obs", "obs_ts")) {
   type <- match.arg(type)
 
   # Store names for later use
@@ -600,6 +764,61 @@ process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
   )
 
   return(climaterast)
+}
+
+#' @export
+#' @noRd
+process_one_climaterast.SpatRaster <- function(climaterast, res, xyz, timeseries = FALSE,
+                                               type = c("gcms", "gcm_hist_ts", "obs", "obs_ts")) {
+  type <- match.arg(type)
+  
+  # Store names for later use
+  nm <- names(climaterast)
+  
+  climaterast <- try({
+    if (!terra::same.crs(climaterast, xyz)) {
+      climaterast <- terra::project(climaterast, terra::crs(xyz))
+    }
+    terra::resample(climaterast, xyz, method = "bilinear")
+  })
+  
+  ## we may have run out of memory if there are MANY rasters
+  ## attempt to get only unique raster cell values
+  ## (i.e. xyz may be at higher res than the climaterast leading to extracting the same values many times)
+  if (is(climaterast, "try-error")) {
+    if (grepl("bad_alloc", climaterast)) {
+      message("System is out of memory to extract climate values for the supplied coordinates")
+      stop(
+        "Insufficient memory to downscale climate data for these many points/climate layers.\n",
+        "  Try reducing number of points/layers."
+      )
+    }
+  }
+  
+  # Create match set to match with res names
+  if (type %in% c("obs")) {
+    ## Create match set to match with res names
+    labels <- nm
+  } else {
+    labels <- vapply(
+      strsplit(nm, "_"),
+      function(x) {
+        paste0(x[2:3], collapse = "_")
+      },
+      character(1)
+    )
+  }
+  
+  # Add matching column to climaterast
+  origorder <- names(climaterast)
+  ppt <- grep("PPT", labels)
+  temp <- grep("PPT", labels, invert = TRUE)
+  climaterast_ppt <- terra::subset(climaterast, ppt) * terra::subset(res, match(labels[ppt], names(res))) ## PPT
+  climaterast_temp <- terra::subset(climaterast, temp) + terra::subset(res, match(labels[-ppt], names(res))) ## Temperature
+  climaterast <- terra::subset(c(climaterast_ppt, climaterast_temp), origorder)
+  
+  return(climaterast)
+  
 }
 
 

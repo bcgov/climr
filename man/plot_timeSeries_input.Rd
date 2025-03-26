@@ -30,8 +30,8 @@ plot_timeSeries_input_db(
 )
 }
 \arguments{
-\item{xyz}{a \code{data.frame} with the following columns "long", "lat", "elev",
-and a unique "id". Any extra columns will be ignored and not output.}
+\item{xyz}{a \code{terra::SpatRaster} or a \code{data.frame} with the following columns
+"long", "lat", "elev", and a unique "id". Any extra columns will be ignored and not output.}
 
 \item{gcms}{character. Vector of global climate model names. Options are \code{\link[=list_gcms]{list_gcms()}}.}
 
