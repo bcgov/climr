@@ -1,13 +1,14 @@
-#' Add extra climate variables to a `data.table`
-#'
-#' @param dt A `data.table` with TminXX, TmaxXX, PPTXX for XX in 01 to 12.
-#' @template vars
-#'
-#' @return a `data.table`
-#'
+# Add extra climate variables to a SpatRaster or `data.table`
 #' @importFrom data.table set setcolorder
 #' @noRd
+#' @export 
 append_clim_vars <- function(dt, vars) {
+  UseMethod("append_clim_vars")
+}
+
+#' @noRd
+#' @export 
+append_clim_vars.data.frame <- function(dt, vars) {
   # Return variable or create it if not found in dt
   v <- function(nm) {
     if (is.null(res <- dt[[nm]])) {
@@ -44,6 +45,59 @@ append_clim_vars <- function(dt, vars) {
 
   # Reorder to match vars
   setcolorder(dt, c(names(dt)[names(dt) %in% c("id", "DATASET", "GCM", "SSP", "RUN", "PERIOD")], unique(vars)))
+}
+
+#' @noRd
+#' @export 
+append_clim_vars.SpatRaster <- function(dt, vars) {
+  # Return variable or create it if not found in dt
+  var_nm_template <- character(0)
+  
+  findindt <- \(nm) {
+    if (nm %in% c("elev", "lat")) {
+      which(names(dt) %in% nm)
+    } else if (length(var_nm_template)) {
+      which(names(dt) %in% gsub("{VAR}", nm, var_nm_template, fixed = TRUE))
+    } else {
+      grep(nm, names(dt), fixed = TRUE)  
+    }
+  }
+  
+  v <- function(nm) {
+    loc <- findindt(nm)
+    if (!length(loc)) {
+      f(nm)
+      loc <- findindt(nm)
+    } else if (!length(var_nm_template)) {
+      var_nm_template <<- gsub(nm, "{VAR}", names(dt)[loc], fixed = TRUE)
+    }
+    return(terra::subset(dt, loc))
+  }
+  
+  # Call .calc_def if exists, otherwise print message
+  f <- function(nm) {
+    if (length(findindt(nm))) {
+      # return if already computed
+      return()
+    } else if (is.null(expr <- .calc_def[[nm]])) {
+      message(nm, " calculation is not supported yet.")
+    } else {
+      newrast <- expr(v)
+      names(newrast) <- gsub("{VAR}", nm, var_nm_template, fixed = TRUE)
+      message("Appending... [%s]" |> sprintf(nm))
+      dt <<- c(dt, newrast)
+
+    }
+  }
+  
+  # Append vars except default one
+  vars2 <- vars[!vars %in% sprintf(c("PPT%02d", "Tmax%02d", "Tmin%02d"), sort(rep(1:12, 3)))]
+  vars2 <- vars2[order(match(vars2, names(.calc_def)))] ## run functions in the order of .calc_def
+  for (var in vars2) {
+    f(var)
+  }
+  
+  return(dt)
 }
 
 # Big climate var definition list, access each variable by using v("varname")

@@ -125,56 +125,92 @@ downscale <- function(xyz, which_refmap = "auto",
     gcm_hist_years, max_run, run_nm
   )
 
-  expectedCols <- c("lon", "lat", "elev", "id")
-  xyz <- .checkXYZ(copy(xyz), expectedCols)
+  if (inherits(xyz, "SpatRaster")) {
+    el <- grep("elev", names(xyz), ignore.case = TRUE)
+    if (length(el)) {
+      message("Elevation layer found in xyz raster in layer [%s]" |> sprintf(el))
+      xyz <- xyz[[el]]
+      names(xyz) <- "elev"
+    } else {
+      el <- 1
+      warning("No elevation layer found in xyz raster. No elevation adjustment will be performed.") 
+      xyz <- xyz[[el]]
+    }
+  } else {
+    expectedCols <- c("lon", "lat", "elev", "id")
+    xyz <- .checkXYZ(copy(xyz), expectedCols)
+    rmCols <- setdiff(names(xyz), expectedCols)
+    if (length(rmCols)) { ## remove extraneous columns
+      warnings("Extra columns will be ignored")
+      xyz <- xyz[, ..expectedCols]
+    }
+    ## make an integer id col to use through out
+    if (inherits(xyz$id, c("integer", "numeric"))) {
+      IDint <- as.integer(xyz$id)
+    } else {
+      if (inherits(xyz$id, c("character", "factor"))) {
+        IDint <- as.integer(as.factor(xyz$id))
+      }
+    }
+    setnames(xyz, "id", "id_orig")
+    xyz[, id := IDint]
+    rm(IDint)
+    
+    ## save original ID column to join back
+    origID <- xyz[, .(id, id_orig)]
+    
+    xyz[, id_orig := NULL]
+  }
 
-  dbCon <- data_connect(local = local)
+  dbCon <- data_con(if (local) "local")
   thebb <- get_bb(xyz) ## get bounding box based on input points
 
-  rmCols <- setdiff(names(xyz), expectedCols)
-  if (length(rmCols)) { ## remove extraneous columns
-    warnings("Extra columns will be ignored")
-    xyz <- xyz[, ..expectedCols]
-  }
-
-  ## make an integer id col to use through out
-  if (inherits(xyz$id, c("integer", "numeric"))) {
-    IDint <- as.integer(xyz$id)
-  } else {
-    if (inherits(xyz$id, c("character", "factor"))) {
-      IDint <- as.integer(as.factor(xyz$id))
-    }
-  }
-  setnames(xyz, "id", "id_orig")
-  xyz[, id := IDint]
-  rm(IDint)
-
-  ## save original ID column to join back
-  origID <- xyz[, .(id, id_orig)]
-
-  xyz[, id_orig := NULL]
-
   message("Getting normals...")
-  if(which_refmap %in% c("refmap_climatena","refmap_prism","refmap_climr")){
+  if(which_refmap %in% c("refmap_climatena","refmap_prism","refmap_climr")) {
     reference <- input_refmap(dbCon = dbCon, reference = which_refmap, bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
   } else {
-    # message("Normals not specified, using highest resolution available for each point")
-    rastFile <- system.file("extdata", "bc_outline.tif", package = "climr")
-    ## if package is loaded with devtools::load_all, file won't be found and we need to pass .libPaths
-    if (rastFile == "") {
-      rastFile <- system.file("extdata", "bc_outline.tif", package = "climr", lib.loc = .libPaths())
-    }
-    bc_outline <- rast(rastFile)
-    pnts <- extract(bc_outline, xyz[, .(lon, lat)], method = "simple")
-    bc_ids <- xyz[["id"]][!is.na(pnts[[2]])]
-    if (length(bc_ids) >= 1) {
-      xyz_save <- xyz
-      xyz <- xyz[!is.na(pnts[[2]]), ]
-      thebb_bc <- get_bb(xyz)
-      message("for BC...")
-      reference <- input_refmap(dbCon = dbCon, reference = "refmap_prism", bbox = thebb_bc, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
+    if (inherits(xyz, "SpatRaster")) {
+      refmapchck <- \(rf, bb) {
+        q <- "
+        SELECT min(ST_UpperLeftX(rast)) xmin,
+               max(ST_UpperLeftX(rast)+ST_Width(rast)*ST_PixelWidth(rast)) xmax,
+               min(ST_UpperLeftY(rast)-ST_Height(rast)*abs(ST_PixelHeight(rast))) ymin,
+               max(ST_UpperLeftY(rast)) ymax
+        FROM %s" |> sprintf(rf)
+        normalhull <- DBI::dbGetQuery(dbCon, q) |> 
+          unlist() |>
+          terra::ext() |>
+          terra::vect(crs = "EPSG:4326")
+        bchck <- terra::ext(bb["xmin"], bb["xmax"], bb["ymin"], bb["ymax"]) |> terra::vect(crs = "EPSG:4326")
+        terra::is.related(normalhull, bchck, relation = "contains")
+      }
+      reference <- "refmap_prism"
+      if (!refmapchck("normal_bc", thebb)) { 
+        reference <- "refmap_climr"
+      }
+      if (!refmapchck("normal_composite", thebb)) { 
+        reference <- "refmap_climatena"
+      }
+      reference <- input_refmap(dbCon = dbCon, reference = reference, bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
     } else {
-      reference <- input_refmap(dbCon = dbCon, reference = "refmap_climatena", bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
+      # message("Normals not specified, using highest resolution available for each point")
+      rastFile <- system.file("extdata", "bc_outline.tif", package = "climr")
+      ## if package is loaded with devtools::load_all, file won't be found and we need to pass .libPaths
+      if (rastFile == "") {
+        rastFile <- system.file("extdata", "bc_outline.tif", package = "climr", lib.loc = .libPaths())
+      }
+      bc_outline <- rast(rastFile)
+      pnts <- extract(bc_outline, xyz[, .(lon, lat)], method = "simple")
+      bc_ids <- xyz[["id"]][!is.na(pnts[[2]])]
+      if (length(bc_ids) >= 1) {
+        xyz_save <- xyz
+        xyz <- xyz[!is.na(pnts[[2]]), ]
+        thebb_bc <- get_bb(xyz)
+        message("for BC...")
+        reference <- input_refmap(dbCon = dbCon, reference = "refmap_prism", bbox = thebb_bc, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
+      } else {
+        reference <- input_refmap(dbCon = dbCon, reference = "refmap_climatena", bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
+      }
     }
   }
 
@@ -240,16 +276,17 @@ downscale <- function(xyz, which_refmap = "auto",
     gcms = gcm_ssp_periods,
     gcm_ssp_ts = gcm_ssp_ts,
     gcm_hist_ts = gcm_hist_ts,
+    skip_check = TRUE,
     ...
   )
+  
+  if (inherits(xyz, "SpatRaster")) return(results)
 
   if (which_refmap != "auto") {
-    if (!is.null(dbCon)) poolClose(dbCon)
     results <- addIDCols(origID, results)
     return(results)
   }
   if ((length(bc_ids) < 1 || length(bc_ids) == nrow(xyz_save))) {
-    if (!is.null(dbCon)) poolClose(dbCon)
     results <- addIDCols(origID, results)
     return(results)
   } else {
@@ -266,10 +303,10 @@ downscale <- function(xyz, which_refmap = "auto",
       gcms = gcm_ssp_periods,
       gcm_ssp_ts = gcm_ssp_ts,
       gcm_hist_ts = gcm_hist_ts,
+      skip_check = TRUE,
       ...
     )
 
-    if (!is.null(dbCon)) poolClose(dbCon)
     res_all <- rbind(results, results_na)
     res_all <- addIDCols(origID, res_all)
 

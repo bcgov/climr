@@ -51,9 +51,9 @@ input_refmap <- function(dbCon, bbox, reference = "refmap_climr", cache = TRUE, 
   if (!grepl("normal", reference)) {
     rmap_nm <- switch(reference,
                       refmap_prism = "normal_bc",
-                      refmap_climr = "refmap_climr",
+                      refmap_climr = "normal_composite",
                       refmap_climatena = "normal_na",
-                      auto = "refmap_climr"
+                      auto = "normal_composite"
     )
   } else {
     rmap_nm <- reference

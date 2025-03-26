@@ -16,12 +16,11 @@
 #' if (FALSE) {
 #' }
 #'
-#' @importFrom plotly plot_ly
+#' @importFrom plotly plot_ly layout
 #' @importFrom grDevices colorRamp rgb
 #' @importFrom stats runif
 #' @import data.table
 #' @importFrom scales rescale
-#' @importFrom graphics layout
 #'
 #' @export
 plot_climate_stripes <- function(X, mode = c("warming_stripes", "labelled_stripes", "bars", "bars_with_scale")) {
@@ -42,25 +41,25 @@ plot_climate_stripes <- function(X, mode = c("warming_stripes", "labelled_stripe
   }
   # TODO plot 
   if (mode %in% "warming_stripes") {
-    plot_ly(X) |>
-      add_bars(x = ~x, y = ~1, marker = list(color = ~marker_color)) |>
-      layout(bargap = 0, xaxis = list(visible = FALSE), yaxis = list(visible = FALSE))
+    plotly::plot_ly(X) |>
+      plotly::add_bars(x = ~x, y = ~1, marker = list(color = ~marker_color)) |>
+      plotly::layout(bargap = 0, xaxis = list(visible = FALSE), yaxis = list(visible = FALSE))
   }
   if (mode %in% "labelled_stripes") {
-    plot_ly(X) |>
-      add_bars(x = ~x, y = ~1, marker = list(color = ~marker_color)) |>
-      layout(title = list(text = "Global temperature change (1850-2023)"),bargap = 0, xaxis = list(showgrid = FALSE, showline = FALSE, title = FALSE), yaxis = list(visible = FALSE))
+    plotly::plot_ly(X) |>
+      plotly::add_bars(x = ~x, y = ~1, marker = list(color = ~marker_color)) |>
+      plotly::layout(title = list(text = "Global temperature change (1850-2023)"),bargap = 0, xaxis = list(showgrid = FALSE, showline = FALSE, title = FALSE), yaxis = list(visible = FALSE))
   }
   if (mode %in% "bars") {
-    plot_ly(X) |>
-      add_bars(x = ~x, y = ~y, marker = list(color = ~marker_color)) |>
-      layout(title = list(text = paste0("Global temperature have increase by over ", X[, round(max(y)- min(y),1)], "\u00B0C")),bargap = 0, xaxis = list(visible = FALSE), yaxis = list(visible = FALSE))
+    plotly::plot_ly(X) |>
+      plotly::add_bars(x = ~x, y = ~y, marker = list(color = ~marker_color)) |>
+      plotly::layout(title = list(text = paste0("Global temperature have increase by over ", X[, round(max(y)- min(y),1)], "\u00B0C")),bargap = 0, xaxis = list(visible = FALSE), yaxis = list(visible = FALSE))
     
   }
   if (mode %in% "bars_with_scale") {
-    plot_ly(X) |>
-      add_bars(x = ~x, y = ~y, marker = list(color = ~marker_color)) |>
-      layout(bargap = 0, xaxis = list(showgrid = FALSE,showline = TRUE, title = FALSE), yaxis = list(showgrid = FALSE, showline = TRUE, title = FALSE))
+    plotly::plot_ly(X) |>
+      plotly::add_bars(x = ~x, y = ~y, marker = list(color = ~marker_color)) |>
+      plotly::layout(bargap = 0, xaxis = list(showgrid = FALSE,showline = TRUE, title = FALSE), yaxis = list(showgrid = FALSE, showline = TRUE, title = FALSE))
   }
 
  }

@@ -35,9 +35,9 @@ calc_EMT(t_min_list, mcmt, td)
 
 calc_EXT(t_max_list, mwmt, td)
 
-calc_MCMT(t_min_list)
+calc_MCMT(t_ave_list)
 
-calc_MWMT(t_max_list)
+calc_MWMT(t_ave_list)
 
 calc_TD(mcmt, mwmt)
 

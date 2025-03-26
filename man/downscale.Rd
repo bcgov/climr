@@ -42,8 +42,8 @@ downscale_db(
 )
 }
 \arguments{
-\item{xyz}{a \code{data.frame} with the following columns "long", "lat", "elev",
-and a unique "id". Any extra columns will be ignored and not output.}
+\item{xyz}{a \code{terra::SpatRaster} or a \code{data.frame} with the following columns
+"long", "lat", "elev", and a unique "id". Any extra columns will be ignored and not output.}
 
 \item{which_refmap}{character. Which map of 1961-1990 climatological normals to use as the
 high-resolution reference climate map for downscaling. Default is "auto",

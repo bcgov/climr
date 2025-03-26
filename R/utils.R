@@ -34,7 +34,14 @@ is_in_bbox <- function(newbb, oldbb) {
 #'  with columns "lon", "lat", "elev" and "id"
 #' @return numeric vector. Bounding box coordinates with order ymax,ymin,xmax,xmin (e.g. `c(51, 50, -121, -122)`).
 #' @export
+#' @rdname get_bb
 get_bb <- function(in_xyz) {
+  UseMethod("get_bb", in_xyz)
+}
+
+#' @export
+#' @rdname get_bb
+get_bb.data.frame <- function(in_xyz) {
   .checkXYZ(copy(in_xyz))
   thebb <- c(max(in_xyz[, "lat"]), min(in_xyz[, "lat"]), max(in_xyz[, "lon"]), min(in_xyz[, "lon"]))
 
@@ -45,6 +52,13 @@ get_bb <- function(in_xyz) {
   .check_bb(thebb)
 
   return(thebb)
+}
+
+#' @rdname get_bb
+#' @export
+get_bb.SpatRaster <- function(in_xyz) {
+  ext <- terra::ext(in_xyz)
+  return(c(ext$ymax, ext$ymin, ext$xmax, ext$xmin))
 }
 
 
@@ -103,7 +117,9 @@ tif_folder_gen <- function(dir, overwrite = FALSE) {
 #' @keywords internal
 #' @export
 get_latitude_raster <- function(r, out = NULL, ...) {
-  r <- terra::rast(r)
+  if (is.character(r) && file.exists(r)) {
+    r <- terra::rast(r) 
+  }
   # Check if the input raster is in a longitude/latitude CRS
   if (terra::is.lonlat(r)) {
     # Get the y-coordinates (latitudes) for each row
@@ -132,7 +148,7 @@ get_latitude_raster <- function(r, out = NULL, ...) {
     # Initialize a new raster with the latitude values computed for each cell
     lat_raster <- terra::init(r, fun = lat_fun)
   }
-  names(lat_raster) <- "latitude"
+  names(lat_raster) <- "lat"
   if (!is.null(out)) {
     terra::writeRaster(lat_raster, out, ...)
     return(invisible(lat_raster))
@@ -159,8 +175,11 @@ get_latitude_raster <- function(r, out = NULL, ...) {
 #' @keywords internal
 #' @export
 get_elev_raster <- function(r, elev, out = NULL, ...) {
+  if (is.character(r) && file.exists(r)) {
+    r <- terra::rast(r) 
+  }
   prj <- terra::project(elev, r, method = "near")
-  names(prj) <- "elevation"
+  names(prj) <- "elev"
   if (!is.null(out)) {
     terra::writeRaster(prj, out, ...)
     return(invisible(prj))

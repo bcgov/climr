@@ -24,22 +24,54 @@ calc_EXT <- function(t_max_list, mwmt, td) {
 #' Mean Temperature of the Coldest Month (MCMT)
 #' @export
 #' @rdname climatevar
-calc_MCMT <- function(t_min_list) {
-  if (inherits(t_min_list[[1]], "SpatRaster")) {
-    do.call(c, unname(t_min_list)) |> min()
+calc_MCMT <- function(t_ave_list) {
+  if (inherits(t_ave_list[[1]], "SpatRaster")) {
+    nly <- terra::nlyr(t_ave_list[[1]])
+    lapply(seq_len(nly), \(i) {
+      c(
+        t_ave_list[[1]][[i]],
+        t_ave_list[[2]][[i]],
+        t_ave_list[[3]][[i]],
+        t_ave_list[[4]][[i]],
+        t_ave_list[[5]][[i]],
+        t_ave_list[[6]][[i]],
+        t_ave_list[[7]][[i]],
+        t_ave_list[[8]][[i]],
+        t_ave_list[[9]][[i]],
+        t_ave_list[[10]][[i]],
+        t_ave_list[[11]][[i]],
+        t_ave_list[[12]][[i]]
+      ) |> min()
+    }) |> unname() |> do.call(c, args = _)
   } else {
-    do.call(pmin, t_min_list)
+    do.call(pmin, t_ave_list)
   }
 }
 
 #' Mean Temperature of the Warmest Month (MWMT)
 #' @export
 #' @rdname climatevar
-calc_MWMT <- function(t_max_list) {
-  if (inherits(t_max_list[[1]], "SpatRaster")) {
-    do.call(c, unname(t_max_list)) |> max()
+calc_MWMT <- function(t_ave_list) {
+  if (inherits(t_ave_list[[1]], "SpatRaster")) {
+    nly <- terra::nlyr(t_ave_list[[1]])
+    lapply(seq_len(nly), \(i) {
+      c(
+        t_ave_list[[1]][[i]],
+        t_ave_list[[2]][[i]],
+        t_ave_list[[3]][[i]],
+        t_ave_list[[4]][[i]],
+        t_ave_list[[5]][[i]],
+        t_ave_list[[6]][[i]],
+        t_ave_list[[7]][[i]],
+        t_ave_list[[8]][[i]],
+        t_ave_list[[9]][[i]],
+        t_ave_list[[10]][[i]],
+        t_ave_list[[11]][[i]],
+        t_ave_list[[12]][[i]]
+      ) |> max()
+    }) |> unname() |> do.call(c, args = _)
   } else {
-    do.call(pmax, t_max_list)
+    do.call(pmax, t_ave_list)
   }
 }
 
