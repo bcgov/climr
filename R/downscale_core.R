@@ -571,7 +571,8 @@ downscale_.SpatRaster <- function(xyz, refmap, gcms, gcm_ssp_ts, gcm_hist_ts,
   }
   
   lat <- get_latitude_raster(xyz)
-  res <- c(res_gcm, res_gcmts, res_gcm_hist, res_hist, res_hist_ts, res, lat)
+  # Put res first to get the right dispatch for rasters
+  res <- c(res, res_gcm, res_gcmts, res_gcm_hist, res_hist, res_hist_ts, lat)
   
   if ("elev" %in% names(xyz)) {
     res <- c(res, xyz[["elev"]]) 
