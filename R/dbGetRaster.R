@@ -53,43 +53,44 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
 
   info <- DBI::dbGetQuery(conn, "
     select
+      rid as id,
       st_xmax(st_envelope(rast)) as xmx,
       st_xmin(st_envelope(rast)) as xmn,
       st_ymax(st_envelope(rast)) as ymx,
       st_ymin(st_envelope(rast)) as ymn,
       st_width(rast) as cols,
       st_height(rast) as rows
-    from
-      (select st_union(%s, 1) rast from \"%s\"
-    WHERE rid IN (%s))"
-    |> sprintf(rastque, nameque, paste(rids$rid, collapse = ","))
+    from \"%s\"
+    WHERE rid IN (%s)"
+    |> sprintf(nameque, paste(rids$rid, collapse = ","))
   )
   
   bandqs1 <- bands |>
     paste0(collapse = ",") |>
     sprintf(fmt ="UNNEST((ST_Dumpvalues(rast, ARRAY[%s])).valarray::real[][]) as vals")
   
-  qry2 <- "
-    WITH unioned AS (
-      select ST_Union(%s) rast
+  rout <- lapply(rids$rid, \(rid) {
+    info_tl <- info[info$id == rid,]
+    qry2 <- "
+      select %s
       from \"%s\"
-      where rid IN (%s) 
+      where rid = %s
+    " |> sprintf(bandqs1, name, rid)
+    r_values <- DBI::dbGetQuery(conn,qry2)[["vals"]]
+    if (all(is.na(r_values))) {
+      warning("Empty tile - not enough data")
+      return(NULL)
+    }
+    terra::rast(
+      nrows = info_tl$rows, ncols = info_tl$cols, xmin = info_tl$xmn,
+      xmax = info_tl$xmx, ymin = info_tl$ymn, ymax = info_tl$ymx, nlyrs = length(bands),
+      crs = paste0("EPSG:", 4326), vals = r_values
     )
-    SELECT %s FROM unioned
-  " |> sprintf(rastque, name, paste(rids$rid, collapse = ", "), bandqs1)
-  r_values <- DBI::dbGetQuery(conn, qry2)
-  
-  if (all(is.na(r_values[, 1]))) {
-    warning("Empty tile - not enough data")
-    return(NULL)
-  } else {
-    rout <- terra::rast(
-      nrows = info$rows, ncols = info$cols, xmin = info$xmn,
-      xmax = info$xmx, ymin = info$ymn, ymax = info$ymx, nlyrs = length(bands),
-      crs = paste0("EPSG:", projID), vals = r_values$vals
-    )
-    return(rout)
-  }
+  }) |>
+    terra::sprc()
+    terra::merge()
+    
+  return(rout)
   
   # if (length(bands) > 1664) { ## maximum number of columns
   #   brks <- c(seq(1, length(bands), by = 1663), (length(bands) + 1))
