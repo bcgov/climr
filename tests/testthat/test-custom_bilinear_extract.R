@@ -1,20 +1,19 @@
 test_that("testing that the custom bilinear function works", {
   
   # Establish database connection
-  dbCon <- DBI::dbConnect(
-    RPostgres::Postgres(),
-    dbname = 'climr',
+  climr:::.globals[["sessprof"]]$set("adm", list(
     host = '146.190.244.244',
-    port = 5432,
     user = 'postgres',
     password = 'climr2022'
-  )
-  DBI::dbExecute(dbCon, "SET client_min_messages TO WARNING;")
+  ))
+  data_con("adm")
+  
+  db_safe_exec("SET client_min_messages TO WARNING;")
   # Drop the table if it exists ----
-  DBI::dbExecute(dbCon, "DROP TABLE IF EXISTS test_rasters;")
+  db_safe_exec("DROP TABLE IF EXISTS test_rasters;")
   ### Create 10x10 raster with 10 bands with random values and NAs
   # Create a table to store the raster
-  DBI::dbExecute(dbCon, "
+  db_safe_exec("
     CREATE TABLE test_rasters (
       rid serial PRIMARY KEY,
       rast raster
@@ -22,7 +21,7 @@ test_that("testing that the custom bilinear function works", {
   ")
   
   # Generate a 10x10 raster with 10 bands using PostGIS functions ----
-  DBI::dbExecute(dbCon, "
+  db_safe_exec("
     DO $$
     DECLARE
         rast raster;
@@ -56,11 +55,11 @@ test_that("testing that the custom bilinear function works", {
   ")
   
   # Drop the table if it exists ----
-  DBI::dbExecute(dbCon, "DROP TABLE IF EXISTS tmp_xyz;") |> invisible()
+  db_safe_exec("DROP TABLE IF EXISTS tmp_xyz;") |> invisible()
   
   ### Create 5 geometry POINTs within the raster ----
   # Create a table to store the points
-  DBI::dbExecute(dbCon, "
+  db_safe_exec("
     CREATE TABLE tmp_xyz (
         id serial PRIMARY KEY,
         geom geometry(Point, 4326)
@@ -68,7 +67,7 @@ test_that("testing that the custom bilinear function works", {
   ")
   
   # Insert 5 points within the raster extent (x: 0 to 10, y: -10 to 0) ----
-  DBI::dbExecute(dbCon, "
+  db_safe_exec("
     INSERT INTO tmp_xyz (geom) VALUES
         (ST_SetSRID(ST_MakePoint(1.1, -1.1), 4326)),
         (ST_SetSRID(ST_MakePoint(2, -2), 4326)),
@@ -87,10 +86,10 @@ test_that("testing that the custom bilinear function works", {
       var_nm = as.character(bands),
       laynum = bands
     ),
-    hull = DBI::dbGetQuery(dbCon, "SELECT ST_ASTEXT(ST_ConvexHull(ST_Collect(geom))) FROM tmp_xyz")[[1]]
+    hull = db_safe_query("SELECT ST_ASTEXT(ST_ConvexHull(ST_Collect(geom))) FROM tmp_xyz")[[1]]
   )
   
-  results_2 <- DBI::dbGetQuery(dbCon, "
+  results_2 <- db_safe_query("
     SELECT 
         p.id \"ID\",
         %s
@@ -107,8 +106,8 @@ test_that("testing that the custom bilinear function works", {
   testthat::expect_equal(results_1, results_2, info = "Testing that the custom SQL returns the same value as ST_Value")
   
   # Clean up by dropping test tables and disconnecting
-  DBI::dbExecute(dbCon, "DROP TABLE test_rasters;")
-  DBI::dbExecute(dbCon, "DROP TABLE tmp_xyz;")
+  db_safe_exec("DROP TABLE test_rasters;")
+  db_safe_exec("DROP TABLE tmp_xyz;")
   
   
   # Test tiles interpolation using normal_composite
@@ -161,7 +160,7 @@ test_that("testing that the custom bilinear function works", {
     SELECT 12 as id, ST_Translate(g0, +pw/4 ,-ph*2) AS geom FROM tmp_xyz_1
   )"
   
-  DBI::dbExecute(dbCon, q1)
+  db_safe_exec(q1)
   
   bands <- c(6,18,30,42,54,66)
   results_1 <- extract_db(
@@ -171,7 +170,7 @@ test_that("testing that the custom bilinear function works", {
       var_nm = paste("value", bands, sep = "_"),
       laynum = bands
     ),
-    hull = DBI::dbGetQuery(dbCon, "SELECT ST_ASTEXT(ST_ConvexHull(ST_Collect(geom))) FROM tmp_xyz")[[1]]
+    hull = db_safe_query("SELECT ST_ASTEXT(ST_ConvexHull(ST_Collect(geom))) FROM tmp_xyz")[[1]]
   )
   
   q2 <- "
@@ -186,11 +185,11 @@ test_that("testing that the custom bilinear function works", {
   " |> sprintf(
     paste0("ST_Value(rast, %s, geom, true, 'bilinear') value_%s" |> sprintf(bands, bands), collapse = ",\n       ")
   )
-  results_2 <- DBI::dbGetQuery(dbCon, q2)
+  results_2 <- db_safe_query(q2)
   
   testthat::expect_equal(results_1, results_2, info = "Testing that the custom SQL returns the same value as ST_Value (multi tiles crossing)")
   
-  DBI::dbExecute(dbCon, "DROP TABLE tmp_xyz;")
-  DBI::dbDisconnect(dbCon)
+  db_safe_exec("DROP TABLE tmp_xyz;")
+  connections_clear()
   
 })

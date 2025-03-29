@@ -25,7 +25,7 @@ NULL
 #' @noRd
 .onLoad <- function(libname, pkgname) {
 
-  .globals[["sesscon"]] <- session_connections()
+  init_globals()
   options("climr.recycle.warn"  = FALSE)
   dbCon <- tryCatch(data_con(), error = \(e) NULL)
 
