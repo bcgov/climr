@@ -1,6 +1,6 @@
 Package: climr
 Title: An R package of downscaled monthly climate data for North America
-Version: 0.1.1.9000
+Version: 0.1.1.9900
 Date: 19-03-2025
 Authors@R: c(
     person("Kiri", "Daust", , "kiri.daust@gov.bc.ca", role = c("aut", "cre")),

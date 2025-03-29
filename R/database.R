@@ -57,7 +57,7 @@ data_connect <- function(local = FALSE) {
 #' @rdname data_con
 #' @importFrom utils modifyList
 #' @export
-data_con <- function(profile = c("climr-db-user", "local")) {
+data_con <- function(profile = c(.globals$last_profile, "climr-db-user", "local")) {
   profile <- match.arg(profile)
   con <- .globals[["sesscon"]]$get(profile)
   if (is.null(con)) {
@@ -68,9 +68,21 @@ data_con <- function(profile = c("climr-db-user", "local")) {
     )
     args <- utils::modifyList(default_args, connection_creds(profile))
     con <- do.call(RPostgres::dbConnect, args)
+    if (!is.null(.globals[["last_xyz"]])) {
+      write_xyz(.globals[["last_xyz"]])
+    }
   }
+  .globals[["last_profile"]] <- profile
   .globals[["sesscon"]]$set(profile, con)
   return(con)
+}
+
+#' @noRd
+write_xyz <- function(xyz) {
+  db_safe_write("tmp_xyz", xyz, temporary = TRUE, overwrite = TRUE)
+  db_safe_exec("ALTER TABLE tmp_xyz ADD COLUMN IF NOT EXISTS geom GEOMETRY(Point, 4326)")
+  db_safe_exec("UPDATE tmp_xyz SET geom = ST_SetSRID(ST_MakePoint(lon, lat), 4326)")
+  return(xyz)
 }
 
 #' @noRd
@@ -137,6 +149,58 @@ connection_creds <- function(profile = c("climr-db-user", "local")) {
 
 #' @noRd
 .globals <- new.env()
+
+#' @importFrom RPostgres dbGetQuery
+#' @noRd
+db_safe_query <- function(statement, ...) {
+  db_safe(RPostgres::dbGetQuery, statement, ...)
+}
+
+#' @importFrom RPostgres dbExecute
+#' @noRd
+db_safe_exec <- function(statement, ...) {
+  db_safe(RPostgres::dbExecute, statement, ...)
+}
+
+#' @importFrom RPostgres dbWriteTable
+#' @noRd
+db_safe_write <- function(name, value, ...) {
+  if (name %in% "tmp_xyz") {
+    .globals[["last_xyz"]] <- value
+  }
+  db_safe(RPostgres::dbWriteTable, name, value, ...)
+}
+
+#' @noRd
+db_safe <- function(f, ...) {
+  with_retries(
+    f(conn = data_con(), ...)
+  )
+}
+
+
+#' @noRd
+with_retries <- function(expr, retries = 5L, xyz = NULL) {
+  attempt <- 1L
+  while (attempt <= retries) {
+    no_error <- TRUE
+    res <- tryCatch(
+      eval.parent(substitute(expr)),
+      error = function(e) {
+        message("Database connection issue.")
+        no_error <<- FALSE
+      }
+    )
+    if (no_error) break
+    message(paste("Retrying attempt", attempt, "in", 3^attempt, "seconds."))
+    Sys.sleep(3^attempt)
+    attempt <- attempt + 1L
+    if (attempt > retries) {
+      stop("Database operation could not be completed.")
+    }
+  }
+  return(res)
+}
 
 ### climr_client
 ### PowerOfBEC2023

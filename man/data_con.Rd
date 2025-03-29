@@ -6,7 +6,7 @@
 \alias{connections_clear}
 \title{List connections in cache}
 \usage{
-data_con(profile = c("climr-db-user", "local"))
+data_con(profile = c(.globals$last_profile, "climr-db-user", "local"))
 
 connections()
 

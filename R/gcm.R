@@ -110,7 +110,7 @@ input_gcms_db <- function(
       paste0("'", ssps, "'", collapse = ","),
       paste0("'", period, "'", collapse = ",")
     )
-  layerinfo <- DBI::dbGetQuery(dbCon, q) |> data.table::setDT()
+  layerinfo <- db_safe_query(q) |> data.table::setDT()
   layerinfo[, var_nm := paste(mod, var, month, scenario, run, period, sep = "_")]
 
   res <- lapply(gcms, function(gcm_nm) {
@@ -207,7 +207,7 @@ input_gcm_hist_db <- function(
       paste0("'", gcms, "'", collapse = ","),
       paste0("'", years, "'", collapse = ",")
     )
-  layerinfo <- DBI::dbGetQuery(dbCon, q) |> data.table::setDT()
+  layerinfo <- db_safe_query(q) |> data.table::setDT()
   layerinfo[, var_nm := paste(mod, var, month, run, year, sep = "_")]
 
   res <- lapply(gcms, function(gcm_nm) {
@@ -330,7 +330,7 @@ input_gcm_ssp_db <- function(
       paste0("'", ssps, "'", collapse = ","),
       paste0("'", years, "'", collapse = ",")
     )
-  layerinfo <- DBI::dbGetQuery(dbCon, q) |> data.table::setDT()
+  layerinfo <- db_safe_query(q) |> data.table::setDT()
 
   res <- lapply(gcms, function(gcm_nm) {
     if (!gcm_nm %in% dbnames_ts[["GCM"]]) return()
@@ -493,7 +493,7 @@ process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run, dbnames = dbna
       "') and period in ('", paste(period, collapse = "','"), "') and run in ('", paste(sel_runs, collapse = "','"), "')"
     )
     # print(q)
-    layerinfo <- as.data.table(dbGetQuery(dbCon, q))
+    layerinfo <- as.data.table(db_safe_query(q))
     message("Downloading GCM anomalies")
     gcm_rast <- pgGetTerra(dbCon, gcmcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
     layerinfo[, fullnm := paste(mod, var, month, scenario, run, period, sep = "_")]
@@ -614,7 +614,7 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
     if (needDownload) {
       q <- paste0("select mod, var, month, run, year, laynum from esm_layers_hist where mod = '", gcm_nm, "' and year in ('", paste(years, collapse = "','"), "') and run in ('", paste(sel_runs, collapse = "','"), "')")
       # print(q)
-      layerinfo <- as.data.table(dbGetQuery(dbCon, q))
+      layerinfo <- as.data.table(db_safe_query(q))
       layerinfo[, fullnm := paste(mod, var, month, run, year, sep = "_")]
       message("Downloading GCM anomalies")
       gcm_rast <- pgGetTerra(dbCon, gcmcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
@@ -747,7 +747,7 @@ process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts
           "') and period in ('", paste(period, collapse = "','"), "') and run in ('", paste(sel_runs, collapse = "','"), "')"
         )
         # print(q)
-        layerinfo <- dbGetQuery(dbCon, q)
+        layerinfo <- db_safe_query(q)
         message("Downloading GCM anomalies")
         message("Precip...")
         gcm_rast_ppt <- pgGetTerra(dbCon, gsub("VAR", "ppt", gcmcode), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
