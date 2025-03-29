@@ -177,7 +177,7 @@ downscale <- function(xyz, which_refmap = "auto",
                min(ST_UpperLeftY(rast)-ST_Height(rast)*abs(ST_PixelHeight(rast))) ymin,
                max(ST_UpperLeftY(rast)) ymax
         FROM %s" |> sprintf(rf)
-        normalhull <- DBI::dbGetQuery(dbCon, q) |> 
+        normalhull <- db_safe_query(q) |> 
           unlist() |>
           terra::ext() |>
           terra::vect(crs = "EPSG:4326")
@@ -420,13 +420,6 @@ downscale_db <- function(
     }
   } else {
     gcm_ssp_periods <- gcm_ssp_ts <- gcm_hist_ts <- NULL
-  }
-
-  write_xyz <- function(xyz) {
-    DBI::dbWriteTable(dbCon, "tmp_xyz", xyz, temporary = TRUE, overwrite = TRUE)
-    DBI::dbExecute(dbCon, "ALTER TABLE tmp_xyz ADD COLUMN IF NOT EXISTS geom GEOMETRY(Point, 4326)")
-    DBI::dbExecute(dbCon, "UPDATE tmp_xyz SET geom = ST_SetSRID(ST_MakePoint(lon, lat), 4326)")
-    return(xyz)
   }
   
   write_xyz(xyz)
