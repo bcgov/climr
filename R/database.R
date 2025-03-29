@@ -57,22 +57,15 @@ data_connect <- function(local = FALSE) {
 #' @rdname data_con
 #' @importFrom utils modifyList
 #' @export
-data_con <- function(profile = c(.globals$last_profile, "climr-db-user", "local")) {
+data_con <- function(profile = .globals[["sessprof"]]$list()) {
   profile <- match.arg(profile)
   con <- .globals[["sesscon"]]$get(profile)
   if (is.null(con)) {
-    default_args <- list(
-      drv = RPostgres::Postgres(),
-      dbname = "climr",
-      port = 5432
-    )
-    args <- utils::modifyList(default_args, connection_creds(profile))
-    con <- do.call(RPostgres::dbConnect, args)
+    con <- do.call(RPostgres::dbConnect, .globals[["sessprof"]]$get(profile))
     if (!is.null(.globals[["last_xyz"]])) {
       write_xyz(.globals[["last_xyz"]])
     }
   }
-  .globals[["last_profile"]] <- profile
   .globals[["sesscon"]]$set(profile, con)
   return(con)
 }
@@ -86,13 +79,16 @@ write_xyz <- function(xyz) {
 }
 
 #' @noRd
-session_connections <- function(nm) {
+session_connections <- function() {
   connections <- list()
   active <- TRUE
   return(
     list(
       set = function(nm, con) { 
-        if (active) connections[[nm]] <<- con 
+        if (active) {
+          connections[[nm]] <<- con
+          .globals[["sessprof"]]$last(nm)
+        }
       },
       get = function(nm) {
         if (!active || !length(nm)) return(NULL)
@@ -115,6 +111,38 @@ session_connections <- function(nm) {
   )
 }
 
+#' @noRd
+session_profiles <- function() {
+  profiles <- list()
+  last <- NULL
+  active <- TRUE
+  default_args <- list(
+    drv = RPostgres::Postgres(),
+    dbname = "climr",
+    port = 5432
+  )
+  return(
+    list(
+      set = function(nm, args) { 
+        if (active) {
+          profiles[[nm]] <<- args
+        }
+      },
+      get = function(nm = c(last, .globals[["sessprof"]]$list())) {
+        nm <- match.arg(nm)
+        if (!active || !length(nm)) return(NULL)
+        if (is.null(profiles[[nm]])) return(NULL)
+        utils::modifyList(default_args, profiles[[nm]])
+      },
+      clear = function() { profiles <<- list() },
+      last = function(nm) { last <<- nm },
+      list = function() {if (length(names(profiles))) c(last, names(profiles)) else return(invisible())},
+      enable = function() { active <<- TRUE},
+      disable = function() { active <<- FALSE}
+    )
+  )
+}
+
 #' List connections in cache
 #' @rdname data_con
 #' @export
@@ -130,25 +158,15 @@ connections_clear <- function() {
 }
 
 #' @noRd
-connection_creds <- function(profile = c("climr-db-user", "local")) {
-  profile <- match.arg(profile)
-  switch(
-    profile,
-    `climr-db-user` = list(
-      host = "146.190.244.244",
-      user = "climr_client",
-      password = "PowerOfBEC2023"
-    ),
-    local = list(
-      host = "localhost",
-      user = "postgres",
-      password = "climrserver"
-    )
-  )
-}
+.globals <- new.env()
 
 #' @noRd
-.globals <- new.env()
+init_globals <- function() {
+  .globals[["sesscon"]] <- session_connections()
+  .globals[["sessprof"]] <- session_profiles()
+  .globals[["sessprof"]]$set(nm = "climr-db-use", args = list(host = "146.190.244.244", user = "climr_client", password = "PowerOfBEC2023"))
+  .globals[["sessprof"]]$set(nm = "local", args = list(host = "localhost", user = "postgres", password = "climrserver"))
+}
 
 #' @importFrom RPostgres dbGetQuery
 #' @noRd
