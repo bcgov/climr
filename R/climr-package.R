@@ -25,7 +25,8 @@ NULL
 #' @noRd
 .onLoad <- function(libname, pkgname) {
 
-  .globals[["sesscon"]] <- session_connections()
+  init_globals()
+  options("climr.recycle.warn"  = FALSE)
   dbCon <- tryCatch(data_con(), error = \(e) NULL)
 
   if (is.null(dbCon)) {
@@ -47,26 +48,25 @@ NULL
     
   } else {
     
-    .globals[["gcm_period_runs"]] <- RPostgres::dbGetQuery(
-      dbCon, "
+    .globals[["gcm_period_runs"]] <- db_safe_query("
       select distinct mod, scenario, run
       from esm_layers_period order by mod, scenario, run;
       ") |> data.table::setDT()
     
-    .globals[["gcm_ts_runs"]] <- RPostgres::dbGetQuery(
-      dbCon,"
+    .globals[["gcm_ts_runs"]] <- db_safe_query("
       select distinct mod, scenario, run
       from esm_layers_ts order by mod, scenario, run;
       ") |> data.table::setDT()
     
-    .globals[["gcm_hist_runs"]] <- RPostgres::dbGetQuery(
-      dbCon, "
+    .globals[["gcm_hist_runs"]] <- db_safe_query("
       select distinct mod, run
       from esm_layers_hist order by mod, run;
       ") |> data.table::setDT()
     
   }
   
+  options("climr.recycle.warn" = TRUE)
+
 }
 
 # .onLoad <- function(libname, pkgname) {

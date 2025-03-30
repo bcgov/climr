@@ -347,7 +347,7 @@ extract_db <- function(
     ;"
   )
   
-  res <- DBI::dbGetQuery(dbCon, q) |> 
+  res <- db_safe_query(q) |> 
     data.table::setDT()
   
   uniqb <- res[["nband"]] |> unique() |> sort()
@@ -395,12 +395,12 @@ extract_db <- function(
   
   data.table::setcolorder(res, colorder)
   
-  if (nrow(res) != {nxyz <- DBI::dbGetQuery(dbCon, "SELECT COUNT(1) FROM tmp_xyz")[[1]]}) {
+  if (nrow(res) != {nxyz <- db_safe_query("SELECT COUNT(1) FROM tmp_xyz")[[1]]}) {
     warning(
       "Extraction from [%s] returned [%s] rows and requested geometries has [%s]. Filled with missing values" |> 
         sprintf(rastertbl[1], nrow(res), nxyz)
     )
-    xyzids <- DBI::dbGetQuery(dbCon, "SELECT id \"ID\" FROM tmp_xyz") |> data.table::setDT(key = "ID")
+    xyzids <- db_safe_query("SELECT id \"ID\" FROM tmp_xyz") |> data.table::setDT(key = "ID")
     res <- data.table::rbindlist(list(xyzids, res), use.names = TRUE, fill = TRUE)
   }
   

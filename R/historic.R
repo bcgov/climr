@@ -91,7 +91,7 @@ input_obs <- function(dbCon, bbox = NULL, period = list_obs_periods(), cache = T
   if (needDownload) {
     q <- paste0("select var_nm, laynum from historic_layers where period in ('", paste(period, collapse = "','"), "')")
     # print(q)
-    layerinfo <- dbGetQuery(dbCon, q)
+    layerinfo <- db_safe_query(q)
     message("Downloading observed period anomalies")
     hist_rast <- pgGetTerra(dbCon, dbcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
     names(hist_rast) <- layerinfo$var_nm
@@ -135,7 +135,7 @@ input_obs_db <- function(dbCon, period = list_obs_periods()) {
     sprintf(
       paste0("'", period, "'", collapse = ",")
     ) 
-  layerinfo <- DBI::dbGetQuery(dbCon, q) |>
+  layerinfo <- db_safe_query(q) |>
     data.table::setDT()
   res <- list(
     list(
@@ -208,7 +208,7 @@ input_obs_ts_db <- function(dbCon, dataset = c("cru.gpcc", "climatena"), years =
         dbnames_hist_obs[["dbname"]][m],
         paste0("'", years, "'", collapse = ",")
       )
-    layerinfo <- DBI::dbGetQuery(dbCon, q) |> 
+    layerinfo <- db_safe_query(q) |> 
       data.table::setDT()
     layerinfo[, var_nm := paste(d, var_nm, period, sep = "_")] 
     list(
@@ -285,7 +285,7 @@ process_one_historicts <- function(dataset, years, dbCon, bbox, dbnames = dbname
     if (needDownload) {
       q <- paste0("select var_nm, period, laynum from ", dbcode, "_layers where period in ('", paste(years, collapse = "','"), "')")
       # print(q)
-      layerinfo <- dbGetQuery(dbCon, q)
+      layerinfo <- db_safe_query(q)
       message("Downloading obs anomalies")
       hist_rast <- pgGetTerra(dbCon, dbcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
       names(hist_rast) <- paste(ts_name, layerinfo$var_nm, layerinfo$period, sep = "_")
