@@ -580,7 +580,7 @@ downscale_db <- function(
     message("'gcms' is missing. 'gcm_hist_years', 'gcm_ssp_years', 'gcm_periods' and 'ssps' will be ignored")
   }
 
-  if ((!is.null(max_run) | max_run > 0) &
+  if ((!is.null(max_run) & max_run > 0) &
     is.null(gcms)) {
     message("'gcms' is missing. 'max_run' will be ignored")
   }

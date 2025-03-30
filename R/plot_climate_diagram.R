@@ -1,164 +1,131 @@
 #' Plot Climate Diagram
-
-#' @param temp vector of temperatures (in Celsius) for each month
-#' @param precip vector of precipitation (in mm) for each month
-#' @param elev elevation (in m). Optional, if NULL no elevation will be shown in output. 
 #' 
-#' @importFrom data.table fcase fifelse
-#' @importFrom ggplot2 aes geom_hline geom_line geom_ribbon ggplot geom_polygon
-#' @importFrom ggplot2 scale_x_continuous scale_y_continuous sec_axis
-#' @importFrom ggplot2 annotate coord_cartesian labs theme_classic
+#' This is a wrapper function that will create the climate diagram input and 
+#' then will call the function to generate the climate diagram. 
+#' 
+#' @inheritParams create_climate_diagram_input
 #' @export
 #' @examples
+#' \dontrun{
+#' in_xyz <- data.frame(lon = -127.7052, lat = 55.3557, elev = 291, id = 1)
+#' plot_climate_diagram(in_xyz)
 #' 
-#' temperature <- c(14, 14, 17, 20, 24, 28, 31, 31, 27, 23, 18, 15)
-#' precipitations <- c(93.1, 62.1, 58.8, 46.6, 45.9, 23.1, 11.2, 18.9, 73.8, 68, 155.3, 76.3)
-#' plot_climate_diagram(temp = temperature, precip = precipitations,  elev = 25)
+#' plot_climate_diagram(in_xyz, 
+#'   gcms = "CanESM5",
+#'   ssp = "ssp245",
+#'   obs_period = "2001_2020",
+#'   gcm_period = "2021_2040",
+#'   max_run = 1,
+#'   cache = TRUE
+#'   )
+#' }
+
+plot_climate_diagram <- function(xyz,
+                                 gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)],
+                                 ssps = list_ssps()[2],
+                                 obs_periods = list_obs_periods()[1],
+                                 gcm_periods = list_gcm_periods(),
+                                 max_run = 10,
+                                 cache = TRUE, 
+                                 ...){
+  
+  
+  plot_input <- create_climate_diagram_input(xyz = xyz,
+                                             gcms = gcms,
+                                             ssps = ssps,
+                                             obs_periods = obs_periods,
+                                             gcm_periods = gcm_periods,
+                                             max_run = max_run,
+                                             cache = cache, 
+                                             ...)
+  
+  
+  create_climate_diagram(temp = plot_input[["Tave"]], precip = plot_input[["PPT"]], elev = plot_input[["elev"]])
+  
+  
+}
+
+
+
+#' Create input for Climate Diagram
 #' 
-#' plot_climate_diagram(temp = c(-3, 14, 17, 20, 24, 28, 31, 31, 27, 23, 18, -5), 
-#'    precip = c(93.1, 62.1, 58.8, 46.6, 45.9, 23.1, 11.2, 18.9, 73.8, 68, 155.3, 76.3), 
-#'    elev = 25 )
-#' 
-plot_climate_diagram <- function(temp, precip, elev = NULL){
-  
-  #Remove CRAN check warnings
-  if (FALSE) {
-    y_temp <- y_precip <- y_100 <- x <- y <- NULL
-  }
+#' This function will downscale and return a list of the montly Tmin, Tmax, Tave, PPT and the elevation.
+#' @inheritParams downscale
+#' @param use_downscale_db Should the function `downscale_db` be used instead of `downscale`
+#' @export
+#' @examples
+#' \dontrun{
+#' in_xyz <- data.frame(lon = -127.7052, lat = 55.3557, elev = 291, id = 1)
+#' create_climate_diagram_input(xyz)
+#' }
 
-  stopifnot(length(temp)==12)
-  stopifnot(length(precip)==12)
-  stopifnot(!anyNA(c(temp, precip)))
-
-  month <- 1:12
+create_climate_diagram_input <- function(xyz,
+                                         gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)],
+                                         ssps = list_ssps()[2],
+                                         obs_periods = list_obs_periods()[1],
+                                         gcm_periods = list_gcm_periods(),
+                                         max_run = 10L,
+                                         cache = TRUE, 
+                                         use_downscale_db = FALSE,
+                                         ...) {
   
-  # when monthly precipitation is greater than 100 mm, the scale is increased from 2 mm/Celsius to 20 mm/Celsius to avoid too high diagrams in very wet locations.
-  y_precip_rel <- fifelse(precip > 100, (precip-100)/20 + 50, precip/2)
-  
-  period_type <- fcase(precip > 100, 'Wet',
-                       y_precip_rel > temp, 'Humid', 
-                       default = 'Dry')
-  
-  monthly_df <- data.frame(month = month, y_precip = y_precip_rel, y_temp = temp, period_type = period_type)
-  
-  intersect_xy <- find_intersect_humid_dry(temp, y_precip_rel)
-  
-  if (nrow(intersect_xy)){
-    intersect_df <- data.frame(month = intersect_xy$x, y_precip = intersect_xy$y, y_temp = intersect_xy$y)
-
-    df_humid <- rbind(monthly_df[which(period_type %in% c('Humid', 'Wet')),], cbind(intersect_df, period_type = 'Humid'))
-    df_dry <- rbind(monthly_df[which(period_type == 'Dry'),], cbind(intersect_df, period_type = 'Dry'))
-  } else {
-    df_humid <- monthly_df[which(period_type %in% c('Humid', 'Wet')),]
-    df_dry <- monthly_df[which(period_type == 'Dry'),]
-  }
-  
-  all_info <- unique(rbind(df_humid, df_dry))
-   
-  gg <- ggplot(data = all_info, mapping = aes(x = month)) + 
-    geom_line(aes(month, y_temp), colour = 'red') + 
-    geom_line(aes(month, y_precip), colour = 'blue') + 
-    geom_hline(yintercept = 50) +
-    geom_hline(yintercept = 0) +
-    geom_ribbon(data = all_info[which(all_info$period_type %in% c('Humid', 'Wet')),], aes(ymax = y_precip, ymin = y_temp), fill = "blue", alpha = 0.25) +
-    geom_ribbon(data = all_info[which(all_info$period_type == "Dry"),], aes(ymax = y_temp, ymin = y_precip), fill = "red", alpha = 0.25) +
-    scale_x_continuous(breaks = 1:12, labels = c('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'), name = 'Month') +
-    scale_y_continuous("Temperature (C)", sec.axis = sec_axis(transform = ~(.*2)*(.<=100)+(20*(.-100)+100)*(.>100), name = "Precipitation (mm)")) +
-    coord_cartesian(xlim = c(1,12), ylim = c(min(-2, temp), max(y_precip_rel, temp, 50)), clip = 'off', expand = FALSE ) + #, expand = FALSE to start at Jan
-    annotate("text", x = 11.75, y = max(y_precip_rel, temp, 50)+4, label = paste0(trunc(sum(precip)), " mm")) + 
-    annotate("text", x = 10, y = max(y_precip_rel, temp, 50)+4, label = paste0(trunc(mean(temp)*10)/10, " C")) + 
-    labs(title = 'Walter-Lieth Climate Diagram', subtitle = ifelse(is.null(elev),"",paste0("(", elev, "m)"))) +
-    theme_classic()
-  
-  # Add Wet Periods (precip > 100) ----
-  if (any(period_type == 'Wet')){
-
-    which_wet <- which(period_type == 'Wet')
-
-    intersections_100 <- do.call(cbind, lapply(which_wet, find_intersect_wet_period, y_precip_rel = y_precip_rel))
-    intersections_100 <- data.frame(intersect_x = intersections_100[1,], intersect_y = intersections_100[2,])
-
-    df_wet <- data.frame(
-      month = c(month[which_wet], intersections_100$intersect_x),
-      y_precip = c(y_precip_rel[which_wet], intersections_100$intersect_y), 
-      y_100 = 50
-    )
+  if (isTRUE(use_downscale_db)){
+    data <- downscale_db(xyz,
+                         gcms = gcms,
+                         ssps = ssps,
+                         obs_periods = obs_periods,
+                         gcm_periods = gcm_periods,
+                         vars = c(sprintf("PPT_%02d", 1:12), sprintf("Tmin_%02d", 1:12), sprintf("Tmax_%02d", 1:12), sprintf("Tave_%02d", 1:12)),
+                         return_refperiod = FALSE,
+                         max_run = max_run,
+                         ...)
     
-    gg <- gg + geom_ribbon(data = df_wet, aes(ymax = y_precip, ymin = y_100), fill = 'black', alpha = 0.50) 
-  }
-  
-
-  # Add Freeze Periods  ----
-  freeze <- which(temp < 0)
-   
-  for(i in seq_along(freeze)){
-    df_freeze <- data.frame(x = c(pmax(1,rep(freeze[i]-0.5, 2)), pmin(rep(freeze[i]+0.5, 2), 12)),
-                            y= c(0,-1, -1, 0))
-    
-    gg <- gg + geom_polygon(data = df_freeze, aes(x = x, y = y), fill = "blue", colour = "black", alpha = 0.6)
-  }
-  
-  
-  gg
-  
-} 
-
-
-
-
-
-find_intersect_wet_period <- function(x, y_precip_rel){
-
-  if (x == 1){
-    if (y_precip_rel[2] > 50){ # We don't cross threshold between 1 and 2
-      matrix(data = c(1, y_precip_rel[1]))
-    } else{
-      cbind(matrix(data = c(1, y_precip_rel[1])), 
-          find_intersect_xy(1:2, y1 = c(50, 50), y2 = y_precip_rel[1:2]))
-    }
-
-  } else if (x == 12){
-    if (y_precip_rel[11] > 50){ # We don't cross threshold between 11 and 12
-      matrix(data = c(12, y_precip_rel[12]))
-    } else {
-      cbind(find_intersect_xy(11:12, y1 = c(50, 50), y2 = y_precip_rel[11:12]), 
-          matrix(data = c(12, y_precip_rel[12])))
-    }
     
   } else{
-    if (y_precip_rel[x-1] < 50 & y_precip_rel[x+1] < 50){
-      cbind(find_intersect_xy((x-1):x, y1 = c(50, 50), y2 = y_precip_rel[(x-1):x]), 
-          find_intersect_xy(x:(x+1), y1 = c(50, 50), y2 = y_precip_rel[x:(x+1)]))
-    } else if (y_precip_rel[x-1] < 50 & y_precip_rel[x+1] > 50) {
-      cbind(find_intersect_xy((x-1):x, y1 = c(50, 50), y2 = y_precip_rel[(x-1):x]), 
-          matrix(data = c(x, y_precip_rel[x])))
-    } else if (y_precip_rel[x-1] > 50 & y_precip_rel[x+1] < 50) {
-      cbind(matrix(data = c(x, y_precip_rel[x])), 
-          find_intersect_xy(x:(x+1), y1 = c(50, 50), y2 = y_precip_rel[x:(x+1)]))
-    } else {
-      matrix(data = c(x, y_precip_rel[x]))
-    }
     
+    data <- downscale(xyz,
+                      gcms = gcms,
+                      ssps = ssps,
+                      obs_periods = obs_periods,
+                      gcm_periods = gcm_periods,
+                      vars = c(sprintf("PPT_%02d", 1:12), sprintf("Tmin_%02d", 1:12), sprintf("Tmax_%02d", 1:12), sprintf("Tave_%02d", 1:12)),
+                      return_refperiod = FALSE,
+                      max_run = max_run,
+                      cache = cache, 
+                      ...)
   }
+ 
+
+  
+  data <- merge(data, data.frame(id = xyz$id, elev = xyz$elev), by = 'id')
+  
+  if (any(data$RUN == "ensembleMean")){
+    
+    Tmin <-  data[RUN !=  "ensembleMean", lapply(.SD, min, na.rm = TRUE), .SDcols = patterns("Tmin_[0-9]")]
+    Tmax <-  data[RUN !=  "ensembleMean", lapply(.SD, max, na.rm = TRUE), .SDcols = patterns("Tmax_[0-9]")]
+    Tave <-  data[RUN ==  "ensembleMean", lapply(.SD, mean, na.rm = TRUE), .SDcols = patterns("Tave_[0-9]")]
+    PPT <- data[RUN == "ensembleMean", lapply(.SD, mean, na.rm = TRUE), .SDcols = patterns("PPT_[0-9]")]
+    
+  } else { #use historical data
+    Tmin <-  data[, lapply(.SD, min, na.rm = TRUE), .SDcols = patterns("Tmin_[0-9]")]
+    Tmax <-  data[, lapply(.SD, max, na.rm = TRUE), .SDcols = patterns("Tmax_[0-9]")]
+    Tave <-  data[, lapply(.SD, mean, na.rm = TRUE), .SDcols = patterns("Tave_[0-9]")]
+    PPT <- data[, lapply(.SD, mean, na.rm = TRUE), .SDcols = patterns("PPT_[0-9]")]
+  }
+  
+  list(Tmin = c(Tmin[["Tmin_01"]], Tmin[["Tmin_02"]], Tmin[["Tmin_03"]], Tmin[["Tmin_04"]], Tmin[["Tmin_05"]], Tmin[["Tmin_06"]], 
+                Tmin[["Tmin_07"]], Tmin[["Tmin_08"]], Tmin[["Tmin_09"]], Tmin[["Tmin_10"]], Tmin[["Tmin_11"]], Tmin[["Tmin_12"]]),
+       Tmax = c(Tmax[["Tmax_01"]], Tmax[["Tmax_02"]], Tmax[["Tmax_03"]], Tmax[["Tmax_04"]], Tmax[["Tmax_05"]], Tmax[["Tmax_06"]], 
+                Tmax[["Tmax_07"]], Tmax[["Tmax_08"]], Tmax[["Tmax_09"]], Tmax[["Tmax_10"]], Tmax[["Tmax_11"]], Tmax[["Tmax_12"]]), 
+       Tave = c(Tave[["Tave_01"]], Tave[["Tave_02"]], Tave[["Tave_03"]], Tave[["Tave_04"]], Tave[["Tave_05"]], Tave[["Tave_06"]], 
+                Tave[["Tave_07"]], Tave[["Tave_08"]], Tave[["Tave_09"]], Tave[["Tave_10"]], Tave[["Tave_11"]], Tave[["Tave_12"]]), 
+       PPT = c(PPT[["PPT_01"]], PPT[["PPT_02"]], PPT[["PPT_03"]], PPT[["PPT_04"]], PPT[["PPT_05"]], PPT[["PPT_06"]], 
+               PPT[["PPT_07"]], PPT[["PPT_08"]], PPT[["PPT_09"]], PPT[["PPT_10"]], PPT[["PPT_11"]], PPT[["PPT_12"]]), 
+       elev = mean(xyz$elev, na.rm = TRUE))
+
 }
 
-#' @importFrom stats coef lm
-find_intersect_xy <- function(x, y1, y2){
-  coef_1 <- coef(lm(y1~x))
-  coef_2 <- coef(lm(y2~x))
-  #find x
-  inter_x <- as.numeric((coef_2[1] - coef_1[1]) / (coef_1[2] - coef_2[2]))
-  c(inter_x, as.numeric(coef_1[1] + inter_x*coef_1[2]))
-} 
 
-find_intersect_humid_dry <- function(temp, y_precip_rel){
 
-  #Compare to previous month to know if period type changed between months.
-  ## January won't change because it has no prior state so we assign FALSE.
-  period_type_change <- c(FALSE, (y_precip_rel[-1] > temp[-1]) != (y_precip_rel[-12] > temp[-12]))
 
-  intersect_xy <- vapply(which(period_type_change), \(x) find_intersect_xy((x-1):x, y1=temp[(x-1):x], y2=y_precip_rel[(x-1):x]), numeric(2))
 
-  data.frame(x = intersect_xy[1,], y = intersect_xy[2,])
-
-}

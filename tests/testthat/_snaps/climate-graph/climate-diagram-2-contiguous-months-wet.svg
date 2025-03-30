@@ -30,8 +30,6 @@
 <polygon points='254.73,313.35 268.98,304.41 328.03,267.38 387.08,239.61 446.12,239.61 486.58,264.98 486.58,264.98 446.12,439.11 387.08,474.75 328.03,419.67 268.98,314.13 254.73,313.35 ' style='stroke-width: 0.00; stroke: none; stroke-linecap: butt; fill: #FF0000; fill-opacity: 0.25;' />
 <polyline points='254.73,313.35 268.98,304.41 328.03,267.38 387.08,239.61 446.12,239.61 486.58,264.98 ' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
 <polyline points='486.58,264.98 446.12,439.11 387.08,474.75 328.03,419.67 268.98,314.13 254.73,313.35 ' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
-<text x='667.55' y='4.88' text-anchor='middle' style='font-size: 11.04px; font-family: sans;' textLength='39.89px' lengthAdjust='spacingAndGlyphs'>883 mm</text>
-<text x='564.22' y='4.88' text-anchor='middle' style='font-size: 11.04px; font-family: sans;' textLength='32.53px' lengthAdjust='spacingAndGlyphs'>21.8 C</text>
 <polygon points='66.94,63.71 91.84,40.43 98.27,63.71 558.10,63.71 564.22,49.69 564.22,49.69 623.26,38.12 623.26,38.12 634.44,63.71 634.44,63.71 623.26,63.71 623.26,63.71 564.22,63.71 564.22,63.71 558.10,63.71 98.27,63.71 91.84,63.71 66.94,63.71 ' style='stroke-width: 0.00; stroke: none; stroke-linecap: butt; fill: #000000; fill-opacity: 0.50;' />
 <polyline points='66.94,63.71 91.84,40.43 98.27,63.71 558.10,63.71 564.22,49.69 564.22,49.69 623.26,38.12 623.26,38.12 634.44,63.71 ' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
 <polyline points='634.44,63.71 623.26,63.71 623.26,63.71 564.22,63.71 564.22,63.71 558.10,63.71 98.27,63.71 91.84,63.71 66.94,63.71 ' style='stroke-width: 1.07; stroke: none; stroke-linecap: butt;' />
@@ -88,6 +86,6 @@
 <text transform='translate(13.05,291.61) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='81.31px' lengthAdjust='spacingAndGlyphs'>Temperature (C)</text>
 <text transform='translate(706.95,291.61) rotate(90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='89.25px' lengthAdjust='spacingAndGlyphs'>Precipitation (mm)</text>
 <text x='32.79' y='30.35' style='font-size: 11.00px; font-family: sans;' textLength='28.73px' lengthAdjust='spacingAndGlyphs'>(25m)</text>
-<text x='32.79' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='173.12px' lengthAdjust='spacingAndGlyphs'>Walter-Lieth Climate Diagram</text>
+<text x='32.79' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='352.25px' lengthAdjust='spacingAndGlyphs'>Walter-Lieth Climate Diagram           ( 21.8°C )      ( 884mm )</text>
 </g>
 </svg>
