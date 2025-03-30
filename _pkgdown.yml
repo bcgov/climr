@@ -84,6 +84,8 @@ reference:
   - plot_timeSeries_input_db
   - plot_climate_stripes
   - plot_climate_diagram
+  - create_climate_diagram
+  - create_climate_diagram_input
   - plot_ensemble
   - get_bb
   - lapse_rate
