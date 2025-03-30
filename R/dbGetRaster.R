@@ -34,15 +34,15 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
   namechar <- gsub("'", "''", paste(gsub('^"|"$', "", name1), collapse = "."))
 
   ## rast query name
-  rastque <- RPostgres::dbQuoteIdentifier(conn, rast)
+  rastque <- db_safe(RPostgres::dbQuoteIdentifier, rast)
 
-  projID <- DBI::dbGetQuery(conn, "
+  projID <- db_safe_query("
     select ST_SRID(%s) as srid
     from \"%s\" where rid = 1;
   " |> sprintf(rastque, nameque)
   )$srid[1]
   
-  rids <- DBI::dbGetQuery(conn, "
+  rids <- db_safe_query("
     select rid
     from \"%s\"
     WHERE ST_Intersects(ST_ConvexHull(%s), ST_GeomFromText('POLYGON((%s %s,%s %s,%s %s,%s %s,%s %s))', %s))"
@@ -51,7 +51,7 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
                projID)
   )
 
-  info <- DBI::dbGetQuery(conn, "
+  info <- db_safe_query("
     select
       rid as id,
       st_xmax(st_envelope(rast)) as xmx,
@@ -61,22 +61,21 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
       st_width(rast) as cols,
       st_height(rast) as rows
     from \"%s\"
-    WHERE rid IN (%s)"
-    |> sprintf(nameque, paste(rids$rid, collapse = ","))
+    WHERE rid IN (%s)" |> sprintf(nameque, paste(rids$rid, collapse = ","))
   )
   
   bandqs1 <- bands |>
     paste0(collapse = ",") |>
     sprintf(fmt ="UNNEST((ST_Dumpvalues(rast, ARRAY[%s])).valarray::real[][]) as vals")
   
-  rout <- lapply(rids$rid, \(rid) {
+  out_list <- lapply(rids$rid, \(rid) {
     info_tl <- info[info$id == rid,]
     qry2 <- "
       select %s
       from \"%s\"
       where rid = %s
     " |> sprintf(bandqs1, name, rid)
-    r_values <- DBI::dbGetQuery(conn,qry2)[["vals"]]
+    r_values <- db_safe_query(qry2)[["vals"]]
     if (all(is.na(r_values))) {
       warning("Empty tile - not enough data")
       return(NULL)
@@ -86,11 +85,11 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
       xmax = info_tl$xmx, ymin = info_tl$ymn, ymax = info_tl$ymx, nlyrs = length(bands),
       crs = paste0("EPSG:", 4326), vals = r_values
     )
-  }) |>
-    terra::sprc()
-    terra::merge()
-    
-  return(rout)
+  })
+  
+  rsrc <- terra::sprc(out_list)
+  rast_res <- terra::merge(rsrc)
+  return(rast_res)
   
   # if (length(bands) > 1664) { ## maximum number of columns
   #   brks <- c(seq(1, length(bands), by = 1663), (length(bands) + 1))
@@ -194,7 +193,7 @@ dbGetTiles <- function(conn, name, pnts, bands = 1:73){
     WHERE ST_Intersects(ST_ConvexHull(rast), ST_GeomFromText('%s', 4326))
   " |> sprintf(name, wkt_str)
   
-  info <- DBI::dbGetQuery(conn,qry)
+  info <- db_safe_query(qry)
   
   bandqs1 <- bands |>
     paste0(collapse = ",") |>
@@ -206,7 +205,7 @@ dbGetTiles <- function(conn, name, pnts, bands = 1:73){
     from \"%s\"
     where rid IN (%s)
   " |> sprintf(bandqs1, name, paste(info$id, collapse = ", "))
-  r_values <- DBI::dbGetQuery(conn,qry2)
+  r_values <- db_safe_query(qry2)
   r_values <- split(r_values[,-1], r_values$rid)
   
   out_list <- lapply(names(r_values), \(tile) {
@@ -301,7 +300,7 @@ dbGetTiles <- function(conn, name, pnts, bands = 1:73){
 #' @noRd
 make_raster <- function(boundary, conn, rastque, nameque, projID, bands) {
   cat(".")
-  info <- dbGetQuery(conn, paste0(
+  info <- db_safe_query(paste0(
     "select
               st_xmax(st_envelope(rast)) as xmx,
               st_xmin(st_envelope(rast)) as xmn,
@@ -319,7 +318,7 @@ make_raster <- function(boundary, conn, rastque, nameque, projID, bands) {
     "))'),", projID, "))) as a;"
   ))
   bandqs1 <- paste0("UNNEST(ST_Dumpvalues(rast, ", bands, ")) as vals_", bands)
-  rast_vals <- dbGetQuery(conn, paste0(
+  rast_vals <- db_safe_query(paste0(
     "SELECT ", paste(bandqs1, collapse = ","),
     " from (SELECT ST_Union(rast) rast FROM \"", nameque, "\" WHERE ST_Intersects(",
     rastque, ",ST_SetSRID(ST_GeomFromText('POLYGON((", boundary[4],
