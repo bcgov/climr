@@ -79,7 +79,7 @@
 <text x='357.55' y='568.24' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='30.58px' lengthAdjust='spacingAndGlyphs'>Month</text>
 <text transform='translate(13.05,291.61) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='81.31px' lengthAdjust='spacingAndGlyphs'>Temperature (C)</text>
 <text transform='translate(706.95,291.61) rotate(90)' text-anchor='middle' style='font-size: 11.00px; font-family: sans;' textLength='89.25px' lengthAdjust='spacingAndGlyphs'>Precipitation (mm)</text>
-<text x='32.79' y='30.35' style='font-size: 11.00px; font-family: sans;' textLength='28.73px' lengthAdjust='spacingAndGlyphs'>(25m)</text>
+<text x='32.79' y='30.35' style='font-size: 11.00px; font-family: sans;' textLength='34.84px' lengthAdjust='spacingAndGlyphs'>( 25m )</text>
 <text x='32.79' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='352.25px' lengthAdjust='spacingAndGlyphs'>Walter-Lieth Climate Diagram           ( 25.0°C )      ( 881mm )</text>
 </g>
 </svg>

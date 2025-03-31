@@ -25,5 +25,11 @@ create_climate_diagram(temp = temperature, precip = precipitations,  elev = 25)
 create_climate_diagram(temp = c(-3, 14, 17, 20, 24, 28, 31, 31, 27, 23, 18, -5), 
    precip = c(93.1, 62.1, 58.8, 46.6, 45.9, 23.1, 11.2, 18.9, 73.8, 68, 155.3, 76.3), 
    elev = 25 )
+   
+\dontrun{  
+ in_xyz <- data.frame(lon = -127.7052, lat = 55.3557, elev = 291, id = 1)
+ diagram_info <- create_climate_diagram_input(in_xyz)
+ create_climate_diagram(temp = diagram_info[["Tave"]], precip = diagram_info[["PPT"]], elev = diagram_info[["elev"]])
+}
 
 }
