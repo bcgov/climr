@@ -1,6 +1,9 @@
-# Add extra climate variables to a SpatRaster or `data.table`
+#' Append Additional Climate Variables
+#' Add extra climate variables to a SpatRaster or `data.table`
 #' @importFrom data.table set setcolorder
-#' @noRd
+#' @param dt object on which to add variables. Eith a SpatRaster or a data.table 
+#' @param vars variables to add
+#' @keywords internal
 #' @export 
 append_clim_vars <- function(dt, vars) {
   UseMethod("append_clim_vars")

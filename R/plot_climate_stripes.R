@@ -25,6 +25,9 @@
 #' @export
 plot_climate_stripes <- function(X, mode = c("warming_stripes", "labelled_stripes", "bars", "bars_with_scale")) {
   
+  #Remove NSE CRAN check warnings
+  if (FALSE){ x <- y <- marker_color  <- NULL}
+  
   mode <- match.arg(mode)
   
   # options
