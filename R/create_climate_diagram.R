@@ -22,7 +22,9 @@
 #' \dontrun{  
 #'  in_xyz <- data.frame(lon = -127.7052, lat = 55.3557, elev = 291, id = 1)
 #'  diagram_info <- create_climate_diagram_input(in_xyz)
-#'  create_climate_diagram(temp = diagram_info[["Tave"]], precip = diagram_info[["PPT"]], elev = diagram_info[["elev"]])
+#'  create_climate_diagram(temp = diagram_info[["Tave"]], 
+#'     precip = diagram_info[["PPT"]], 
+#'     elev = diagram_info[["elev"]])
 #' }
 #' 
 create_climate_diagram <- function(temp, precip, elev = NULL){

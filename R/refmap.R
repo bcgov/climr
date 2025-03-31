@@ -137,6 +137,10 @@ input_refmap <- function(dbCon, bbox, reference = "refmap_climr", cache = TRUE, 
 #' @rdname input_refmap
 #' @export
 input_refmap_db <- function(reference = "refmap_climatena") {
+  
+  #Remove NSE CRAN check warnings
+  if (FALSE){ var_nm <- NULL}
+  
   ## checks
   if (is(reference, "character")) {
     # match.arg(reference, list_refmaps()) ## temporarily disable

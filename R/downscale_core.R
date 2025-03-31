@@ -621,8 +621,32 @@ threaded_downscale_ <- function(xyz, refmap, gcms, gcm_ssp_ts, gcm_hist_ts, obs,
   return(res)
 }
 
-#' @noRd
+#' Process climate raster data for specific coordinates
+#' 
+#' This function processes climate raster data by extracting values at specified coordinates
+#' using bilinear interpolation and transforming the data according to the specified type.
+#' 
+#' @param climaterast Raster object containing climate data
+#' @param res Rresolution/scaling factors
+#' @param timeseries Logical indicating if data should be processed as time series (default: FALSE)
+#' @param type Character specifying the type of climate data
+#' @inheritParams downscale
+#' @return A data.table containing processed climate data with columns depending on type:
+#'   \itemize{
+#'     \item For "gcms": id, GCM, SSP, RUN, PERIOD, lat, elev, and climate variables
+#'     \item For "gcm_hist_ts": id, GCM, RUN, PERIOD, lat, elev, and climate variables
+#'     \item For "obs": id, PERIOD, lat, elev, and climate variables
+#'     \item For "obs_ts": id, DATASET, PERIOD, lat, elev, and climate variables
+#'   }
+#'
+#' @details
+#' The function performs the following steps:
+#' 1. Crops the raster to an extent around the input coordinates
+#' 2. Extracts values using bilinear interpolation
+#' 3. Applies scaling factors from res
+#' 4. Reshapes the data based on the specified type
 #' @export
+#' @keywords internal
 #' @importFrom stats as.formula
 process_one_climaterast <- function(climaterast, res, xyz, timeseries = FALSE,
                                     type = c("gcms", "gcm_hist_ts", "obs", "obs_ts")) {

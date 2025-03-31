@@ -42,6 +42,7 @@ Imports:
     terra,
     uuid,
     dplyr,
+    tidyr,
     abind,
     dbplyr,
     plotly,

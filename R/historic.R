@@ -123,6 +123,9 @@ input_obs <- function(dbCon, bbox = NULL, period = list_obs_periods(), cache = T
 #' @rdname hist-input-data
 #' @export
 input_obs_db <- function(dbCon, period = list_obs_periods()) {
+  
+  #Remove NSE CRAN check warnings
+  if (FALSE){ var_nm <- NULL}
 
   dbnames2 <- structure(list(
     PERIOD = c("2001_2020"),
@@ -200,6 +203,9 @@ input_obs_ts <- function(dbCon, dataset = c("cru.gpcc", "climatena"), bbox = NUL
 #' @rdname hist-input-data
 #' @export
 input_obs_ts_db <- function(dbCon, dataset = c("cru.gpcc", "climatena"), years = 2010:2022) {
+  
+  #Remove NSE CRAN check warnings
+  if (FALSE){ var_nm <- NULL}
 
   res <- lapply(dataset, function(d) {
     if (is.na(m <- match(d, dbnames_hist_obs$dataset))) return(NULL)

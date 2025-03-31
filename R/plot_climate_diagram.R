@@ -56,7 +56,7 @@ plot_climate_diagram <- function(xyz,
 #' @examples
 #' \dontrun{
 #' in_xyz <- data.frame(lon = -127.7052, lat = 55.3557, elev = 291, id = 1)
-#' create_climate_diagram_input(xyz)
+#' create_climate_diagram_input(in_xyz)
 #' }
 
 create_climate_diagram_input <- function(xyz,

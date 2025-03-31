@@ -174,6 +174,9 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 37:73,
 #' @export
 dbGetTiles <- function(conn, name, pnts, bands = 1:73){
   
+  #Remove NSE CRAN check warnings
+  if (FALSE){ mls <- NULL}
+  
   if (inherits(pnts, "SpatRaster")) {
     wkt_str <- terra::ext(ref) |> terra::vect() |> terra::geom(wkt = TRUE)
   } else {

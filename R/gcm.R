@@ -89,7 +89,10 @@ input_gcms_db <- function(
   max_run = 0L,
   run_nm = NULL
 ) {
-
+  
+  #Remove NSE CRAN check warnings
+  if (FALSE){ dbname <- var_nm <- NULL}
+  
   gcms <- match.arg(gcms, list_gcms(), several.ok = TRUE)
   ssps <- match.arg(ssps, list_ssps(), several.ok = TRUE)
   period <- match.arg(period, list_gcm_periods(), several.ok = TRUE)
@@ -195,6 +198,9 @@ input_gcm_hist_db <- function(
   run_nm = NULL
 ) {
 
+  #Remove NSE CRAN check warnings
+  if (FALSE){ dbname <- var_nm <- NULL}
+  
   runs <- .globals[["gcm_hist_runs"]]
 
   q <- "
@@ -315,6 +321,9 @@ input_gcm_ssp_db <- function(
   run_nm = NULL
 ) {
 
+  #Remove NSE CRAN check warnings
+  if (FALSE){ dbname <- var_nm <- NULL}
+  
   if (nrow(dbnames_ts) < 1) stop("That isn't a valid GCM")
  
   runs <- .globals[["gcm_ts_runs"]]
@@ -802,10 +811,16 @@ process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts
 #' @template run_nm
 #'
 #' @importFrom tools R_user_dir
+#' @importFrom tidyr unnest
+#' @importFrom dplyr collect tbl mutate
 #'
 #' @return a `SpatRaster`
 #' @noRd
 process_one_gcmts_fast <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache, run_nm) { 
+  
+  #Remove NSE CRAN check warnings
+  if (FALSE){ vals <- cellid <- ssp <- i.row <- i.col <- NULL}
+  
   if(gcm_nm %in% dbnames$GCM){
     gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
     gcmarray <- dbnames$dbarray[dbnames$GCM == gcm_nm]

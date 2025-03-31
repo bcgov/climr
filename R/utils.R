@@ -211,6 +211,9 @@ extract_db <- function(
   VAR = NULL,
   hull = NULL
 ) {
+  #Remove NSE CRAN check warnings
+  if (FALSE){ band <- NULL}
+  
   colorder <- c("ID", layers[["var_nm"]])
   layers <- layers[order(laynum)]
   if (!is.null(VAR) && length(VAR)) {

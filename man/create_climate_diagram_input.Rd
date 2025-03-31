@@ -48,6 +48,6 @@ This function will downscale and return a list of the montly Tmin, Tmax, Tave, P
 \examples{
 \dontrun{
 in_xyz <- data.frame(lon = -127.7052, lat = 55.3557, elev = 291, id = 1)
-create_climate_diagram_input(xyz)
+create_climate_diagram_input(in_xyz)
 }
 }
