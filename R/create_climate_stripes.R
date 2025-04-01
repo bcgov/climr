@@ -109,6 +109,8 @@ create_climate_stripes_input <- function(xyz = NULL,
                                  downscale_results = NULL,
                                  ...){
   
+  #Remove NSE CRAN check warnings
+  if (FALSE){ x <- y <- Tave <-  avg_temp <- NULL}
   
   vars <- c("Tave")
   
