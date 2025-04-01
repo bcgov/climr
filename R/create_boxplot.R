@@ -50,6 +50,8 @@ create_boxplot <- function(dt, var = c("Tmax", "Tmin", "PPT", "Tave")){
   
   var_nm <- sprintf("%s_%02d", match.arg(var), 1:12)
   
+  var <- match.arg(var)
+  
   if (!is.null(dt$RUN) && any(dt$RUN == "ensembleMean")){
     avg <- dt[RUN == "ensembleMean", lapply(.SD, mean), by = PERIOD, .SDcols = var_nm]  
   } else{
@@ -83,6 +85,7 @@ create_boxplot <- function(dt, var = c("Tmax", "Tmin", "PPT", "Tave")){
 #' This function will downscale and return a data.table used to call `create_boxplot`.
 #' 
 #' @inheritParams downscale
+#' @param downscale_results optional, if you want to pass precomputed downscale results
 #' @param use_downscale_db Should the function `downscale_db` be used instead of `downscale`
 #' @param ... Additional arguments passed to `downscale` or `downscale_db`
 #'
@@ -99,7 +102,7 @@ create_boxplot <- function(dt, var = c("Tmax", "Tmin", "PPT", "Tave")){
 #'   gcm_ssp_years = 2015:2040)
 #' }
 
-create_boxplot_input <- function(xyz,
+create_boxplot_input <- function(xyz = NULL,
                                  gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)],
                                  ssps = list_ssps()[2],
                                  max_run = 10L,
@@ -108,6 +111,7 @@ create_boxplot_input <- function(xyz,
                                  gcm_ssp_years = list_gcm_ssp_years(), 
                                  use_downscale_db = FALSE,
                                  cache = TRUE, 
+                                 downscale_results = NULL,
                                  ...){
   
   
@@ -116,39 +120,18 @@ create_boxplot_input <- function(xyz,
             sprintf("%s_%02d", "Tmax", 1:12),
             sprintf("%s_%02d", "PPT", 1:12))
     
-  if (isTRUE(use_downscale_db)){
-    
-    dwn_dt <- downscale_db(xyz = xyz,
-                           gcms = gcms,
-                           ssps = ssps,
-                           max_run = max_run,
-                           obs_years = obs_years,
-                           gcm_hist_years = gcm_hist_years,
-                           gcm_ssp_years = gcm_ssp_years,
-                           vars = vars,
-                           return_refperiod = FALSE,
-                           ...)
-  }else{
-    dwn_dt <- downscale(xyz = xyz,
-                        gcms = gcms,
-                        ssps = ssps,
-                        max_run = max_run,
-                        obs_years = obs_years,
-                        gcm_hist_years = gcm_hist_years,
-                        gcm_ssp_years = gcm_ssp_years,
-                        vars = vars,
-                        return_refperiod = FALSE,
-                        cache = TRUE, ...)
-  }
-  
-  
-  if (!is.null(dwn_dt$RUN) && any(dwn_dt$RUN == "ensembleMean")){
-    avg <- dwn_dt[RUN == "ensembleMean", lapply(.SD, mean), by = PERIOD, .SDcols = vars]  
-  } else{
-    avg <- dwn_dt[, lapply(.SD, mean), by = PERIOD, .SDcols = vars]
-  }
-  
-  avg
+  summarize_downscale_input(xyz,
+                            gcms = gcms,
+                            ssps = ssps,
+                            max_run = max_run,
+                            obs_years = obs_years,
+                            gcm_hist_years = gcm_hist_years,
+                            gcm_ssp_years = gcm_ssp_years, 
+                            use_downscale_db = use_downscale_db,
+                            cache = cache, 
+                            vars = vars,
+                            downscale_results = downscale_results,
+                            ...)
 }
 
 
