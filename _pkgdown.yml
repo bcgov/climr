@@ -86,6 +86,8 @@ reference:
   - plot_climate_diagram
   - create_climate_diagram
   - create_climate_diagram_input
+  - create_boxplot
+  - create_boxplot_input
   - plot_ensemble
   - get_bb
   - lapse_rate
