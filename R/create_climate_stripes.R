@@ -112,7 +112,7 @@ create_climate_stripes_input <- function(xyz = NULL,
   
   vars <- c("Tave")
   
-  dwn_dt <- summarize_downscale_input(xyz,
+  dwn_dt <- summarize_downscale_output(xyz,
                             gcms = gcms,
                             ssps = ssps,
                             max_run = max_run,

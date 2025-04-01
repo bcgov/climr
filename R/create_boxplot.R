@@ -120,7 +120,7 @@ create_boxplot_input <- function(xyz = NULL,
             sprintf("%s_%02d", "Tmax", 1:12),
             sprintf("%s_%02d", "PPT", 1:12))
     
-  summarize_downscale_input(xyz,
+  summarize_downscale_output(xyz,
                             gcms = gcms,
                             ssps = ssps,
                             max_run = max_run,
