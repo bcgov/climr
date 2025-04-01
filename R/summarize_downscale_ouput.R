@@ -16,13 +16,13 @@
 #' @examples
 #' \dontrun{
 #' in_xyz <- data.frame(lon = -127.7052, lat = 55.3557, elev = 291, id = 1)
-#' summarize_downscale_input(in_xyz)
-#' summarize_downscale_input(in_xyz, max_run = 1L, 
+#' summarize_downscale_output(in_xyz)
+#' summarize_downscale_output(in_xyz, max_run = 1L, 
 #'   gcm_hist_years = 1950:2015, 
 #'   gcm_ssp_years = 2015:2040)
 #' }
 
-summarize_downscale_input <- function(xyz = NULL,
+summarize_downscale_output <- function(xyz = NULL,
                                  gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)],
                                  ssps = list_ssps()[2],
                                  max_run = 10L,
