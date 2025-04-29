@@ -3,6 +3,84 @@ library(terra)
 library(climr)
 library(RPostgres)
 
+my_points <- data.frame(
+  lon = c(-127.7300, -127.7500),
+  lat = c(55.34114, 55.25),
+  elev = c(711, 500),
+  id = 1:2
+)
+
+bb <- get_bb(my_points)
+boundary <- bb
+dbCon <- data_con()
+bc_bb <- c(59,57,-120,-121)
+
+in_xyz <- data.frame(
+  lon = c(-127.7052, -127.6227, -127.5623, -127.7162, -127.1858, -127.125, -126.9495, -126.9550),
+  lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
+  elev = c(291, 296, 626, 377, 424, 591, 723, 633),
+  id = 1:8
+)
+data <- downscale(in_xyz, which_refmap = "refmap_climr", obs_periods = "2001_2020", vars = c("MAT","MAP","CMD"))
+dem <- rast("data-raw/dem_mosaic/climr_mosaic_dem.tif")
+dem2 <- crop(dem, ext(res2))
+
+res3 <- downscale(dem2, which_refmap = "refmap_climr", vars = c("MAT","MAP","CMD"))
+
+library(tictoc)
+tic()
+res <- dbGetRaster(dbCon, "normal_composite", TRUE, bands = 1:73, boundary = bc_bb)
+toc()
+
+conn <- data_con()
+tic()
+res2 <- pgGetTerra(conn, "normal_composite", TRUE, bands = 1:73, boundary = bc_bb)
+toc()
+
+projID <- 4326L
+rids <- climr:::db_safe_query("
+    select rid
+    from \"%s\"
+    WHERE ST_Intersects(ST_ConvexHull(%s), ST_GeomFromText('POLYGON((%s %s,%s %s,%s %s,%s %s,%s %s))', %s))" |> 
+                        sprintf("normal_composite", "rast", boundary[4], boundary[1], boundary[4], boundary[2],
+                                 boundary[3], boundary[2], boundary[3], boundary[1], boundary[4], boundary[1],
+                                 projID)
+)
+
+txt <- "select rid
+    from \"%s\"
+    WHERE ST_Intersects(ST_ConvexHull(%s), ST_GeomFromText('POLYGON((%s %s,%s %s,%s %s,%s %s,%s %s))', %s))" |> 
+  sprintf("normal_composite", "rast", boundary[4], boundary[1], boundary[4], boundary[2],
+           boundary[3], boundary[2], boundary[3], boundary[1], boundary[4], boundary[1],
+           4326)
+
+rids <- climr:::db_safe_query("
+    select rid
+    from \"%s\"
+    WHERE ST_Intersects(ST_ConvexHull(%s), ST_GeomFromText('POLYGON((%s %s,%s %s,%s %s,%s %s,%s %s))', %s))"
+                      |> sprintf("normal_composite", "rast", boundary[4], boundary[1], boundary[4], boundary[2],
+                                 boundary[3], boundary[2], boundary[3], boundary[1], boundary[4], boundary[1],
+                                 4326L)
+)
+res <- input_refmap(dbCon, bb)
+res2 <- input_refmap(dbCon, bb, reference = "refmap_climatena")
+
+projID <- climr:::db_safe_query("
+    select ST_SRID(%s) as srid
+    from \"%s\" where rid = 1;
+  " |> sprintf("rast", "normal_bc")
+)$srid[1]
+
+# generate the input data
+my_data <- plot_timeSeries_input_db(my_points[1,], gcms = list_gcms()[1])
+
+# use the input to create a plot
+plot_timeSeries(my_data, var1 = "Tmin_sm")
+
+plot_bivariate_db(my_points)
+
+plot_climate_stripes()
+
 dbCon <- data_connect()
 bbox <- c(55,51.5,-115,-128)
 
