@@ -693,12 +693,6 @@ process_one_climaterast.data.frame <- function(climaterast, res, xyz, timeseries
     }
   }
 
-  # else { Ceres not sure what this is for but it's always causing fails
-  #     stop("Climate value extraction failed.",
-  #          "\n   Please contact developers with a reproducible example and the error:\n",
-  #          climaterast)
-  #   }
-
   # Create match set to match with res names
 
   labels <- vapply(
