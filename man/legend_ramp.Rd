@@ -48,17 +48,37 @@ the legend. The legend can be oriented either horizontally or vertically, and lo
 scaling is applied to the labels if the \code{log} parameter is specified.
 }
 \examples{
-dem <- get(data("dem_vancouver")) |> unwrap() ## get the sample digital elevation model (dem) provided with `climr`
-grid <- as.data.frame(dem, cells = TRUE, xy = TRUE) ## convert the DEM to a data.frame
-colnames(grid) <- c("id", "lon", "lat", "elev") # rename column names to what climr expects
-ds_out <- downscale(grid, which_refmap = "refmap_prism") ## A simple climr query. This will return the observed 1961-1990 normals for the raster grid points. 
-clim <- rast(dem) # use the DEM as a template raster
-clim[ds_out[, id]] <- ds_out[, get(var)] # populate the raster cells with the 2001-2020 annual precipitation (MAP) values, using the `id` field as the link. 
-clim <- log2(clim) # log-transform precipitation for more meaningful scaling
-inc=diff(range(values(clim)))/500 #increment for the ramp
-breaks=seq(min(values(clim))-inc, max(values(clim))+inc, inc) # color breaks
-ColScheme <- rev(hcl.colors(length(breaks)-1, "GnBu")) # color scheme
-plot(clim, col=ColScheme, breaks=breaks, legend=F, main="", mar=NA)
-legend_ramp(clim, title = paste(var, "(mm)"), ColScheme = ColScheme, breaks = breaks, pos=c(0.05, 0.45, 0.1, 0.125), log = 2, horizontal = TRUE)
+## get the sample digital elevation model (dem) provided with `climr`
+dem <- get(data("dem_vancouver")) |> terra::unwrap()
+## convert the DEM to a data.frame
+grid <- as.data.frame(dem, cells = TRUE, xy = TRUE)
+## rename column names to what climr expects
+colnames(grid) <- c("id", "lon", "lat", "elev")
+## A simple climr query.
+## This will return the observed 1961-1990 normals for the raster grid points.
+var <- "MAP"
+ds_out <- downscale(grid, which_refmap = "refmap_prism", vars = var)
+clim <- terra::rast(dem) # use the DEM as a template raster
+## populate the raster cells with the 2001-2020 annual precipitation (MAP) values,
+## using the `id` field as the link.
+clim[ds_out[, id]] <- ds_out[, var, with = FALSE]
+## log-transform precipitation for more meaningful scaling
+clim <- log2(clim)
+## increment for the ramp
+inc=diff(range(terra::values(clim)))/500
+## color breaks
+breaks=seq(min(terra::values(clim))-inc, max(terra::values(clim))+inc, inc)
+## color scheme
+ColScheme <- rev(hcl.colors(length(breaks)-1, "GnBu"))
+terra::plot(clim, col=ColScheme, breaks=breaks, legend=FALSE, main="", mar=NA)
+legend_ramp(
+  clim,
+  title = paste(var, "(mm)"),
+  ColScheme = ColScheme,
+  breaks = breaks,
+  pos=c(0.05, 0.45, 0.1, 0.125),
+  log = 2,
+  horizontal = TRUE
+)
 
 }

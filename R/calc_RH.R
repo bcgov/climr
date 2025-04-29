@@ -7,9 +7,10 @@
 #'
 #' @examples
 #' \dontrun{
-#' climr:::calc_RH(tmmin = 10, tmmax = 40)
+#' climr::calc_RH(tmmin = 10, tmmax = 40)
 #' }
-#' @noRd
+#' @export
+#' @rdname climatevar
 calc_RH <- function(tmmin, tmmax) {
   es_tmin <- calc_SVP(tmmin)
   es_tmax <- calc_SVP(tmmax)
@@ -28,13 +29,13 @@ calc_RH <- function(tmmin, tmmax) {
 #'
 #' @references Hogg, E.H. (1997). Temporal scaling of moisture and the forest-grassland boundary in western Canada. Agricultural and Forest Meteorology, Research on Forest Environmental Influences in a Changing World, 84, 115–122.
 #' @importFrom data.table fifelse
-#' @noRd
+#' @export
+#' @rdname climatevar
 calc_PET <- function(tave, tmmin, tmmax, alt) {
   D <- 0.5 * (.calc_SVP(tmmax) + .calc_SVP(tmmin)) - .calc_SVP(tmmin - 2.5)
-  pet <- fifelse(
-    tave > 10, 93 * D * exp(alt / 9300),
-    fifelse(tave > -5, (6.2 * tave + 31) * D * exp(alt / 9300), 0)
-  )
+  test1 <- tave > 10
+  test2 <- tave > -5
+  pet <- test1 * (93 * D * exp(alt / 9300)) + (!test1) * test2 * ((6.2 * tave + 31) * D * exp(alt / 9300))
   return(pet)
 }
 
@@ -44,13 +45,15 @@ calc_PET <- function(tave, tmmin, tmmax, alt) {
 
 #' Calculate Saturated Vapour Pressure at a temperature t
 #' @template t
-#' @noRd
+#' @export
+#' @rdname climatevar
 calc_SVP <- function(t) {
   svp <- .calc_SVP(t)
-  i <- which(t < 0)
-  svp[i] <- svp[i] * (1 + (t[i] * 0.01))
+  test1 <- t < 0
+  svp <- test1 * svp * (1 + (t * 0.01)) + (!test1) * svp
   return(svp)
 }
+
 
 #' internal utility function
 #' Magnus-Tetens empirical formula for saturation vapour pressure, with units of degrees C and kPa

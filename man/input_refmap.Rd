@@ -2,16 +2,19 @@
 % Please edit documentation in R/refmap.R
 \name{input_refmap}
 \alias{input_refmap}
+\alias{input_refmap_db}
 \title{Retrieve reference period climate maps}
 \usage{
 input_refmap(
   dbCon,
   bbox,
-  reference = "refmap_climatena",
+  reference = "refmap_climr",
   cache = TRUE,
   indiv_tiles = FALSE,
   xyz = NULL
 )
+
+input_refmap_db(reference = "refmap_climatena")
 }
 \arguments{
 \item{dbCon}{A db connection object created by \code{data_connect}.}
@@ -23,6 +26,11 @@ Can be obtained from \code{\link[=list_refmaps]{list_refmaps()}}. For \code{Spat
 names PPT01:PPT12, Tmax01:Tmax12 and Tmin01:Tmin12. Defaults to \code{list_refmaps()[1]}.}
 
 \item{cache}{logical. Specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
+
+\item{indiv_tiles}{logical. Only download necessary tiles instead of full bounding box?}
+
+\item{xyz}{a \code{terra::SpatRaster} or a \code{data.frame} with the following columns
+"long", "lat", "elev", and a unique "id". Any extra columns will be ignored and not output.}
 }
 \value{
 A \code{SpatRaster} containing reference period climatologies, lapse rates
