@@ -8,9 +8,10 @@
 #'
 #' @examples
 #' \dontrun{
-#' climr:::calc_PAS(4, 2, 600)
+#' climr::calc_PAS(4, 2, 600)
 #' }
-#' @noRd
+#' @export
+#' @rdname climatevar
 calc_PAS <- function(m, tave, PPT) {
   if (FALSE) {
     T0 <- a <- b <- NULL

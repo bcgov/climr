@@ -4,23 +4,22 @@
 #' @template tmmax
 #' @template latitude
 #' @return numeric. Reference evaporation (Eref)
-#' @noRd
+#' @export
+#' @rdname climatevar
 calc_Eref <- function(m, tmmin, tmmax, latitude) {
-  Eref <- numeric(length(tmmax))
   tmean <- (tmmax + tmmin) / 2
-  i <- which(tmean >= 0)
+  test1 <- tmean >= 0
   day_month <- c(31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
   day_julian <- c(15, 45, 74, 105, 135, 166, 196, 227, 258, 288, 319, 349)
   # Paper unclear, 1.18 - 0.0065 in Appendix, 1.18 - 0.0067 in paper
   # Wangetal2012_ClimateWNA_JAMC-D-11-043.pdf
   # Probably missing
-  Eref[i] <- 0.0023 * day_month[m] *
-    calc_S0_I(day_julian[m], tmean[i], latitude[i]) *
-    (tmean[i] + 17.8) * sqrt(tmmax[i] - tmmin[i]) *
-    (1.18 - 0.0065 * latitude[i])
-
-  Eref[is.na(tmmax)] <- tmmax[is.na(tmmax)] ## use tmmax[is.na(tmmax)] to respect NA type
-
+  Eref <- test1 * (
+    0.0023 * day_month[m] *
+    calc_S0_I(day_julian[m], tmean, latitude) *
+    (tmean + 17.8) * sqrt(tmmax - tmmin) *
+    (1.18 - 0.0065 * latitude)
+  )
   return(Eref)
 }
 
@@ -28,15 +27,11 @@ calc_Eref <- function(m, tmmin, tmmax, latitude) {
 #' @param Eref Reference evaporation
 #' @template PPT
 #' @return numeric. Climatic moisture deficit
-#' @noRd
+#' @export
+#' @rdname climatevar
 calc_CMD <- function(Eref, PPT) {
-  CMD <- numeric(length(Eref))
-  i <- which(Eref > PPT)
-  CMD[i] <- Eref[i] - PPT[i]
-
-  ## return 0s to NaNs if missing values
-  CMD[is.na(Eref)] <- Eref[is.na(Eref)] ## use Eref[is.na(Eref)] to respect NA type
-
+  test1 <- Eref > PPT
+  CMD <- test1 * (Eref - PPT)
   return(CMD)
 }
 
@@ -62,13 +57,13 @@ calc_S0_I <- function(d, tm, latitude) {
   XLR <- latitude / 57.2958
   Z <- -tan(XLR) * tan(DEC)
   OM <- -atan(Z / sqrt(-Z * Z + 1)) + pi / 2
-  OM[!is.finite(OM)] <- if(d %in% 91:274) 3.1 else 0 # NB this is a modification of Hargreaves program to provide finite values above the arctic circle. 
+  test1 <- is.finite(OM)
+  OM <- (!test1) * (if(d %in% 91:274) 3.1 else 0) + (test1 * OM) # NB this is a modification of Hargreaves program to provide finite values above the arctic circle. 
   # CALCULATE THE DAILY EXTRATERRESTRIAL RADIATION IN LANGLEYS/DAY
   DL <- OM / 0.1309
   RAL <- 120 * (DL * sin(XLR) * sin(DEC) + 7.639 * cos(XLR) * cos(DEC) * sin(OM)) / ES
   # CALCULATE THE EXTRATERRESTRIAL RADIATION IN MM/DAY
   RA <- RAL * 10 / (595.9 - 0.55 * tm)
-
   return(RA)
 }
 

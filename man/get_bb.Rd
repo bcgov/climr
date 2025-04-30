@@ -2,9 +2,15 @@
 % Please edit documentation in R/utils.R
 \name{get_bb}
 \alias{get_bb}
+\alias{get_bb.data.frame}
+\alias{get_bb.SpatRaster}
 \title{Find bounding box of data}
 \usage{
 get_bb(in_xyz)
+
+\method{get_bb}{data.frame}(in_xyz)
+
+\method{get_bb}{SpatRaster}(in_xyz)
 }
 \arguments{
 \item{in_xyz}{\code{data.table} (or \code{data.frame}) of points to downscale

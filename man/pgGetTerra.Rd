@@ -2,7 +2,7 @@
 % Please edit documentation in R/dbGetRaster.R
 \name{pgGetTerra}
 \alias{pgGetTerra}
-\title{Download raster with bounding box from PostGIS}
+\title{Download raster with bounding box from PostGIS (original)}
 \usage{
 pgGetTerra(conn, name, tile, rast = "rast", bands = 37:73, boundary)
 }
@@ -24,5 +24,5 @@ Defaults to "rast"}
 A \code{SpatRaster}
 }
 \description{
-Download raster with bounding box from PostGIS
+Download raster with bounding box from PostGIS (original)
 }

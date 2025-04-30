@@ -8,7 +8,7 @@ output:
 description: >
   Criteria for climate model inclusion in climr, and rationale for the recommended 8-GCM general-purpose ensemble. 
 vignette: >
-  %\VignetteIndexEntry{Climate model and scenario selection}
+  %\VignetteIndexEntry{Global climate model ensemble selection}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 editor_options: 
