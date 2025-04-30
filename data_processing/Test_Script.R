@@ -3,6 +3,7 @@ library(terra)
 library(climr)
 library(RPostgres)
 
+
 my_points <- data.frame(
   lon = c(-127.7300, -127.7500),
   lat = c(55.34114, 55.25),
@@ -11,6 +12,55 @@ my_points <- data.frame(
 )
 
 bb <- get_bb(my_points)
+dbCon <- data_connect()
+res <- input_refmap(dbCon, bb)
+res2 <- input_refmap(dbCon, bb, reference = "refmap_climatena")
+
+
+plot(res2$Tmax_07)
+# draw the plot
+plot_bivariate(my_points)
+
+my_data <- plot_timeSeries_input(my_points)
+plot_timeSeries(my_data, var1 = "DD5")
+
+in_xyz <- data.frame(
+     lon = c(-127.7052, -127.6227, -127.5623, -127.7162, -127.1858, -127.125, -126.9495, -126.9550),
+     lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
+     elev = c(291, 296, 626, 377, 424, 591, 723, 633),
+     id = 1:8
+   )
+ clim <- downscale(xyz = in_xyz, 
+                                           which_refmap = "refmap_climr", 
+                                            gcms = list_gcms()[1], 
+                                            ssps = list_ssps()[2],
+                                            gcm_periods = list_gcm_periods()[3], 
+                                            run_nm = list_runs_ssp(list_gcms()[1], list_ssps()[2])[3]
+                     )
+
+ 
+ 
+ dir <- paste("//objectstore2.nrs.bcgov/ffec/Climatologies/PRISM_BC/PRISM_dem/", sep="")
+ dem <- rast(paste(dir, "PRISM_dem.asc", sep=""))
+ dem <- aggregate(dem, fact=3)
+ dem <- mask(dem, bc)
+ dem <- trim(dem)
+ 
+ # climr data
+ grid <- as.data.frame(dem, cells = TRUE, xy = TRUE)
+ colnames(grid) <- c("id", "lon", "lat", "elev") # rename column names to what climr expects
+ setDT(grid)
+ pnts <- extract(bc_outline, grid[, .(lon, lat)], method = "simple")
+ 
+ clim.grid <- downscale(xyz = grid, 
+                        which_refmap = "refmap_climr", 
+                        gcms = list_gcms()[1], 
+                        ssps = list_ssps()[2],
+                        gcm_periods = list_gcm_periods()[3], 
+                        max_run = 2,
+                        vars = list_vars()
+ )
+
 boundary <- bb
 dbCon <- data_con()
 bc_bb <- c(59,57,-120,-121)
