@@ -2,6 +2,7 @@
 % Please edit documentation in R/downscale.R
 \name{downscale}
 \alias{downscale}
+\alias{downscale_db}
 \title{Self-contained change-factor downscaling of observed and simulated climate data}
 \usage{
 downscale(
@@ -22,10 +23,27 @@ downscale(
   indiv_tiles = FALSE,
   ...
 )
+
+downscale_db(
+  xyz,
+  which_refmap = "auto",
+  obs_periods = NULL,
+  obs_years = NULL,
+  obs_ts_dataset = NULL,
+  gcms = NULL,
+  ssps = NULL,
+  gcm_periods = NULL,
+  gcm_ssp_years = NULL,
+  gcm_hist_years = NULL,
+  max_run = 0L,
+  run_nm = NULL,
+  local = FALSE,
+  ...
+)
 }
 \arguments{
-\item{xyz}{a \code{data.frame} with the following columns "long", "lat", "elev",
-and a unique "id". Any extra columns will be ignored and not output.}
+\item{xyz}{a \code{terra::SpatRaster} or a \code{data.frame} with the following columns
+"long", "lat", "elev", and a unique "id". Any extra columns will be ignored and not output.}
 
 \item{which_refmap}{character. Which map of 1961-1990 climatological normals to use as the
 high-resolution reference climate map for downscaling. Default is "auto",
@@ -69,7 +87,8 @@ are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
 \item{local}{logical. Is the postgres database local? Default \code{FALSE}}
 
-\item{indiv_tiles}{logical. Only download necessary tiles instead of full bounding box? This will generally be faster, but doesn't cache.}
+\item{indiv_tiles}{logical. Only download necessary tiles instead of full bounding box?
+This will generally be faster, but doesn't cache.}
 
 \item{...}{other arguments passed to \code{\link[=downscale_core]{downscale_core()}}. Namely: \code{return_refperiod},
 \code{vars}, \code{out_spatial} and \code{plot}}

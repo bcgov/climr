@@ -2,6 +2,7 @@
 % Please edit documentation in R/plot_timeSeries_input.R
 \name{plot_timeSeries_input}
 \alias{plot_timeSeries_input}
+\alias{plot_timeSeries_input_db}
 \title{Input data for the time series climate change plot}
 \usage{
 plot_timeSeries_input(
@@ -15,10 +16,22 @@ plot_timeSeries_input(
   gcm_ssp_years = list_gcm_ssp_years(),
   vars = list_vars()
 )
+
+plot_timeSeries_input_db(
+  xyz,
+  gcms = list_gcms(),
+  ssps = list_ssps(),
+  max_run = 10,
+  obs_ts_dataset = c("cru.gpcc", "climatena"),
+  obs_years = list_obs_years(),
+  gcm_hist_years = list_gcm_hist_years(),
+  gcm_ssp_years = list_gcm_ssp_years(),
+  vars = list_vars()
+)
 }
 \arguments{
-\item{xyz}{a \code{data.frame} with the following columns "long", "lat", "elev",
-and a unique "id". Any extra columns will be ignored and not output.}
+\item{xyz}{a \code{terra::SpatRaster} or a \code{data.frame} with the following columns
+"long", "lat", "elev", and a unique "id". Any extra columns will be ignored and not output.}
 
 \item{gcms}{character. Vector of global climate model names. Options are \code{\link[=list_gcms]{list_gcms()}}.}
 
@@ -51,23 +64,29 @@ can be obtained with \code{\link[=list_vars]{list_vars()}}. Definitions can be f
 \code{data.table} of average downscaled climate variables for all locations.
 }
 \description{
-Input data for the \code{\link[=plot_timeSeries]{plot_timeSeries()}} function. Since these inputs are time-consuming to generate,
-the purpose of conducting the generation of the input table in a separate function is to allow users
-to make multiple calls to \code{\link[=plot_timeSeries]{plot_timeSeries()}} (e.g., for comparing different climate variables)
-without needing to generate the inputs each time.
+Input data for the \code{\link[=plot_timeSeries]{plot_timeSeries()}} function. Since these inputs are time-consuming to
+generate, the purpose of conducting the generation of the input table in a separate function is
+to allow users to make multiple calls to \code{\link[=plot_timeSeries]{plot_timeSeries()}} (e.g., for comparing different
+climate variables) without needing to generate the inputs each time.
 }
 \details{
 This function generates standardized inputs for one or multiple locations at any spatial scale.
-If multiple locations are specified, the output is the average of the climate variables for all locations.
+If multiple locations are specified, the output is the average of the climate variables for all
+locations.
 
-Downloads of GCM time series take some time. The \code{plot_timeSeries_input()} function can take ~5 minutes
-to run for the first time it is called for a location. Once the time series are cached, they
-don't need to be downloaded again.
+Downloads of GCM time series take some time. The \code{plot_timeSeries_input()} function can take
+~5 minutes to run for the first time it is called for a location. Once the time series are
+cached, they don't need to be downloaded again.
 }
 \examples{
 if (FALSE) {
   # data frame of arbitrary points
-  my_points <- data.frame(lon = c(-127.7300, -127.7500), lat = c(55.34114, 55.25), elev = c(711, 500), id = 1:2)
+  my_points <- data.frame(
+    lon = c(-127.7300, -127.7500),
+    lat = c(55.34114, 55.25),
+    elev = c(711, 500),
+    id = 1:2
+  )
 
   # generate the input data
   my_data <- plot_timeSeries_input(my_points)

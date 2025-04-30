@@ -6,6 +6,9 @@
 \usage{
 data_connect(local = FALSE)
 }
+\arguments{
+\item{local}{A logical. Use a local database. Default \code{FALSE}.}
+}
 \value{
 pool object of database connection
 }
