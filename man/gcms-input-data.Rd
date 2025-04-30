@@ -2,8 +2,11 @@
 % Please edit documentation in R/gcm.R
 \name{input_gcms}
 \alias{input_gcms}
+\alias{input_gcms_db}
 \alias{input_gcm_hist}
+\alias{input_gcm_hist_db}
 \alias{input_gcm_ssp}
+\alias{input_gcm_ssp_db}
 \title{Retrieve global climate model anomalies for \code{downscale_core}.}
 \usage{
 input_gcms(
@@ -17,6 +20,15 @@ input_gcms(
   run_nm = NULL
 )
 
+input_gcms_db(
+  dbCon,
+  gcms = list_gcms(),
+  ssps = list_ssps(),
+  period = list_gcm_periods(),
+  max_run = 0L,
+  run_nm = NULL
+)
+
 input_gcm_hist(
   dbCon,
   bbox = NULL,
@@ -24,6 +36,14 @@ input_gcm_hist(
   years = 1901:2014,
   max_run = 0L,
   cache = TRUE,
+  run_nm = NULL
+)
+
+input_gcm_hist_db(
+  dbCon,
+  gcms = list_gcms(),
+  years = 1901:2014,
+  max_run = 0L,
   run_nm = NULL
 )
 
@@ -37,6 +57,15 @@ input_gcm_ssp(
   cache = TRUE,
   run_nm = NULL,
   fast = TRUE
+)
+
+input_gcm_ssp_db(
+  dbCon,
+  gcms = list_gcms(),
+  ssps = list_ssps(),
+  years = 2020:2030,
+  max_run = 0L,
+  run_nm = NULL
 )
 }
 \arguments{

@@ -47,9 +47,7 @@ list_gcm_periods <- function() {
 #' @rdname data-option-lists
 #' @export
 list_runs_ssp <- function(gcm, ssp){
-  rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
-  runs <- fread(file.path(rInfoPath, "gcm_periods.csv"))
-  runs[mod == gcm & scenario == ssp, run]
+  .globals[["gcm_period_runs"]][mod %in% gcm & scenario %in% ssp, run]
 }
 
 #' @description
@@ -61,9 +59,7 @@ list_runs_ssp <- function(gcm, ssp){
 #' @rdname data-option-lists
 #' @export
 list_runs_historic <- function(gcm){
-  rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
-  runs <- fread(file.path(rInfoPath, "gcm_hist.csv"))
-  runs[mod == gcm, run]
+  .globals[["gcm_hist_runs"]][mod %in% gcm, run]
 }
 
 #' @description
@@ -107,9 +103,9 @@ list_vars <- function(set = c("All", "Monthly", "Seasonal", "Annual"), only_extr
   }
   set <- match.arg(set, several.ok = TRUE)
   if ("All" %in% set) {
-    res <- variables[["Code"]]
+    res <- climr::variables[["Code"]]
   } else {
-    res <- variables[["Code"]][variables[["Category"]] %in% set]
+    res <- climr::variables[["Code"]][climr::variables[["Category"]] %in% set]
   }
   if (isTRUE(only_extra)) {
     res <- res[!grepl("(^PPT|^Tmax|^Tmin)", res)]

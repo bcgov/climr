@@ -21,3 +21,4 @@ A \code{SpatRaster}
 \description{
 Download individual raster tiles from PostGIS
 }
+\keyword{internal}
