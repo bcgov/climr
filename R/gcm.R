@@ -79,6 +79,65 @@ input_gcms <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(
   return(res)
 }
 
+#' @rdname gcms-input-data
+#' @export
+input_gcms_db <- function(
+  dbCon,
+  gcms = list_gcms(),
+  ssps = list_ssps(),
+  period = list_gcm_periods(),
+  max_run = 0L,
+  run_nm = NULL
+) {
+  
+  #Remove NSE CRAN check warnings
+  if (FALSE){ dbname <- var_nm <- NULL}
+  
+  gcms <- match.arg(gcms, list_gcms(), several.ok = TRUE)
+  ssps <- match.arg(ssps, list_ssps(), several.ok = TRUE)
+  period <- match.arg(period, list_gcm_periods(), several.ok = TRUE)
+
+  if (!is(max_run, "numeric")) {
+    stop("please pass a numeric value to 'max_runs'")
+  }
+  
+  runs <- .globals[["gcm_period_runs"]]
+
+  q <- "
+  select * from esm_layers_period
+  where mod in (%s)
+    and scenario in (%s)
+    and period in (%s)" |> 
+    sprintf(
+      paste0("'", gcms, "'", collapse = ","),
+      paste0("'", ssps, "'", collapse = ","),
+      paste0("'", period, "'", collapse = ",")
+    )
+  layerinfo <- db_safe_query(q) |> data.table::setDT()
+  layerinfo[, var_nm := paste(mod, var, month, scenario, run, period, sep = "_")]
+
+  res <- lapply(gcms, function(gcm_nm) {
+    gcmcode <- dbnames[GCM == gcm_nm, dbname]
+    runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssps, run]))
+    if (is.null(run_nm)) {
+      sel_runs <- runs[1:(max_run + 1L)]
+    } else {
+      if (!run_nm %in% runs) {
+        stop("Run ", run_nm, "doesn't exist for this GCM.")
+      }
+      sel_runs <- run_nm
+    }
+
+    list(
+      tbl = gcmcode,
+      layers = layerinfo[mod %in% gcm_nm & run %in% sel_runs, list(var_nm, laynum)]
+    )
+  })
+
+  attr(res, "builder") <- "climr"
+  return(res)
+}
+
 
 #' @description
 #' `input_gcm_hist` creates GCM time series inputs for the historical scenario (1850-2014), given chosen GCMs,
@@ -129,7 +188,58 @@ input_gcm_hist <- function(dbCon, bbox = NULL, gcms = list_gcms(),
   return(res)
 }
 
+#' @rdname gcms-input-data
+#' @export
+input_gcm_hist_db <- function(
+  dbCon,
+  gcms = list_gcms(),
+  years = 1901:2014,
+  max_run = 0L,
+  run_nm = NULL
+) {
 
+  #Remove NSE CRAN check warnings
+  if (FALSE){ dbname <- var_nm <- NULL}
+  
+  runs <- .globals[["gcm_hist_runs"]]
+
+  q <- "
+  select mod, var, month,
+         run, year, laynum
+    from esm_layers_hist
+   where mod in (%s)
+     and year in (%s)" |>
+    sprintf(
+      paste0("'", gcms, "'", collapse = ","),
+      paste0("'", years, "'", collapse = ",")
+    )
+  layerinfo <- db_safe_query(q) |> data.table::setDT()
+  layerinfo[, var_nm := paste(mod, var, month, run, year, sep = "_")]
+
+  res <- lapply(gcms, function(gcm_nm) {
+    if (!gcm_nm %in% dbnames_hist$GCM) return(NULL)
+    gcmcode <- dbnames_hist[GCM == gcm_nm, dbname]
+    runs <- sort(unique(runs[mod == gcm_nm, run]))
+    if (is.null(run_nm)) {
+      sel_runs <- runs[1:(max_run + 1L)]
+    } else {
+      if (!run_nm %in% runs) {
+        stop("Run ", run_nm, "doesn't exist for this GCM.")
+      }
+      sel_runs <- run_nm
+    }
+
+    list(
+      tbl = gcmcode,
+      layers = layerinfo[mod %in% gcm_nm & run %in% sel_runs, list(var_nm, laynum)]
+    )
+  })
+
+  res <- res[!sapply(res, is.null)] ## remove NULL
+  attr(res, "builder") <- "climr"
+  return(res)
+
+}
 
 # gcm_nm <- "ACCESS-ESM1-5"
 # ssps <- c("ssp245","ssp370")
@@ -161,6 +271,7 @@ input_gcm_hist <- function(dbCon, bbox = NULL, gcms = list_gcms(),
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @importFrom dplyr tbl sql collect mutate
+#' @importFrom dbplyr db_collect
 #' @import uuid
 #' @import data.table
 #' @import abind
@@ -197,6 +308,68 @@ input_gcm_ssp <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ss
 
   # Return a list of SpatRasters, one element for each model
   return(res)
+}
+
+#' @rdname gcms-input-data
+#' @export
+input_gcm_ssp_db <- function(
+  dbCon,
+  gcms = list_gcms(),
+  ssps = list_ssps(),
+  years = 2020:2030,
+  max_run = 0L,
+  run_nm = NULL
+) {
+
+  #Remove NSE CRAN check warnings
+  if (FALSE){ dbname <- var_nm <- NULL}
+  
+  if (nrow(dbnames_ts) < 1) stop("That isn't a valid GCM")
+ 
+  runs <- .globals[["gcm_ts_runs"]]
+  
+  q <-  "
+  select fullnm as var_nm, laynum, run, mod
+    from esm_layers_ts
+   where mod in (%s)
+     and scenario in (%s)
+     and period in (%s)" |>
+    sprintf(
+      paste0("'", gcms, "'", collapse = ","),
+      paste0("'", ssps, "'", collapse = ","),
+      paste0("'", years, "'", collapse = ",")
+    )
+  layerinfo <- db_safe_query(q) |> data.table::setDT()
+
+  res <- lapply(gcms, function(gcm_nm) {
+    if (!gcm_nm %in% dbnames_ts[["GCM"]]) return()
+    gcmcode <- dbnames_ts[GCM == gcm_nm, dbname]
+    runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssps, run]))
+    if (length(runs) < 1) {
+      warning("That GCM isn't in our database yet.")
+      return()
+    }
+    
+    if (is.null(run_nm)) {
+      sel_runs <- runs[1:(max_run + 1L)]
+    } else {
+      if (!run_nm %in% runs) {
+        stop("Run ", run_nm, "doesn't exist for this GCM.")
+      }
+      sel_runs <- run_nm
+    }
+  
+    list(
+      tbl = gcmcode,
+      layers = layerinfo[mod %in% gcm_nm & run %in% sel_runs, list(var_nm, laynum)],
+      VAR = c("PPT", "Tmin", "Tmax")
+    )
+  })
+    
+  res <- res[!sapply(res, is.null)] ##remove NULL
+  attr(res, "builder") <- "climr"
+  return(res)
+
 }
 
 
@@ -252,9 +425,7 @@ process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run, dbnames = dbna
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   # gcm_nm <- gsub("-", ".", gcm_nm)
 
-  rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
-  
-  runs <- fread(file.path(rInfoPath, "gcm_periods.csv"))
+  runs <- .globals[["gcm_period_runs"]]
   runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssps, run]))
   if(is.null(run_nm)){
     sel_runs <- runs[1:(max_run + 1L)]
@@ -331,7 +502,7 @@ process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run, dbnames = dbna
       "') and period in ('", paste(period, collapse = "','"), "') and run in ('", paste(sel_runs, collapse = "','"), "')"
     )
     # print(q)
-    layerinfo <- as.data.table(dbGetQuery(dbCon, q))
+    layerinfo <- as.data.table(db_safe_query(q))
     message("Downloading GCM anomalies")
     gcm_rast <- pgGetTerra(dbCon, gcmcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
     layerinfo[, fullnm := paste(mod, var, month, scenario, run, period, sep = "_")]
@@ -381,9 +552,7 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
   if (gcm_nm %in% dbnames$GCM) {
     gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
 
-    rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
-
-    runs <- fread(file.path(rInfoPath, "gcm_hist.csv"))
+    runs <- .globals[["gcm_hist_runs"]]
     runs <- sort(unique(runs[mod == gcm_nm, run]))
     if(is.null(run_nm)){
       sel_runs <- runs[1:(max_run + 1L)]
@@ -454,7 +623,7 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
     if (needDownload) {
       q <- paste0("select mod, var, month, run, year, laynum from esm_layers_hist where mod = '", gcm_nm, "' and year in ('", paste(years, collapse = "','"), "') and run in ('", paste(sel_runs, collapse = "','"), "')")
       # print(q)
-      layerinfo <- as.data.table(dbGetQuery(dbCon, q))
+      layerinfo <- as.data.table(db_safe_query(q))
       layerinfo[, fullnm := paste(mod, var, month, run, year, sep = "_")]
       message("Downloading GCM anomalies")
       gcm_rast <- pgGetTerra(dbCon, gcmcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
@@ -503,9 +672,7 @@ process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts
   if (gcm_nm %in% dbnames$GCM) {
     gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
 
-    rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
-
-    runs <- fread(file.path(rInfoPath, "gcm_ts.csv"))
+    runs <- .globals[["gcm_ts_runs"]]
     runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssps, run]))
     if (length(runs) < 1) {
       warning("That GCM isn't in our database yet.")
@@ -589,7 +756,7 @@ process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts
           "') and period in ('", paste(period, collapse = "','"), "') and run in ('", paste(sel_runs, collapse = "','"), "')"
         )
         # print(q)
-        layerinfo <- dbGetQuery(dbCon, q)
+        layerinfo <- db_safe_query(q)
         message("Downloading GCM anomalies")
         message("Precip...")
         gcm_rast_ppt <- pgGetTerra(dbCon, gsub("VAR", "ppt", gcmcode), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
@@ -644,16 +811,21 @@ process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts
 #' @template run_nm
 #'
 #' @importFrom tools R_user_dir
+#' @importFrom tidyr unnest
+#' @importFrom dplyr collect tbl mutate
 #'
 #' @return a `SpatRaster`
 #' @noRd
 process_one_gcmts_fast <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache, run_nm) { 
+  
+  #Remove NSE CRAN check warnings
+  if (FALSE){ vals <- cellid <- ssp <- i.row <- i.col <- NULL}
+  
   if(gcm_nm %in% dbnames$GCM){
     gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
     gcmarray <- dbnames$dbarray[dbnames$GCM == gcm_nm]
-    rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
     
-    runs <- fread(file.path(rInfoPath, "gcm_ts.csv"))
+    runs <- .globals[["gcm_ts_runs"]]
     runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssps, run]))
     if (length(runs) < 1) {
       warning("That GCM isn't in our database yet.")
@@ -794,3 +966,4 @@ process_one_gcmts_fast <- function(gcm_nm, ssps, period, max_run, dbnames = dbna
     }
   }
 }
+

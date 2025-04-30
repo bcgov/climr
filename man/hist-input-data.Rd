@@ -2,10 +2,14 @@
 % Please edit documentation in R/historic.R
 \name{input_obs}
 \alias{input_obs}
+\alias{input_obs_db}
 \alias{input_obs_ts}
+\alias{input_obs_ts_db}
 \title{Retrieve observational anomalies.}
 \usage{
 input_obs(dbCon, bbox = NULL, period = list_obs_periods(), cache = TRUE)
+
+input_obs_db(dbCon, period = list_obs_periods())
 
 input_obs_ts(
   dbCon,
@@ -14,6 +18,8 @@ input_obs_ts(
   years = 2010:2022,
   cache = TRUE
 )
+
+input_obs_ts_db(dbCon, dataset = c("cru.gpcc", "climatena"), years = 2010:2022)
 }
 \arguments{
 \item{dbCon}{A db connection object created by \code{data_connect}.}

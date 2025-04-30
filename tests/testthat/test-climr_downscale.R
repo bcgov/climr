@@ -12,7 +12,7 @@ test_that("test dowscale basic and spatial", {
     ),
     lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
     elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
-    id = LETTERS[1:8]
+    id = seq_len(8)
   )
 
   ## get bounding box based on input points
@@ -120,7 +120,7 @@ test_that("test downscale with different argument combinations", {
     ),
     lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
     elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
-    id = LETTERS[1:8],
+    id = seq_len(8),
     Zone = c(rep("CWH", 3), rep("CDF", 5)),
     Subzone = c("vm1", "vm2", "vs1", rep("mm", 3), "dk", "dc")
   )
@@ -249,7 +249,7 @@ test_that("test climr_dowscale all periods, all GCMs, all SSPS, all years", {
     ),
     lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
     elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
-    id = LETTERS[1:8]
+    id = seq_len(8)
   )
 
   normals <- c("auto", "refmap_prism", "refmap_climatena")
