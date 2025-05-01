@@ -119,7 +119,7 @@ pgGetTerra <- function(conn, name, tile, rast = "rast", bands = 1:73,
     for (i in 1:(length(brks) - 1)) {
       bands_temp <- bands[brks[i]:(brks[i + 1] - 1)]
       bandqs1 <- paste0("UNNEST(ST_Dumpvalues(rast, ", bands_temp, ")) as vals_", bands_temp)
-      bandqs2 <- paste0("ST_Union(rast", rastque, ",", bands_temp, ") rast_", bands_temp)
+      bandqs2 <- paste0("ST_Union(rast", rast, ",", bands_temp, ") rast_", bands_temp)
       
       rast_vals_temp <- dbGetQuery(conn, paste0(
         "SELECT ", paste(bandqs1, collapse = ","),
