@@ -26,11 +26,8 @@
 #'
 #' @template xyz
 #' @param which_refmap character. Which map of 1961-1990 climatological normals to use as the
-#'   high-resolution reference climate map for downscaling. Default is "auto",
-#'   which selects, for each query point, the best available climatological
-#'   normals map in declining order of `"refmap_prism"`, `"refmap_climr"`, and `"refmap_climatena"`.
-#'   Other options are one of [`list_refmaps()`], which will provide a consistent
-#'   reference map for all points.
+#'   high-resolution reference climate map for downscaling. Default is `"refmap_climr"`.
+#'   Other options are one of [`list_refmaps()`].
 #' @param obs_periods character. Which historical period for observational climate
 #'   data, averaged over this period. Options are [`list_obs_periods()`].
 #' @param obs_years integer. Vector of years to obtain individual years or time
@@ -104,7 +101,7 @@
 #' )
 #'
 #' @export
-downscale <- function(xyz, which_refmap = "auto",
+downscale <- function(xyz, which_refmap = "refmap_climr",
                       obs_periods = NULL,
                       obs_years = NULL,
                       obs_ts_dataset = NULL,
@@ -166,52 +163,10 @@ downscale <- function(xyz, which_refmap = "auto",
   thebb <- get_bb(xyz) ## get bounding box based on input points
 
   message("Getting normals...")
-  if(which_refmap %in% c("refmap_climatena","refmap_prism","refmap_climr")) {
+  if(which_refmap %in% c("refmap_climatena","refmap_climr")) {
     reference <- input_refmap(dbCon = dbCon, reference = which_refmap, bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
   } else {
-    if (inherits(xyz, "SpatRaster")) {
-      refmapchck <- \(rf, bb) {
-        q <- "
-        SELECT min(ST_UpperLeftX(rast)) xmin,
-               max(ST_UpperLeftX(rast)+ST_Width(rast)*ST_PixelWidth(rast)) xmax,
-               min(ST_UpperLeftY(rast)-ST_Height(rast)*abs(ST_PixelHeight(rast))) ymin,
-               max(ST_UpperLeftY(rast)) ymax
-        FROM %s" |> sprintf(rf)
-        normalhull <- db_safe_query(q) |> 
-          unlist() |>
-          terra::ext() |>
-          terra::vect(crs = "EPSG:4326")
-        bchck <- terra::ext(bb["xmin"], bb["xmax"], bb["ymin"], bb["ymax"]) |> terra::vect(crs = "EPSG:4326")
-        terra::is.related(normalhull, bchck, relation = "contains")
-      }
-      reference <- "refmap_prism"
-      if (!refmapchck("normal_bc", thebb)) { 
-        reference <- "refmap_climr"
-      }
-      if (!refmapchck("normal_composite", thebb)) { 
-        reference <- "refmap_climatena"
-      }
-      reference <- input_refmap(dbCon = dbCon, reference = reference, bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
-    } else {
-      # message("Normals not specified, using highest resolution available for each point")
-      rastFile <- system.file("extdata", "bc_outline.tif", package = "climr")
-      ## if package is loaded with devtools::load_all, file won't be found and we need to pass .libPaths
-      if (rastFile == "") {
-        rastFile <- system.file("extdata", "bc_outline.tif", package = "climr", lib.loc = .libPaths())
-      }
-      bc_outline <- rast(rastFile)
-      pnts <- extract(bc_outline, xyz[, .(lon, lat)], method = "simple")
-      bc_ids <- xyz[["id"]][!is.na(pnts[[2]])]
-      if (length(bc_ids) >= 1) {
-        xyz_save <- xyz
-        xyz <- xyz[!is.na(pnts[[2]]), ]
-        thebb_bc <- get_bb(xyz)
-        message("for BC...")
-        reference <- input_refmap(dbCon = dbCon, reference = "refmap_prism", bbox = thebb_bc, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
-      } else {
-        reference <- input_refmap(dbCon = dbCon, reference = "refmap_climatena", bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
-      }
-    }
+    stop("Unknown which_refmap parameter")
   }
 
   if (!is.null(obs_periods)) {
@@ -281,44 +236,15 @@ downscale <- function(xyz, which_refmap = "auto",
   )
   
   if (inherits(xyz, "SpatRaster")) return(results)
-
-  if (which_refmap != "auto") {
-    results <- addIDCols(origID, results)
-    return(results)
-  }
-  if ((length(bc_ids) < 1 || length(bc_ids) == nrow(xyz_save))) {
-    results <- addIDCols(origID, results)
-    return(results)
-  } else {
-    na_xyz <- xyz_save[!xyz_save[, 4] %in% bc_ids, ]
-    thebb <- get_bb(na_xyz)
-    message("Now North America...")
-    reference <- input_refmap(dbCon = dbCon, reference = "refmap_climatena", bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
-
-    results_na <- downscale_core(
-      xyz = na_xyz,
-      refmap = reference,
-      obs = obs_periods,
-      obs_ts = obs_years,
-      gcms = gcm_ssp_periods,
-      gcm_ssp_ts = gcm_ssp_ts,
-      gcm_hist_ts = gcm_hist_ts,
-      skip_check = TRUE,
-      ...
-    )
-
-    res_all <- rbind(results, results_na)
-    res_all <- addIDCols(origID, res_all)
-
-    return(res_all)
-  }
+  results <- addIDCols(origID, results)
+  return(results)
 }
 
 #' @rdname downscale
 #' @export
 downscale_db <- function(
   xyz,
-  which_refmap = "auto",
+  which_refmap = "refmap_climr",
   obs_periods = NULL,
   obs_years = NULL,
   obs_ts_dataset = NULL,
@@ -357,24 +283,8 @@ downscale_db <- function(
   if(which_refmap %in% c("refmap_climatena","refmap_prism","refmap_climr")){
     reference <- input_refmap_db(reference = which_refmap)
   } else {
-    # message("Normals not specified, using highest resolution available for each point")
-    rastFile <- system.file("extdata", "bc_outline.tif", package = "climr")
-    ## if package is loaded with devtools::load_all, file won't be found and we need to pass .libPaths
-    if (rastFile == "") {
-      rastFile <- system.file("extdata", "bc_outline.tif", package = "climr", lib.loc = .libPaths())
-    }
-    bc_outline <- terra::rast(rastFile)
-    pnts <- terra::extract(bc_outline, xyz[, list(lon, lat)], method = "simple")
-    bc_ids <- xyz[["id"]][!is.na(pnts[[2]])]
-    if (length(bc_ids) >= 1) {
-      xyz_save <- xyz
-      xyz <- xyz[!is.na(pnts[[2]]), ]
-      reference <- input_refmap_db(reference = "refmap_prism")
-    } else {
-      reference <- input_refmap_db(reference = "refmap_climatena")
-    }
+    stop("Unknown `which_refmap` parameter.")
   }
-
   if (!is.null(obs_periods)) {
     obs_periods <- input_obs_db(dbCon = dbCon, period = obs_periods)
   }
@@ -436,30 +346,7 @@ downscale_db <- function(
     gcm_hist_ts = gcm_hist_ts,
     ...
   )
-
-  if (which_refmap != "auto" || length(bc_ids) < 1 || length(bc_ids) == nrow(xyz_save)) return(results)
-  
-  na_xyz <- xyz_save[!xyz_save[, 4] %in% bc_ids, ]
-  reference <- input_refmap_db(reference = "refmap_climatena")
-  
-  write_xyz(na_xyz)
-
-  message("Downscaling (Again)...")
-  results_na <- downscale_db_core(
-    dbCon = dbCon,
-    xyz = na_xyz,
-    refmap = reference,
-    obs = obs_periods,
-    obs_ts = obs_years,
-    gcms = gcm_ssp_periods,
-    gcm_ssp_ts = gcm_ssp_ts,
-    gcm_hist_ts = gcm_hist_ts,
-    ...
-  )
-
-  res_all <- rbind(results, results_na)
-  return(res_all)
-
+  return(results)
 }
 
 
@@ -579,3 +466,75 @@ downscale_db <- function(
   }
   return(invisible(NULL))
 }
+
+
+##code for checking bounding box
+# if (inherits(xyz, "SpatRaster")) {
+#   refmapchck <- \(rf, bb) {
+#     q <- "
+#         SELECT min(ST_UpperLeftX(rast)) xmin,
+#                max(ST_UpperLeftX(rast)+ST_Width(rast)*ST_PixelWidth(rast)) xmax,
+#                min(ST_UpperLeftY(rast)-ST_Height(rast)*abs(ST_PixelHeight(rast))) ymin,
+#                max(ST_UpperLeftY(rast)) ymax
+#         FROM %s" |> sprintf(rf)
+#     normalhull <- db_safe_query(q) |> 
+#       unlist() |>
+#       terra::ext() |>
+#       terra::vect(crs = "EPSG:4326")
+#     bchck <- terra::ext(bb["xmin"], bb["xmax"], bb["ymin"], bb["ymax"]) |> terra::vect(crs = "EPSG:4326")
+#     terra::is.related(normalhull, bchck, relation = "contains")
+#   }
+#   reference <- "refmap_prism"
+#   if (!refmapchck("normal_bc", thebb)) { 
+#     reference <- "refmap_climr"
+#   }
+#   if (!refmapchck("normal_composite", thebb)) { 
+#     reference <- "refmap_climatena"
+#   }
+#   reference <- input_refmap(dbCon = dbCon, reference = reference, bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
+# } else {
+#   # message("Normals not specified, using highest resolution available for each point")
+#   rastFile <- system.file("extdata", "bc_outline.tif", package = "climr")
+#   ## if package is loaded with devtools::load_all, file won't be found and we need to pass .libPaths
+#   if (rastFile == "") {
+#     rastFile <- system.file("extdata", "bc_outline.tif", package = "climr", lib.loc = .libPaths())
+#   }
+#   bc_outline <- rast(rastFile)
+#   pnts <- extract(bc_outline, xyz[, .(lon, lat)], method = "simple")
+#   bc_ids <- xyz[["id"]][!is.na(pnts[[2]])]
+#   if (length(bc_ids) >= 1) {
+#     xyz_save <- xyz
+#     xyz <- xyz[!is.na(pnts[[2]]), ]
+#     thebb_bc <- get_bb(xyz)
+#     message("for BC...")
+#     reference <- input_refmap(dbCon = dbCon, reference = "refmap_prism", bbox = thebb_bc, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
+#   } else {
+#     reference <- input_refmap(dbCon = dbCon, reference = "refmap_climatena", bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
+#   }
+# }
+# if ((length(bc_ids) < 1 || length(bc_ids) == nrow(xyz_save))) {
+#   results <- addIDCols(origID, results)
+#   return(results)
+# } else {
+#   na_xyz <- xyz_save[!xyz_save[, 4] %in% bc_ids, ]
+#   thebb <- get_bb(na_xyz)
+#   message("Now North America...")
+#   reference <- input_refmap(dbCon = dbCon, reference = "refmap_climatena", bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
+#   
+#   results_na <- downscale_core(
+#     xyz = na_xyz,
+#     refmap = reference,
+#     obs = obs_periods,
+#     obs_ts = obs_years,
+#     gcms = gcm_ssp_periods,
+#     gcm_ssp_ts = gcm_ssp_ts,
+#     gcm_hist_ts = gcm_hist_ts,
+#     skip_check = TRUE,
+#     ...
+#   )
+#   
+#   res_all <- rbind(results, results_na)
+#   res_all <- addIDCols(origID, res_all)
+#   
+#   return(res_all)
+# }

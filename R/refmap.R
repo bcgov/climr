@@ -48,18 +48,12 @@ input_refmap <- function(dbCon, bbox, reference = "refmap_climr", cache = TRUE, 
   }
 
   needDownload <- TRUE
-  if (!grepl("normal", reference)) {
-    rmap_nm <- switch(reference,
-                      refmap_prism = "normal_bc",
-                      refmap_climr = "normal_composite",
-                      refmap_climatena = "normal_na",
-                      auto = "normal_composite"
-    )
+  if(reference == "refmap_climatena"){
+    rmap_nm <- "normal_na"
   } else {
     rmap_nm <- reference
   }
   
-
   cPath <- file.path(cache_path(), "reference", rmap_nm)
 
   if (dir.exists(cPath)) {

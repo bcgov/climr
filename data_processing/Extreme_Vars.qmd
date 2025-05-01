@@ -132,9 +132,9 @@ setorder(t_res, id, PERIOD, Month)
 cmd_res[t_res, tmax := i.value, on = c("id","PERIOD","Month")]
 
 cmd.temp <- cmd_res %>% filter(grepl("IDFx", id))
-temp <- cmd_res[cmd_sum > 800 & tmax > 30,] %>% filter(grepl("IDFx", id))
+temp <- cmd_res[cmd_sum > 800 & tmax > 30,]
 
-ggplot(cmd.temp, aes(x = Date, y = cmd_sum)) +
+ggplot(temp, aes(x = Date, y = cmd_sum)) +
   geom_line() +
   geom_point(data = temp, color = "red", size = 3)+
   facet_wrap(~id, ncol = 4)
