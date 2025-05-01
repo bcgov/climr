@@ -7,7 +7,7 @@
 \usage{
 downscale(
   xyz,
-  which_refmap = "auto",
+  which_refmap = "refmap_climr",
   obs_periods = NULL,
   obs_years = NULL,
   obs_ts_dataset = NULL,
@@ -26,7 +26,7 @@ downscale(
 
 downscale_db(
   xyz,
-  which_refmap = "auto",
+  which_refmap = "refmap_climr",
   obs_periods = NULL,
   obs_years = NULL,
   obs_ts_dataset = NULL,
@@ -46,11 +46,8 @@ downscale_db(
 "long", "lat", "elev", and a unique "id". Any extra columns will be ignored and not output.}
 
 \item{which_refmap}{character. Which map of 1961-1990 climatological normals to use as the
-high-resolution reference climate map for downscaling. Default is "auto",
-which selects, for each query point, the best available climatological
-normals map in declining order of \code{"refmap_prism"}, \code{"refmap_climr"}, and \code{"refmap_climatena"}.
-Other options are one of \code{\link[=list_refmaps]{list_refmaps()}}, which will provide a consistent
-reference map for all points.}
+high-resolution reference climate map for downscaling. Default is \code{"refmap_climr"}.
+Other options are one of \code{\link[=list_refmaps]{list_refmaps()}}.}
 
 \item{obs_periods}{character. Which historical period for observational climate
 data, averaged over this period. Options are \code{\link[=list_obs_periods]{list_obs_periods()}}.}

@@ -17,6 +17,16 @@ res <- input_refmap(dbCon, bb)
 res2 <- input_refmap(dbCon, bb, reference = "refmap_climatena")
 
 
+rf <- "normal_na"
+    q <- "
+        SELECT min(ST_UpperLeftX(rast)) xmin,
+               max(ST_UpperLeftX(rast)+ST_Width(rast)*ST_PixelWidth(rast)) xmax,
+               min(ST_UpperLeftY(rast)-ST_Height(rast)*abs(ST_PixelHeight(rast))) ymin,
+               max(ST_UpperLeftY(rast)) ymax
+        FROM %s" |> sprintf(rf)
+
+tst <- climr:::db_safe_query(q)    
+
 plot(res2$Tmax_07)
 # draw the plot
 plot_bivariate(my_points)
@@ -40,20 +50,24 @@ in_xyz <- data.frame(
 
  
  
+ bc <- bcmaps::bc_bound()
+ dem <- rast("../Common_Files/PRISM_dem.tiff")
  dir <- paste("//objectstore2.nrs.bcgov/ffec/Climatologies/PRISM_BC/PRISM_dem/", sep="")
  dem <- rast(paste(dir, "PRISM_dem.asc", sep=""))
  dem <- aggregate(dem, fact=3)
+ bc <- vect(bc)
+ bc <- project(bc, crs(dem))
  dem <- mask(dem, bc)
  dem <- trim(dem)
+ 
+ res <- downscale(dem, vars = c("MAT","CMD"))
  
  # climr data
  grid <- as.data.frame(dem, cells = TRUE, xy = TRUE)
  colnames(grid) <- c("id", "lon", "lat", "elev") # rename column names to what climr expects
  setDT(grid)
- pnts <- extract(bc_outline, grid[, .(lon, lat)], method = "simple")
- 
+
  clim.grid <- downscale(xyz = grid, 
-                        which_refmap = "refmap_climr", 
                         gcms = list_gcms()[1], 
                         ssps = list_ssps()[2],
                         gcm_periods = list_gcm_periods()[3], 

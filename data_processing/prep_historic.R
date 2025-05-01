@@ -2,16 +2,24 @@
 library(terra)
 library(data.table)
 library(climr)
+library(RPostgres)
+
+con <- data_connect()
+r <- input_obs(con, bbox = c(83,15,-52.5,-170))
 
 ppt <- rast("Y:\\TransferAnomalies/delta.from.1961_1990.to.2001_2020.Pr.tif")
 tmax <- rast("Y:\\TransferAnomalies/delta.from.1961_1990.to.2001_2020.Tmax.tif")
 tmin <- rast("Y:\\TransferAnomalies/delta.from.1961_1990.to.2001_2020.Tmin.tif")
+
+plot(r[[1]][[12]])
+
 dbCon <- data_connect()
-nms <- dbGetQuery(dbCon, "select * from historic_layers")
+nms <- dbGetQuery(con, "select * from historic_layers")
 allr <- c(ppt,tmax,tmin)
 names(allr) <- nms$fullnm
-writeRaster(allr, "Colin_2001_2020.tif", gdal="COMPRESS=NONE")
-
+writeRaster(allr, "Aseem_2001_2020.tif", gdal="COMPRESS=NONE", overwrite = T)
+r2 <- rast("Colin_2001_2020.tif")
+plot(r2[[13]])
 
 allgcms <- list.files("C:/Users/kdaust/LocalFiles/ProcessedGCMs/gcm/historic/")
 gcm_nm <- allgcms[1]

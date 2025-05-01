@@ -3,18 +3,11 @@ library(terra)
 library(data.table)
 library(climr)
 
-normal <- rast("C:\\Users\\kirid\\AppData\\Local/R/cache/R/climr/normal/normal_na/4da15456-9ae2-462c-a375-35913dde8c7d.tif")
-rna_dem <- rna[[73]]
-writeRaster(rna_dem, 'noram_dem.asc',NAflag=-9999,overwrite=TRUE)
+dat <- rast("../Common_Files/clmr_blend_ts_1901_2024/prcp_climrblend_ano_dt_NA_mon_10_1901_2024.tif")
 
-temp <- readLines('noram_dem.asc')
+##aseem blended ts
+ppt_files <- list.files("../Common_Files/clmr_blend_ts_1901_2024/", pattern = "prcp.*.tif$")
 
-write.table(temp,'noram_dem2.asc', row.names=F,col.names=F,quote=F)
-
-ppt <- rast("../Common_Files/TimeSeries_gridded_monthly/GPCC/precip.comb.v2020to2019-v2020monitorafter.total.nc")
-plot(ppt$precip_1)
-
-bbna <- c(83.125,	18.545,	-51.5625,	-175.2875)
 
 monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09","10","11","12")
 con <- data_connect()
