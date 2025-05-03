@@ -3,6 +3,82 @@ library(terra)
 library(climr)
 library(RPostgres)
 
+library(climr)
+library(dplyr)
+
+# Get lat, long, and elevation for 7 locations in BC
+test_pts<-data.frame(id = seq(1,6,by=1),
+                     lon = c(-120.1879,-120.4258,-121.9251,-120.3030,-127.5062,-127.6785),
+                     lat = c(59.3396, 57.4644, 59.9900, 55.2420, 54.0191, 54.1638),
+                     elev = c(441.9092,901.2709,461.7851,926.7590,1098.2932,1022.2858)
+)
+
+ds_out <- downscale_db(xyz = test_pts, 
+                       which_refmap = "refmap_climr",
+                       gcm_hist_years = 1960:2014,
+                       gcm_ssp_years = 2015:2100,
+                       ssps = c("ssp245"), 
+                       max_run = 1,
+                       gcms = list_gcms()[4],
+                       vars = c("Tmax_sm", "PPT_sm"))
+
+ds_out <- downscale(
+  xyz = test_pts,
+  which_refmap = "refmap_climr",
+  gcm_hist_years = 1960:2014,
+  gcm_ssp_years = 2015:2100,
+  ssps = c("ssp245"),
+  max_run = 3,
+  gcms = list_gcms()[3:4],
+  vars = c("Tmax_sm", "PPT_sm"),
+  db_option = "auto")
+
+ds_out <- downscale(
+  xyz = test_pts,
+  which_refmap = "refmap_climr",
+  gcms = list_gcms()[1:4],
+  ssps = "ssp245",
+  gcm_periods = list_gcm_periods(),
+  db_option = "local")
+
+ds_out <- downscale(
+  xyz = test_pts,
+  which_refmap = "refmap_climr",
+  gcms = list_gcms()[1:4],
+  ssps = "ssp245",
+  gcm_periods = list_gcm_periods(),
+  db_option = "database")
+
+ds_out <- downscale(
+  xyz = test_pts,
+  which_refmap = "refmap_climr",
+  gcms = list_gcms()[1:4],
+  ssps = "ssp245",
+  gcm_periods = list_gcm_periods(),
+  obs_years = 1951:2010,
+  obs_ts_dataset = "cru.gpcc",
+  db_option = "local")
+
+ds_out2<-ds_out[!is.na(GCM),]
+
+par(mfrow=c(3,2))
+for(i in 1:3){
+  x <- ds_out2[GCM=="CNRM-ESM2-1" & id == i & RUN == "r1i1p1f2", PERIOD]
+  y <- ds_out2[GCM=="CNRM-ESM2-1" & id == i & RUN == "r1i1p1f2", Tmax_sm]
+  plot(x,y, type="l", main="CNRM-ESM2-1")
+  
+  x <- ds_out2[GCM=="CanESM5" & id == i & RUN == "r2i1p1f1", PERIOD]
+  y <- ds_out2[GCM=="CanESM5" & id == i & RUN == "r2i1p1f1", Tmax_sm]
+  plot(x,y, type="l", main="CanESM5")
+}
+
+par(mfrow=c(2,2))
+for(i in unique(ds_out2[GCM=="CNRM-ESM2-1", RUN])){
+  x <- ds_out2[GCM=="CNRM-ESM2-1" & id == 1 & RUN == i, PERIOD]
+  y <- ds_out2[GCM=="CNRM-ESM2-1" & id == 1 & RUN == i, Tmax_sm]
+  plot(x,y, type="l", main=i)
+  
+}
 
 my_points <- data.frame(
   lon = c(-127.7300, -127.7500),
