@@ -1,4 +1,4 @@
-#' Calculate Extreme Minimum Temperature (EMT)
+#' Calculate Hargreaves' reference evaporation
 #' @template m
 #' @template tmmin
 #' @template tmmax
