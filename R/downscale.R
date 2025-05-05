@@ -19,10 +19,6 @@
 #' [`downscale_core()`] parameters can be applied in `downscale()`. For example,
 #' setting `ppt_lr = TRUE` in `downscale()` will apply elevation adjustment to precipitation values.
 #'
-#' Although `which_refmap = "auto"` is the default, users are cautioned that
-#' this can produce artefacts associated with downscaling to different reference
-#' climate maps within and outside the western North American boundary of `refmap_climr`.
-#' We recommend that queries spanning this boundary use `which_refmap = "refmap_climatena"`.
 #'
 #' @template xyz
 #' @param which_refmap character. Which map of 1961-1990 climatological normals to use as the
@@ -50,15 +46,25 @@
 #' @param local logical. Is the postgres database local? Default `FALSE`
 #' @param indiv_tiles logical. Only download necessary tiles instead of full bounding box?
 #' This will generally be faster, but doesn't cache.
+#' @param db_option character. One of `auto`, `database`, or `local`. Default `auto`. 
 #' @param ... other arguments passed to [`downscale_core()`]. Namely: `return_refperiod`,
 #'   `vars`, `out_spatial` and `plot`
 #'   
-#' @return `data.table` of downscaled climate variables for each location.
-#'   All outputs are returned in one table.
+#' @return `data.table` or `SpatRaster` of downscaled climate variables for each location.
+#'   All outputs are returned in one table. If output is `SpatRaster`, each layer corresponds to a variable.
 #' @importFrom sf st_as_sf st_join
 #' @importFrom pool poolClose
 #' @importFrom terra rast extract sources ext xres yres crop
 #' @importFrom data.table getDTthreads setDTthreads rbindlist setkey
+#' 
+#' @details
+#' The standard climr method, when `db_option = "local"` downloads and optionally caches raster data, 
+#' then does the processing locally. Option `database` submits points to the climr database, 
+#' and processes them on the database server. This is generally faster for a) very few points, or b) 
+#' timeseries with many layers. Option `auto` attempts to intelligently combine these methods depending on the input:
+#' if fewer than 5 points are submitted, all downscaling will be done on the database, otherwise period downscaling will
+#' be done locally, and timeseries will be done on the database. 
+#' 
 #'
 #' @examples
 #'
@@ -118,7 +124,7 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
 
   ## checks
   .checkDwnsclArgs(
-    xyz, which_refmap, obs_periods, obs_years, obs_ts_dataset,
+    xyz, which_refmap, db_option, obs_periods, obs_years, obs_ts_dataset,
     gcms, ssps, gcm_periods, gcm_ssp_years,
     gcm_hist_years, max_run, run_nm
   )
@@ -417,11 +423,15 @@ downscale_db <- function(
 #'
 #' @return NULL
 #' @noRd
-.checkDwnsclArgs <- function(xyz, which_refmap = NULL, obs_periods = NULL, obs_years = NULL,
+.checkDwnsclArgs <- function(xyz, which_refmap = NULL, db_option = NULL, obs_periods = NULL, obs_years = NULL,
                              obs_ts_dataset = NULL, gcms = NULL, ssps = list_ssps(), gcm_periods = NULL, gcm_ssp_years = NULL,
                              gcm_hist_years = NULL, max_run = 0L, run_nm = NULL) {
   if (is.null(ssps) & (!is.null(gcm_periods) | !is.null(gcm_ssp_years))) {
     stop("ssps must be specified")
+  }
+  
+  if(!db_option %in% c("auto","database","local")) {
+    stop("db_option must be one of `auto`, `database` or `local`.")
   }
   
   if(!is.null(run_nm) & max_run > 1){

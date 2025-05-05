@@ -40,7 +40,7 @@ downscale_db_core(
 )
 }
 \arguments{
-\item{xyz}{a \code{terra::SpatRaster} or a \code{data.frame} with the following columns
+\item{xyz}{a \code{terra::SpatRaster} with a single layer containing elevation values in metres, or a \code{data.frame} with the following columns
 "long", "lat", "elev", and a unique "id". Any extra columns will be ignored and not output.}
 
 \item{refmap}{\code{SpatRaster}. Outputs from \code{\link[=input_refmap]{input_refmap()}}. The high-resolution
