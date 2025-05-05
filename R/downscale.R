@@ -124,17 +124,10 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
   )
 
   if (inherits(xyz, "SpatRaster")) {
+    if(db_option == "database") warning("Database downscaling is currently not supported for rasters. Switching to local version.")
     db_option <- "local"
-    el <- grep("elev", names(xyz), ignore.case = TRUE)
-    if (length(el)) {
-      message("Elevation layer found in xyz raster in layer [%s]" |> sprintf(el))
-      xyz <- xyz[[el]]
-      names(xyz) <- "elev"
-    } else {
-      el <- 1
-      warning("No elevation layer found in xyz raster. No elevation adjustment will be performed.") 
-      xyz <- xyz[[el]]
-    }
+    if(nlyr(xyz) > 1) stop("Please supply a single layer SpatRaster containing elevation values in metres.")
+    names(xyz) <- "elev"
   } else {
     expectedCols <- c("lon", "lat", "elev", "id")
     xyz <- .checkXYZ(copy(xyz), expectedCols)
@@ -163,20 +156,20 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
 
   dbCon <- data_con(if (local) "local")
   thebb <- get_bb(xyz) ## get bounding box based on input points
-  if((db_option == "auto" & nrow(xyz) < 50) | db_option == "database"){
+  db_ts <- db_option
+  if((db_option == "auto" & nrow(xyz) < 5) | db_option == "database"){
     db_option <- "database"
   } else {
     db_option <- "local"
   }
   
-  message("Getting normals...")
   if(which_refmap %in% c("refmap_climatena","refmap_climr")) {
     reference_db <- reference <- NULL
   } else {
     stop("Unknown which_refmap parameter")
   }
 
-  obs_periods_db <- obs_periods_reg <- NULL
+  obs_periods_db <- obs_periods_reg <- obs_years_reg <- obs_years_db <- NULL
   if (!is.null(obs_periods)) {
     message("Getting observed anomalies...")
     if(db_option == "database"){
@@ -186,10 +179,17 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
     }
   }
   if (!is.null(obs_years)) { ##should probably also have a local option here
-    obs_years_db <- input_obs_ts_db(dbCon = dbCon, dataset = obs_ts_dataset, years = obs_years)
+    if(db_ts == "local"){
+      obs_years_reg <- input_obs_ts(dbCon,
+                                dataset = obs_ts_dataset,
+                                bbox = thebb, years = obs_years, cache = cache
+      )
+    } else {
+      obs_years_db <- input_obs_ts_db(dbCon = dbCon, dataset = obs_ts_dataset, years = obs_years)
+    }  
   }
   
-  gcm_ssp_periods <- gcm_ssp_periods_db <- NULL
+  gcm_ssp_periods <- gcm_ssp_periods_db <- gcm_ssp_ts <- gcm_ssp_ts_reg <- gcm_hist_ts <- gcm_hist_ts_reg <- NULL
   if (!is.null(gcms)) {
     if (!is.null(gcm_periods)) {
       message("Getting GCMs...")
@@ -215,44 +215,64 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
       
     }
     if (!is.null(gcm_ssp_years)) {
-      gcm_ssp_ts <- input_gcm_ssp_db(
-        dbCon = dbCon,
-        gcms = gcms,
-        ssps = ssps,
-        years = gcm_ssp_years,
-        max_run = max_run,
-        run_nm = run_nm
-      )
+      if(db_ts == "local"){
+        gcm_ssp_ts_reg <- input_gcm_ssp(dbCon,
+                                    bbox = thebb, gcms = gcms,
+                                    ssps = ssps,
+                                    years = gcm_ssp_years,
+                                    max_run = max_run,
+                                    cache = cache,
+                                    run_nm = run_nm,
+                                    fast = FALSE
+        )
+      } else {
+        gcm_ssp_ts <- input_gcm_ssp_db(
+          dbCon = dbCon,
+          gcms = gcms,
+          ssps = ssps,
+          years = gcm_ssp_years,
+          max_run = max_run,
+          run_nm = run_nm
+        )
+      }
+
     } else {
-      gcm_ssp_ts <- NULL
+      gcm_ssp_ts <- gcm_ssp_ts_reg <- NULL
     }
     if (!is.null(gcm_hist_years)) {
-      gcm_hist_ts <- input_gcm_hist_db(
-        dbCon = dbCon,
-        gcms = gcms,
-        years = gcm_hist_years,
-        max_run = max_run,
-        run_nm = run_nm
-      )
-    } else {
-      gcm_hist_ts <- NULL
+      if(db_ts == "local"){
+        gcm_hist_ts_reg <- input_gcm_hist(dbCon,
+                                      bbox = thebb, gcms = gcms,
+                                      years = gcm_hist_years,
+                                      max_run = max_run,
+                                      run_nm = run_nm,
+                                      cache = cache
+        )
+      } else {
+        gcm_hist_ts <- input_gcm_hist_db(
+          dbCon = dbCon,
+          gcms = gcms,
+          years = gcm_hist_years,
+          max_run = max_run,
+          run_nm = run_nm
+        )
+      }
+      
     }
-  } else {
-    gcm_ssp_periods <- gcm_ssp_ts <- gcm_hist_ts <- NULL
   }
 
   results <- results_ts <- NULL
-  if(any(!is.null(c(obs_periods_reg, gcm_ssp_periods)))){
+  if(any(!is.null(c(obs_periods_reg, obs_years_reg, gcm_ssp_periods, gcm_ssp_ts_reg, gcm_hist_ts_reg))) | db_option == "local"){
     reference <- input_refmap(dbCon = dbCon, reference = which_refmap, bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
     message("Downscaling...")
     results <- downscale_core(
       xyz = xyz,
       refmap = reference,
       obs = obs_periods_reg,
-      #obs_ts = obs_years,
+      obs_ts = obs_years_reg,
       gcms = gcm_ssp_periods,
-      #gcm_ssp_ts = gcm_ssp_ts,
-      #gcm_hist_ts = gcm_hist_ts,
+      gcm_ssp_ts = gcm_ssp_ts_reg,
+      gcm_hist_ts = gcm_hist_ts_reg,
       skip_check = TRUE,
       ...
     )
