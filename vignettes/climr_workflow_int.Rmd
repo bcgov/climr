@@ -211,14 +211,12 @@ We will chose the only available historic period (2001-2020), the
 2021-2040 future period, the 'EC-Earth3' GCM and the SSP 2.45 scenario.
 MAT, PPT and PAS will be selected as output variables.
 
-We pass our choices to `downscale()`, choosing the "auto" normals
-option (which defaults to using the highest resolution data available
-for the points selected).
+We pass our choices to `downscale()`, choosing the climr composite reference climatology (`refmap_climr`).
 
 ```{r, message = TRUE}
 ds_out <- downscale(
   xyz = xyzDT,
-  which_refmap = "auto",
+  which_refmap = "refmap_climr",
   obs_periods = "2001_2020",
   gcm_periods = "2021_2040",
   gcms = "EC-Earth3",
@@ -274,10 +272,9 @@ values so that they align with their observed counterpart. See
 ```{r, message = TRUE}
 ds_out_ts <- downscale(
   xyz = xyzDT,
-  which_refmap = "auto",
-  obs_years = 2001:2015, ## currently up to 2015
-  gcm_hist_years = 2001:2014, ## currently up to 2010
-  gcm_ssp_years = 2015:2040, ## currently starting at 2021
+  obs_years = 2001:2015,
+  gcm_hist_years = 2001:2014,
+  gcm_ssp_years = 2015:2040,
   gcms = "EC-Earth3",
   ssps = "ssp245",
   max_run = 1,
@@ -354,7 +351,6 @@ passed to `downscale(..., vars)`, in this case MAT.
 ```{r, fig.dim = c(8, 6), out.width = "80%"}
 ds_out_spatial <- downscale(
   xyz = xyzDT,
-  which_refmap = "auto",
   gcms = "EC-Earth3",
   gcm_periods = "2021_2040",
   ssps = "ssp245",
@@ -428,11 +424,8 @@ There is no "auto" option to select the source of climate normals.
 -   'refmap_climatena' corresponds to normals for North America obtained from
 [ClimateNA](climatena.ca) [@wang2016];
 
--   'refmap_prism' corresponds to the British Columbia PRISM normals;
-
 -   'refmap_climr' corresponds to a composite of British Columbia
-    PRISM, adjusted US PRISM and DAYMET (Alberta and Saskatchewan), and
-    covers western Canada and western US.
+    PRISM, adjusted US PRISM and DAYMET (Alberta and Saskatchewan).
 
 We will use 'refmap_climr' has it is the highest resolution product
 for the area of interest.
@@ -451,7 +444,7 @@ Alternatively, `get_bb` could be used to extract bounding box around the
 point locations in `xyzDT`. 
 
 ```{r}
-dbCon <- data_connect()
+dbCon <- data_con()
 the_bb <- c(50, 49, -122, -124)
 
 ## alternatively:

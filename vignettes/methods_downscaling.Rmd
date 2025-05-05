@@ -32,7 +32,7 @@ knitr::opts_chunk$set(
 
 library(climr)
 library(terra)
-dbCon <- data_connect()
+dbCon <- data_con()
 bdy <- unwrap(get(data("vancouver", envir = new.env()))) ## new.env() makes sure the original object doesn't clutter .GlobalEnv as we assign it to another obj
 ```
 
@@ -139,7 +139,7 @@ X <- dem_aoi
 values(X) <- NA
 X[clim.aoi[PERIOD == "1961_1990", id]] <- clim.aoi[PERIOD == "1961_1990", Tmax_07]
 par(mfrow = c(1, 2))
-breaks <- seq(14.5, 23.5, 0.1)
+breaks <- seq(12.5, 24.5, 0.1)
 
 plot(refNormals$Tmax_07,
   col = colPal(length(breaks) - 1), breaks = breaks,
