@@ -75,9 +75,7 @@ a character vector.
 Currently available reference maps of gridded climate normals (\code{list_refmaps()}) are:
 \itemize{
 \item "refmap_climatena" for Climate NA derived normals
-\item "refmap_prism" for British Columbia PRISM climatologies derived normals
 \item "refmap_climr" for a composite of BC PRISM, adjusted US PRISM and
-DAYMET (Alberta and Saskatchewan), covering western Canada and western
-US.
+DAYMET (Alberta and Saskatchewan), covering North America
 }
 }

@@ -1,8 +1,8 @@
 test_that("test dowscale basic and spatial", {
   testInit("data.table")
 
-  dbCon <- data_connect()
-  on.exit(try(pool::poolClose(dbCon)), add = TRUE)
+  dbCon <- data_con()
+  #on.exit(try(pool::poolClose(dbCon)), add = TRUE)
 
   ## a small area
   xyz <- data.frame(
@@ -19,7 +19,7 @@ test_that("test dowscale basic and spatial", {
   thebb <- get_bb(xyz)
 
   ds_hist <- downscale(
-    xyz = xyz, which_refmap = "auto",
+    xyz = xyz,
     obs_periods = "2001_2020",
     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07")
   ) ## specify desired variablesds_hist <- climr_downscale(xyz = xyz, which_refmap = "auto",
@@ -36,7 +36,7 @@ test_that("test dowscale basic and spatial", {
 
 
   ds_hist2 <- downscale(
-    xyz = xyz, which_refmap = "auto",
+    xyz = xyz, 
     obs_periods = "2001_2020",
     return_refperiod = FALSE, ## put this to TRUE if you want the 1961-1990 period
     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07")
@@ -46,7 +46,7 @@ test_that("test dowscale basic and spatial", {
   expect_false(any(is.na(test)))
 
   ds_hist_spatial <- downscale(
-    xyz = xyz, which_refmap = "auto",
+    xyz = xyz, 
     obs_periods = "2001_2020",
     return_refperiod = TRUE, ## put this to TRUE if you want the 1961-1990 period
     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
@@ -57,7 +57,7 @@ test_that("test dowscale basic and spatial", {
   expect_true(all(test[, .N, by = id][, N] == 2))
 
   ds_hist_spatial2 <- downscale(
-    xyz = xyz, which_refmap = "auto",
+    xyz = xyz,
     obs_periods = "2001_2020",
     return_refperiod = FALSE, ## put this to TRUE if you want the 1961-1990 period
     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
@@ -126,7 +126,7 @@ test_that("test downscale with different argument combinations", {
   )
 
   argsCombos <- expand.grid(
-    which_refmap = c("auto", "refmap_climr"), obs_periods = c(NA, "2001_2020"),
+    which_refmap = c("refmap_climatena", "refmap_climr"), obs_periods = c(NA, "2001_2020"),
     obs_years = c(NA, "1990:2010"), obs_ts_dataset = c(NA,"cru.gpcc","climatena"),
     gcms = c(NA, "list_gcms()[2]"),
     ssps = c(NA, "list_ssps()[1:3]"), gcm_periods = c(NA, "list_gcm_periods()[1]"),
@@ -252,7 +252,7 @@ test_that("test climr_dowscale all periods, all GCMs, all SSPS, all years", {
     id = seq_len(8)
   )
 
-  normals <- c("auto", "refmap_prism", "refmap_climatena")
+  normals <- c("refmap_climr")
 
   sapply(normals, function(normal) {
     maxrun <- 2

@@ -17,7 +17,7 @@ process_one_climaterast(
 
 \item{res}{Rresolution/scaling factors}
 
-\item{xyz}{a \code{terra::SpatRaster} or a \code{data.frame} with the following columns
+\item{xyz}{a \code{terra::SpatRaster} with a single layer containing elevation values in metres, or a \code{data.frame} with the following columns
 "long", "lat", "elev", and a unique "id". Any extra columns will be ignored and not output.}
 
 \item{timeseries}{Logical indicating if data should be processed as time series (default: FALSE)}
