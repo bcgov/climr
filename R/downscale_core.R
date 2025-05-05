@@ -582,8 +582,7 @@ downscale_.SpatRaster <- function(xyz, refmap, gcms, gcm_ssp_ts, gcm_hist_ts,
   # Compute extra climate variables, assign by reference
   message("Climate vars...")
   res <- append_clim_vars(res, vars)
-  
-  return(res)
+  return(res[[grep(paste(vars, collapse = "|"),names(res))]])
 }
 
 
