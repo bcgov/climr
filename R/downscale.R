@@ -19,10 +19,6 @@
 #' [`downscale_core()`] parameters can be applied in `downscale()`. For example,
 #' setting `ppt_lr = TRUE` in `downscale()` will apply elevation adjustment to precipitation values.
 #'
-#' Although `which_refmap = "auto"` is the default, users are cautioned that
-#' this can produce artefacts associated with downscaling to different reference
-#' climate maps within and outside the western North American boundary of `refmap_climr`.
-#' We recommend that queries spanning this boundary use `which_refmap = "refmap_climatena"`.
 #'
 #' @template xyz
 #' @param which_refmap character. Which map of 1961-1990 climatological normals to use as the
@@ -50,15 +46,25 @@
 #' @param local logical. Is the postgres database local? Default `FALSE`
 #' @param indiv_tiles logical. Only download necessary tiles instead of full bounding box?
 #' This will generally be faster, but doesn't cache.
+#' @param db_option character. One of `auto`, `database`, or `local`. Default `auto`. 
 #' @param ... other arguments passed to [`downscale_core()`]. Namely: `return_refperiod`,
 #'   `vars`, `out_spatial` and `plot`
 #'   
-#' @return `data.table` of downscaled climate variables for each location.
-#'   All outputs are returned in one table.
+#' @return `data.table` or `SpatRaster` of downscaled climate variables for each location.
+#'   All outputs are returned in one table. If output is `SpatRaster`, each layer corresponds to a variable.
 #' @importFrom sf st_as_sf st_join
 #' @importFrom pool poolClose
 #' @importFrom terra rast extract sources ext xres yres crop
 #' @importFrom data.table getDTthreads setDTthreads rbindlist setkey
+#' 
+#' @details
+#' The standard climr method, when `db_option = "local"` downloads and optionally caches raster data, 
+#' then does the processing locally. Option `database` submits points to the climr database, 
+#' and processes them on the database server. This is generally faster for a) very few points, or b) 
+#' timeseries with many layers. Option `auto` attempts to intelligently combine these methods depending on the input:
+#' if fewer than 5 points are submitted, all downscaling will be done on the database, otherwise period downscaling will
+#' be done locally, and timeseries will be done on the database. 
+#' 
 #'
 #' @examples
 #'
@@ -112,27 +118,22 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
                       cache = TRUE,
                       local = FALSE,
                       indiv_tiles = FALSE,
+                      db_option = "auto",
                       ...) {
   message("Welcome to climr!")
 
   ## checks
   .checkDwnsclArgs(
-    xyz, which_refmap, obs_periods, obs_years, obs_ts_dataset,
+    xyz, which_refmap, db_option, obs_periods, obs_years, obs_ts_dataset,
     gcms, ssps, gcm_periods, gcm_ssp_years,
     gcm_hist_years, max_run, run_nm
   )
 
   if (inherits(xyz, "SpatRaster")) {
-    el <- grep("elev", names(xyz), ignore.case = TRUE)
-    if (length(el)) {
-      message("Elevation layer found in xyz raster in layer [%s]" |> sprintf(el))
-      xyz <- xyz[[el]]
-      names(xyz) <- "elev"
-    } else {
-      el <- 1
-      warning("No elevation layer found in xyz raster. No elevation adjustment will be performed.") 
-      xyz <- xyz[[el]]
-    }
+    if(db_option == "database") warning("Database downscaling is currently not supported for rasters. Switching to local version.")
+    db_option <- "local"
+    if(nlyr(xyz) > 1) stop("Please supply a single layer SpatRaster containing elevation values in metres.")
+    names(xyz) <- "elev"
   } else {
     expectedCols <- c("lon", "lat", "elev", "id")
     xyz <- .checkXYZ(copy(xyz), expectedCols)
@@ -161,81 +162,147 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
 
   dbCon <- data_con(if (local) "local")
   thebb <- get_bb(xyz) ## get bounding box based on input points
-
-  message("Getting normals...")
+  db_ts <- db_option
+  if((db_option == "auto" & nrow(xyz) < 5) | db_option == "database"){
+    db_option <- "database"
+  } else {
+    db_option <- "local"
+  }
+  
   if(which_refmap %in% c("refmap_climatena","refmap_climr")) {
-    reference <- input_refmap(dbCon = dbCon, reference = which_refmap, bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
+    reference_db <- reference <- NULL
   } else {
     stop("Unknown which_refmap parameter")
   }
 
+  obs_periods_db <- obs_periods_reg <- obs_years_reg <- obs_years_db <- NULL
   if (!is.null(obs_periods)) {
     message("Getting observed anomalies...")
-    obs_periods <- input_obs(dbCon, bbox = thebb, period = obs_periods, cache = cache)
+    if(db_option == "database"){
+      obs_periods_db <- input_obs_db(dbCon = dbCon, period = obs_periods)
+    } else {
+      obs_periods_reg <- input_obs(dbCon, bbox = thebb, period = obs_periods, cache = cache)
+    }
   }
-  if (!is.null(obs_years)) {
-    obs_years <- input_obs_ts(dbCon,
-      dataset = obs_ts_dataset,
-      bbox = thebb, years = obs_years, cache = cache
-    )
+  if (!is.null(obs_years)) { ##should probably also have a local option here
+    if(db_ts == "local"){
+      obs_years_reg <- input_obs_ts(dbCon,
+                                dataset = obs_ts_dataset,
+                                bbox = thebb, years = obs_years, cache = cache
+      )
+    } else {
+      obs_years_db <- input_obs_ts_db(dbCon = dbCon, dataset = obs_ts_dataset, years = obs_years)
+    }  
   }
-
+  
+  gcm_ssp_periods <- gcm_ssp_periods_db <- gcm_ssp_ts <- gcm_ssp_ts_reg <- gcm_hist_ts <- gcm_hist_ts_reg <- NULL
   if (!is.null(gcms)) {
     if (!is.null(gcm_periods)) {
       message("Getting GCMs...")
-      gcm_ssp_periods <- input_gcms(dbCon,
-        bbox = thebb, gcms = gcms,
-        ssps = ssps,
-        period = gcm_periods,
-        max_run = max_run,
-        run_nm = run_nm,
-        cache = cache
-      )
-    } else {
-      gcm_ssp_periods <- NULL
+      if(db_option == "database"){
+        gcm_ssp_periods_db <- input_gcms_db(
+          dbCon = dbCon,
+          gcms = gcms,
+          ssps = ssps,
+          period = gcm_periods,
+          max_run = max_run,
+          run_nm = run_nm
+        )
+      } else {
+        gcm_ssp_periods <- input_gcms(dbCon,
+                                      bbox = thebb, gcms = gcms,
+                                      ssps = ssps,
+                                      period = gcm_periods,
+                                      max_run = max_run,
+                                      run_nm = run_nm,
+                                      cache = cache
+        )
+      }
+      
     }
     if (!is.null(gcm_ssp_years)) {
-      gcm_ssp_ts <- input_gcm_ssp(dbCon,
-        bbox = thebb, gcms = gcms,
-        ssps = ssps,
-        years = gcm_ssp_years,
-        max_run = max_run,
-        cache = cache,
-        run_nm = run_nm,
-        fast = TRUE
-      )
+      if(db_ts == "local"){
+        gcm_ssp_ts_reg <- input_gcm_ssp(dbCon,
+                                    bbox = thebb, gcms = gcms,
+                                    ssps = ssps,
+                                    years = gcm_ssp_years,
+                                    max_run = max_run,
+                                    cache = cache,
+                                    run_nm = run_nm,
+                                    fast = FALSE
+        )
+      } else {
+        gcm_ssp_ts <- input_gcm_ssp_db(
+          dbCon = dbCon,
+          gcms = gcms,
+          ssps = ssps,
+          years = gcm_ssp_years,
+          max_run = max_run,
+          run_nm = run_nm
+        )
+      }
+
     } else {
-      gcm_ssp_ts <- NULL
+      gcm_ssp_ts <- gcm_ssp_ts_reg <- NULL
     }
     if (!is.null(gcm_hist_years)) {
-      gcm_hist_ts <- input_gcm_hist(dbCon,
-        bbox = thebb, gcms = gcms,
-        years = gcm_hist_years,
-        max_run = max_run,
-        run_nm = run_nm,
-        cache = cache
-      )
-    } else {
-      gcm_hist_ts <- NULL
+      if(db_ts == "local"){
+        gcm_hist_ts_reg <- input_gcm_hist(dbCon,
+                                      bbox = thebb, gcms = gcms,
+                                      years = gcm_hist_years,
+                                      max_run = max_run,
+                                      run_nm = run_nm,
+                                      cache = cache
+        )
+      } else {
+        gcm_hist_ts <- input_gcm_hist_db(
+          dbCon = dbCon,
+          gcms = gcms,
+          years = gcm_hist_years,
+          max_run = max_run,
+          run_nm = run_nm
+        )
+      }
+      
     }
-  } else {
-    gcm_ssp_periods <- gcm_ssp_ts <- gcm_hist_ts <- NULL
   }
 
-  message("Downscaling...")
-  results <- downscale_core(
-    xyz = xyz,
-    refmap = reference,
-    obs = obs_periods,
-    obs_ts = obs_years,
-    gcms = gcm_ssp_periods,
-    gcm_ssp_ts = gcm_ssp_ts,
-    gcm_hist_ts = gcm_hist_ts,
-    skip_check = TRUE,
-    ...
-  )
+  results <- results_ts <- NULL
+  if(any(!is.null(c(obs_periods_reg, obs_years_reg, gcm_ssp_periods, gcm_ssp_ts_reg, gcm_hist_ts_reg))) | db_option == "local"){
+    reference <- input_refmap(dbCon = dbCon, reference = which_refmap, bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
+    message("Downscaling...")
+    results <- downscale_core(
+      xyz = xyz,
+      refmap = reference,
+      obs = obs_periods_reg,
+      obs_ts = obs_years_reg,
+      gcms = gcm_ssp_periods,
+      gcm_ssp_ts = gcm_ssp_ts_reg,
+      gcm_hist_ts = gcm_hist_ts_reg,
+      skip_check = TRUE,
+      ...
+    )
+  }
+  
+  if(any(!is.null(c(obs_periods_db, obs_years_db, gcm_ssp_periods_db, gcm_ssp_ts, gcm_hist_ts)))){
+    write_xyz(xyz)
+    reference_db <- input_refmap_db(reference = which_refmap)
+    message("Downscaling in database...")
+    results_ts <- downscale_db_core(
+      dbCon = dbCon,
+      xyz = xyz,
+      refmap = reference_db,
+      obs = obs_periods_db,
+      obs_ts = obs_years_db,
+      gcms = gcm_ssp_periods_db,
+      gcm_ssp_ts = gcm_ssp_ts,
+      gcm_hist_ts = gcm_hist_ts,
+      ...
+    )
+  }
   
   if (inherits(xyz, "SpatRaster")) return(results)
+  results <- rbind(results, results_ts, fill = TRUE)
   results <- addIDCols(origID, results)
   return(results)
 }
@@ -280,7 +347,7 @@ downscale_db <- function(
     xyz <- xyz[, ..expectedCols]
   }
 
-  if(which_refmap %in% c("refmap_climatena","refmap_prism","refmap_climr")){
+  if(which_refmap %in% c("refmap_climatena","refmap_climr")){
     reference <- input_refmap_db(reference = which_refmap)
   } else {
     stop("Unknown `which_refmap` parameter.")
@@ -356,11 +423,15 @@ downscale_db <- function(
 #'
 #' @return NULL
 #' @noRd
-.checkDwnsclArgs <- function(xyz, which_refmap = NULL, obs_periods = NULL, obs_years = NULL,
+.checkDwnsclArgs <- function(xyz, which_refmap = NULL, db_option = NULL, obs_periods = NULL, obs_years = NULL,
                              obs_ts_dataset = NULL, gcms = NULL, ssps = list_ssps(), gcm_periods = NULL, gcm_ssp_years = NULL,
                              gcm_hist_years = NULL, max_run = 0L, run_nm = NULL) {
   if (is.null(ssps) & (!is.null(gcm_periods) | !is.null(gcm_ssp_years))) {
     stop("ssps must be specified")
+  }
+  
+  if(!db_option %in% c("auto","database","local")) {
+    stop("db_option must be one of `auto`, `database` or `local`.")
   }
   
   if(!is.null(run_nm) & max_run > 1){

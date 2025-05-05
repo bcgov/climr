@@ -21,6 +21,7 @@ downscale(
   cache = TRUE,
   local = FALSE,
   indiv_tiles = FALSE,
+  db_option = "auto",
   ...
 )
 
@@ -42,7 +43,7 @@ downscale_db(
 )
 }
 \arguments{
-\item{xyz}{a \code{terra::SpatRaster} or a \code{data.frame} with the following columns
+\item{xyz}{a \code{terra::SpatRaster} with a single layer containing elevation values in metres, or a \code{data.frame} with the following columns
 "long", "lat", "elev", and a unique "id". Any extra columns will be ignored and not output.}
 
 \item{which_refmap}{character. Which map of 1961-1990 climatological normals to use as the
@@ -87,12 +88,14 @@ are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 \item{indiv_tiles}{logical. Only download necessary tiles instead of full bounding box?
 This will generally be faster, but doesn't cache.}
 
+\item{db_option}{character. One of \code{auto}, \code{database}, or \code{local}. Default \code{auto}.}
+
 \item{...}{other arguments passed to \code{\link[=downscale_core]{downscale_core()}}. Namely: \code{return_refperiod},
 \code{vars}, \code{out_spatial} and \code{plot}}
 }
 \value{
-\code{data.table} of downscaled climate variables for each location.
-All outputs are returned in one table.
+\code{data.table} or \code{SpatRaster} of downscaled climate variables for each location.
+All outputs are returned in one table. If output is \code{SpatRaster}, each layer corresponds to a variable.
 }
 \description{
 \code{downscale()} provides downscaled climate variables for user-specified
@@ -113,10 +116,12 @@ See \code{vignette("methods_downscaling")} for a description of the downscaling 
 \code{\link[=downscale_core]{downscale_core()}} parameters can be applied in \code{downscale()}. For example,
 setting \code{ppt_lr = TRUE} in \code{downscale()} will apply elevation adjustment to precipitation values.
 
-Although \code{which_refmap = "auto"} is the default, users are cautioned that
-this can produce artefacts associated with downscaling to different reference
-climate maps within and outside the western North American boundary of \code{refmap_climr}.
-We recommend that queries spanning this boundary use \code{which_refmap = "refmap_climatena"}.
+The standard climr method, when \code{db_option = "local"} downloads and optionally caches raster data,
+then does the processing locally. Option \code{database} submits points to the climr database,
+and processes them on the database server. This is generally faster for a) very few points, or b)
+timeseries with many layers. Option \code{auto} attempts to intelligently combine these methods depending on the input:
+if fewer than 5 points are submitted, all downscaling will be done on the database, otherwise period downscaling will
+be done locally, and timeseries will be done on the database.
 }
 \examples{
 

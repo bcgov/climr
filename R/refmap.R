@@ -147,13 +147,8 @@ input_refmap_db <- function(reference = "refmap_climatena") {
     }
   }
 
-  if (!grepl("normal", reference)) {
-    rmap_nm <- switch(reference,
-                      refmap_prism = "normal_bc",
-                      refmap_climr = "normal_composite",
-                      refmap_climatena = "normal_na",
-                      auto = "normal_composite"
-    )
+  if(reference == "refmap_climatena"){
+    rmap_nm <- "normal_na"
   } else {
     rmap_nm <- reference
   }

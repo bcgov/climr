@@ -86,7 +86,7 @@ test_that("calc_* give sensible outputs", {
   )
   thebb <- get_bb(xyz)
 
-  normalbc <- input_refmap(dbCon = dbCon, reference = "refmap_prism", bbox = thebb, cache = TRUE)
+  normalbc <- input_refmap(dbCon = dbCon, reference = "refmap_climr", bbox = thebb, cache = TRUE)
 
   gcm <- input_gcms(dbCon,
     bbox = thebb,
