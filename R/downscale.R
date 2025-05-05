@@ -80,7 +80,7 @@
 #' vars <- c("PPT", "CMD", "Tave_07")
 #' climate_norms_hist <- downscale(
 #'   xyz = in_xyz,
-#'   which_refmap = "auto",
+#'   which_refmap = "refmap_climr",
 #'   return_refperiod = TRUE,
 #'   obs_periods = "2001_2020",
 #'   vars = vars,
@@ -89,7 +89,7 @@
 #'
 #' ## as a data.table
 #' climate_norms_hist <- downscale(
-#'   xyz = in_xyz, which_refmap = "auto",
+#'   xyz = in_xyz, which_refmap = "refmap_climr",
 #'   return_refperiod = TRUE,
 #'   vars = vars,
 #'   out_spatial = FALSE, plot = "PPT"
@@ -97,7 +97,7 @@
 #'
 #' ## future projections for annual variables from three models
 #' climate_norms_fut <- downscale(
-#'   xyz = in_xyz, which_refmap = "auto",
+#'   xyz = in_xyz, which_refmap = "refmap_climr",
 #'   gcms = list_gcms()[c(1, 5, 6)],
 #'   ssps = list_ssps()[2],
 #'   gcm_periods = list_gcm_periods()[1:2],
