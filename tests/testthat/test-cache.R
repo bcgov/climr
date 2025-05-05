@@ -36,7 +36,7 @@ test_that("test cache in default location", {
   #expect_false(any(expecteddirs %in% cachedirs))
 
   ds_res <- downscale(xyz,
-    which_refmap = "refmap_prism", obs_periods = "2001_2020",
+    which_refmap = "refmap_climr", obs_periods = "2001_2020",
     cache = FALSE
   )
   cachedirs <- normalizePath(list.dirs(cache_path(), recursive = FALSE), winslash = "/")
@@ -55,7 +55,7 @@ test_that("test cache in default location", {
   )
   expect_true("gcms" %in% list.files(cache_path()))
 
-  ds_res <- downscale(xyz, which_refmap = "refmap_prism", obs_periods = "2001_2020")
+  ds_res <- downscale(xyz, which_refmap = "refmap_climr", obs_periods = "2001_2020")
   expect_true("obs" %in% list.files(cache_path()))
 
 
