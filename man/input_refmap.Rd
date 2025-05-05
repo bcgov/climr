@@ -29,7 +29,7 @@ names PPT01:PPT12, Tmax01:Tmax12 and Tmin01:Tmin12. Defaults to \code{list_refma
 
 \item{indiv_tiles}{logical. Only download necessary tiles instead of full bounding box?}
 
-\item{xyz}{a \code{terra::SpatRaster} or a \code{data.frame} with the following columns
+\item{xyz}{a \code{terra::SpatRaster} with a single layer containing elevation values in metres, or a \code{data.frame} with the following columns
 "long", "lat", "elev", and a unique "id". Any extra columns will be ignored and not output.}
 }
 \value{

@@ -17,7 +17,7 @@ create_climate_diagram_input(
 )
 }
 \arguments{
-\item{xyz}{a \code{terra::SpatRaster} or a \code{data.frame} with the following columns
+\item{xyz}{a \code{terra::SpatRaster} with a single layer containing elevation values in metres, or a \code{data.frame} with the following columns
 "long", "lat", "elev", and a unique "id". Any extra columns will be ignored and not output.}
 
 \item{gcms}{character. Vector of global climate model names. Options are \code{\link[=list_gcms]{list_gcms()}}.}

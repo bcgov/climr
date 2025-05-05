@@ -64,7 +64,7 @@ my_points <- data.frame(
 
 ## climr query for the data.frame
 ds_out <- downscale(
-  xyz = my_points, which_refmap = "auto",
+  xyz = my_points,
   gcms = c("GFDL-ESM4", "EC-Earth3"), # specify two global climate models
   ssps = c("ssp370", "ssp245"), # specify two greenhouse gas concentration scenarios
   gcm_periods = c("2001_2020", "2041_2060"), # specify two 20-year periods
