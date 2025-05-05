@@ -35,7 +35,6 @@ ds_out <- downscale(
 
 ds_out <- downscale(
   xyz = test_pts,
-  which_refmap = "refmap_climr",
   gcms = list_gcms()[1:4],
   ssps = "ssp245",
   gcm_periods = list_gcm_periods(),
@@ -57,7 +56,7 @@ ds_out <- downscale(
   gcm_periods = list_gcm_periods(),
   obs_years = 1951:2010,
   obs_ts_dataset = "cru.gpcc",
-  db_option = "local")
+  db_option = "auto")
 
 ds_out2<-ds_out[!is.na(GCM),]
 
@@ -144,12 +143,72 @@ in_xyz <- data.frame(
  setDT(grid)
 
  clim.grid <- downscale(xyz = grid, 
+                        which_refmap = "refmap_climr", 
                         gcms = list_gcms()[1], 
                         ssps = list_ssps()[2],
                         gcm_periods = list_gcm_periods()[3], 
                         max_run = 2,
                         vars = list_vars()
  )
+ 
+ clim.grid <- downscale(xyz = grid, 
+                        which_refmap = "refmap_climr", 
+                        gcms = list_gcms()[1], 
+                        ssps = list_ssps()[2],
+                        gcm_periods = list_gcm_periods()[3], 
+                        max_run = 2,
+                        vars = c("CMD", "Tmin_07")
+ )
+ 
+res <- downscale(dem, 
+                 which_refmap = "refmap_climr", 
+                 gcms = list_gcms()[1], 
+                 ssps = list_ssps()[2],
+                 gcm_periods = list_gcm_periods(),
+                 vars = c("CMD", "Tmin_07"))
+
+
+library(climr)
+library(tidyverse)
+library(terra)
+library(data.table)
+
+## provide a data.frame or data.table of point coordinates, IDs and elevation
+BEC_data<-readRDS("../../../Downloads/BEC_data.rds") #change this to OS #13 
+
+#pull out plot data 
+plot_dat<-BEC_data$env #70,547 plots
+
+#make dataframe for extracting climate data
+my_points <- select(plot_dat, Longitude, Latitude, Elevation, PlotNumber, ProjectID) %>%
+  rename(lon = Longitude,   lat = Latitude, 
+         elev = Elevation)%>%
+  mutate(id = seq_along(lon)) %>%
+  na.omit() #remove NAs- 59,345 plots with GPS locations 
+
+#look at options 
+#what to select here?
+list_obs_periods()
+list_obs_years()
+list_vars() 
+
+vars<-climr::variables #look up table for vars 
+var_names<-vars$Code
+
+## climr query for the historic data - only using 1961-1990 for now 
+## what is the resolution/scale of these data? PRISM 800m downscaled to plot-level (accuracy of GPS points and elevation- double checks elev vals make bigger difference)
+#cache_clear()
+setDT(my_points)
+clim_dat <- downscale(
+  xyz = my_points, which_refmap = "refmap_climr", 
+  #historic_period = "2001_2020", 
+  #historic_ts = C(1961:1990),
+  #gcm_models = c("GFDL-ESM4", "EC-Earth3"), # specify two global climate models
+  #ssp = c("ssp370", "ssp245"), # specify two greenhouse gas concentration scenarios
+  #gcm_period = c("2001_2020", "2041_2060"), # specify two 20-year periods
+  #max_run = 3, # specify 3 individual runs for each model
+  #  vars = c("PPT", "MAT", "CMD", 'AHM', 'CMI', 'DD5', 'TD', "PPT_10"))  #TD variable?? continentality??
+  vars=list_vars()) 
 
 boundary <- bb
 dbCon <- data_con()
