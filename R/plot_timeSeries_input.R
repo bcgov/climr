@@ -59,35 +59,9 @@ plot_timeSeries_input <- function(
     obs_years = obs_years,
     gcm_hist_years = gcm_hist_years,
     gcm_ssp_years = gcm_ssp_years,
-    vars = vars
+    vars = vars,
+    db_option = "database"
   )
   data.agg <- data[, lapply(.SD, mean), by = .(GCM, SSP, RUN, PERIOD, DATASET), .SDcols = -c("id", "GCM", "SSP", "RUN", "PERIOD", "DATASET")]
   return(data.agg)
-}
-
-#' @rdname plot_timeSeries_input
-#' @export
-plot_timeSeries_input_db <- function(
-  xyz,
-  gcms = list_gcms(),
-  ssps = list_ssps(),
-  max_run = 10,
-  obs_ts_dataset = c("cru.gpcc", "climatena"),
-  obs_years = list_obs_years(),
-  gcm_hist_years = list_gcm_hist_years(),
-  gcm_ssp_years = list_gcm_ssp_years(),
-  vars = list_vars()) {
-data <- downscale_db(
-  xyz = xyz,
-  gcms = gcms,
-  ssps = ssps,
-  max_run = max_run,
-  obs_ts_dataset = obs_ts_dataset,
-  obs_years = obs_years,
-  gcm_hist_years = gcm_hist_years,
-  gcm_ssp_years = gcm_ssp_years,
-  vars = vars
-)
-data.agg <- data[, lapply(.SD, mean), by = .(GCM, SSP, RUN, PERIOD, DATASET), .SDcols = -c("id", "GCM", "SSP", "RUN", "PERIOD", "DATASET")]
-return(data.agg)
 }

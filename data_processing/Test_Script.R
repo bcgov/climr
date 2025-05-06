@@ -13,6 +13,9 @@ test_pts<-data.frame(id = seq(1,6,by=1),
                      elev = c(441.9092,901.2709,461.7851,926.7590,1098.2932,1022.2858)
 )
 
+
+plot_bivariate(test_pts[1,])
+
 ds_out <- downscale_db(xyz = test_pts, 
                        which_refmap = "refmap_climr",
                        gcm_hist_years = 1960:2014,
