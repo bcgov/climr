@@ -307,8 +307,7 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
   return(results)
 }
 
-#' @rdname downscale
-#' @export
+
 downscale_db <- function(
   xyz,
   which_refmap = "refmap_climr",

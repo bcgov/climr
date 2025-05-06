@@ -2,7 +2,6 @@
 % Please edit documentation in R/downscale.R
 \name{downscale}
 \alias{downscale}
-\alias{downscale_db}
 \title{Self-contained change-factor downscaling of observed and simulated climate data}
 \usage{
 downscale(
@@ -22,23 +21,6 @@ downscale(
   local = FALSE,
   indiv_tiles = FALSE,
   db_option = "auto",
-  ...
-)
-
-downscale_db(
-  xyz,
-  which_refmap = "refmap_climr",
-  obs_periods = NULL,
-  obs_years = NULL,
-  obs_ts_dataset = NULL,
-  gcms = NULL,
-  ssps = NULL,
-  gcm_periods = NULL,
-  gcm_ssp_years = NULL,
-  gcm_hist_years = NULL,
-  max_run = 0L,
-  run_nm = NULL,
-  local = FALSE,
   ...
 )
 }
@@ -137,7 +119,7 @@ in_xyz <- data.frame(
 vars <- c("PPT", "CMD", "Tave_07")
 climate_norms_hist <- downscale(
   xyz = in_xyz,
-  which_refmap = "auto",
+  which_refmap = "refmap_climr",
   return_refperiod = TRUE,
   obs_periods = "2001_2020",
   vars = vars,
@@ -146,7 +128,7 @@ climate_norms_hist <- downscale(
 
 ## as a data.table
 climate_norms_hist <- downscale(
-  xyz = in_xyz, which_refmap = "auto",
+  xyz = in_xyz, which_refmap = "refmap_climr",
   return_refperiod = TRUE,
   vars = vars,
   out_spatial = FALSE, plot = "PPT"
@@ -154,7 +136,7 @@ climate_norms_hist <- downscale(
 
 ## future projections for annual variables from three models
 climate_norms_fut <- downscale(
-  xyz = in_xyz, which_refmap = "auto",
+  xyz = in_xyz, which_refmap = "refmap_climr",
   gcms = list_gcms()[c(1, 5, 6)],
   ssps = list_ssps()[2],
   gcm_periods = list_gcm_periods()[1:2],
