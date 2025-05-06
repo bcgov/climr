@@ -57,7 +57,7 @@ colnames(grid) <- c("id", "lon", "lat", "elev")
 ## A simple climr query.
 ## This will return the observed 1961-1990 normals for the raster grid points.
 var <- "MAP"
-ds_out <- downscale(grid, which_refmap = "refmap_prism", vars = var)
+ds_out <- downscale(grid, which_refmap = "refmap_climr", vars = var)
 clim <- terra::rast(dem) # use the DEM as a template raster
 ## populate the raster cells with the 2001-2020 annual precipitation (MAP) values,
 ## using the `id` field as the link.
