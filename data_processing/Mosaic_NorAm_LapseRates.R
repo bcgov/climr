@@ -10,20 +10,25 @@ elements <- c("Tmin", "Tmax", "Pr")
 
 
 dir <- "//objectstore2.nrs.bcgov/ffec/Climatologies/climr_mosaic/"
-# dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/climr_mosaic/" # option to use a local copy for faster processing
+dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/climr_mosaic/" # option to use a local copy for faster processing
 files <- list.files(dir, pattern=paste(".*.tif", sep=""))
 dem <- rast(paste(dir, "climr_mosaic_dem.tif", sep=""))
 clim <- rast(paste(dir, files[1:36], sep=""))
-names(clim) <- paste0(rep(c("PPT", "Tmax", "Tmin"), each=12), rep(monthcodes, times=3))
+names(clim) <- paste0(rep(c("PPT", "Tmax", "Tmin"), each=12), rep(monthcodes, times=3)) #need this because lapse_rate uses legacy variable names
 
 lapse <- lapse_rate(clim, dem)
+
+# calculated temperature lapse rates have very long tails. clip/clamp the tails at the lapse rates at somewhere beyond the limits of physical plausibility; 20K/km seems about right because at lower values the alaska prism shows artefacts. 
+lim <- 20/1000 # set maximum absolute lapse rate to ±20 K/km (but data is in K/m, so limit is 0.01 K/m)
+s <- grep("Tm", names(lapse)) # identify temperature lapse rate layers
+lapse[[s]] <- clamp(lapse[[s]], lower = -lim, upper = lim) # apply lapse rate limit
 
 names(clim) <- paste0(rep(c("PPT_", "Tmax_", "Tmin_"), each=12), rep(monthcodes, times=3))
 names(lapse) <- paste0("lr_", names(clim))
 combined <- c(clim, lapse, dem)
 
 writeRaster(combined, "//objectstore2.nrs.bcgov/ffec/Climatologies/climr_mosaic/climr_mosaic.tif", overwrite=T)
-# writeRaster(combined, "C:/Users/CMAHONY/OneDrive - Government of BC/Data/climr_mosaic/climr_mosaic.tif", overwrite=T)
+writeRaster(combined, "C:/Users/CMAHONY/OneDrive - Government of BC/Data/climr_mosaic/climr_mosaic.tif", overwrite=T)
 
 # -----------------------------------
 # evaluate
