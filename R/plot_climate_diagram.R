@@ -4,7 +4,7 @@
 #' then will call the function to generate the climate diagram. 
 #' 
 #' @inheritParams create_climate_diagram_input
-#' @export
+#' @noRd
 #' @examples
 #' \dontrun{
 #' in_xyz <- data.frame(lon = -127.7052, lat = 55.3557, elev = 291, id = 1)
@@ -52,7 +52,7 @@ plot_climate_diagram <- function(xyz,
 #' This function will downscale and return a list of the montly Tmin, Tmax, Tave, PPT and the elevation.
 #' @inheritParams downscale
 #' @param use_downscale_db Should the function `downscale_db` be used instead of `downscale`
-#' @export
+#' @noRd
 #' @examples
 #' \dontrun{
 #' in_xyz <- data.frame(lon = -127.7052, lat = 55.3557, elev = 291, id = 1)
