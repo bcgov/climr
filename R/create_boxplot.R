@@ -40,7 +40,7 @@
 #'
 #' @importFrom data.table setnames melt
 #' @importFrom ggplot2 ggplot aes geom_boxplot xlab ylab theme_classic
-#' @export
+#' @noRd
 create_boxplot <- function(dt, var = c("Tmax", "Tmin", "PPT", "Tave")){
   
   #Remove CRAN check warnings
@@ -92,7 +92,7 @@ create_boxplot <- function(dt, var = c("Tmax", "Tmin", "PPT", "Tave")){
 #' @return A data.table containing averaged climate variables by period, 
 #'    including monthly temperature (average, min, max) and precipitation
 #'    values (Tave, Tmin, Tmax, PPT) for each of the 12 months
-#' @export
+#' @noRd
 #' @examples
 #' \dontrun{
 #' in_xyz <- data.frame(lon = -127.7052, lat = 55.3557, elev = 291, id = 1)

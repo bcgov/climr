@@ -22,7 +22,7 @@
 #' @import data.table
 #' @importFrom scales rescale
 #'
-#' @export
+#' @noRd
 create_climate_stripes <- function(dt, mode = c("warming_stripes", "labelled_stripes", "bars", "bars_with_scale")) {
   
   #Remove NSE CRAN check warnings
@@ -87,7 +87,7 @@ convert_rgb_to_col <- function(rgb_matrix) {
 #'
 #' @return A data.table containing averaged climate variables by period, 
 #'    including yearly temperature (average)
-#' @export
+#' @noRd
 #' @examples
 #' \dontrun{
 #' in_xyz <- data.frame(lon = -127.7052, lat = 55.3557, elev = 291, id = 1)

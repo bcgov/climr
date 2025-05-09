@@ -1,4 +1,4 @@
-# `climr` 0.1.2
+# `climr` 0.2
 
 ## Bug Fixes
 
@@ -8,7 +8,8 @@
 
 -   Expanded the climr mosaic of 1981-2010 gridded climatologies to the full North American domain. 
 -   New function `legend_ramp()` for simplified legend plotting on color ramp maps, including accommodation of logarithmic scaling. 
--   New function `plot_climate_diagram()` to generate a Walter-Lieth climate diagram.
+-   New function `logVars()` for logarithmic transformation of specified columns in any data.table. 
+-   Added a Known Issues vignette on NFFD and PAS discrepancies with ClimateNA
 
 
 # `climr` 0.1.1
