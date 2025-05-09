@@ -15,6 +15,7 @@ downscale(
   gcm_periods = NULL,
   gcm_ssp_years = NULL,
   gcm_hist_years = NULL,
+  ensemble_mean = TRUE,
   max_run = 0L,
   run_nm = NULL,
   cache = TRUE,
@@ -57,8 +58,11 @@ scenarios specified by \code{ssps}. See \code{\link[=list_gcm_ssp_years]{list_gc
 \item{gcm_hist_years}{character.  Timeseries years for GCM simulations of the
 historical scenario. See \code{\link[=list_gcm_hist_years]{list_gcm_hist_years()}} for available years.}
 
-\item{max_run}{integer. Maximum number of model runs to include.
-A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
+\item{ensemble_mean}{Logical. Return the mean of the individual GCM runs? If \code{ensemble_mean = TRUE} and \code{max_run = 0}, only
+the mean will be returned. To return an individual run and exclude the mean, set \code{ensemble_mean = FALSE} and \code{max_run = 1}.}
+
+\item{max_run}{integer. Maximum number of model runs to include, not including the ensemble mean.
+Runs are included in the order they
 are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
 \item{run_nm}{character. \code{NULL} or length >= 1. Name of specified run(s) to return, instead of using \code{max_run}. Use the \verb{list_runs_*()} functions to list available runs.Defaults to \code{NULL}.}

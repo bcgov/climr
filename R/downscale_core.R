@@ -36,7 +36,6 @@
 #'   If the variable exists in `reference`, then its reference values will also be plotted.
 #'   Otherwise, reference January total precipitation (PPT01) values will be plotted.
 #' @param skip_check A boolean. Skip checks if coming from downscale.
-#' @param dbCon For database implementation, a connection to `climr` database.
 #' 
 #' @import data.table
 #' @importFrom terra extract rast sources ext xres yres crop plot as.polygons setValues
@@ -63,11 +62,9 @@
 #' ## get bounding box based on input points
 #' thebb <- get_bb(xyz)
 #'
-#' ## get database connection
-#' dbCon <- data_connect()
 #'
 #' # obtain the climatena 1961-1990 normals for the study area.
-#' refmap <- input_refmap(dbCon, thebb, reference = "refmap_climatena")
+#' refmap <- input_refmap(thebb, reference = "refmap_climatena")
 #'
 #' # obtain the low-resolution climate data for a single gcm, 20-year period, and ssp scenario.
 #' gcm_raw <- input_gcms(
@@ -99,7 +96,6 @@
 #'
 #' # downscale the null values for variables of interest
 #' null_downscaled <- downscale_core(xyz = xyz, refmap = refmap, gcms = null, vars = c("MAT", "PAS"))
-#' pool::poolClose(dbCon)
 #'
 downscale_core <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NULL,
                            gcm_hist_ts = NULL, obs_ts = NULL, return_refperiod = TRUE,

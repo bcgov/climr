@@ -4,11 +4,9 @@
 \alias{pgGetTerra}
 \title{Download raster with bounding box from PostGIS (original)}
 \usage{
-pgGetTerra(conn, name, tile, rast = "rast", bands = 1:73, boundary)
+pgGetTerra(name, tile, rast = "rast", bands = 1:73, boundary)
 }
 \arguments{
-\item{conn}{a DBI or RPostgres connection object.}
-
 \item{name}{character. Table name in database.}
 
 \item{tile}{Logical. Retrieve data in tiles to avoid overloading the database?}

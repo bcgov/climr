@@ -27,7 +27,7 @@ NULL
 
   init_globals()
   options("climr.recycle.warn"  = FALSE)
-  dbCon <- tryCatch(data_con(), error = \(e) NULL)
+  dbCon <- tryCatch(data_connect(), error = \(e) NULL)
 
   if (is.null(dbCon)) {
     

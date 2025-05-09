@@ -31,8 +31,8 @@ data, averaged over this period. Options are \code{\link[=list_obs_periods]{list
 \item{gcm_periods}{character. 20-year reference periods for GCM simulations.
 Options are \code{\link[=list_gcm_periods]{list_gcm_periods()}}.}
 
-\item{max_run}{integer. Maximum number of model runs to include.
-A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
+\item{max_run}{integer. Maximum number of model runs to include, not including the ensemble mean.
+Runs are included in the order they
 are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
 \item{cache}{logical. Cache data locally? Default \code{TRUE}}

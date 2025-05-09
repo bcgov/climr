@@ -6,6 +6,38 @@ library(RPostgres)
 library(climr)
 library(dplyr)
 
+
+#low res dem for north america
+dem <- rast("//objectstore2.nrs.bcgov/ffec/DEM/DEM_NorAm/dem_noram_lowres.tif")
+
+my_grid <- as.data.frame(dem, cells = TRUE, xy = TRUE)
+colnames(my_grid) <- c("id", "lon", "lat", "elev") # rename column names to what climr expects
+climr <- downscale(xyz = my_grid, which_refmap = "refmap_climr", 
+                   obs_periods = "2001_2020", vars = c("Tmin_01","Tmin_07"))
+
+thebb <- get_bb(my_grid)
+
+dbCon <- data_connect()
+
+refmap <- input_refmap(dbCon, thebb, reference = "refmap_climr")
+
+var="Tmin_01"
+par(mfrow=c(1,2), mar=c(0,0,2,2))
+values(X) <- NA
+
+plot(refmap[[names(refmap)==var]], main=paste("climr refmap", var), axes=F)
+
+data_climr <-   climr[,get(var)]
+X[climr[, id]] <- data_climr
+plot(X, main=paste("climr downscaled", var), axes=F)
+s <- which(data_climr>100)
+points(my_grid$lon[s], my_grid$lat[s])
+
+## climr data
+climr <- downscale(xyz = my_grid, which_refmap = "refmap_climatena", vars = list_vars())
+
+
+
 # Get lat, long, and elevation for 7 locations in BC
 test_pts<-data.frame(id = seq(1,6,by=1),
                      lon = c(-120.1879,-120.4258,-121.9251,-120.3030,-127.5062,-127.6785),
@@ -13,6 +45,19 @@ test_pts<-data.frame(id = seq(1,6,by=1),
                      elev = c(441.9092,901.2709,461.7851,926.7590,1098.2932,1022.2858)
 )
 
+clim_vars <- climr::downscale(test_pts,  
+                              vars = list_vars(), 
+                              return_refperiod = TRUE, 
+                              obs_periods = c("2001_2020"),
+                              obs_years = 2022)
+
+clim_vars <- climr::downscale(test_pts,  
+                              vars = list_vars(), 
+                              return_refperiod = TRUE, 
+                              obs_periods = c("2001_2020"),
+                              obs_years = 2022, 
+                              obs_ts_dataset = "cru.gpcc",
+                              db_option = "database")
 
 plot_bivariate(test_pts[1,])
 
@@ -118,14 +163,18 @@ in_xyz <- data.frame(
      elev = c(291, 296, 626, 377, 424, 591, 723, 633),
      id = 1:8
    )
- clim <- downscale(xyz = in_xyz, 
-                                           which_refmap = "refmap_climr", 
-                                            gcms = list_gcms()[1], 
-                                            ssps = list_ssps()[2],
-                                            gcm_periods = list_gcm_periods()[3], 
-                                            run_nm = list_runs_ssp(list_gcms()[1], list_ssps()[2])[3]
+ clim3 <- downscale(xyz = in_xyz, 
+                   which_refmap = "refmap_climr", 
+                    gcms = list_gcms()[1], 
+                    ssps = list_ssps()[2],
+                    gcm_periods = list_gcm_periods()[3], 
+                    gcm_ssp_years = 2030:2040,
+                    db_option = "auto"
                      )
 
+ t1 <- input_refmap(get_bb(in_xyz))
+ 
+ t2 <- input_refmap(get_bb(test_pts), reference = "refmap_climatena")
  
  
  bc <- bcmaps::bc_bound()
@@ -144,14 +193,22 @@ in_xyz <- data.frame(
  grid <- as.data.frame(dem, cells = TRUE, xy = TRUE)
  colnames(grid) <- c("id", "lon", "lat", "elev") # rename column names to what climr expects
  setDT(grid)
+ 
+ bbox <- c(-134,-124,61,65)
+ bb2 <- ext(bbox)
+ 
+ test2 <- input_gcms(bb2, gcms = list_gcms()[1], ssps = list_ssps()[2], period = "2041_2060")
 
+ test <- input_refmap(bbox, reference = "refmap_climr")
+ plot(test[[18]])
  clim.grid <- downscale(xyz = grid, 
                         which_refmap = "refmap_climr", 
                         gcms = list_gcms()[1], 
-                        ssps = list_ssps()[2],
+                        ssps = list_ssps()[3],
                         gcm_periods = list_gcm_periods()[3], 
-                        max_run = 2,
-                        vars = list_vars()
+                        ensemble_mean = TRUE,
+                        max_run = 0,
+                        vars = list_vars("Annual")
  )
  
  clim.grid <- downscale(xyz = grid, 
@@ -735,3 +792,58 @@ tic()
 clim_vars <- climr_downscale(coords, which_normal = "normal_composite", 
                                               vars = list_variables(), return_normal = T)
 toc()
+
+##original connection function
+#' Connect to PostGIS database
+#' 
+#' @return pool object of database connection
+#' @param local A logical. Use a local database. Default `FALSE`.
+#' @importFrom pool dbPool
+#' @importFrom RPostgres Postgres
+#' 
+#' @export
+# data_connect <- function(local = FALSE) {
+#   if(local){
+#     pool <- dbPool(
+#       drv = Postgres(),
+#       dbname = "climr",
+#       host = "localhost",
+#       port = 5432,
+#       user = "postgres",
+#       password = "climrserver"
+#     )
+#   }else{
+#     pool <- tryCatch(
+#       {
+#         dbPool(
+#           drv = Postgres(),
+#           dbname = "climr",
+#           host = "146.190.244.244",
+#           port = 5432,
+#           user = "climr_client",
+#           password = "PowerOfBEC2023"
+#         )
+#       },
+#       error = function(e) {
+#         tryCatch(
+#           {
+#             dbPool(
+#               drv = Postgres(),
+#               dbname = "climr",
+#               host = "146.190.244.244",
+#               port = 5432,
+#               user = "climr_client",
+#               password = "PowerOfBEC2023"
+#             )
+#           },
+#           error = function(f) {
+#             warning("Could not connect to database. Will try using cached data.")
+#             NULL
+#           }
+#         )
+#       }
+#     )
+#   }
+#   
+#   return(pool)
+# }

@@ -4,11 +4,9 @@
 \alias{dbGetTiles}
 \title{Download individual raster tiles from PostGIS}
 \usage{
-dbGetTiles(conn, name, pnts, bands = 1:73)
+dbGetTiles(name, pnts, bands = 1:73)
 }
 \arguments{
-\item{conn}{a DBI or RPostgres connection object.}
-
 \item{name}{character. Table name in database.}
 
 \item{pnts}{data.table of point locations with columns \code{lon} and \code{lat}}

@@ -21,7 +21,7 @@ shush <- function(expr) {
 #' @return logical
 #' @noRd
 is_in_bbox <- function(newbb, oldbb) {
-  if (newbb[1] <= oldbb[1] & newbb[2] >= oldbb[2] & newbb[3] <= oldbb[3] & newbb[4] >= oldbb[4]) {
+  if (newbb[1] >= oldbb[1] & newbb[2] <= oldbb[2] & newbb[3] >= oldbb[3] & newbb[4] <= oldbb[4]) {
     TRUE
   } else {
     FALSE
@@ -30,20 +30,20 @@ is_in_bbox <- function(newbb, oldbb) {
 
 #' Find bounding box of data
 #'
-#' @param in_xyz `data.table` (or `data.frame`) of points to downscale
+#' @param xyz `data.table` (or `data.frame`) of points to downscale
 #'  with columns "lon", "lat", "elev" and "id"
-#' @return numeric vector. Bounding box coordinates with order ymax,ymin,xmax,xmin (e.g. `c(51, 50, -121, -122)`).
+#' @return numeric vector. Bounding box coordinates with order xmin, xmax, ymin, ymax (e.g. `c(-122, -121, 50, 51)`).
 #' @export
 #' @rdname get_bb
-get_bb <- function(in_xyz) {
-  UseMethod("get_bb", in_xyz)
+get_bb <- function(xyz) {
+  UseMethod("get_bb", xyz)
 }
 
 #' @export
 #' @rdname get_bb
 get_bb.data.frame <- function(in_xyz) {
   .checkXYZ(copy(in_xyz))
-  thebb <- c(max(in_xyz[, "lat"]), min(in_xyz[, "lat"]), max(in_xyz[, "lon"]), min(in_xyz[, "lon"]))
+  thebb <- c(min(in_xyz[, "lon"]), max(in_xyz[, "lon"]), min(in_xyz[, "lat"]), max(in_xyz[, "lat"]))
 
   if (any(is.na(thebb))) {
     stop("Couldn't guess bounding box. Are there NA's in 'xyz'?")
@@ -58,7 +58,7 @@ get_bb.data.frame <- function(in_xyz) {
 #' @export
 get_bb.SpatRaster <- function(in_xyz) {
   ext <- terra::ext(in_xyz)
-  return(c(ext$ymax, ext$ymin, ext$xmax, ext$xmin))
+  return(ext)
 }
 
 
@@ -76,8 +76,8 @@ get_bb.SpatRaster <- function(in_xyz) {
   maxLat <- 83.125
 
   if (any(
-    (bbox[4] < minLon), (bbox[3] > maxLon),
-    (bbox[2] < minLat), (bbox[1] > maxLat)
+    (bbox[1] < minLon), (bbox[2] > maxLon),
+    (bbox[3] < minLat), (bbox[4] > maxLat)
   )) {
     stop("input fields lon and lat are not in lat/long coordinates, or extent is outside ext(-179.0625, -51.5625, 14.375, 83.125)")
   }
@@ -190,7 +190,6 @@ get_elev_raster <- function(r, elev, out = NULL, ...) {
 
 
 #' Bilinear interpolation point extraction from raster bands
-#' @param dbCon A postgres database connection.
 #' @param rastertbl The name of the raster table to extract from.
 #' @param layers A data.table with column `var_nm` (names of the bands) and
 #' @param VAR In case of rasters split across different tables. One VAR in each.
@@ -205,7 +204,6 @@ get_elev_raster <- function(r, elev, out = NULL, ...) {
 #' @keywords internal
 #' @export
 extract_db <- function(
-  dbCon,
   rastertbl,
   layers = data.table::data.table(var_nm = character(), laynum = integer()),
   VAR = NULL,

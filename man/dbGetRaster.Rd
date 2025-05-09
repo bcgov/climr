@@ -4,11 +4,9 @@
 \alias{dbGetRaster}
 \title{Download raster with bounding box from PostGIS (boostao version)}
 \usage{
-dbGetRaster(conn, name, tile, rast = "rast", bands = 37:73, boundary)
+dbGetRaster(name, tile, rast = "rast", bands = 37:73, boundary)
 }
 \arguments{
-\item{conn}{a DBI or RPostgres connection object.}
-
 \item{name}{character. Table name in database.}
 
 \item{tile}{Logical. Retrieve data in tiles to avoid overloading the database?}
