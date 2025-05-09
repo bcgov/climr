@@ -4,6 +4,10 @@
 #'
 #' @description
 #' `list_gcms` lists available global climate models.
+#' 
+#' @details
+#' The eight-gcm ensemble recommended by Mahony et al. (2022) can be specified as `gcms = list_gcm()[c(1,4,5,6,7,10,11,12)]`. 
+#' 
 #'
 #' @rdname data-option-lists
 #' @export
@@ -89,8 +93,11 @@ list_obs_periods <- function() {
 
 #' @description
 #' `list_vars` lists available climate variables
-#'
-#' @param set character. One of All, Monthly, Seasonal, Annual, or any combination thereof. Defaults to "All".
+#' 
+#' @details
+#' A lookup table of variable names, units, types, and other attributes is available by calling `data(variables)`.
+#' 
+#' @param set character. One of `c("All", "Monthly", "Seasonal", "Annual")` or any combination thereof. Defaults to "All".
 #' @param only_extra logical. Should Tmin, Tmax and PPT be excluded? Defaults to FALSE.
 #'
 #' @rdname data-option-lists
