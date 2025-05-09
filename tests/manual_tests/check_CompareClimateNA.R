@@ -87,7 +87,7 @@ vars <- vars[-which(vars%in%c("Tave", "Tmin", "Tmax"))]
 # for(var in vars[grep("NFFD", vars)]){
 var="CMD"
 for(var in vars){
-  png(filename=paste(figDir, "/refmapclimatenaVsClimateNA", var, "png",sep="."), type="cairo", units="in", width=6.5, height=2, pointsize=10, res=600)
+  png(filename=paste(figDir, "/refmapclimatenaVsClimateNA", var, "png",sep="."), type="cairo", units="in", width=6.5, height=1.75, pointsize=10, res=600)
   
   par(mfrow=c(1,3), mar=c(0,0,2,2))
   values(X) <- NA
