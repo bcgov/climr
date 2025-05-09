@@ -16,7 +16,7 @@
 #' @param refmap `SpatRaster`. Outputs from [`input_refmap()`]. The high-resolution
 #'   climate maps for use as the downscaling baseline.
 #' @param gcms `list` of `SpatRasters`. Outputs from [`input_gcms()`]. Global
-#'   climate model data for 20-year reference periods to be downscaled.
+#'   climate models to be downscaled.
 #' @param obs `list` of `SpatRasters`. Outputs from [`input_obs()`].
 #'   Observed climate data for 20-year reference periods to be downscaled. 
 #' @param gcm_ssp_ts `list` of `SpatRasters`. Outputs from [`input_gcm_ssp()`].
@@ -46,7 +46,7 @@
 #' @return A SpatRaster, a `data.table` or SpatVector with downscaled climate variables.
 #'   If `gcms` is NULL, this is just the downscaled `reference` at point locations.
 #'   If `gcms` is provided, this returns a downscaled dataset for each point location,
-#'   general circulation model (GCM), shared socioeconomic pathway (SSP), run and period.
+#'   global climate model (GCM), shared socioeconomic pathway scenario (SSP), model run, and period.
 #'
 #' @seealso [`input_gcms()`], [`input_obs()`], [`list_vars()`]
 #'

@@ -55,7 +55,7 @@ published equations and parameters from [@wang2016].
 See `vignette("methods_downscaling.Rmd")` for a detailed explanation of
 the downscaling methodology employed in `climr`.
 
-`climr`'s strenghts are:
+`climr`'s strengths are:
 
 1.  its ability to obtain multiple, individual runs of a (or several)
     General Circulation Model(s) (GCM), as well as the ensemble
@@ -272,7 +272,7 @@ values so that they align with their observed counterpart. See
 ```{r, message = TRUE}
 ds_out_ts <- downscale(
   xyz = xyzDT,
-  obs_years = 2001:2015,
+  obs_years = 2001:2023,
   gcm_hist_years = 2001:2014,
   gcm_ssp_years = 2015:2040,
   gcms = "EC-Earth3",
@@ -301,7 +301,7 @@ plotdata <- plotdata[id == head(id, 1)]
 ## time series period groupings
 plotdata[GCM == "Historic", pgrp := "obs_hist"]
 plotdata[GCM != "Historic" & PERIOD <= 2020, pgrp := "proj_hist"]
-plotdata[GCM != "Historic" & PERIOD > 2020, pgrp := "proj_fut"]
+plotdata[GCM != "Historic" & PERIOD > 2014, pgrp := "proj_fut"]
 
 ## make groups so that missing data is not shown as a "line connection"
 groups <- data.table(PERIOD = unique(plotdata$PERIOD))
