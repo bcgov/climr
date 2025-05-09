@@ -8,7 +8,7 @@
 #' @importFrom ggplot2 aes geom_hline geom_line geom_ribbon ggplot geom_polygon
 #' @importFrom ggplot2 scale_x_continuous scale_y_continuous sec_axis
 #' @importFrom ggplot2 annotate coord_cartesian labs theme_classic
-#' @export
+#' @noRd
 #' @examples
 #' 
 #' temperature <- c(14, 14, 17, 20, 24, 28, 31, 31, 27, 23, 18, 15)
