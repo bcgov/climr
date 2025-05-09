@@ -9,8 +9,7 @@
 -   Expanded the climr mosaic of 1981-2010 gridded climatologies to the full North American domain. 
 -   New function `legend_ramp()` for simplified legend plotting on color ramp maps, including accommodation of logarithmic scaling. 
 -   New function `logVars()` for logarithmic transformation of specified columns in any data.table. 
--   Added a Known Issues vignette on NFFD and PAS discrepancies with ClimateNA
-
+-   Added a Known Issues section to the vignettes, including the FFP, NFFD, and PAS discrepancies with ClimateNA.
 
 # `climr` 0.1.1
 
