@@ -23,7 +23,6 @@ articles:
   contents:
   - climr_workflow_beg
   - climr_workflow_int
-  - climr_with_rasters
 - title: "Methods"
   navbar: "Methods"
   desc: "Climate downscaling methods used in `climr`"
@@ -31,10 +30,15 @@ articles:
   - methods_downscaling
   - methods_mosaic
   - methods_ensembleSelection
-  - lapse_rates
 - title: "Guidance"
   contents:
   - guidance_ensembleSelection
+- title: "Known Issues"
+  navbar: "Known Issues"
+  desc: "Unresolved bugs, artefacts, and shortcomings"
+  contents:
+  - knownIssues_DiscrepanciesWithClimateNA
+  - knownIssues_customRefmap
 - title: "Caching"
   contents:
   - caching

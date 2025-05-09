@@ -46,7 +46,7 @@ downscale_db_core(
 climate maps for use as the downscaling baseline.}
 
 \item{gcms}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=input_gcms]{input_gcms()}}. Global
-climate model data for 20-year reference periods to be downscaled.}
+climate models to be downscaled.}
 
 \item{obs}{\code{list} of \code{SpatRasters}. Outputs from \code{\link[=input_obs]{input_obs()}}.
 Observed climate data for 20-year reference periods to be downscaled.}
@@ -84,7 +84,7 @@ Otherwise, reference January total precipitation (PPT01) values will be plotted.
 A SpatRaster, a \code{data.table} or SpatVector with downscaled climate variables.
 If \code{gcms} is NULL, this is just the downscaled \code{reference} at point locations.
 If \code{gcms} is provided, this returns a downscaled dataset for each point location,
-general circulation model (GCM), shared socioeconomic pathway (SSP), run and period.
+global climate model (GCM), shared socioeconomic pathway scenario (SSP), model run, and period.
 }
 \description{
 \code{downscale_core()} is the engine for \code{\link[=downscale]{downscale()}}.
