@@ -5,7 +5,6 @@
 \title{Bilinear interpolation point extraction from raster bands}
 \usage{
 extract_db(
-  dbCon,
   rastertbl,
   layers = data.table::data.table(var_nm = character(), laynum = integer()),
   VAR = NULL,
@@ -13,8 +12,6 @@ extract_db(
 )
 }
 \arguments{
-\item{dbCon}{A postgres database connection.}
-
 \item{rastertbl}{The name of the raster table to extract from.}
 
 \item{layers}{A data.table with column \code{var_nm} (names of the bands) and}

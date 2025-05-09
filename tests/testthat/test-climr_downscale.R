@@ -1,9 +1,6 @@
 test_that("test dowscale basic and spatial", {
   testInit("data.table")
 
-  dbCon <- data_con()
-  #on.exit(try(pool::poolClose(dbCon)), add = TRUE)
-
   ## a small area
   xyz <- data.frame(
     lon = c(
@@ -165,6 +162,7 @@ test_that("test downscale with different argument combinations", {
   argsCombos <- argsCombos[89:108,]
   
   out <- apply(argsCombos, 1, function(args, xyz) {
+    #browser()
     args <- args[!is.na(args)]
     suppressWarnings(args$xyz <- xyz) # coerces to list.
     args$vars <- c("PPT", "CMD") ## for faster results.
@@ -299,3 +297,13 @@ test_that("test climr_dowscale all periods, all GCMs, all SSPS, all years", {
     lapply(testOut, function(x) expect_true(all(x)))
   })
 })
+
+
+# out <- downscale(xyz, 
+#                  which_refmap = "refmap_climatena",
+#                  obs_years = 1990:2010,
+#                  obs_ts_dataset = "cru.gpcc",
+#                  gcms = list_gcms()[2],
+#                  ssps = list_ssps()[1:3],
+#                  gcm_ssp_years = 2040:2050,
+#                  gcm_hist_years = 1990:2010)

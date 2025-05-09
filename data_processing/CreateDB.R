@@ -6,7 +6,102 @@ library(analogsea)
 ##add normals
 library(ssh)
 
+library(terra)
+dat <- rast("../Common_Files/climr_mosaic_2025/climr_mosiac_wlrdem_compressed.tif")
+clamped <- rast("../Common_Files/climr_mosaic_2025/climr_mosaic_clamped.tif")
+dat[[37:72]] <- clamped[[37:72]]
+plot(dat[[49]])
 
+# Actual writing
+terra::writeRaster(
+  dat,
+  "../Common_Files/climr_mosaic_wlrdem.tif",
+  overwrite = TRUE,
+  gdal="COMPRESS=NONE"
+)
+
+##clamp lapse rates
+library(RPostgres)
+conn <- dbConnect(RPostgres::Postgres(),dbname = 'climr',
+                  host = '146.190.244.244',
+                  port = 5432,
+                  user = 'postgres',
+                  password = 'climr2022')
+
+lim <- 20/1000 # set maximum absolute lapse rate to ±20 K/km (but data is in K/m, so limit is 0.01 K/m)
+layers <- c(
+  "PPT_01", "PPT_02", "PPT_03", "PPT_04", "PPT_05", "PPT_06", "PPT_07",
+  "PPT_08", "PPT_09", "PPT_10", "PPT_11", "PPT_12", "Tmax_01", "Tmax_02",
+  "Tmax_03", "Tmax_04", "Tmax_05", "Tmax_06", "Tmax_07", "Tmax_08", "Tmax_09",
+  "Tmax_10", "Tmax_11", "Tmax_12", "Tmin_01", "Tmin_02", "Tmin_03", "Tmin_04",
+  "Tmin_05", "Tmin_06", "Tmin_07", "Tmin_08", "Tmin_09", "Tmin_10", "Tmin_11",
+  "Tmin_12", "lr_PPT_01", "lr_PPT_02", "lr_PPT_03", "lr_PPT_04", "lr_PPT_05",
+  "lr_PPT_06", "lr_PPT_07", "lr_PPT_08", "lr_PPT_09", "lr_PPT_10", "lr_PPT_11",
+  "lr_PPT_12", "lr_Tmax_01", "lr_Tmax_02", "lr_Tmax_03", "lr_Tmax_04",
+  "lr_Tmax_05", "lr_Tmax_06", "lr_Tmax_07", "lr_Tmax_08", "lr_Tmax_09",
+  "lr_Tmax_10", "lr_Tmax_11", "lr_Tmax_12", "lr_Tmin_01", "lr_Tmin_02",
+  "lr_Tmin_03", "lr_Tmin_04", "lr_Tmin_05", "lr_Tmin_06", "lr_Tmin_07",
+  "lr_Tmin_08", "lr_Tmin_09", "lr_Tmin_10", "lr_Tmin_11", "lr_Tmin_12",
+  "dem2_WNA"
+)
+idx <- grep("lr_T", layers) # identify temperature lapse rate layers
+
+clamp_q <- 
+"UPDATE refmap_climr
+SET rast = ST_AddBand(
+    NULL,
+    ARRAY(
+        SELECT 
+            CASE 
+                WHEN band >= 49 AND band <=72 THEN 
+                    ST_MapAlgebraExpr(
+                        rast,
+                        band,
+                        ST_BandPixelType(rast, band),
+                        '[rast] * 2'
+                    )
+                ELSE ST_Band(rast, band)
+            END
+        FROM generate_series(1, ST_NumBands(rast)) AS band
+    )
+);"
+dbExecute(conn, clamp_q)
+
+
+clamp_create <- 
+  "CREATE TABLE refmap_climr_clamped AS
+SELECT rid,
+       ST_AddBand(
+           NULL,
+           ARRAY(
+               SELECT 
+                   CASE 
+                       WHEN band >= 49 AND band <= 72 THEN
+                           ST_MapAlgebraExpr(
+                               rast,
+                               band,
+                               NULL,
+                               'CASE 
+                                    WHEN [rast] < -0.02 THEN -0.02  
+                                    WHEN [rast] > 0.02 THEN 0.02
+                                    ELSE [rast] 
+                                END'::text
+                           )
+                       ELSE ST_Band(rast, band)
+                   END
+               FROM generate_series(1, ST_NumBands(rast)) AS band
+           )
+       ) AS rast
+FROM refmap_climr_save;"
+
+'CASE 
+WHEN [rast] < -0.02 THEN -0.02  
+WHEN [rast] > 0.02 THEN 0.02
+ELSE [rast] 
+END'
+dbExecute(conn, clamp_create)
+clamped <- pgGetTerra("refmap_climr", FALSE, bands = 49, boundary = get_bb(test_pts))
+plot(clamped)
 # bc_rast <- rast("../Common_Files/composite_wna_wlrdem.tif")[[32]]
 # plot(bc_rast)
 # bc_rast[!is.na(bc_rast)] <- 1L
@@ -78,10 +173,9 @@ names(lr) <- paste0("lr_",names(lr))
 
 # Actual writing
 terra::writeRaster(
-  c(dem, lr, d),
-  file.path("../Common_Files/climatena4km_wlrdem.tif"),
-  overwrite = TRUE,
-  gdal="COMPRESS=NONE"
+  dat,
+  file.path("../Common_Files/climr_mosaic_wlrdem.tif"),
+  overwrite = TRUE
 )
 
 ############# now upload

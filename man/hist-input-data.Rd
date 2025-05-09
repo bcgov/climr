@@ -7,23 +7,20 @@
 \alias{input_obs_ts_db}
 \title{Retrieve observational anomalies.}
 \usage{
-input_obs(dbCon, bbox = NULL, period = list_obs_periods(), cache = TRUE)
+input_obs(bbox = NULL, period = list_obs_periods(), cache = TRUE)
 
-input_obs_db(dbCon, period = list_obs_periods())
+input_obs_db(period = list_obs_periods())
 
 input_obs_ts(
-  dbCon,
   dataset = c("cru.gpcc", "climatena"),
   bbox = NULL,
   years = 2010:2022,
   cache = TRUE
 )
 
-input_obs_ts_db(dbCon, dataset = c("cru.gpcc", "climatena"), years = 2010:2022)
+input_obs_ts_db(dataset = c("cru.gpcc", "climatena"), years = 2010:2022)
 }
 \arguments{
-\item{dbCon}{A db connection object created by \code{data_connect}.}
-
 \item{bbox}{numeric. Vector of length 4 giving bounding box of study region, in the order ymax,ymin,xmax,xmin. In general this is created by \code{get_bb()}, but can also be user-defined.}
 
 \item{period}{character. Vector of labels of the periods to use.

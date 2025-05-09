@@ -41,6 +41,7 @@
 #' @param gcm_hist_years character.  Timeseries years for GCM simulations of the
 #'   historical scenario. See [`list_gcm_hist_years()`] for available years.
 #' @template max_run
+#' @template ensemble_mean
 #' @template run_nm
 #' @param cache logical. Cache data locally? Default `TRUE`
 #' @param local logical. Is the postgres database local? Default `FALSE`
@@ -113,7 +114,9 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
                       obs_ts_dataset = NULL,
                       gcms = NULL, ssps = NULL,
                       gcm_periods = NULL, gcm_ssp_years = NULL,
-                      gcm_hist_years = NULL, max_run = 0L,
+                      gcm_hist_years = NULL, 
+                      ensemble_mean = TRUE,
+                      max_run = 0L,
                       run_nm = NULL,
                       cache = TRUE,
                       local = FALSE,
@@ -160,7 +163,7 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
     xyz[, id_orig := NULL]
   }
 
-  dbCon <- data_con(if (local) "local")
+  #dbCon <- data_con(if (local) "local")
   thebb <- get_bb(xyz) ## get bounding box based on input points
   db_ts <- db_option
   if((db_option == "auto" & nrow(xyz) < 5) | db_option == "database"){
@@ -179,19 +182,19 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
   if (!is.null(obs_periods)) {
     message("Getting observed anomalies...")
     if(db_option == "database"){
-      obs_periods_db <- input_obs_db(dbCon = dbCon, period = obs_periods)
+      obs_periods_db <- input_obs_db(period = obs_periods)
     } else {
-      obs_periods_reg <- input_obs(dbCon, bbox = thebb, period = obs_periods, cache = cache)
+      obs_periods_reg <- input_obs(bbox = thebb, period = obs_periods, cache = cache)
     }
   }
   if (!is.null(obs_years)) { ##should probably also have a local option here
     if(db_ts == "local"){
-      obs_years_reg <- input_obs_ts(dbCon,
+      obs_years_reg <- input_obs_ts(
                                 dataset = obs_ts_dataset,
                                 bbox = thebb, years = obs_years, cache = cache
       )
     } else {
-      obs_years_db <- input_obs_ts_db(dbCon = dbCon, dataset = obs_ts_dataset, years = obs_years)
+      obs_years_db <- input_obs_ts_db(dataset = obs_ts_dataset, years = obs_years)
     }  
   }
   
@@ -201,19 +204,19 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
       message("Getting GCMs...")
       if(db_option == "database"){
         gcm_ssp_periods_db <- input_gcms_db(
-          dbCon = dbCon,
           gcms = gcms,
           ssps = ssps,
           period = gcm_periods,
           max_run = max_run,
+          ensemble_mean = ensemble_mean,
           run_nm = run_nm
         )
       } else {
-        gcm_ssp_periods <- input_gcms(dbCon,
-                                      bbox = thebb, gcms = gcms,
+        gcm_ssp_periods <- input_gcms(bbox = thebb, gcms = gcms,
                                       ssps = ssps,
                                       period = gcm_periods,
                                       max_run = max_run,
+                                      ensemble_mean = ensemble_mean,
                                       run_nm = run_nm,
                                       cache = cache
         )
@@ -222,22 +225,22 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
     }
     if (!is.null(gcm_ssp_years)) {
       if(db_ts == "local"){
-        gcm_ssp_ts_reg <- input_gcm_ssp(dbCon,
-                                    bbox = thebb, gcms = gcms,
+        gcm_ssp_ts_reg <- input_gcm_ssp(bbox = thebb, gcms = gcms,
                                     ssps = ssps,
                                     years = gcm_ssp_years,
                                     max_run = max_run,
+                                    ensemble_mean = ensemble_mean,
                                     cache = cache,
                                     run_nm = run_nm,
                                     fast = FALSE
         )
       } else {
         gcm_ssp_ts <- input_gcm_ssp_db(
-          dbCon = dbCon,
           gcms = gcms,
           ssps = ssps,
           years = gcm_ssp_years,
           max_run = max_run,
+          ensemble_mean = ensemble_mean,
           run_nm = run_nm
         )
       }
@@ -247,19 +250,19 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
     }
     if (!is.null(gcm_hist_years)) {
       if(db_ts == "local"){
-        gcm_hist_ts_reg <- input_gcm_hist(dbCon,
-                                      bbox = thebb, gcms = gcms,
+        gcm_hist_ts_reg <- input_gcm_hist(bbox = thebb, gcms = gcms,
                                       years = gcm_hist_years,
                                       max_run = max_run,
+                                      ensemble_mean = ensemble_mean,
                                       run_nm = run_nm,
                                       cache = cache
         )
       } else {
         gcm_hist_ts <- input_gcm_hist_db(
-          dbCon = dbCon,
           gcms = gcms,
           years = gcm_hist_years,
           max_run = max_run,
+          ensemble_mean = ensemble_mean,
           run_nm = run_nm
         )
       }
@@ -269,7 +272,7 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
 
   results <- results_ts <- NULL
   if(any(!is.null(c(obs_periods_reg, obs_years_reg, gcm_ssp_periods, gcm_ssp_ts_reg, gcm_hist_ts_reg))) | db_option == "local"){
-    reference <- input_refmap(dbCon = dbCon, reference = which_refmap, bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
+    reference <- input_refmap(reference = which_refmap, bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
     message("Downscaling...")
     results <- downscale_core(
       xyz = xyz,
@@ -289,7 +292,6 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
     reference_db <- input_refmap_db(reference = which_refmap)
     message("Downscaling in database...")
     results_ts <- downscale_db_core(
-      dbCon = dbCon,
       xyz = xyz,
       refmap = reference_db,
       obs = obs_periods_db,
@@ -338,7 +340,7 @@ downscale_db <- function(
       terra::convHull() |>
       terra::geom(wkt = TRUE)
   }
-  dbCon <- data_con(if (local) "local")
+  #dbCon <- data_con(if (local) "local")
  
   rmCols <- setdiff(names(xyz), expectedCols)
   if (length(rmCols)) { ## remove extraneous columns
@@ -352,16 +354,15 @@ downscale_db <- function(
     stop("Unknown `which_refmap` parameter.")
   }
   if (!is.null(obs_periods)) {
-    obs_periods <- input_obs_db(dbCon = dbCon, period = obs_periods)
+    obs_periods <- input_obs_db(period = obs_periods)
   }
   if (!is.null(obs_years)) {
-    obs_years <- input_obs_ts_db(dbCon = dbCon, dataset = obs_ts_dataset, years = obs_years)
+    obs_years <- input_obs_ts_db(dataset = obs_ts_dataset, years = obs_years)
   }
 
   if (!is.null(gcms)) {
     if (!is.null(gcm_periods)) {
       gcm_ssp_periods <- input_gcms_db(
-        dbCon = dbCon,
         gcms = gcms,
         ssps = ssps,
         period = gcm_periods,
@@ -373,7 +374,6 @@ downscale_db <- function(
     }
     if (!is.null(gcm_ssp_years)) {
       gcm_ssp_ts <- input_gcm_ssp_db(
-        dbCon = dbCon,
         gcms = gcms,
         ssps = ssps,
         years = gcm_ssp_years,
@@ -385,7 +385,6 @@ downscale_db <- function(
     }
     if (!is.null(gcm_hist_years)) {
       gcm_hist_ts <- input_gcm_hist_db(
-        dbCon = dbCon,
         gcms = gcms,
         years = gcm_hist_years,
         max_run = max_run,
@@ -402,7 +401,6 @@ downscale_db <- function(
   
   message("Downscaling...")
   results <- downscale_db_core(
-    dbCon = dbCon,
     xyz = xyz,
     refmap = reference,
     obs = obs_periods,
@@ -410,6 +408,7 @@ downscale_db <- function(
     gcms = gcm_ssp_periods,
     gcm_ssp_ts = gcm_ssp_ts,
     gcm_hist_ts = gcm_hist_ts,
+    return_refperiod = FALSE,
     ...
   )
   return(results)

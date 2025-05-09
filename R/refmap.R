@@ -4,7 +4,6 @@
 #' from a specified data source for the specified bounding box.
 #' It is intended for use with [`downscale_core()`], but can also be used as stand-alone raster data.
 #'
-#' @template dbCon
 #' @template bbox
 #' @template reference
 #' @template cache
@@ -26,7 +25,7 @@
 #' @importFrom uuid UUIDgenerate
 #' @rdname input_refmap
 #' @export
-input_refmap <- function(dbCon, bbox, reference = "refmap_climr", cache = TRUE, indiv_tiles = FALSE, xyz = NULL) {
+input_refmap <- function(bbox, reference = "refmap_climr", cache = TRUE, indiv_tiles = FALSE, xyz = NULL) {
   ## checks
   if (is(reference, "character")) {
     # match.arg(reference, list_refmaps()) ## temporarily disable
@@ -73,7 +72,7 @@ input_refmap <- function(dbCon, bbox, reference = "refmap_climr", cache = TRUE, 
 
   if (!needDownload) {
     for (i in 1:nrow(bnds)) {
-      isin <- is_in_bbox(bbox, matrix(bnds[i, 2:5]))
+      isin <- is_in_bbox(bbox, matrix(bnds[i, .(xmin,xmax,ymin,ymax)]))
       if (isin) break
     }
     if (isin) {
@@ -92,9 +91,9 @@ input_refmap <- function(dbCon, bbox, reference = "refmap_climr", cache = TRUE, 
     message("Downloading new data from ",rmap_nm,"...")
     if(indiv_tiles){
       cache <- FALSE
-      res <- dbGetTiles(dbCon, rmap_nm, pnts = xyz, bands = 1:73)
+      res <- dbGetTiles(rmap_nm, pnts = xyz, bands = 1:73)
     }else{
-      res <- pgGetTerra(dbCon, rmap_nm, tile = TRUE, boundary = bbox, bands = 1:73)
+      res <- pgGetTerra(rmap_nm, tile = TRUE, boundary = bbox, bands = 1:73)
     }
     names(res) <- c(
       "PPT_01", "PPT_02", "PPT_03", "PPT_04", "PPT_05", "PPT_06", "PPT_07",

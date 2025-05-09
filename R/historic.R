@@ -10,7 +10,6 @@
 #'   be used with [`downscale_core()`]. Each element of the list corresponds to a particular period, and the
 #'   values of the `SpatRaster` are anomalies of the obs period compare to the reference period.
 #'
-#' @template dbCon
 #' @template bbox
 #' @param period character. Vector of labels of the periods to use.
 #'   Can be obtained from [`list_obs_periods()`]. Default to "2001_2020".
@@ -30,7 +29,7 @@
 #' @importFrom uuid UUIDgenerate
 #' @rdname hist-input-data
 #' @export
-input_obs <- function(dbCon, bbox = NULL, period = list_obs_periods(), cache = TRUE) {
+input_obs <- function(bbox = NULL, period = list_obs_periods(), cache = TRUE) {
   ## checks
   if (!is.null(bbox)) {
     .check_bb(bbox)
@@ -66,7 +65,7 @@ input_obs <- function(dbCon, bbox = NULL, period = list_obs_periods(), cache = T
   if (!needDownload) {
     setorder(bnds, -numlay)
     for (i in 1:nrow(bnds)) {
-      isin <- is_in_bbox(bbox, matrix(bnds[i, 2:5]))
+      isin <- is_in_bbox(bbox, matrix(bnds[i, .(xmin,xmax,ymin,ymax)]))
       if (isin) break
     }
     if (isin) {
@@ -93,7 +92,7 @@ input_obs <- function(dbCon, bbox = NULL, period = list_obs_periods(), cache = T
     # print(q)
     layerinfo <- db_safe_query(q)
     message("Downloading observed period anomalies")
-    hist_rast <- pgGetTerra(dbCon, dbcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
+    hist_rast <- pgGetTerra(dbcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
     names(hist_rast) <- layerinfo$var_nm
 
     if (cache) {
@@ -122,7 +121,7 @@ input_obs <- function(dbCon, bbox = NULL, period = list_obs_periods(), cache = T
 
 #' @rdname hist-input-data
 #' @export
-input_obs_db <- function(dbCon, period = list_obs_periods()) {
+input_obs_db <- function(period = list_obs_periods()) {
   
   #Remove NSE CRAN check warnings
   if (FALSE){ var_nm <- NULL}
@@ -156,7 +155,6 @@ input_obs_db <- function(dbCon, period = list_obs_periods()) {
 #' @description
 #' `input_obs_ts` produces anomalies of observed climate for a given **time series** of individual years.
 #'
-#' @template dbCon
 #' @param dataset Character. Which observational dataset to use? Options are `"climatena"` for the
 #' ClimateNA gridded time series or `"cru.gpcc"` for the combined Climatic Research Unit TS dataset
 #' (for temperature) and Global Precipitation Climatology Centre dataset (for precipitation).
@@ -177,7 +175,7 @@ input_obs_db <- function(dbCon, period = list_obs_periods()) {
 #' @importFrom uuid UUIDgenerate
 #' @rdname hist-input-data
 #' @export
-input_obs_ts <- function(dbCon, dataset = c("cru.gpcc", "climatena"), bbox = NULL, years = 2010:2022, cache = TRUE) {
+input_obs_ts <- function(dataset = c("cru.gpcc", "climatena"), bbox = NULL, years = 2010:2022, cache = TRUE) {
   ## checks
   if (!is.null(bbox)) {
     .check_bb(bbox)
@@ -185,7 +183,7 @@ input_obs_ts <- function(dbCon, dataset = c("cru.gpcc", "climatena"), bbox = NUL
 
   res <- sapply(dataset, process_one_historicts,
     years = years,
-    dbnames = dbnames_hist_obs, bbox = bbox, dbCon = dbCon,
+    dbnames = dbnames_hist_obs, bbox = bbox,
     cache = cache, USE.NAMES = TRUE, simplify = FALSE
   )
   res <- res[!sapply(res, is.null)] ## remove NULL
@@ -202,7 +200,7 @@ input_obs_ts <- function(dbCon, dataset = c("cru.gpcc", "climatena"), bbox = NUL
 
 #' @rdname hist-input-data
 #' @export
-input_obs_ts_db <- function(dbCon, dataset = c("cru.gpcc", "climatena"), years = 2010:2022) {
+input_obs_ts_db <- function(dataset = c("cru.gpcc", "climatena"), years = 2010:2022) {
   
   #Remove NSE CRAN check warnings
   if (FALSE){ var_nm <- NULL}
@@ -229,7 +227,7 @@ input_obs_ts_db <- function(dbCon, dataset = c("cru.gpcc", "climatena"), years =
 
 }
 
-process_one_historicts <- function(dataset, years, dbCon, bbox, dbnames = dbnames_hist_obs, cache) {
+process_one_historicts <- function(dataset, years, bbox, dbnames = dbnames_hist_obs, cache) {
   if (dataset %in% dbnames$dataset) {
     ts_name <- dataset
     dbcode <- dbnames$dbname[dbnames$dataset == dataset]
@@ -257,7 +255,7 @@ process_one_historicts <- function(dataset, years, dbCon, bbox, dbnames = dbname
       setorder(bnds, -numlay)
 
       spat_match <- lapply(1:nrow(bnds), FUN = function(x){
-        if (is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]
+        if (is_in_bbox(bbox, matrix(bnds[x, .(xmin,xmax,ymin,ymax)]))) bnds$uid[x]
       })
       spat_match <- spat_match[!sapply(spat_match, is.null)]
       if (length(spat_match) > 0) {
@@ -293,7 +291,7 @@ process_one_historicts <- function(dataset, years, dbCon, bbox, dbnames = dbname
       # print(q)
       layerinfo <- db_safe_query(q)
       message("Downloading obs anomalies")
-      hist_rast <- pgGetTerra(dbCon, dbcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
+      hist_rast <- pgGetTerra(dbcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
       names(hist_rast) <- paste(ts_name, layerinfo$var_nm, layerinfo$period, sep = "_")
 
       if (cache) {

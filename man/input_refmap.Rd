@@ -6,7 +6,6 @@
 \title{Retrieve reference period climate maps}
 \usage{
 input_refmap(
-  dbCon,
   bbox,
   reference = "refmap_climr",
   cache = TRUE,
@@ -17,8 +16,6 @@ input_refmap(
 input_refmap_db(reference = "refmap_climatena")
 }
 \arguments{
-\item{dbCon}{A db connection object created by \code{data_connect}.}
-
 \item{bbox}{numeric. Vector of length 4 giving bounding box of study region, in the order ymax,ymin,xmax,xmin. In general this is created by \code{get_bb()}, but can also be user-defined.}
 
 \item{reference}{A \code{character} or a \code{SpatRaster}. For character, label of the normal baseline to use.

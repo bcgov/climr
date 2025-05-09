@@ -1,7 +1,6 @@
 #' @export
 #' @rdname downscale_core
 downscale_db_core <- function(
-  dbCon,
   xyz,
   refmap,
   gcms = NULL,
@@ -27,7 +26,6 @@ downscale_db_core <- function(
   xyz <- .checkXYZ(copy(xyz), expectedCols)
   
   res <- downscale_db_(
-    dbCon,
     xyz,
     refmap,
     gcms,
@@ -100,7 +98,6 @@ downscale_db_core <- function(
 #' @importFrom DBI dbWriteTable dbExecute dbGetQuery SQL
 #' @noRd
 downscale_db_ <- function(
-  dbCon,
   xyz,
   refmap,
   gcms,
@@ -108,7 +105,7 @@ downscale_db_ <- function(
   gcm_hist_ts,
   obs,
   obs_ts,
-  return_refperiod,
+  return_refperiod = FALSE,
   vars,
   ppt_lr = FALSE
 ) {
@@ -116,7 +113,6 @@ downscale_db_ <- function(
   # Offload to database
   message("Extracting [%s] bands from %s"|> sprintf(format(nrow(refmap[["layers"]]), big.mark = ","), refmap[["tbl"]]))
   res <- extract_db(
-    dbCon = dbCon,
     rastertbl = refmap[["tbl"]],
     layers = refmap[["layers"]],
     hull = attr(xyz, "hull")
@@ -173,7 +169,7 @@ downscale_db_ <- function(
   if (!is.null(gcms)) {
     # Process each gcms and rbind resulting tables
     res_gcm <- data.table::rbindlist(
-      lapply(gcms, process_one_climate_db, dbCon = dbCon, res = res, xyz = xyz, type = "gcms"),
+      lapply(gcms, process_one_climate_db, res = res, xyz = xyz, type = "gcms"),
       use.names = TRUE
     )
   } else {
@@ -182,7 +178,7 @@ downscale_db_ <- function(
   if (!is.null(gcm_ssp_ts)) {
     # Process each gcms and rbind resulting tables
     res_gcmts <- data.table::rbindlist(
-      lapply(gcm_ssp_ts, process_one_climate_db, dbCon = dbCon, res = res, xyz = xyz, timeseries = TRUE, type = "gcms"),
+      lapply(gcm_ssp_ts, process_one_climate_db, res = res, xyz = xyz, timeseries = TRUE, type = "gcms"),
       use.names = TRUE
     )
   } else {
@@ -191,7 +187,7 @@ downscale_db_ <- function(
   if (!is.null(gcm_hist_ts)) {
     # Process each gcms and rbind resulting tables
     res_gcm_hist <- data.table::rbindlist(
-      lapply(gcm_hist_ts, process_one_climate_db, dbCon = dbCon, res = res, xyz = xyz, type = "gcm_hist_ts"),
+      lapply(gcm_hist_ts, process_one_climate_db, res = res, xyz = xyz, type = "gcm_hist_ts"),
       use.names = TRUE
     )
   } else {
@@ -200,7 +196,7 @@ downscale_db_ <- function(
   if (!is.null(obs)) {
     # print(obs)
     res_hist <- data.table::rbindlist(
-      lapply(obs, process_one_climate_db, dbCon = dbCon, res = res, xyz = xyz, type = "obs"),
+      lapply(obs, process_one_climate_db, res = res, xyz = xyz, type = "obs"),
       use.names = TRUE
     )
   } else {
@@ -209,7 +205,7 @@ downscale_db_ <- function(
   if (!is.null(obs_ts)) {
     # print(obs)
     res_hist_ts <- data.table::rbindlist(
-      lapply(obs_ts, process_one_climate_db, dbCon = dbCon, res = res, xyz = xyz, timeseries = TRUE, type = "obs_ts"),
+      lapply(obs_ts, process_one_climate_db, res = res, xyz = xyz, timeseries = TRUE, type = "obs_ts"),
       use.names = TRUE
     )
   } else {
@@ -262,7 +258,6 @@ downscale_db_ <- function(
 
 #' @noRd
 process_one_climate_db <- function(
-  dbCon,
   r,
   res,
   xyz,
@@ -282,7 +277,6 @@ process_one_climate_db <- function(
   # Run in database
   message("Extracting [%s] bands from %s"|> sprintf(format(nrow(r[["layers"]]), big.mark = ","), r[["tbl"]]))
   climaterast <- extract_db(
-    dbCon = dbCon,
     rastertbl = r[["tbl"]],
     layers = r[["layers"]],
     VAR = r[["VAR"]],

@@ -1,67 +1,18 @@
-#' Connect to PostGIS database
-#'
-#' @return pool object of database connection
-#' @param local A logical. Use a local database. Default `FALSE`.
-#' @importFrom pool dbPool
-#' @importFrom RPostgres Postgres
-#'
-#' @export
-data_connect <- function(local = FALSE) {
-  if(local){
-    pool <- dbPool(
-      drv = Postgres(),
-      dbname = "climr",
-      host = "localhost",
-      port = 5432,
-      user = "postgres",
-      password = "climrserver"
-    )
-  }else{
-    pool <- tryCatch(
-      {
-        dbPool(
-          drv = Postgres(),
-          dbname = "climr",
-          host = "146.190.244.244",
-          port = 5432,
-          user = "climr_client",
-          password = "PowerOfBEC2023"
-        )
-      },
-      error = function(e) {
-        tryCatch(
-          {
-            dbPool(
-              drv = Postgres(),
-              dbname = "climr",
-              host = "146.190.244.244",
-              port = 5432,
-              user = "climr_client",
-              password = "PowerOfBEC2023"
-            )
-          },
-          error = function(f) {
-            warning("Could not connect to database. Will try using cached data.")
-            NULL
-          }
-        )
-      }
-    )
-  }
-  
-  return(pool)
-}
-
 #' List connections in cache
 #' @param profile Either `climr-db-user` or `local`.
-#' @rdname data_con
-#' @importFrom utils modifyList
+#' @rdname data_connect
+#' @importFrom RPostgres dbConnect
 #' @export
-data_con <- function(profile = .globals[["sessprof"]]$list()) {
+data_connect <- function(profile = .globals[["sessprof"]]$list()) {
   profile <- match.arg(profile)
   con <- .globals[["sesscon"]]$get(profile)
   if (is.null(con)) {
-    con <- do.call(RPostgres::dbConnect, .globals[["sessprof"]]$get(profile))
+    con <- tryCatch({
+      do.call(RPostgres::dbConnect, .globals[["sessprof"]]$get(profile))
+    }, error = \(e) {
+      warning("Could not establish connection to database: ", conditionMessage(e))
+      return(NULL) 
+    })
     if (!is.null(.globals[["last_xyz"]])) {
       write_xyz(.globals[["last_xyz"]])
     }
@@ -75,10 +26,12 @@ write_xyz <- function(xyz) {
   db_safe_write("tmp_xyz", xyz, temporary = TRUE, overwrite = TRUE)
   db_safe_exec("ALTER TABLE tmp_xyz ADD COLUMN IF NOT EXISTS geom GEOMETRY(Point, 4326)")
   db_safe_exec("UPDATE tmp_xyz SET geom = ST_SetSRID(ST_MakePoint(lon, lat), 4326)")
+  db_safe_exec("CREATE INDEX idx_tmp_xyz_id ON tmp_xyz (id);")
   return(xyz)
 }
 
 #' @noRd
+#' @importFrom RPostgres dbGetQuery dbDisconnect
 session_connections <- function() {
   connections <- list()
   active <- TRUE
@@ -112,6 +65,8 @@ session_connections <- function() {
 }
 
 #' @noRd
+#' @importFrom RPostgres Postgres
+#' @importFrom utils modifyList
 session_profiles <- function() {
   profiles <- list()
   last <- NULL
@@ -144,14 +99,14 @@ session_profiles <- function() {
 }
 
 #' List connections in cache
-#' @rdname data_con
+#' @rdname data_connect
 #' @export
 connections <- function() {
   .globals[["sesscon"]]$list()
 }
 
 #' Clear connections in cache
-#' @rdname data_con
+#' @rdname data_connect
 #' @export
 connections_clear <- function() {
   .globals[["sesscon"]]$clear()
@@ -166,6 +121,7 @@ init_globals <- function() {
   .globals[["sessprof"]] <- session_profiles()
   .globals[["sessprof"]]$set(nm = "climr-db-use", args = list(host = "146.190.244.244", user = "climr_client", password = "PowerOfBEC2023"))
   .globals[["sessprof"]]$set(nm = "local", args = list(host = "localhost", user = "postgres", password = "climrserver"))
+  .globals[["cache"]] <- list()
 }
 
 #' @importFrom RPostgres dbGetQuery
@@ -192,24 +148,26 @@ db_safe_write <- function(name, value, ...) {
 #' @noRd
 db_safe <- function(f, ...) {
   with_retries(
-    f(conn = data_con(), ...)
+    f(conn = data_connect(), ...)
   )
 }
 
 
 #' @noRd
-with_retries <- function(expr, retries = 5L, xyz = NULL) {
+with_retries <- function(expr, retries = 3L, xyz = NULL) {
   attempt <- 1L
   while (attempt <= retries) {
     no_error <- TRUE
+    msg <- character()
     res <- tryCatch(
       eval.parent(substitute(expr)),
       error = function(e) {
-        message("Database connection issue.")
+        msg <<- conditionMessage(e)
         no_error <<- FALSE
       }
     )
     if (no_error) break
+    message("Caught error: ", msg)
     message(paste("Retrying attempt", attempt, "in", 3^attempt, "seconds."))
     Sys.sleep(3^attempt)
     attempt <- attempt + 1L
@@ -221,4 +179,4 @@ with_retries <- function(expr, retries = 5L, xyz = NULL) {
 }
 
 ### climr_client
-### PowerOfBEC2023
+### Powe
