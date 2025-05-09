@@ -37,7 +37,8 @@ articles:
   navbar: "Known Issues"
   desc: "Unresolved bugs, artefacts, and shortcomings"
   contents:
-  - Differences_ClimateNA
+  - knownIssues_DiscrepanciesWithClimateNA
+  - knownIssues_customRefmap
 - title: "Caching"
   contents:
   - caching
