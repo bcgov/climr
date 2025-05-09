@@ -1,4 +1,4 @@
-# `climr` 0.1.2
+# `climr` 0.2
 
 ## Bug Fixes
 
