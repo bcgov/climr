@@ -1,0 +1,38 @@
+---
+title: "Discrepancies with ClimateNA for NFFD and PAS"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
+description: >
+vignette: >
+  %\VignetteIndexEntry{Discrepancies with ClimateNA for NFFD and PAS}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+bibliography: references.bib
+link-citations: true
+code_folding: show
+---
+
+`climr` currently uses the ClimateNA derived variable equations [@wang2016]. We have obtained updated parameters for number of frost free days (NFFD) and precipitation-as-snow (PAS) from the ClimateNA developers. However, there are still discrepancies between `climr` results using refmap_climatena and results from the ClimateNA product. 
+
+Annual NFFD has discrepancies across eastern North America. 
+
+![](plots_diffClimateNA/refmapclimatenaVsClimateNA.NFFD.png){width=100%}
+
+Monthly NFFD is confined to latitudinal bands within eastern North America. Note that ClimateNA has a very sharp monthly NFFD gradient in Eastern North America. 
+
+![](plots_diffClimateNA/refmapclimatenaVsClimateNA.NFFD_03.png){width=100%}
+![](plots_diffClimateNA/refmapclimatenaVsClimateNA.NFFD_10.png){width=100%}
+
+The pattern is similar for PAS. Differences in western North America are likely due our choice to disable elevation adjustment for precipitation in `climr` 
+
+![](plots_diffClimateNA/refmapclimatenaVsClimateNA.PAS.png){width=100%}
+![](plots_diffClimateNA/refmapclimatenaVsClimateNA.PAS_03.png){width=100%}
+
+It is likely that ClimateNA is using different parameters in eastern North America. We have chosen not to pursue this issue because we are planning to develop new derived variable equations for `climr` within the next year. 
+
+#### References
