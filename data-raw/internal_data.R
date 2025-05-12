@@ -53,8 +53,8 @@ dbnames_hist <- data.table(
              "hist_ukesm1-0-ll")
 )
 
-dbnames_hist_obs <- data.table(dataset = c("cru.gpcc", "climatena"),
-                               dbname = c("historic_cru_gpcc","historic_climatena"))
+dbnames_hist_obs <- data.table(dataset = c("mswx.blend", "cru.gpcc", "climatena"),
+                               dbname = c("mswx_blend", "historic_cru_gpcc","historic_climatena"))
 
 dbnames_ts <- data.table(
   GCM = c(
@@ -84,3 +84,5 @@ dbnames_ts_fast <- data.table(
 usethis::use_data(param, dbnames, dbnames_hist, dbnames_ts, dbnames_hist_obs, dbnames_ts_fast,
   overwrite = TRUE, internal = TRUE
 )
+
+usethis::use_data(dbnames_hist_obs, overwrite = TRUE, internal = TRUE)

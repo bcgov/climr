@@ -175,7 +175,7 @@ input_obs_db <- function(period = list_obs_periods()) {
 #' @importFrom uuid UUIDgenerate
 #' @rdname hist-input-data
 #' @export
-input_obs_ts <- function(dataset = c("cru.gpcc", "climatena"), bbox = NULL, years = 2010:2022, cache = TRUE) {
+input_obs_ts <- function(dataset = c("mswx.blend", "cru.gpcc", "climatena"), bbox = NULL, years = 2010:2022, cache = TRUE) {
   ## checks
   if (!is.null(bbox)) {
     .check_bb(bbox)
@@ -200,7 +200,7 @@ input_obs_ts <- function(dataset = c("cru.gpcc", "climatena"), bbox = NULL, year
 
 #' @rdname hist-input-data
 #' @export
-input_obs_ts_db <- function(dataset = c("cru.gpcc", "climatena"), years = 2010:2022) {
+input_obs_ts_db <- function(dataset = c("mswx.blend", "cru.gpcc", "climatena"), years = 2010:2022) {
   
   #Remove NSE CRAN check warnings
   if (FALSE){ var_nm <- NULL}

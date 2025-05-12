@@ -472,8 +472,8 @@ downscale_db <- function(
   }
 
   if (!is.null(obs_ts_dataset)) {
-    if (any(!obs_ts_dataset %in% c("cru.gpcc", "climatena"))) {
-      stop("obs_ts_dataset must be 'cru.gpcc', 'climatena', or 'both'")
+    if (any(!obs_ts_dataset %in% c("mswx.blend", "cru.gpcc", "climatena"))) {
+      stop("obs_ts_dataset must be one or more of 'mswx.blend', 'cru.gpcc', 'climatena'.")
     }
     if (is.null(obs_years)) {
       stop("'obs_years' must be specified")
