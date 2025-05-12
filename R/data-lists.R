@@ -125,7 +125,7 @@ list_vars <- function(set = c("All", "Monthly", "Seasonal", "Annual"), only_extr
 #' @rdname data-option-lists
 #' @export
 list_obs_years <- function() {
-  1901:2023
+  1901:2024
 }
 
 #' @description
