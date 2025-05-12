@@ -1,0 +1,107 @@
+---
+title: "Gridded observational time series"
+Author: "Colin Mahony"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
+description: >
+  An explanation of the three gridded observational time series datasets used in climr: CRU/GPCC, MSWX-blend, and ClimateNA
+vignette: >
+  %\VignetteIndexEntry{Gridded observational time series}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+editor_options: 
+  markdown: 
+    wrap: 72
+bibliography: references.bib
+link-citations: true
+---
+
+
+A gridded observational time series is a dataset that organizes real-world measurements into a regular latitude-longitude grid and tracks changes over time. Observations from sources like weather stations and satellites are collected and assigned to these grid cells, using interpolation for grid cells that do not have a direct observation. For each grid cell, the dataset provides a continuous record of a variable — such as temperature or precipitation — over regular time intervals, like daily, monthly, or yearly steps. This structure allows researchers to analyze both spatial patterns and temporal trends across large areas, even in locations without direct observations. 
+
+`climr` provides access to three observational time series datasets of temperature and precipitation: 
+
+1.	`cru.gpcc`: The 1901-2023 combined Climatic Research Unit TS dataset (CRU; @ harris2020cruts) for temperature and Global Precipitation Climatology Centre dataset (GPCC; becker2013gpcc) for precipitation; 
+2.	`mswx-blend`: The 1981-2024 Multi-Source Weather (MSWX; @ beck2022mswx) for temperature and Multi-Source Weighted-Ensemble Precipitation (MSWEP; @ beck2019mswep) for precipitation, which we have extended back to 1901 using the CRU/GPCC dataset; and 
+3.	`climatena`: The 1901-2023 ClimateNA time series (@wang2024monthly). 
+
+Our aim in this article is provide a better understanding of these datasets, including their strengths and weaknesses. 
+
+### Why are multiple observational datasets necessary? 
+
+Observations of historical weather are limited to data from climate stations, which are very sparse in many areas of North America, and modeled reconstructions (“reanalysis”) of historical weather systems, which have multiple sources of bias. As a result, there is considerable uncertainty about the past weather, and this uncertainty varies across the landscape depending on proximity to where observations were made. By analyzing multiple datasets with different methods and input data, we can better understand the uncertainties in our variables and locations of interest. Further, each dataset may be optimal for different applications. Finally, providing multiple datasets allows `climr` output to be benchmarked against other studies that are based on those products. 
+
+### Dataset descriptions
+
+#### CRU/GPCC
+
+The Climatic Research Unit TS dataset uses angular distance weighting to interpolate monthly weather station anomalies (deviations from a long-term average). It is the only global gridded station time series product that provides monthly mean minimum and maximum daily temperature (Tmin and Tmax) for the entire 20th century. As a result, it is very widely used in climate research. While CRU provides precipitation data, independent research (@sun2018review) and our own analysis indicate that GPCC has higher performance in representing historical precipitation. A significant weakness of both the CRU and GPCC time series dataset is a dramatic decline in the number of stations contributing to the dataset at the end of the 1990s ([Figure 1](#fig1)). 
+
+<div id="fig1">
+```{r, echo=FALSE, fig.cap = "Figure 1: Changes in the number of stations contributing to the CRU gridded minimum and maximum temperature products (a) and the GPCC precipitation product (b).", results='asis', out.width = "100%"}
+knitr::include_graphics("plots_timeseries/StationCounts_CRU.png")
+```
+</div>
+
+#### ClimateNA
+
+The 21st century station sparsity of the CRU and GPCC datasets ([Figure 1](#fig1)) motivated the development of the ClimateNA gridded monthly historical time series for North America (@wang2024monthly). This product uses thin-plate splines to interpolate between weather station observations. The station density from 1961-present is maintained at above n=6000 for temperature and n=8000 for precipitation. 
+
+#### MSWX blend
+
+MSWX provides an entirely different approach to gridded observational time series. Instead of interpolating between weather stations, it applies bias correction to the hourly ERA5 reanalysis (i.e., an observationally constrained weather model simulation) for the period 1979-present. The bias correction is performed using monthly climatologies (30-year averages) obtained from the CHELSA product. For precipitation, we use MSWEP, which merges multiple data sources including rain guage, satellite, reanalysis, and river discharge data. We blended the MSWX/MSWEP time series with the CRU/GPCC time series to produce a 1901-2024 time series and to allow calculation of MSWX anomalies relative to the 1961-1990 baseline used in climr. The blend occurs in the 1990s; hence the `mswx_blend` product is CRU/GPCC prior to 1990, MSWX/MSWEP post-1997, and a weighted average from 1990-1997. 
+
+### Intercomparison of datasets
+
+The three datasets have distinct spatial patterns of anomalies; exemplified by their 2001-2020 average Tmin anomalies across North America ([Figure 2](#fig2)). CRU anomalies vary at large spatial scales due to the broad spatial influence of each station in the distance weighting method.  In contrast, the MSWX blend exhibits localized anomalies that follow physical features such as the MacKenzie Mountains in southern Yukon, the Great Lakes, and the coastal fringe in the Pacific Northwest. This link to physical features is an outcome of using a physical weather model as the basis for MSWX. Finally, the ClimateNA time series exhibits credible spatial detail in station-dense United States, but also has spatial oscillations in station-sparse western and northern Canada that may be artefacts of the thin-plate spline method. 
+
+<div id="fig2">
+```{r, echo=FALSE, fig.cap = "Figure 2: ", results='asis', out.width = "100%"}
+knitr::include_graphics("plots_timeseries/CRUvsMSWXvsClimateNA_3Panel_30arcminute.Tmin.02.png")
+```
+</div>
+
+
+<div id="fig3">
+```{r, echo=FALSE, fig.cap = "Figure 3: ", results='asis', out.width = "100%"}
+knitr::include_graphics("plots_timeseries/CRUvsMSWX_Diffplots.png")
+```
+</div>
+
+
+<div id="fig4">
+```{r, echo=FALSE, fig.cap = "Figure 4: ", results='asis', out.width = "100%"}
+knitr::include_graphics("plots_timeseries/CRUvsMSWXvsClimateNA_BCAB.Tmin.02.png")
+```
+</div>
+
+
+<div id="fig5">
+```{r, echo=FALSE, fig.cap = "Figure 5: ", results='asis', out.width = "100%"}
+knitr::include_graphics("plots_timeseries/CRUvsClimateNA_ts.Tmin.02.png")
+```
+</div>
+
+
+<div id="fig6">
+```{r, echo=FALSE, fig.cap = "Figure 4: ", results='asis', out.width = "100%"}
+knitr::include_graphics("plots_timeseries/Boxplots_AHCCD_Wcan.png")
+```
+</div>
+
+
+<div id="fig7">
+```{r, echo=FALSE, fig.cap = "Figure 5: ", results='asis', out.width = "100%"}
+knitr::include_graphics("plots_timeseries/Boxplots_AHCCD_provinces.Tmin.png")
+```
+</div>
+
+
+### Conclusions
+-	All three gridded datasets have potential drawbacks. 
+-	None are reliable for detection of climate change trends, for which quality-controlled station data such as the AHCCD product (@vincent2020ahccd) are preferable. We intend to provide access to AHCCD data in future versions of `climr`. 
+
+### References
+
