@@ -45,7 +45,7 @@ for(e in 1:3){
     r <- extend.coastal(r)
     
   # set reference period for anomaly calculation
-  ref.startyear <- 1981
+  ref.startyear <- 1961
   ref.duration <- 30
   for(ref.startyear in c(1961, 1981)){
     ref.endyear <- ref.startyear+ref.duration-1
@@ -71,7 +71,7 @@ for(e in 1:3){
           
           # Calculate delta anomalies (subtract for temperature and divide for precipitation)
             delta <- if(e!=3) normal-ref.normal else (normal+1)/(ref.normal+1)
-            delta <- aggregate(delta, fact=3, na.rm=T) # reduce resolution (the spatial detail isn't warranted)
+            # delta <- aggregate(delta, fact=3, na.rm=T) # reduce resolution (the spatial detail isn't warranted)
             
           # plot(delta, main=paste(month.abb[m], element))
           
