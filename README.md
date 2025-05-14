@@ -29,9 +29,10 @@ subscribe to the `climr` GitHub repo using the following steps:
 
 `climr` provides the following data:
 
--   Two historical observational time series: (1) the 1901-2022 combined Climatic Research Unit TS dataset 
-(for temperature) and Global Precipitation Climatology Centre dataset (for precipitation) and (2) the 1901-2023 ClimateNA time series 
-(Wang et al., 2024). 
+-   Three historical observational time series: (1) the 1901-2022 combined Climatic Research Unit TS dataset 
+(for temperature) and Global Precipitation Climatology Centre dataset (for precipitation); (2) the 1901-2023 ClimateNA time series 
+(Wang et al., 2024); and (3) the 1981-2024 Multi-Source Weather (MSWX; for temperature) and 
+Multi-Source Weighted-Ensemble Precipitation (MSWEP; for precipitation), extended back to 1901 using the CRU/GPCC dataset. 
 
 -   Multiple historical (1851-2014) and future (2015-2100) climate model simulations 
 for each of 13 CMIP6 global climate models, in monthly time series and 20-year normals.

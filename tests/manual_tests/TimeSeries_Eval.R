@@ -1,4 +1,4 @@
-## Manual test to compare the CRU/GPCC, ClimateNA, and climr time series. 
+## Manual test to compare the CRU/GPCC, ClimateNA, and MSWX time series. 
 ## Colin Mahony, January 29, 2025
 
 library(climr)
@@ -45,7 +45,7 @@ anom.climna.1981[, (ppt_columns) := ref.climna[, .SD, .SDcols = ppt_columns] / y
 anom.climna.1981[, c(1, 2, 3, 4, 5) := ref.climna[, c(1, 2, 3, 4, 5), with = FALSE]]
 
 # ==========================================
-# three-panel comparison of CRU and climr anomaly to 2001-2020
+# three-panel comparison of CRU and MSWX anomaly to 2001-2020
 # ==========================================
 
 
@@ -60,11 +60,11 @@ m=2
 
 for(e in 1:3){
 anom.cru <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/CRUGPCC_2024/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
-anom.climr <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
+anom.mswx <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
 
 for(m in 1:12){
   
-png(filename=paste("vignettes/plots_timeseries/CRUvsclimrvsClimateNA_3Panel_30arcminute", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=6.5, height=3.5, pointsize=10, res=300)
+png(filename=paste("vignettes/plots_timeseries/CRUvsMSWXvsClimateNA_3Panel_30arcminute", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=6.5, height=3.5, pointsize=10, res=300)
 # pdf(file=paste("results//CMIP6Eval.Fig3", metric,"pdf",sep="."), width=7.5, height=14, pointsize=12)
 
 mat <- matrix(c(7,1,2,7,3,4,7,5,6), 3)
@@ -83,26 +83,26 @@ colscheme <- colorRampPalette(if(elements[e]=="Pr") rev(hcl.colors(5,"Blue-Red 3
 
 pct <- if(elements[e]=="Pr") 100 else 1
 
-for(source in c("cru.gpcc", "climr", "climatena")){
+for(source in c("cru.gpcc", "mswx", "climatena")){
   
-  source.name <- if(source=="climr") "climr blend" else if(source=="climatena") "ClimateNA" else if(elements[e]=="Pr") "GPCC" else "CRU"
+  source.name <- if(source=="mswx") "MSWX blend" else if(source=="climatena") "ClimateNA" else if(elements[e]=="Pr") "GPCC" else "CRU"
   plot(1, type="n", axes=F, xlab="", ylab="")  
   text(1,1, source.name, font=2,cex=1.35)  
   
   par(mar=c(0.1,0.1,0.1,0.1))
   if(source=="cru.gpcc"){
     X <- anom.cru[[m]]
-  } else if(source=="climr") {
+  } else if(source=="mswx") {
     # # dir <- "//objectstore2.nrs.bcgov/ffec/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/"
     # dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/"
     # file <- list.files(dir, pattern = paste0(c("tmin", "tmax", "prcp")[e], ".*._", monthcodes[m], "_.*"))
-    # ts.climr <- rast(paste0(dir, file))
-    # ts.years <- substr(time(ts.climr), 1,4)
-    # ref.climr <- mean(ts.climr[[ts.years%in%1961:1990]]) 
-    # curr.climr <- mean(ts.climr[[ts.years%in%2001:2020]])
-    # anom.climr <- if(e==3) (curr.climr+1) / (ref.climr+1) else curr.climr - ref.climr
-    # X <- anom.climr
-    X <- anom.climr[[m]]
+    # ts.mswx <- rast(paste0(dir, file))
+    # ts.years <- substr(time(ts.mswx), 1,4)
+    # ref.mswx <- mean(ts.mswx[[ts.years%in%1961:1990]]) 
+    # curr.mswx <- mean(ts.mswx[[ts.years%in%2001:2020]])
+    # anom.mswx <- if(e==3) (curr.mswx+1) / (ref.mswx+1) else curr.mswx - ref.mswx
+    # X <- anom.mswx
+    X <- anom.mswx[[m]]
     X <- project(X, anom.cru)
   } else {
     X <- dem # use the DEM as a template raster
@@ -117,7 +117,7 @@ X <- project(X, dem.lcc)
   X[X < lim.lower] <- lim.lower
   
   image(X, col=colscheme, breaks=breaks, xaxt="n", yaxt="n", bty="n")
-  lines(bdy.lcc, lwd=0.4)
+  plot(bdy.lcc, lwd=0.4, add=T)
   
   print(source)
 }
@@ -138,7 +138,7 @@ print(e)
 }
 
 # ==========================================
-# three-panel comparison of CRU and climr anomaly to from 1981-2010 to 1961-1990
+# three-panel comparison of CRU and MSWX anomaly to from 1981-2010 to 1961-1990
 # ==========================================
 
 
@@ -153,11 +153,11 @@ m=2
 
 for(e in 1:3){
   anom.cru <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/CRUGPCC_2024/delta.from.1981_2010.to.1961_1990.", elements[e], ".tif"))
-  anom.climr <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.from.1981_2010.to.1961_1990.", elements[e], ".tif"))
+  anom.mswx <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.from.1981_2010.to.1961_1990.", elements[e], ".tif"))
   
   for(m in 1:12){
     
-    png(filename=paste("vignettes/plots_timeseries/CRUvsclimrvsClimateNA_3Panel_1981rev_30arcminute", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=6.5, height=3.5, pointsize=10, res=300)
+    png(filename=paste("vignettes/plots_timeseries/CRUvsMSWXvsClimateNA_3Panel_1981rev_30arcminute", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=6.5, height=3.5, pointsize=10, res=300)
 
     mat <- matrix(c(7,1,2,7,3,4,7,5,6), 3)
     layout(mat, widths=c(1,1,1), heights=c(0.275, .05 ,1))
@@ -175,26 +175,26 @@ for(e in 1:3){
     
     pct <- if(elements[e]=="Pr") 100 else 1
     
-    for(source in c("cru.gpcc", "climr", "climatena")){
+    for(source in c("cru.gpcc", "mswx", "climatena")){
       
-      source.name <- if(source=="climr") "climr blend" else if(source=="climatena") "ClimateNA" else if(elements[e]=="Pr") "GPCC" else "CRU"
+      source.name <- if(source=="mswx") "MSWX blend" else if(source=="climatena") "ClimateNA" else if(elements[e]=="Pr") "GPCC" else "CRU"
       plot(1, type="n", axes=F, xlab="", ylab="")  
       text(1,1, source.name, font=2,cex=1.35)  
       
       par(mar=c(0.1,0.1,0.1,0.1))
       if(source=="cru.gpcc"){
         X <- anom.cru[[m]]
-      } else if(source=="climr") {
+      } else if(source=="mswx") {
         # # dir <- "//objectstore2.nrs.bcgov/ffec/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/"
         # dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/"
         # file <- list.files(dir, pattern = paste0(c("tmin", "tmax", "prcp")[e], ".*._", monthcodes[m], "_.*"))
-        # ts.climr <- rast(paste0(dir, file))
-        # ts.years <- substr(time(ts.climr), 1,4)
-        # ref.climr <- mean(ts.climr[[ts.years%in%1981:2010]]) 
-        # curr.climr <- mean(ts.climr[[ts.years%in%1961:1990]])
-        # anom.climr <- if(e==3) (curr.climr+1) / (ref.climr+1) else curr.climr - ref.climr
-        # X <- anom.climr
-        X <- anom.climr[[m]]
+        # ts.mswx <- rast(paste0(dir, file))
+        # ts.years <- substr(time(ts.mswx), 1,4)
+        # ref.mswx <- mean(ts.mswx[[ts.years%in%1981:2010]]) 
+        # curr.mswx <- mean(ts.mswx[[ts.years%in%1961:1990]])
+        # anom.mswx <- if(e==3) (curr.mswx+1) / (ref.mswx+1) else curr.mswx - ref.mswx
+        # X <- anom.mswx
+        X <- anom.mswx[[m]]
         X <- project(X, anom.cru)
       } else {
         X <- dem # use the DEM as a template raster
@@ -209,7 +209,7 @@ for(e in 1:3){
       X[X < lim.lower] <- lim.lower
       
       image(X, col=colscheme, breaks=breaks, xaxt="n", yaxt="n", bty="n")
-      lines(bdy.lcc, lwd=0.4)
+      plot(bdy.lcc, lwd=0.4, add=T)
       
       print(source)
     }
@@ -230,7 +230,7 @@ for(e in 1:3){
 }
 
 # ==========================================
-# multipanel comparison of CRU and climr blend
+# multipanel comparison of CRU and MSWX blend
 # ==========================================
 
 
@@ -239,7 +239,7 @@ element.names <- c("mean daily\nminimum temperature (K)", "mean daily\nmaximum t
 dem.lcc <- rast("C:/Users/CMAHONY/OneDrive - Government of BC/Projects/2021_CMIP6Eval_NA/inputs//dem.na.lcc.tif")
 ipccregions.lcc <- vect("C:\\Users\\CMAHONY\\OneDrive - Government of BC\\Shiny_Apps\\cmip6-NA-eval\\data\\ipccregions_lcc.shp")
 
-png(filename=paste("vignettes/plots_timeseries/CRUvsClimateNA_Diffplots", "png",sep="."), type="cairo", units="in", width=6.5, height=15, pointsize=10, res=300)
+png(filename=paste("vignettes/plots_timeseries/CRUvsMSWX_Diffplots", "png",sep="."), type="cairo", units="in", width=6.5, height=15, pointsize=10, res=300)
 
 mat <- matrix(0:(13*9-1), 13)
 mat[,8:9] <- mat[,6:7]+2
@@ -268,31 +268,22 @@ for(e in 1:3){
   breaks=seq(lim.lower, lim.upper+inc, inc)
   colscheme <- colorRampPalette(if(elements[e]=="Pr") rev(hcl.colors(5,"Blue-Red 3")) else hcl.colors(5,"Blue-Red 3"))(length(breaks)-1)
   
-  anom <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
+  anom.cru <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/CRUGPCC_2024/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
+  anom.mswx <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
   pct <- if(elements[e]=="Pr") 100 else 1
   
-  for(source in c("cru.gpcc", "climatena")){
+  for(source in c("cru.gpcc", "mswx")){
     
-    source.name <- if(source=="climatena") "ClimateNA" else if(elements[e]=="Pr") "GPCC" else "CRU"
+    source.name <- if(source=="mswx") "MSWX" else if(elements[e]=="Pr") "GPCC" else "CRU"
     plot(1, type="n", axes=F, xlab="", ylab="")  
     text(1,1, source.name, font=2,cex=1.35)  
     
     par(mar=c(0.1,0.1,0.1,0.1))
     for(m in 1:12){
       if(source=="cru.gpcc"){
-        X <- anom[[m]]
-        
+        X <- anom.cru[[m]]
       } else {
-        # dir <- "//objectstore2.nrs.bcgov/ffec/new_monthly_blended_climate_data/blended_monthly_tmi_tmx_prcp_ts_NA_1901_2024/"
-        dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/new_monthly_blended_climate_data/blended_monthly_tmi_tmx_prcp_ts_NA_1901_2024/"
-        file <- list.files(dir, pattern = paste0("*.", month.abb[m], "_", c("tmin", "tmax", "prcp")[e], ".*"))
-        ts.climr <- rast(paste0(dir, file))
-        ts.years <- substr(names(ts.climr), 1,4)
-        ref.climr <- mean(ts.climr[[ts.years%in%1961:1990]])
-        curr.climr <- mean(ts.climr[[ts.years%in%2001:2020]])
-        anom.climr <- curr.climr - ref.climr
-        
-        X <- anom.climr
+         X <- anom.mswx[[m]]
       }     
       X <- project(X, dem.lcc)
       X <- crop(X, ipccregions.lcc)
@@ -324,35 +315,15 @@ for(e in 1:3){
 dev.off()
 
 
-
-
 #-----------------------------------------
-## Compare to AHCCD station data over BC and Alberta
+## map comparison to AHCCD station data over BC and Alberta
 #-----------------------------------------
 
 #calculate the ahccd anomalies
-stn <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/AHCCD/AHCCD_location.csv")
-ahccd <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/AHCCD/AHCCD.csv")
+stn <- fread("//objectstore2.nrs.bcgov/ffec/AHCCD/AHCCD_location.csv")
+ahccd <- fread("//objectstore2.nrs.bcgov/ffec/AHCCD/AHCCD.csv")
 ahccd <- ahccd[,- "tmean"]
 names(ahccd) <- c("id", "year", "month", "Tmin", "Tmax", "PPT")
-
-ahccd.ref <- ahccd[year %in% 1961:1990, 
-                   lapply(.SD, function(x) mean(x, na.rm = TRUE)), 
-                   by = .(id, month), 
-                   .SDcols = c("Tmin", "Tmax", "PPT")]
-ahccd.recent <- ahccd[year %in% 2001:2010, 
-                   lapply(.SD, function(x) mean(x, na.rm = TRUE)), 
-                   by = .(id, month), 
-                   .SDcols = c("Tmin", "Tmax", "PPT")]
-ahccd.ref <- ahccd.ref[which(ahccd.ref$id %in% unique(ahccd.recent$id))]
-ahccd.recent <- ahccd.recent[which(ahccd.recent$id %in% unique(ahccd.ref$id))]
-
-# subtract ref from recent
-ahccd.anom <- copy(ahccd.ref)
-ahccd.anom[, (3:ncol(ahccd.anom)) := lapply(3:ncol(ahccd.recent),
-                                            function(i) ahccd.recent[[i]] - ahccd.ref[[i]])]
-ppt_columns <- grep("PPT", names(ahccd.anom), value = TRUE)
-ahccd.anom[, (ppt_columns) := ahccd.recent[, .SD, .SDcols = ppt_columns] / ahccd.ref[, .SD, .SDcols = ppt_columns]]
 
 ## Plot of pairwise comparison of CRU and ClimateNA (with AHCCD stations)
 element.names <- c("mean daily minimum temperature", "mean daily maximum temperature", " precipitation")
@@ -368,52 +339,90 @@ for(e in 1:3){
   breaks=seq(lim.lower, lim.upper+inc, inc)
   colscheme <- colorRampPalette(if(elements[e]=="Pr") rev(hcl.colors(5,"Blue-Red 3")) else hcl.colors(5,"Blue-Red 3"))(length(breaks)-1)
   
-  anom <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
+  anom.cru <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/CRUGPCC_2024/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
+  anom.mswx <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
+  # anom.mswx <- project(anom.mswx, anom.cru) # put on same grid for easier visual comparison
   pct <- if(elements[e]=="Pr") 100 else 1
   
   m=2
   for(m in 1:12){
     
-    png(filename=paste("vignettes/plots_timeseries/CRUvsClimateNA_BCAB", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=6.5, height=3.3, pointsize=10, res=300)
+    #calculate the ahccd anomalies (do this by month to ensure that we have complete data for as many stations as possible)
+    stn.all <- ahccd[month == m,c("id", "year", c("Tmin", "Tmax", "PPT")[e]), with = FALSE]
+    
+    # plot(table(stn.all$year[!is.na(stn.all[,3])])) 
+    
+    count.ref <- stn.all[year %in% 1961:1990, 
+                         .(n = sum(!is.na(get(c("Tmin", "Tmax", "PPT")[e])))), 
+                         by = .(id)]
+    # hist(count.ref$n, breaks = 0:30)
+    count.recent <- stn.all[year %in% 2001:2020, 
+                            .(n = sum(!is.na(get(c("Tmin", "Tmax", "PPT")[e])))), 
+                            by = .(id)]
+    # hist(count.recent$n, breaks = 0:20)
+    
+    # Select stations where complete records are >27 in baseline period and > 17 years in recent period
+    include <- count.ref[n > 27]
+    include <- include[id %in% count.recent[n > 17, id]]
+    ahccd.include <- stn.all[id %in% include[,id]]
+    
+    ahccd.ref <- ahccd.include[year %in% 1961:1990, 
+                               lapply(.SD, function(x) mean(x, na.rm = TRUE)), 
+                               by = .(id)]
+    ahccd.recent <- ahccd.include[year %in% 2001:2020, 
+                                  lapply(.SD, function(x) mean(x, na.rm = TRUE)), 
+                                  by = .(id)]
+    
+    # subtract ref from recent
+    ahccd.anom <- copy(ahccd.ref)
+    ahccd.anom[, (3:ncol(ahccd.anom)) := lapply(3:ncol(ahccd.recent),
+                                                function(i) ahccd.recent[[i]] - ahccd.ref[[i]])]
+    ppt_columns <- grep("PPT", names(ahccd.anom), value = TRUE)
+    ahccd.anom[, (ppt_columns) := ahccd.recent[, .SD, .SDcols = ppt_columns] / ahccd.ref[, .SD, .SDcols = ppt_columns]]
+    
+    
+    
+    png(filename=paste("vignettes/plots_timeseries/CRUvsMSWXvsClimateNA_BCAB", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=7.5, height=3, pointsize=10, res=300)
 
-    mat <- matrix(c(5,1,2,5,3,4), 3)
-    layout(mat, widths=c(1,1), heights=c(0.3, .05 ,1))
+    mat <- matrix(c(7,1,2,7,3,4,7,5,6), 3)
+    layout(mat, widths=c(1,1,1), heights=c(0.3, .08 ,1))
     
     par(mar=c(0.1,0.1,0.1,0.1))
     
-    ahccd.ptData <- ahccd.anom[month==m, get(c("Tmin", "Tmax", "PPT")[e])]
-    hasData <- is.finite(ahccd.ptData)
-    ahccd.ptData <- ahccd.ptData[hasData]
-    ahccd.locations <- stn[which(stn$id %in% ahccd.anom[month==m,id][hasData])]
-    if(e==3) ahccd.ptData <- log2(ahccd.ptData)
+    ahccd.ptData <- as.vector(unlist(ahccd.anom[,3]))
+    ahccd.locations <- stn[which(stn$id %in% ahccd.anom[,id])]
+    if (e == 3) ahccd.ptData <- log2(ahccd.ptData)
     ahccd.ptData[ahccd.ptData>lim.upper] <- lim.upper
     ahccd.ptData[ahccd.ptData < lim.lower] <- lim.lower
     z_cut <- cut(ahccd.ptData, breaks = breaks, include.lowest = TRUE, labels = colscheme)
     
-    for(source in c("cru.gpcc", "climatena")){
+    sources <- c("cru.gpcc", "mswx", "climatena")
+    for(source in sources){
       
-      source.name <- if(source=="climatena") "ClimateNA" else if(elements[e]=="Pr") "GPCC" else "CRU"
+      source.name <- if(source=="mswx") "MSWX blend" else if(source=="climatena") "ClimateNA" else if(elements[e]=="Pr") "GPCC" else "CRU"
       plot(1, type="n", axes=F, xlab="", ylab="")  
       text(1,1, source.name, font=2,cex=1.35)  
       
       par(mar=c(0.1,0.1,0.1,0.1))
       if(source=="cru.gpcc"){
-        X <- anom[[m]]
-        
+        X <- anom.cru[[m]]
+      } else if(source=="mswx") {
+        X <- anom.mswx[[m]]
       } else {
-        X <- rast(dem) # use the DEM as a template raster
+        X <- dem # use the DEM as a template raster
         X[anom.climna[, id1]] <- anom.climna[,get(paste0(c("Tmin", "Tmax", "PPT")[e], monthcodes[m]))]
       }     
       if(e==3) X <- log2(X)
       X[X>lim.upper] <- lim.upper
       X[X < lim.lower] <- lim.lower
       
-      image(X, xlim=c(-135, -110), ylim=c(48.4, 60.1), col=colscheme, breaks=breaks, xaxt="n", yaxt="n")
-      lines(bdy.na, lwd=0.4)
+      image(X, xlim=c(-130, -110), ylim=c(48.4, 60.1), col=colscheme, breaks=breaks, xaxt="n", yaxt="n")
+      plot(bdy.na, lwd=0.4, add=T)
       points(ahccd.locations$lon, ahccd.locations$lat, bg = as.character(z_cut), pch = 21, cex=1.6, lwd=1.5)
+      mtext(paste0("(",letters[which(sources==source)],")"), side=3, line=-1.5, font=2, adj=0.01)
       
-      legend("bottomleft", legend="AHCCD stations", bg = as.character(z_cut), pch = 21, pt.cex=1.6, pt.lwd=1.5, bty="n")
-      
+      if(source=="cru.gpcc") legend("topright", legend="AHCCD stations", pt.bg = as.character(z_cut), pch = 21, cex=0.9, pt.cex=1.6, pt.lwd=1.5, inset=c(0.015,0.015))
+
       print(source)
     }
     
@@ -431,6 +440,277 @@ for(e in 1:3){
     month.abb[m]
   }
   print(elements[e])
+}
+
+
+#-----------------------------------------
+## Assess trend bias in cru, climatena, and MSWX time series (western Canada)
+#-----------------------------------------
+
+X <- rast(dem) # use the DEM as a template raster
+
+png(filename=paste("vignettes/plots_timeseries/Boxplots_AHCCD_Wcan", "png",sep="."), type="cairo", units="in", width=6.5, height=5.5, pointsize=10, res=300)
+par(mfrow=c(2,1))
+for (e in 1:2) {
+  
+  # storage vectors
+  values <- c()
+  groups <- c()
+  
+  an.cru <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/CRUGPCC_2024/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
+  an.mswx <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
+  an.mswx <- project(an.mswx, an.cru) # put on same grid for easier visual comparison
+  
+  m = 2
+  for (m in 1:12) {
+    
+    #calculate the ahccd anomalies (do this by month to ensure that we have complete data for as many stations as possible)
+    stn.all <- ahccd[month == m,c("id", "year", c("Tmin", "Tmax", "PPT")[e]), with = FALSE]
+    
+    # plot(table(stn.all$year[!is.na(stn.all[,3])])) 
+    
+    count.ref <- stn.all[year %in% 1961:1990, 
+                         .(n = sum(!is.na(get(c("Tmin", "Tmax", "PPT")[e])))), 
+                         by = .(id)]
+    # hist(count.ref$n, breaks = 0:30)
+    count.recent <- stn.all[year %in% 2001:2020, 
+                            .(n = sum(!is.na(get(c("Tmin", "Tmax", "PPT")[e])))), 
+                            by = .(id)]
+    # hist(count.recent$n, breaks = 0:20)
+    
+    # Select stations where complete records are >27 in baseline period and > 17 years in recent period
+    include <- count.ref[n > 27]
+    include <- include[id %in% count.recent[n > 17, id]]
+    # include <- include[id %in% stn[pr == "SK", id]]
+    include <- include[id %in% stn[lon < -101, id]]
+    ahccd.include <- stn.all[id %in% include[,id]]
+    
+    ahccd.ref <- ahccd.include[year %in% 1961:1990, 
+                               lapply(.SD, function(x) mean(x, na.rm = TRUE)), 
+                               by = .(id)]
+    ahccd.recent <- ahccd.include[year %in% 2001:2020, 
+                                  lapply(.SD, function(x) mean(x, na.rm = TRUE)), 
+                                  by = .(id)]
+    
+    # subtract ref from recent
+    ahccd.anom <- copy(ahccd.ref)
+    ahccd.anom[, (3:ncol(ahccd.anom)) := lapply(3:ncol(ahccd.recent),
+                                                function(i) ahccd.recent[[i]] - ahccd.ref[[i]])]
+    ppt_columns <- grep("PPT", names(ahccd.anom), value = TRUE)
+    ahccd.anom[, (ppt_columns) := ahccd.recent[, .SD, .SDcols = ppt_columns] / ahccd.ref[, .SD, .SDcols = ppt_columns]]
+    
+    
+    ahccd.ptData <- as.vector(unlist(ahccd.anom[,3]))
+    ahccd.locations <- stn[which(stn$id %in% ahccd.anom[,id])]
+    if (e == 3) ahccd.ptData <- log2(ahccd.ptData)
+    
+    an.climna <- dem
+    an.climna[anom.climna[, id1]] <- anom.climna[, get(paste0(c("Tmin", "Tmax", "PPT")[e], monthcodes[m]))]
+    
+    # extract from spatial data
+    cru.ptData <- as.vector(extract(an.cru[[m]], ahccd.locations[,3:4])[,2])
+    mswx.ptData <- as.vector(extract(an.mswx[[m]], ahccd.locations[,3:4])[,2])
+    climna.ptData <- as.vector(extract(an.climna, ahccd.locations[,3:4])[,2])
+    
+    cru.error <- cru.ptData - ahccd.ptData
+    mswx.error <- mswx.ptData - ahccd.ptData
+    climna.error <- climna.ptData - ahccd.ptData
+    
+    # accumulate values
+    values <- c(values, cru.error, mswx.error, climna.error)
+    
+    # accumulate groups
+    groups <- c(
+      groups,
+      rep(paste0("CRU-", m), length(cru.ptData)),
+      rep(paste0("MSWX-", m), length(mswx.ptData)),
+      rep(paste0("ClimateNA-", m), length(climna.ptData))
+    )
+    
+    print(m)  
+  }
+  
+  # duplicate values for annual boxplot
+  values <- c(values, values)
+  groups <- c(groups, sapply(strsplit(groups, "-"), `[`, 1))
+  
+  
+  # ensure correct order
+  groups <- factor(groups, levels=unique(groups))
+  
+  # 3 datasets per month
+  n_per_month <- 3
+  
+  # position calculations
+  month_indices <- rep(1:13, each=n_per_month)
+  spacing <- 1 # you can adjust this value
+  at_positions <- (month_indices - 1) * (n_per_month + spacing) + rep(1:n_per_month, times=13)
+  
+  # plot
+  par(mar=c(c(0.1,2)[e],4,c(2,0.1)[e],1), mgp=c(1.75, 0.25, 0), tck=-0.01)
+  boxplot(values ~ groups, outline = FALSE, xlab="",
+          at=at_positions, # <<< HERE
+          las=2,
+          col=rep(c("lightblue", "gold1", "forestgreen"), 12),
+          xaxt="n",
+          ylab=paste0(c("Tmin", "Tmax", "PPT")[e], " error (\u00B0C)"))
+  par(xpd=TRUE)
+  if(e==1) legend("topright", legend=c("CRU", "MSWX-blend", "ClimateNA"), 
+                  # inset = c(-0, -0.125), 
+                  # bty="n", 
+                  ncol=3, fill = c("lightblue", "gold1", "forestgreen"))
+  par(xpd=FALSE)
+  if(e==1) title(main="2001-2020 anomaly error relative to AHCCD weather stations")
+  mtext(paste0("(",letters[e],")"), side=3, line=-1, font=2, adj=0.01)
+  # mtext(c("Tmin", "Tmax", "PPT")[e], side=3, line=-1, font=2, adj=0.03)
+  
+  if(e==2){
+    # add month labels under clusters
+    month_centers <- tapply(at_positions, month_indices, mean)
+    axis(1, at=month_centers, labels=c(month.abb, "All"), las=1, cex.axis=0.8)
+  }
+  
+  abline(h=0, col="grey")    
+  
+  print(e)  
+}
+dev.off()
+
+#-----------------------------------------
+## Assess trend bias in cru, climatena, and MSWX time series (separate provinces)
+#-----------------------------------------
+
+X <- rast(dem) # use the DEM as a template raster
+e = 1
+for(e in 1:2){
+png(filename=paste("vignettes/plots_timeseries/Boxplots_AHCCD_provinces", elements[e], "png",sep="."), type="cairo", units="in", width=6.5, height=5.5, pointsize=10, res=300)
+provinces <- c("BC", "AB", "SK")
+par(mfrow=c(3,1))
+for(p in 1:3) {
+
+  # storage vectors
+  values <- c()
+  groups <- c()
+  
+  an.cru <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/CRUGPCC_2024/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
+  an.mswx <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
+  an.mswx <- project(an.mswx, an.cru) # put on same grid for easier visual comparison
+  
+  m = 2
+  for (m in 1:12) {
+    
+    #calculate the ahccd anomalies (do this by month to ensure that we have complete data for as many stations as possible)
+    stn.all <- ahccd[month == m,c("id", "year", c("Tmin", "Tmax", "PPT")[e]), with = FALSE]
+    
+    # plot(table(stn.all$year[!is.na(stn.all[,3])])) 
+    
+    count.ref <- stn.all[year %in% 1961:1990, 
+                         .(n = sum(!is.na(get(c("Tmin", "Tmax", "PPT")[e])))), 
+                         by = .(id)]
+    # hist(count.ref$n, breaks = 0:30)
+    count.recent <- stn.all[year %in% 2001:2020, 
+                            .(n = sum(!is.na(get(c("Tmin", "Tmax", "PPT")[e])))), 
+                            by = .(id)]
+    # hist(count.recent$n, breaks = 0:20)
+    
+    # Select stations where complete records are >27 in baseline period and > 17 years in recent period
+    include <- count.ref[n > 27]
+    include <- include[id %in% count.recent[n > 17, id]]
+    include <- include[id %in% stn[pr == provinces[p], id]]
+    # include <- include[id %in% stn[lon < -101, id]]
+    ahccd.include <- stn.all[id %in% include[,id]]
+    
+    ahccd.ref <- ahccd.include[year %in% 1961:1990, 
+                               lapply(.SD, function(x) mean(x, na.rm = TRUE)), 
+                               by = .(id)]
+    ahccd.recent <- ahccd.include[year %in% 2001:2020, 
+                                  lapply(.SD, function(x) mean(x, na.rm = TRUE)), 
+                                  by = .(id)]
+    
+    # subtract ref from recent
+    ahccd.anom <- copy(ahccd.ref)
+    ahccd.anom[, (3:ncol(ahccd.anom)) := lapply(3:ncol(ahccd.recent),
+                                                function(i) ahccd.recent[[i]] - ahccd.ref[[i]])]
+    ppt_columns <- grep("PPT", names(ahccd.anom), value = TRUE)
+    ahccd.anom[, (ppt_columns) := ahccd.recent[, .SD, .SDcols = ppt_columns] / ahccd.ref[, .SD, .SDcols = ppt_columns]]
+    
+    
+    ahccd.ptData <- as.vector(unlist(ahccd.anom[,3]))
+    ahccd.locations <- stn[which(stn$id %in% ahccd.anom[,id])]
+    if (e == 3) ahccd.ptData <- log2(ahccd.ptData)
+    
+    an.climna <- dem
+    an.climna[anom.climna[, id1]] <- anom.climna[, get(paste0(c("Tmin", "Tmax", "PPT")[e], monthcodes[m]))]
+    
+    # extract from spatial data
+    cru.ptData <- as.vector(extract(an.cru[[m]], ahccd.locations[,3:4])[,2])
+    mswx.ptData <- as.vector(extract(an.mswx[[m]], ahccd.locations[,3:4])[,2])
+    climna.ptData <- as.vector(extract(an.climna, ahccd.locations[,3:4])[,2])
+    
+    cru.error <- cru.ptData - ahccd.ptData
+    mswx.error <- mswx.ptData - ahccd.ptData
+    climna.error <- climna.ptData - ahccd.ptData
+    
+    # accumulate values
+    values <- c(values, cru.error, mswx.error, climna.error)
+    
+    # accumulate groups
+    groups <- c(
+      groups,
+      rep(paste0("CRU-", m), length(cru.ptData)),
+      rep(paste0("MSWX-", m), length(mswx.ptData)),
+      rep(paste0("ClimateNA-", m), length(climna.ptData))
+    )
+    
+    print(m)  
+  }
+  
+  # duplicate values for annual boxplot
+  values <- c(values, values)
+  groups <- c(groups, sapply(strsplit(groups, "-"), `[`, 1))
+  
+  
+  # ensure correct order
+  groups <- factor(groups, levels=unique(groups))
+  
+  # 3 datasets per month
+  n_per_month <- 3
+  
+  # position calculations
+  month_indices <- rep(1:13, each=n_per_month)
+  spacing <- 1 # you can adjust this value
+  at_positions <- (month_indices - 1) * (n_per_month + spacing) + rep(1:n_per_month, times=13)
+  
+  # plot
+  par(mar=c(c(0,1,2)[p],4,c(2,1,0)[p],1), mgp=c(1.75, 0.25, 0), tck=-0.01)
+  boxplot(values ~ groups, outline = FALSE, xlab="",
+          at=at_positions, # <<< HERE
+          las=2,
+          col=rep(c("lightblue", "gold1", "forestgreen"), 12),
+          xaxt="n",
+          ylab=paste0(c("Tmin", "Tmax", "PPT")[e], " error (\u00B0C)"))
+  par(xpd=TRUE)
+  if(p==1) legend("topright", legend=c("CRU", "MSWX-blend", "ClimateNA"), 
+                  # inset = c(-0, -0.125), 
+                  # bty="n", 
+                  ncol=3, fill = c("lightblue", "gold1", "forestgreen"))
+  par(xpd=FALSE)
+  if(p==1) title(main="2001-2020 anomaly error relative to AHCCD weather stations")
+  mtext(paste0("(",letters[p],")", " ", provinces[p]), side=3, line=-1.5, font=2, adj=0.01)
+  # mtext(c("Tmin", "Tmax", "PPT")[e], side=3, line=-1, font=2, adj=0.03)
+  
+  if(p==3){
+    # add month labels under clusters
+    month_centers <- tapply(at_positions, month_indices, mean)
+    axis(1, at=month_centers, labels=c(month.abb, "All"), las=1, cex.axis=0.8)
+  }
+  
+  abline(h=0, col="grey")    
+  
+  print(p)  
+}
+dev.off()
+print(e)  
 }
 
 #-----------------------------------------
@@ -477,18 +757,18 @@ stations <- unique(stn.s$id)
 
 ## climateNA time series from climr Data
 clim <- downscale(stn.s, 
-                  which_refmap = "refmap_climatena", 
+                  which_refmap = "refmap_climr", 
                   obs_periods = "2001_2020",
                   obs_years = 1901:2020,
-                  obs_ts_dataset = c("cru.gpcc", "climatena")
+                  obs_ts_dataset = c("cru.gpcc", "mswx.blend")
 )
 
 e=1
 # for(e in 1:3){
 m=2
 # for(m in 1:12){
-ts.x.climatena <- as.numeric(unique(clim[PERIOD %in% 1901:2020 & DATASET == "climatena", PERIOD]))
-ts.y.climatena <- unname(unlist(clim[clim$PERIOD %in% 1901:2020 & DATASET == "climatena",
+ts.x.mswx <- as.numeric(unique(clim[PERIOD %in% 1901:2020 & DATASET == "climatena", PERIOD]))
+ts.y.mswx <- unname(unlist(clim[clim$PERIOD %in% 1901:2020 & DATASET == "climatena",
                                      lapply(.SD, function(x) mean(x, na.rm = TRUE)), by = PERIOD, 
                                      .SDcols = paste(c("Tmin", "Tmax", "PPT")[e], monthcodes[m], sep="_")][, 2]))
 ts.x.cru <- as.numeric(unique(clim[PERIOD %in% 1901:2020 & DATASET == "cru.gpcc", PERIOD]))
