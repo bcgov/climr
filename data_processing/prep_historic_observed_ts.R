@@ -3,26 +3,20 @@ library(terra)
 library(data.table)
 library(climr)
 
-dat <- rast("../Common_Files/clmr_blend_ts_1901_2024/prcp_climrblend_ano_dt_NA_mon_10_1901_2024.tif")
-
-##aseem blended ts
-ppt_files <- list.files("../Common_Files/clmr_blend_ts_1901_2024/", pattern = "prcp.*.tif$")
-
-
 monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09","10","11","12")
-con <- data_connect()
-normal <- normal_input(con, bbox = bbna, "normal_na")
-template <- historic_input(con, bbox = bbna, period = "2001_2020")
-plot(template[[1]])
-template <- template[[1]]
-ppt <- project(ppt, template)
+##aseem blended ts
 
+##PPT
+fnames <- list.files("../Common_Files/clmr_blend_ts_1901_2024/", pattern = "prcp.*.nc$", full.names = TRUE)
+ppt <- rast(fnames)
 ppt_tm <- time(ppt)
-ppt <- crop(ppt, template)
-ppt_nrm <- ppt[[ppt_tm >= as.Date("1961-01-01") & ppt_tm <= as.Date("1990-01-01")]]
+ord <- order(ppt_tm)
+ppt <- ppt[[ord]]
+ppt_tm <- time(ppt)
+ppt_nrm <- ppt[[ppt_tm >= as.Date("1961-01-01") & ppt_tm <= as.Date("1990-01-01")]] + 1
 nrm <- tapp(ppt_nrm, index = "months", fun = mean)
-ppt_srt <- ppt[[ppt_tm >= as.Date("1901-01-01") & ppt_tm <= as.Date("2022-12-31")]]
-ppt_delta <- ppt_srt/nrm
+ppt_delta <- (ppt + 1)/(nrm)
+plot(ppt_delta[[7]])
 
 delta_nrm <- ppt_delta[[time(ppt_delta) >= as.Date("1961-01-01") & time(ppt_delta) <= as.Date("1990-01-01")]]
 avg2 <- tapp(delta_nrm, index = "months", fun = mean)
@@ -37,18 +31,19 @@ nms <- paste0("PPT",monthcodes[mn],"_",yr)
 names(ppt_delta) <- nms
 
 ##tmin
-tmin <- rast("../Common_Files/TimeSeries_gridded_monthly/cru_ts4.07/cru_ts4.07.1901.2022.tmn.dat.nc")
+fnames <- list.files("../Common_Files/clmr_blend_ts_1901_2024/", pattern = "tmin.*.nc$", full.names = TRUE)
+tmin <- rast(fnames)
 nms <- names(tmin)
 tmin <- tmin[[grep("tmn",nms)]]
 plot(tmin[[1]])
-tmin <- crop(tmin,template)
-plot(tmin[[1]])
+tmin_tm <- time(tmin)
+ord <- order(tmin_tm)
+tmin <- tmin[[ord]]
 tmin_tm <- time(tmin)
 tmin_nrm <- tmin[[(tmin_tm > as.Date("1961-01-01")) & (tmin_tm < as.Date("1990-01-01"))]]
 nrm <- tapp(tmin_nrm, index = "months", fun = mean)
 plot(nrm[[7]])
-plot(normal[[31]])
-tmin <- tmin[[tmin_tm > as.Date("1901-01-01") & tmin_tm < as.Date("2022-12-31")]]
+#tmin <- tmin[[tmin_tm > as.Date("1901-01-01") & tmin_tm < as.Date("2022-12-31")]]
 tmin_delta <- tmin - nrm
 
 ##test
@@ -64,22 +59,20 @@ mn <- month(tm)
 nms <- paste0("Tmin",monthcodes[mn],"_",yr)
 names(tmin_delta) <- nms
 
-##tmax
-tmin <- rast("../Common_Files/TimeSeries_gridded_monthly/cru_ts4.07/cru_ts4.07.1901.2022.tmx.dat.nc")
+##tmax'
+fnames <- list.files("../Common_Files/clmr_blend_ts_1901_2024/", pattern = "tmax.*.nc$", full.names = TRUE)
+tmin <- rast(fnames)
 nms <- names(tmin)
-tmin <- tmin[[grep("tmx",nms)]]
-plot(tmin[[1]])
-tmin <- crop(tmin,template)
-plot(tmin[[7]])
+tmin_tm <- time(tmin)
+ord <- order(tmin_tm)
+tmin <- tmin[[ord]]
 tmin_tm <- time(tmin)
 tmin_nrm <- tmin[[tmin_tm >= as.Date("1960-01-01") & tmin_tm <= as.Date("1990-01-01")]]
 nrm <- tapp(tmin_nrm, index = "months", fun = mean)
 plot(nrm[[7]])
-tmin <- tmin[[tmin_tm > as.Date("1901-01-01") & tmin_tm < as.Date("2022-12-31")]]
+#tmin <- tmin[[tmin_tm > as.Date("1901-01-01") & tmin_tm < as.Date("2022-12-31")]]
 tmax_delta <- tmin - nrm
 plot(tmax_delta[[19]])
-tmax_delta <- resample(tmax_delta, ppt_delta)
-plot(tmin_delta[[12]])
 
 delta_nrm <- tmax_delta[[(time(tmax_delta) > as.Date("1961-01-01")) & (time(tmax_delta) < as.Date("1990-01-01"))]]
 avg2 <- tapp(delta_nrm, index = "months", fun = mean)
@@ -92,8 +85,8 @@ mn <- month(tm)
 nms <- paste0("Tmax",monthcodes[mn],"_",yr)
 names(tmax_delta) <- nms
 
-gpcc_all <- c(ppt_delta, tmin_delta, tmax_delta)
-writeRaster(gpcc_all,"../Common_Files/cru_gpcc_anom.tif", gdal="COMPRESS=NONE", overwrite = TRUE)
+mswx_all <- c(ppt_delta, tmin_delta, tmax_delta)
+writeRaster(mswx_all,"../Common_Files/climr_blend_anom_ts.tif", gdal="COMPRESS=NONE", overwrite = TRUE)
 temp <- rast("../Common_Files/cru_gpcc_anom.tif")
 
 ##check
@@ -102,11 +95,17 @@ avg2 <- tapp(delta_nrm, index = "months", fun = mean)
 plot(avg2)
 
 ##metadata
-nms <- names(gpcc_all)
+nms <- names(mswx_all)
+metadt <- data.table(var = nms, period = year(time(mswx_all)), month = monthcodes[month(time(mswx_all))])
+metadt[,var := gsub("prcp.*","PPT",var)]
+metadt[,var := gsub("tmin.*","Tmin",var)]
+metadt[,var := gsub("tmax.*","Tmax",var)]
+metadt[,laynum := seq_along(var)]
+metadt[,var_nm := paste0(var, "_", month)]
 
-metadt <- data.table(fullnm = nms)
-metadt[,c("var","period") := tstrsplit(fullnm, "_")]
-metadt[,laynum := seq_along(nms)]
+# metadt <- data.table(fullnm = nms)
+# metadt[,c("var","period") := tstrsplit(fullnm, "_")]
+# metadt[,laynum := seq_along(nms)]
 
 library(RPostgres)
 conn <- dbConnect(RPostgres::Postgres(),dbname = 'climr',
@@ -114,8 +113,8 @@ conn <- dbConnect(RPostgres::Postgres(),dbname = 'climr',
                   port = 5432,
                   user = 'postgres',
                   password = '')
-dbWriteTable(conn, "historic_cru_gpcc_layers", metadt, row.names = F, append = TRUE)
-dbExecute(conn, "create index on historic_cru_gpcc_layers(period)")
+dbWriteTable(conn, "historic_mswx_ts_layers", metadt, row.names = F)
+dbExecute(conn, "create index on historic_mswx_ts_layers(period)")
 dbExecute(conn, "drop table historic_cru_layers")
 # test <- ppt[[ppt_tm == as.Date("1900-07-01")]]
 # plot(test)
