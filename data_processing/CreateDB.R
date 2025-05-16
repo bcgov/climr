@@ -199,7 +199,7 @@ plot(curr_per[[35]])
 scp_upload(session, paste0("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climr/inputs_pkg/historic/Historic_2001_2020/2001_2020.tif"), to = "/share")
 pgisfn <- paste0("raster2pgsql -s 4326 -I -C -M 2001_2020.tif -t 6x6 historic_periods > 2001_2020.sql")
 
-"GTIFF_DIRECT_IO=YES raster2pgsql -s 4326 -I -M climr_mosiac_wlrdem_compressed.tif -t 50x50 refmap_climr > climr_mosaic.sql &"
+"GTIFF_DIRECT_IO=YES raster2pgsql -s 4326 -I -M climr_blend_anom_ts.tif -t 10x10 mswx_blend > climr_blend_ts.sql"
 
 
 metadt <- data.table(period = "2001_2020",fullnm = names(curr_per))
