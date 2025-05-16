@@ -13,11 +13,11 @@ data_connect <- function(profile = .globals[["sessprof"]]$list()) {
       warning("Could not establish connection to database: ", conditionMessage(e))
       return(NULL) 
     })
+    .globals[["sesscon"]]$set(profile, con)
     if (!is.null(.globals[["last_xyz"]])) {
       write_xyz(.globals[["last_xyz"]])
     }
   }
-  .globals[["sesscon"]]$set(profile, con)
   return(con)
 }
 
