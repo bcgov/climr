@@ -7,67 +7,50 @@ monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09","10","11","
 ##aseem blended ts
 
 ##PPT
-fnames <- list.files("../Common_Files/clmr_blend_ts_1901_2024/", pattern = "prcp.*.nc$", full.names = TRUE)
+fnames <- list.files("Y:/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/", pattern = "prcp.*.nc$", full.names = TRUE)
 ppt <- rast(fnames)
 ppt_tm <- time(ppt)
 ord <- order(ppt_tm)
 ppt <- ppt[[ord]]
 ppt_tm <- time(ppt)
-ppt_nrm <- ppt[[ppt_tm >= as.Date("1961-01-01") & ppt_tm <= as.Date("1990-01-01")]] + 1
+ppt_nrm <- ppt[[ppt_tm >= as.Date("1961-01-01") & ppt_tm <= as.Date("1990-12-31")]] + 1
 nrm <- tapp(ppt_nrm, index = "months", fun = mean)
 ppt_delta <- (ppt + 1)/(nrm)
 plot(ppt_delta[[7]])
 
-delta_nrm <- ppt_delta[[time(ppt_delta) >= as.Date("1961-01-01") & time(ppt_delta) <= as.Date("1990-01-01")]]
-avg2 <- tapp(delta_nrm, index = "months", fun = mean)
-
-plot(avg2)
-plot(ppt_delta[[1460]])
-
-tm <- time(ppt_delta)
-yr <- year(tm)
-mn <- month(tm)
-nms <- paste0("PPT",monthcodes[mn],"_",yr)
-names(ppt_delta) <- nms
+# delta_nrm <- ppt_delta[[time(ppt_delta) >= as.Date("1961-01-01") & time(ppt_delta) <= as.Date("1990-01-01")]]
+# avg2 <- tapp(delta_nrm, index = "months", fun = mean)
+# 
+# plot(avg2)
+# plot(ppt_delta[[1460]])
+# 
+# tm <- time(ppt_delta)
+# yr <- year(tm)
+# mn <- month(tm)
+# nms <- paste0("PPT",monthcodes[mn],"_",yr)
+# names(ppt_delta) <- nms
 
 ##tmin
-fnames <- list.files("../Common_Files/clmr_blend_ts_1901_2024/", pattern = "tmin.*.nc$", full.names = TRUE)
+fnames <- list.files("Y:/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/", pattern = "tmin.*.nc$", full.names = TRUE)
 tmin <- rast(fnames)
-nms <- names(tmin)
-tmin <- tmin[[grep("tmn",nms)]]
-plot(tmin[[1]])
 tmin_tm <- time(tmin)
 ord <- order(tmin_tm)
 tmin <- tmin[[ord]]
 tmin_tm <- time(tmin)
-tmin_nrm <- tmin[[(tmin_tm > as.Date("1961-01-01")) & (tmin_tm < as.Date("1990-01-01"))]]
+tmin_nrm <- tmin[[(tmin_tm > as.Date("1961-01-01")) & (tmin_tm < as.Date("1990-12-31"))]]
 nrm <- tapp(tmin_nrm, index = "months", fun = mean)
-plot(nrm[[7]])
+#plot(nrm[[7]])
 #tmin <- tmin[[tmin_tm > as.Date("1901-01-01") & tmin_tm < as.Date("2022-12-31")]]
 tmin_delta <- tmin - nrm
 
-##test
-delta_nrm <- tmin_delta[[(tmin_tm > as.Date("1961-01-01")) & (tmin_tm < as.Date("1990-01-01"))]]
-avg2 <- tapp(delta_nrm, index = "months", fun = mean)
-
-tmin_delta <- resample(tmin_delta, ppt_delta)
-plot(tmin_delta[[18]])
-
-tm <- time(tmin_delta)
-yr <- year(tm)
-mn <- month(tm)
-nms <- paste0("Tmin",monthcodes[mn],"_",yr)
-names(tmin_delta) <- nms
-
 ##tmax'
-fnames <- list.files("../Common_Files/clmr_blend_ts_1901_2024/", pattern = "tmax.*.nc$", full.names = TRUE)
+fnames <- list.files("Y:/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/", pattern = "tmax.*.nc$", full.names = TRUE)
 tmin <- rast(fnames)
-nms <- names(tmin)
 tmin_tm <- time(tmin)
 ord <- order(tmin_tm)
 tmin <- tmin[[ord]]
 tmin_tm <- time(tmin)
-tmin_nrm <- tmin[[tmin_tm >= as.Date("1960-01-01") & tmin_tm <= as.Date("1990-01-01")]]
+tmin_nrm <- tmin[[tmin_tm >= as.Date("1960-01-01") & tmin_tm <= as.Date("1990-12-31")]]
 nrm <- tapp(tmin_nrm, index = "months", fun = mean)
 plot(nrm[[7]])
 #tmin <- tmin[[tmin_tm > as.Date("1901-01-01") & tmin_tm < as.Date("2022-12-31")]]
@@ -87,8 +70,12 @@ names(tmax_delta) <- nms
 
 mswx_all <- c(ppt_delta, tmin_delta, tmax_delta)
 writeRaster(mswx_all,"../Common_Files/climr_blend_anom_ts.tif", gdal="COMPRESS=NONE", overwrite = TRUE)
-temp <- rast("../Common_Files/cru_gpcc_anom.tif")
 
+library(analogsea)
+
+
+temp <- rast("../Common_Files/cru_gpcc_anom.tif")
+mswx_all <- rast("../Common_Files/climr_blend_anom_ts.tif")
 ##check
 delta_nrm <- ppt_delta[[(time(ppt_delta) > as.Date("1961-01-01")) & (time(ppt_delta) < as.Date("1990-01-01"))]]
 avg2 <- tapp(delta_nrm, index = "months", fun = mean)
@@ -102,6 +89,29 @@ metadt[,var := gsub("tmin.*","Tmin",var)]
 metadt[,var := gsub("tmax.*","Tmax",var)]
 metadt[,laynum := seq_along(var)]
 metadt[,var_nm := paste0(var, "_", month)]
+
+
+###testing
+bb <- get_bb(in_xyz)
+climrdat <- input_obs_ts(dataset = "mswx.blend", bbox = c(-127.7162, -126.9495, 54.61025, 55.38847), years = 2016)
+climrdat_new <- input_obs_ts(dataset = "mswx.blend", bbox = c(-127.7162, -126.9495, 54.61025, 55.38847), years = 2016)
+
+plot(climrdat_new$mswx.blend[[6]])
+
+climrdat <- climrdat$mswx.blend
+localdat <- mswx_all[[year(time(mswx_all)) == 2014]]
+directdat <- crop(ppt_delta[[year(time(ppt_delta)) == 2014]], climrdat)
+obj_strg <- rast("Y:/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/prcp_climrblend_ano_dt_NA_mon_6_1901_2024.nc")
+objdat <- crop(obj_strg[[year(time(obj_strg)) == 2014]], climrdat)
+localdat <- crop(localdat, climrdat)
+
+laynum <- 6
+plot(localdat[[laynum]])
+plot(climrdat[[laynum]])
+plot(directdat[[laynum]])
+plot(objdat)
+
+
 
 # metadt <- data.table(fullnm = nms)
 # metadt[,c("var","period") := tstrsplit(fullnm, "_")]

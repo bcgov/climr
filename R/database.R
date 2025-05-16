@@ -127,13 +127,15 @@ init_globals <- function() {
 #' @importFrom RPostgres dbGetQuery
 #' @noRd
 db_safe_query <- function(statement, ...) {
-  db_safe(RPostgres::dbGetQuery, statement, ...)
+  RPostgres::dbGetQuery(conn = data_connect(),statement, ...)
+  #db_safe(RPostgres::dbGetQuery, statement, ...)
 }
 
 #' @importFrom RPostgres dbExecute
 #' @noRd
 db_safe_exec <- function(statement, ...) {
-  db_safe(RPostgres::dbExecute, statement, ...)
+  RPostgres::dbExecute(conn = data_connect(), statement, ...)
+  #db_safe(RPostgres::dbExecute, statement, ...)
 }
 
 #' @importFrom RPostgres dbWriteTable
@@ -142,40 +144,8 @@ db_safe_write <- function(name, value, ...) {
   if (name %in% "tmp_xyz") {
     .globals[["last_xyz"]] <- value
   }
-  db_safe(RPostgres::dbWriteTable, name, value, ...)
-}
-
-#' @noRd
-db_safe <- function(f, ...) {
-  with_retries(
-    f(conn = data_connect(), ...)
-  )
-}
-
-
-#' @noRd
-with_retries <- function(expr, retries = 3L, xyz = NULL) {
-  attempt <- 1L
-  while (attempt <= retries) {
-    no_error <- TRUE
-    msg <- character()
-    res <- tryCatch(
-      eval.parent(substitute(expr)),
-      error = function(e) {
-        msg <<- conditionMessage(e)
-        no_error <<- FALSE
-      }
-    )
-    if (no_error) break
-    message("Caught error: ", msg)
-    message(paste("Retrying attempt", attempt, "in", 3^attempt, "seconds."))
-    Sys.sleep(3^attempt)
-    attempt <- attempt + 1L
-    if (attempt > retries) {
-      stop("Database operation could not be completed.")
-    }
-  }
-  return(res)
+  RPostgres::dbWriteTable(conn = data_connect(), name, value, ...)
+  #db_safe(RPostgres::dbWriteTable, name, value, ...)
 }
 
 ### climr_client
