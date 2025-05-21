@@ -48,7 +48,8 @@
 #' @param indiv_tiles logical. Only download necessary tiles instead of full bounding box?
 #' This will generally be faster, but doesn't cache.
 #' @param db_option character. One of `auto`, `database`, or `local`. Default `auto`. 
-#' @param ... other arguments passed to [`downscale_core()`]. Namely: `return_refperiod`,
+#' @param return_refperiod logical. Return 1961-1990 period? Default `TRUE`
+#' @param ... other arguments passed to [`downscale_core()`]. Namely:
 #'   `vars`, `out_spatial` and `plot`
 #'   
 #' @return `data.table` or `SpatRaster` of downscaled climate variables for each location.
@@ -122,7 +123,7 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
                       local = FALSE,
                       indiv_tiles = FALSE,
                       db_option = "auto",
-                      return_refmap = FALSE,
+                      return_refperiod = TRUE,
                       ...) {
   message("Welcome to climr!")
 
@@ -272,7 +273,7 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
   }
 
   results <- results_ts <- NULL
-  if(any(!is.null(c(obs_periods_reg, obs_years_reg, gcm_ssp_periods, gcm_ssp_ts_reg, gcm_hist_ts_reg))) & !return_refmap){
+  if(any(!is.null(c(obs_periods_reg, obs_years_reg, gcm_ssp_periods, gcm_ssp_ts_reg, gcm_hist_ts_reg))) & !return_refperiod){
     reference <- input_refmap(reference = which_refmap, bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
     message("Downscaling...")
     results <- downscale_core(
@@ -284,7 +285,7 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
       gcm_ssp_ts = gcm_ssp_ts_reg,
       gcm_hist_ts = gcm_hist_ts_reg,
       skip_check = TRUE,
-      return_refmap = return_refmap,
+      return_refperiod = return_refperiod,
       ...
     )
   }
