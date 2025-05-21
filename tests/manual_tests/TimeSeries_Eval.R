@@ -49,7 +49,7 @@ anom.climna.1981[, c(1, 2, 3, 4, 5) := ref.climna[, c(1, 2, 3, 4, 5), with = FAL
 # ==========================================
 
 
-element.names <- c("mean daily minimum temperature (K)", "mean daily maximum temperature (K)", "precipitation (%)")
+element.names <- c("mean daily minimum temperature (\u00B0C)", "mean daily maximum temperature (\u00B0C)", "precipitation (%)")
 
 dem.lcc <- rast("C:/Users/CMAHONY/OneDrive - Government of BC/Projects/2021_CMIP6Eval_NA/inputs//dem.na.lcc.tif")
 ipccregions.lcc <- vect("C:\\Users\\CMAHONY\\OneDrive - Government of BC\\Shiny_Apps\\cmip6-NA-eval\\data\\ipccregions_lcc.shp")
@@ -142,7 +142,7 @@ print(e)
 # ==========================================
 
 
-element.names <- c("mean daily minimum temperature (K)", "mean daily maximum temperature (K)", "precipitation (%)")
+element.names <- c("mean daily minimum temperature (\u00B0C)", "mean daily maximum temperature (\u00B0C)", "precipitation (%)")
 
 dem.lcc <- rast("C:/Users/CMAHONY/OneDrive - Government of BC/Projects/2021_CMIP6Eval_NA/inputs//dem.na.lcc.tif")
 ipccregions.lcc <- vect("C:\\Users\\CMAHONY\\OneDrive - Government of BC\\Shiny_Apps\\cmip6-NA-eval\\data\\ipccregions_lcc.shp")
@@ -230,11 +230,11 @@ for(e in 1:3){
 }
 
 # ==========================================
-# multipanel comparison of CRU and MSWX blend
+# multipanel comparison of CRU and MSWX blend, for three elements
 # ==========================================
 
 
-element.names <- c("mean daily\nminimum temperature (K)", "mean daily\nmaximum temperature (K)", "\nprecipitation (%)")
+element.names <- c("mean daily\nminimum temperature (\u00B0C)", "mean daily\nmaximum temperature (\u00B0C)", "\nprecipitation (%)")
 
 dem.lcc <- rast("C:/Users/CMAHONY/OneDrive - Government of BC/Projects/2021_CMIP6Eval_NA/inputs//dem.na.lcc.tif")
 ipccregions.lcc <- vect("C:\\Users\\CMAHONY\\OneDrive - Government of BC\\Shiny_Apps\\cmip6-NA-eval\\data\\ipccregions_lcc.shp")
@@ -283,7 +283,7 @@ for(e in 1:3){
       if(source=="cru.gpcc"){
         X <- anom.cru[[m]]
       } else {
-         X <- anom.mswx[[m]]
+        X <- anom.mswx[[m]]
       }     
       X <- project(X, dem.lcc)
       X <- crop(X, ipccregions.lcc)
@@ -311,8 +311,357 @@ for(e in 1:3){
   text(mean(c(xl,xr)), yt+0.01, paste("Change in", element.names[e]), pos=3, cex=1.5, font=2)
   
   print(elements[e])
-  }
+}
 dev.off()
+
+# ==========================================
+# multipanel comparison of all datasets, for two elements
+# ==========================================
+
+
+element.names <- c("mean daily\nminimum temperature (\u00B0C)", "mean daily\nmaximum temperature (\u00B0C)", "\nprecipitation (%)")
+
+dem.lcc <- rast("C:/Users/CMAHONY/OneDrive - Government of BC/Projects/2021_CMIP6Eval_NA/inputs//dem.na.lcc.tif")
+ipccregions.lcc <- vect("C:\\Users\\CMAHONY\\OneDrive - Government of BC\\Shiny_Apps\\cmip6-NA-eval\\data\\ipccregions_lcc.shp")
+
+png(filename=paste("vignettes/plots_timeseries/CRUvsMSWXvsClimateNA_Diffplots", "png",sep="."), type="cairo", units="in", width=6.5, height=5.5, pointsize=10, res=300)
+
+nmonths <- 4
+mat <- matrix(0:((nmonths+1)*8-1), (nmonths+1))
+mat[,6:8] <- mat[,5:7]+1
+mat <- rbind(matrix(rep(c(max(mat[,4])+1, max(mat[,8])+1), each=4), 1), mat)
+mat[,5] <- max(mat)+1
+mat[1,1] <- max(mat)
+layout(mat, widths=c(0.25,1,1,1,0.15,1,1,1), heights=c(0.7, .2,rep(1,nmonths)))
+
+sequence <- c(1,4,7,10)
+
+par(mar=c(0.1,0.1,0.1,0.1))
+
+for(month in month.abb[sequence]){
+  plot(1, type="n", axes=F, xlab="", ylab="", xlim=c(0,2), ylim=c(0,2))  
+  text(1,1, month, font=2,cex=1.5, srt=90)  
+}
+
+element=elements[1]
+for(e in 2:3){
+  
+  lim.upper <- if(elements[e]=="Pr") 1 else 3
+  lim.lower <- if(elements[e]=="Pr") -1 else -3
+  
+  inc=(lim.upper-lim.lower)/100
+  breaks=seq(lim.lower, lim.upper+inc, inc)
+  colscheme <- colorRampPalette(if(elements[e]=="Pr") rev(hcl.colors(5,"Blue-Red 3")) else hcl.colors(5,"Blue-Red 3"))(length(breaks)-1)
+  
+  anom.cru <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/CRUGPCC_2024/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
+  anom.mswx <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
+  pct <- if(elements[e]=="Pr") 100 else 1
+  
+  for(source in c("cru.gpcc", "mswx", "climatena")){
+    
+    source.name <- if(source=="mswx") "MSWX blend" else if(source=="climatena") "ClimateNA" else if(elements[e]=="Pr") "GPCC" else "CRU"
+    plot(1, type="n", axes=F, xlab="", ylab="")  
+    text(1,1, source.name, font=2,cex=1.35)  
+    
+    par(mar=c(0.1,0.1,0.1,0.1))
+    for(m in sequence){
+      if(source=="cru.gpcc"){
+        X <- anom.cru[[m]]
+      } else if(source=="mswx") {
+        X <- anom.mswx[[m]]
+      }  else {
+        X <- dem # use the DEM as a template raster
+        X[anom.climna[, id1]] <- anom.climna[,get(paste0(c("Tmin", "Tmax", "PPT")[e], monthcodes[m]))]
+      }     
+      X <- project(X, dem.lcc)
+      X <- crop(X, ipccregions.lcc)
+      X <- mask(X, ipccregions.lcc)
+      if(e==3) X <- log2(X)
+      X[X>lim.upper] <- lim.upper
+      X[X < lim.lower] <- lim.lower
+      
+      image(X, col=colscheme, breaks=breaks, xaxt="n", yaxt="n")
+      box(col="black", lwd=0.5)
+      
+      print(m)
+    }
+    
+    print(source)
+  }
+  
+  ## legend
+  plot(1, type="n", axes=F, xlab="", ylab="", xlim=c(0,1), ylim=c(0,1))  
+  xl <- 0.1; yb <- 0.3; xr <- 0.9; yt <- 0.5
+  rect(head(seq(xl,xr,(xr-xl)/length(colscheme)),-1), yb,  tail(seq(xl,xr,(xr-xl)/length(colscheme)),-1),  yt,  border=NA, col=colscheme)
+  rect(xl,  yb,  xr,  yt)
+  labels <- if(elements[e]=="Pr") paste(round(2^seq(lim.lower,lim.upper,(lim.upper-lim.lower)/2), 2)*pct-pct, "%", sep="") else round(seq(lim.lower,lim.upper,(lim.upper-lim.lower)/2), 2)*pct
+  text(seq(xl,xr,(xr-xl)/(length(labels)-1)),rep(yb,length(labels)),labels,pos=1,cex=1.5,font=1, offset=0.5)
+  text(mean(c(xl,xr)), yt+0.01, paste("Change in", element.names[e]), pos=3, cex=1.5, font=2)
+  
+  print(elements[e])
+}
+dev.off()
+
+#-----------------------------------------
+## compare raw gpcc to climr gpcc
+#-----------------------------------------
+
+library(terra)
+library(data.table)
+library(scales)
+library(rworldxtra)
+data("countriesHigh")
+
+monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12")
+monthdays <- c(31, 28.25, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+elements.cru <- c("tmn", "tmx", "pre", "tmp")
+elements <- c("Tmin", "Tmax", "Pr")
+element.names <- c("mean daily\nminimum temperature (\u00B0C)", "mean daily\nmaximum temperature (\u00B0C)", "\nprecipitation (%)")
+
+studyarea <- ext(c(-170, -52.25, 13.75, 83.75))
+bdy.na <- vect(countriesHigh[grep("Canada|United States|Mexico", countriesHigh$NAME),])
+bdy.na <- erase(bdy.na, ext(c(-170, -140, 13, 30))) # erase hawaii
+bdy.na <- aggregate(bdy.na) # dissolve
+buff.na <- buffer(bdy.na, width=50000) # buffer coastline
+
+
+dem.lcc <- rast("C:/Users/CMAHONY/OneDrive - Government of BC/Projects/2021_CMIP6Eval_NA/inputs//dem.na.lcc.tif")
+ipccregions.lcc <- vect("C:\\Users\\CMAHONY\\OneDrive - Government of BC\\Shiny_Apps\\cmip6-NA-eval\\data\\ipccregions_lcc.shp")
+bdy.lcc <- project(bdy.na, ipccregions.lcc)
+
+# ClimateNA
+#low res dem for north america
+dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/"
+files <- list.files(dir, pattern = paste0(c("tmin", "tmax", "prcp"), "_.*"))
+temp <- rast(paste0(dir, files[1]))
+dem <- rast("//objectstore2.nrs.bcgov/ffec/DEM/DEM_NorAm/dem_noram_lowres.tif")
+dem <- project(dem, temp, method="mode") 
+my_grid <- as.data.frame(dem, cells = TRUE, xy = TRUE)
+climna_grid <- my_grid[,c(1,1,3,2,4)]
+colnames(climna_grid) <- c("id1", "id2", "lat", "lon", "el") # rename column names to what climr expects
+## Run climateNA and then return to script. 
+ref.climna <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/ClimateNA_v750/noramLow_Normal_1961_1990MP.csv")
+y2001.climna <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/ClimateNA_v750/noramLow_Decade_2001_2010MP.csv")
+y2011.climna <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/ClimateNA_v750/noramLow_Decade_2011_2020MP.csv")
+y1981.climna <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/ClimateNA_v750/noramLow_Normal_1981_2010MP.csv")
+recent.climna <- (y2001.climna + y2011.climna)/2
+anom.climna <- recent.climna - ref.climna
+ppt_columns <- grep("PPT", names(anom.climna), value = TRUE)
+anom.climna[, (ppt_columns) := recent.climna[, .SD, .SDcols = ppt_columns] / ref.climna[, .SD, .SDcols = ppt_columns]]
+anom.climna[, c(1, 2, 3, 4, 5) := ref.climna[, c(1, 2, 3, 4, 5), with = FALSE]]
+anom.climna.1981 <- ref.climna - y1981.climna
+anom.climna.1981[, (ppt_columns) := ref.climna[, .SD, .SDcols = ppt_columns] / y1981.climna[, .SD, .SDcols = ppt_columns]]
+anom.climna.1981[, c(1, 2, 3, 4, 5) := ref.climna[, c(1, 2, 3, 4, 5), with = FALSE]]
+
+e=3
+m=2
+
+# ---------------------------------
+# multipanel plot of map and time series for a selected location
+
+lim.upper <- if(elements[e]=="Pr") 1 else 3
+lim.lower <- if(elements[e]=="Pr") -1 else -3
+
+inc=(lim.upper-lim.lower)/100
+breaks=seq(lim.lower, lim.upper+inc, inc)
+colscheme <- colorRampPalette(if(elements[e]=="Pr") rev(hcl.colors(5,"Blue-Red 3")) else hcl.colors(5,"Blue-Red 3"))(length(breaks)-1)
+
+anom.cru <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/CRUGPCC_2024/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
+anom.mswx <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TransferAnomalies/delta.from.1961_1990.to.2001_2020.", elements[e], ".tif"))
+
+xyz <- data.frame(
+  lon = c(-105, -101, -123),
+  lat = c(20, 65, 50),
+  elev = c(50, 50, 50),
+  id = c(1,2, 3), 
+  name = c("mexico", "centralArctic", "BC")
+)
+
+location <- 3
+
+pt <- vect(xyz[location,1:2], crs = "EPSG:4326")
+pt.lcc <- project(pt, dem.lcc)
+
+ts.all <- downscale(xyz[location,], obs_ts_dataset = c("cru.gpcc", "mswx.blend", "climatena"), obs_years = 1901:2023)
+
+sources <- c("cru.gpcc", "mswx.blend", "climatena")
+source.names <- c("CRU/GPCC", "MSWX blend", "ClimateNA")
+
+## initiate plot
+mat <- matrix(c(1,2,5,1,3,6,1,4,7), 3)
+layout(mat, widths=c(1,1,1), heights=c(0.5, 1 ,1.2))
+
+pct <- if(elements[e]=="Pr") 100 else 1
+
+## legend
+par(mar=c(0.1,0.1,0.1,0.1))
+plot(1, type="n", axes=F, xlab="", ylab="", xlim=c(0,1), ylim=c(0,1))  
+xl <- 0.2; yb <- 0.3; xr <- 0.8; yt <- 0.5
+rect(head(seq(xl,xr,(xr-xl)/length(colscheme)),-1), yb,  tail(seq(xl,xr,(xr-xl)/length(colscheme)),-1),  yt,  border=NA, col=colscheme)
+rect(xl,  yb,  xr,  yt)
+labels <- if(elements[e]=="Pr") paste(round(2^seq(lim.lower,lim.upper,(lim.upper-lim.lower)/2), 2)*pct-pct, "%", sep="") else round(seq(lim.lower,lim.upper,(lim.upper-lim.lower)/2), 2)*pct
+text(seq(xl,xr,(xr-xl)/(length(labels)-1)),rep(yb,length(labels)),labels,pos=1,cex=1.5,font=1, offset=0.5)
+text(mean(c(xl,xr)), yt+0.01, paste("Change in", month.name[m], element.names[e], "\n1961-1990 to 2001-2020"), pos=3, cex=1.5, font=2)
+
+## change Maps
+for(source in sources){
+  i <- which(sources==source)
+  if(source=="cru.gpcc"){
+    X <- anom.cru[[m]]
+  } else if(source=="mswx.blend") {
+    X <- anom.mswx[[m]]
+  }  else {
+    X <- dem # use the DEM as a template raster
+    X[anom.climna[, id1]] <- anom.climna[,get(paste0(c("Tmin", "Tmax", "PPT")[e], monthcodes[m]))]
+  }     
+  X <- project(X, dem.lcc)
+  X <- crop(X, ipccregions.lcc)
+  X <- mask(X, ipccregions.lcc)
+  if(e==3) X <- log2(X)
+  X[X>lim.upper] <- lim.upper
+  X[X < lim.lower] <- lim.lower
+  
+  plot(X, col=colscheme, breaks=breaks, axes=F, legend=F, main=source.names[i])
+
+  plot(pt.lcc, add=T, pch=1, cex=2)
+  plot(pt.lcc, add=T, pch=1, cex=5)
+  
+}
+
+## time series
+par(mar=c(2,3,0.1,0.1), mgp=c(2,0.2,0), tck=-0.01)
+for(source in sources){
+  i <- which(sources==source)
+  
+  temp <- ts.all[DATASET==source, c("PERIOD", paste0(c("Tmin", "Tmax", "PPT")[e], "_", monthcodes[m])), with=FALSE]
+  plot(temp, ylim=c(0, max(ts.all[,paste0(c("Tmin", "Tmax", "PPT")[e], "_", monthcodes[m]), with=FALSE], na.rm=T)))
+  colname <- paste0(c("Tmin", "Tmax", "PPT")[e], "_", monthcodes[m])
+  lines(c(1961, 1990), rep(mean(temp[PERIOD %in% 1961:1990, get(colname)], na.rm = TRUE), 2))
+  lines(c(2001, 2020), rep(mean(temp[PERIOD %in% 2001:2020, get(colname)], na.rm = TRUE), 2))
+}
+
+
+# ---------------------------------
+# why is the gpcc and mswx different pre-1990? they should be the same
+
+
+# convert to positive longitude for gpcc (easier than rotating the gpcc raster)
+pt.r <- vect(crds(pt)+c(360,0), crs = "EPSG:4326")
+
+e=3
+m=2
+
+# import GPCC
+# ts.cru <- rast(paste0("//objectstore2.nrs.bcgov/ffec/TimeSeries_gridded_monthly/GPCC/precip.comb.v2020to2019-v2020monitorafter.total.nc"))
+ts.cru <- rast(paste0("C:/Users/CMAHONY/OneDrive - Government of BC/Data/GPCC/precip.comb.v2020to2019-v2020monitorafter.total.nc"))
+ts.mswx <- rast(paste0("C:/Users/CMAHONY/OneDrive - Government of BC/Data/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/", c("tmin", "tmax", "prcp")[e], "_climrblend_ano_dt_NA_mon_", monthcodes[m], "_1901_2024.nc"))
+test <- aggregate(ts.mswx, fact=3)
+
+par(mfrow=c(1,1), mar=c(3,3,1,1))
+
+# gpcc raw time series
+temp <- ts.cru[[which(substr(time(ts.cru),6,7)==monthcodes[m])]]
+ts.pt <- as.vector(unlist(extract(temp, pt.r)))
+years <- unique(substr(time(ts.cru),1,4))[1:length(ts.pt)]
+plot(years, ts.pt, ylab=c())
+
+# mswx raw time series
+ts.pt <- as.vector(unlist(extract(ts.mswx, pt)))[-1]+1
+years <- unique(substr(time(ts.mswx),1,4))[1:length(ts.pt)]
+plot(years, ts.pt, ylab=c())
+lines(c(-9999,9999), c(0,0), lty=2)
+## this is correct, i.e., not the same as the climr output. 
+
+# ## time series on aggregated mswx raster data
+# ts.pt <- as.vector(unlist(extract(test, pt)))[-1]+1
+# plot(years, ts.pt, ylab=c())
+# lines(c(-9999,9999), c(0,0), lty=2)
+# ## the difference is not due to aggregation. 
+
+baseline.1961 <- mean(ts.pt[years %in% 1961:1990], na.rm = TRUE)
+baseline.1981 <- mean(ts.pt[years %in% 1981:2000], na.rm = TRUE)
+baseline.2001 <- mean(ts.pt[years %in% 2001:2020], na.rm = TRUE)
+
+lines(c(1961, 1990), rep(baseline.1961, 2))
+lines(c(1981, 2000), rep(baseline.1981, 2))
+lines(c(2001, 2020), rep(baseline.2001, 2))
+lines(c(-9999,9999), c(1,1), lty=2, col="gray")
+
+ts.1961 <- ts.pt/baseline.1961
+points(years, ts.1961, pch=16)
+
+plot(years, ts.1961, ylab=c())
+lines(c(-9999,9999), c(0,0), lty=2)
+baseline.1961 <- mean(ts.1961[years %in% 1961:1990], na.rm = TRUE)
+lines(c(1961, 1990), rep(baseline.1961, 2))
+lines(c(-9999,9999), c(1,1), lty=2, col="gray")
+
+
+# climr mswx input raster time series
+fnames <- list.files("//objectstore2.nrs.bcgov/ffec/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/", pattern = "prcp.*.nc$", full.names = TRUE)
+ppt <- rast(fnames)
+ppt_tm <- time(ppt)
+ord <- order(ppt_tm)
+ppt <- ppt[[ord]]
+ppt_tm <- time(ppt)
+ppt_nrm <- ppt[[ppt_tm >= as.Date("1961-01-01") & ppt_tm <= as.Date("1990-12-31")]] + 1 ## small error here: the end date should be "1990-12-31" 
+unique(time(ppt_nrm))
+nrm <- tapp(ppt_nrm, index = "months", fun = mean)
+ppt_delta <- (ppt + 1)/(nrm)
+time(ppt_delta)
+
+temp <- ppt_delta[[which(substr(time(ppt_delta),6,7)==monthcodes[m])]]
+ts.pt.raw <- as.vector(unlist(extract(temp, pt)[-1]))
+years.raw <- unique(substr(time(ppt_delta),1,4))[1:length(ts.pt.raw)]
+plot(years.raw, ts.pt.raw, ylab=c())
+lines(c(-9999,9999), c(0,0), lty=2)
+baseline.1961 <- mean(ts.pt.raw[years.raw %in% 1961:1990], na.rm = TRUE)
+
+#climr output for comparison
+temp <- ts.all[DATASET=="mswx.blend", c("PERIOD", paste0(c("Tmin", "Tmax", "PPT")[e], "_", monthcodes[m])), with=FALSE]
+ts.pt.climr <- as.vector(unlist(temp[,-1]))
+years.climr <- as.numeric(unlist(temp[,1]))
+baseline.1961.climr <- mean(ts.pt.climr[years.climr %in% 1961:1990], na.rm = TRUE)
+ts.pt.climr <- ts.pt.climr/baseline.1961.climr
+points(years.climr, ts.pt.climr, pch=16)
+# points(years.raw, ts.pt.raw^0.5, pch=17)
+
+# Climr raw data
+obs.ts <- input_obs_ts(
+  dataset = c("mswx.blend"),
+  bbox = get_bb(xyz[2,]),
+  years = 1901:2023,
+  cache = F
+)
+obs.ts <- obs.ts$mswx.blend
+
+# plot(obs.ts[[2]])
+# plot(pt, add=T, pch=1, cex=2)
+# plot(pt, add=T, pch=1, cex=5)
+# names(obs.ts)
+# 
+temp <- obs.ts[[which(substr(names(obs.ts),12,17) == paste0(c("Tmin", "Tmax", "PPT")[e], "_", monthcodes[m]))]]
+ts.pt.input <- as.vector(unlist(extract(temp, pt)[-1]))
+years.input <- unique(substr(names(obs.ts),19,22))[1:length(ts.pt.input)]
+points(years.input, ts.pt.input, col=2, cex=1.3, pch=2)
+
+legend
+
+# mswx input vs. climr output. 
+par(mfrow=c(1,1), mar=c(3,3,1,1))
+plot(ts.pt.raw[which(years.raw%in%years.climr)], ts.pt.climr)
+# points(ts.pt.raw, ts.pt.raw^0.5, pch=17)
+text(ts.pt.raw[which(years.raw%in%years.climr)], ts.pt.climr, years.climr, col="gray", cex=0.7, pos=4)
+lines(c(-999, 999), c(-999, 999))
+# what is this transform? also, note that points deviating from linear are post-1998. 
+
+# climr input vs. output. 
+par(mfrow=c(1,1), mar=c(3,3,1,1))
+plot(ts.pt.input, ts.pt.climr)
+# points(ts.pt.raw, ts.pt.raw^0.5, pch=17)
+text(ts.pt.input[which(years.raw%in%years.climr)], ts.pt.climr, years.climr, col="gray", cex=0.7, pos=4)
+lines(c(-999, 999), c(-999, 999))
+
 
 
 #-----------------------------------------
@@ -381,6 +730,8 @@ for(e in 1:3){
     ahccd.anom[, (ppt_columns) := ahccd.recent[, .SD, .SDcols = ppt_columns] / ahccd.ref[, .SD, .SDcols = ppt_columns]]
     
     
+    studyarea <- ext(c(-120, -118.8, 49, 50.4)) #okanagan valley study area used in time series plots below
+    
     
     png(filename=paste("vignettes/plots_timeseries/CRUvsMSWXvsClimateNA_BCAB", elements[e], monthcodes[m], "png",sep="."), type="cairo", units="in", width=7.5, height=3, pointsize=10, res=300)
 
@@ -420,6 +771,8 @@ for(e in 1:3){
       plot(bdy.na, lwd=0.4, add=T)
       points(ahccd.locations$lon, ahccd.locations$lat, bg = as.character(z_cut), pch = 21, cex=1.6, lwd=1.5)
       mtext(paste0("(",letters[which(sources==source)],")"), side=3, line=-1.5, font=2, adj=0.01)
+      
+      plot(studyarea, add=T)
       
       if(source=="cru.gpcc") legend("topright", legend="AHCCD stations", pt.bg = as.character(z_cut), pch = 21, cex=0.9, pt.cex=1.6, pt.lwd=1.5, inset=c(0.015,0.015))
 
