@@ -12,13 +12,16 @@ input_obs(bbox = NULL, period = list_obs_periods(), cache = TRUE)
 input_obs_db(period = list_obs_periods())
 
 input_obs_ts(
-  dataset = c("cru.gpcc", "climatena"),
+  dataset = c("mswx.blend", "cru.gpcc", "climatena"),
   bbox = NULL,
   years = 2010:2022,
   cache = TRUE
 )
 
-input_obs_ts_db(dataset = c("cru.gpcc", "climatena"), years = 2010:2022)
+input_obs_ts_db(
+  dataset = c("mswx.blend", "cru.gpcc", "climatena"),
+  years = 2010:2022
+)
 }
 \arguments{
 \item{bbox}{numeric. Vector of length 4 giving bounding box of study region, in the order ymax,ymin,xmax,xmin. In general this is created by \code{get_bb()}, but can also be user-defined.}

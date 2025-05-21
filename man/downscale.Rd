@@ -22,6 +22,7 @@ downscale(
   local = FALSE,
   indiv_tiles = FALSE,
   db_option = "auto",
+  return_refperiod = TRUE,
   ...
 )
 }
@@ -76,7 +77,9 @@ This will generally be faster, but doesn't cache.}
 
 \item{db_option}{character. One of \code{auto}, \code{database}, or \code{local}. Default \code{auto}.}
 
-\item{...}{other arguments passed to \code{\link[=downscale_core]{downscale_core()}}. Namely: \code{return_refperiod},
+\item{return_refperiod}{logical. Return 1961-1990 period? Default \code{TRUE}}
+
+\item{...}{other arguments passed to \code{\link[=downscale_core]{downscale_core()}}. Namely:
 \code{vars}, \code{out_spatial} and \code{plot}}
 }
 \value{
