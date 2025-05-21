@@ -24,7 +24,7 @@ A gridded observational time series is a dataset that organizes real-world measu
 `climr` provides access to three observational time series datasets of temperature and precipitation: 
 
 1.	`cru.gpcc`: The 1901-2023 combined Climatic Research Unit TS dataset (CRU; @ harris2020cruts) for temperature and Global Precipitation Climatology Centre dataset (GPCC; becker2013gpcc) for precipitation; 
-2.	`mswx-blend`: The 1981-2024 Multi-Source Weather (MSWX; @ beck2022mswx) for temperature and Multi-Source Weighted-Ensemble Precipitation (MSWEP; @ beck2019mswep) for precipitation, which we have extended back to 1901 using the CRU/GPCC dataset; and 
+2.	`mswx.blend`: The 1981-2024 Multi-Source Weather (MSWX; @ beck2022mswx) for temperature and Multi-Source Weighted-Ensemble Precipitation (MSWEP; @ beck2019mswep) for precipitation, which we have extended back to 1901 using the CRU/GPCC dataset; and 
 3.	`climatena`: The 1901-2023 ClimateNA time series (@wang2024monthly). 
 
 Our aim in this article is provide a better understanding of these datasets, including their strengths and weaknesses. 
@@ -55,45 +55,53 @@ MSWX provides an entirely different approach to gridded observational time serie
 
 ### Intercomparison of datasets
 
-The three datasets have distinct spatial patterns of anomalies; exemplified by their 2001-2020 average Tmin anomalies across North America ([Figure 2](#fig2)). CRU anomalies vary at large spatial scales due to the broad spatial influence of each station in the distance weighting method.  In contrast, the MSWX blend exhibits localized anomalies that follow physical features such as the MacKenzie Mountains in southern Yukon, the Great Lakes, and the coastal fringe in the Pacific Northwest. This link to physical features is an outcome of using a physical weather model as the basis for MSWX. Finally, the ClimateNA time series exhibits credible spatial detail in station-dense United States, but also has spatial oscillations in station-sparse western and northern Canada that may be artefacts of the thin-plate spline method. 
+The three datasets have distinct spatial patterns of anomalies; exemplified by their 2001-2020 average Tmin anomalies across North America ([Figure 2](#fig2)). CRU anomalies vary at large spatial scales due to the broad spatial influence of each station in the distance weighting method.  In contrast, the MSWX blend exhibits localized anomalies that follow physiographic features such as the MacKenzie Mountains in southern Yukon, the Great Lakes, and the coastal fringe in the Pacific Northwest. This link to physiographic features is an outcome of using a physical weather model as the basis for MSWX. Finally, the ClimateNA time series exhibits credible spatial detail in station-dense United States, but also has spatial oscillations in station-sparse western and northern Canada that may be artefacts of the thin-plate spline method of interpolation between stations. 
 
 <div id="fig2">
-```{r, echo=FALSE, fig.cap = "Figure 2: ", results='asis', out.width = "100%"}
+```{r, echo=FALSE, fig.cap = "Figure 2: Comparison of the CRU, MSWX-blend, and ClimateNA gridded time series in terms of the difference between the 1961-1990 and 2001-2020 average February Tmin.", results='asis', out.width = "100%"}
 knitr::include_graphics("plots_timeseries/CRUvsMSWXvsClimateNA_3Panel_30arcminute.Tmin.02.png")
 ```
 </div>
 
+[Figure 3](#fig3) provides 
 
 <div id="fig3">
-```{r, echo=FALSE, fig.cap = "Figure 3: ", results='asis', out.width = "100%"}
+```{r, echo=FALSE, fig.cap = "Figure 3: As in Figure 2, but for Tmax and precipitation of January, April, July, and October.", results='asis', out.width = "100%"}
 knitr::include_graphics("plots_timeseries/CRUvsMSWX_Diffplots.png")
 ```
 </div>
 
 
 <div id="fig4">
-```{r, echo=FALSE, fig.cap = "Figure 4: ", results='asis', out.width = "100%"}
+```{r, echo=FALSE, fig.cap = "Figure 4: As in figure 2, but zoomed into the region of BC and Alberta. The black rectangle at lower centre of each map is a region of the Okanagan Valley featured in Figures 5 and 6. ", results='asis', out.width = "100%"}
 knitr::include_graphics("plots_timeseries/CRUvsMSWXvsClimateNA_BCAB.Tmin.02.png")
 ```
 </div>
 
 
 <div id="fig5">
-```{r, echo=FALSE, fig.cap = "Figure 5: ", results='asis', out.width = "100%"}
+```{r, echo=FALSE, fig.cap = "Figure 5: Comparison of the ClimateNA and CRU February Tmin time series for the Okanagan Valley study area mapped in Figure 5. Solid grey lines are the station records for the six AHCCD stations located in the study area. Dashed lines are the 2001-2020 mean of each time series. The boxplot shows the distribution of the AHCCD station 2001-2020 means.", results='asis', out.width = "100%"}
 knitr::include_graphics("plots_timeseries/CRUvsClimateNA_ts.Tmin.02.png")
 ```
 </div>
 
 
 <div id="fig6">
-```{r, echo=FALSE, fig.cap = "Figure 4: ", results='asis', out.width = "100%"}
-knitr::include_graphics("plots_timeseries/Boxplots_AHCCD_Wcan.png")
+```{r, echo=FALSE, fig.cap = "Figure 6: As in Figure 5, but for July Tmin. ", results='asis', out.width = "100%"}
+knitr::include_graphics("plots_timeseries/CRUvsClimateNA_ts.Tmin.02.png")
 ```
 </div>
 
 
 <div id="fig7">
-```{r, echo=FALSE, fig.cap = "Figure 5: ", results='asis', out.width = "100%"}
+```{r, echo=FALSE, fig.cap = "Figure 7: Error (relative to AHCCD stations) in 2001-2020 average anomaly from the 1961-1990 baseline, for monthly mean of daily minimum and maximum temperature. The study area is western Canada, west of -100^o^E. Each box-and-whisker plot shows the minimum, 25th percentile, median, 75th percentile, and maximum of the distribution.", results='asis', out.width = "100%"}
+knitr::include_graphics("plots_timeseries/Boxplots_AHCCD_Wcan.png")
+```
+</div>
+
+
+<div id="fig8">
+```{r, echo=FALSE, fig.cap = "Figure 8: As in Figure 7, but Tmin error of (a) British Columbia, (b) Alberta, and (c) Saskatchewan. ", results='asis', out.width = "100%"}
 knitr::include_graphics("plots_timeseries/Boxplots_AHCCD_provinces.Tmin.png")
 ```
 </div>
@@ -102,6 +110,9 @@ knitr::include_graphics("plots_timeseries/Boxplots_AHCCD_provinces.Tmin.png")
 ### Conclusions
 -	All three gridded datasets have potential drawbacks. 
 -	None are reliable for detection of climate change trends, for which quality-controlled station data such as the AHCCD product (@vincent2020ahccd) are preferable. We intend to provide access to AHCCD data in future versions of `climr`. 
+- we have not yet done sufficient QA to recommend one dataset for general purpose. 
+- we are using the MSWX-blend for the 2001-2020 period, and for transfer anomalies. 
+- reanalysis products will tend to do worse in station validation becasue they are based on independent data. however, they can be expected to do better in areas with no stations. 
 
 ### References
 
