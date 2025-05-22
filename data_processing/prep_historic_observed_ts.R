@@ -7,15 +7,15 @@ monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09","10","11","
 ##aseem blended ts
 
 ##PPT
-fnames <- list.files("Y:/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/", pattern = "prcp.*.nc$", full.names = TRUE)
+fnames <- list.files("../Common_Files/clmr_blend_ts_1901_2024/", pattern = "prcp.*.nc$", full.names = TRUE)
 ppt <- rast(fnames)
 ppt_tm <- time(ppt)
 ord <- order(ppt_tm)
 ppt <- ppt[[ord]]
 ppt_tm <- time(ppt)
-ppt_nrm <- ppt[[ppt_tm >= as.Date("1961-01-01") & ppt_tm <= as.Date("1990-12-31")]] + 1
+ppt_nrm <- ppt[[ppt_tm >= as.Date("1961-01-01") & ppt_tm <= as.Date("1990-12-31")]]
 nrm <- tapp(ppt_nrm, index = "months", fun = mean)
-ppt_delta <- (ppt + 1)/(nrm)
+ppt_delta <- (ppt)/(nrm)
 plot(ppt_delta[[7]])
 
 # delta_nrm <- ppt_delta[[time(ppt_delta) >= as.Date("1961-01-01") & time(ppt_delta) <= as.Date("1990-01-01")]]
@@ -31,7 +31,7 @@ plot(ppt_delta[[7]])
 # names(ppt_delta) <- nms
 
 ##tmin
-fnames <- list.files("Y:/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/", pattern = "tmin.*.nc$", full.names = TRUE)
+fnames <- list.files("../Common_Files/clmr_blend_ts_1901_2024/", pattern = "tmin.*.nc$", full.names = TRUE)
 tmin <- rast(fnames)
 tmin_tm <- time(tmin)
 ord <- order(tmin_tm)
@@ -44,7 +44,7 @@ nrm <- tapp(tmin_nrm, index = "months", fun = mean)
 tmin_delta <- tmin - nrm
 
 ##tmax'
-fnames <- list.files("Y:/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024/", pattern = "tmax.*.nc$", full.names = TRUE)
+fnames <- list.files("../Common_Files/clmr_blend_ts_1901_2024/", pattern = "tmax.*.nc$", full.names = TRUE)
 tmin <- rast(fnames)
 tmin_tm <- time(tmin)
 ord <- order(tmin_tm)
@@ -56,17 +56,6 @@ plot(nrm[[7]])
 #tmin <- tmin[[tmin_tm > as.Date("1901-01-01") & tmin_tm < as.Date("2022-12-31")]]
 tmax_delta <- tmin - nrm
 plot(tmax_delta[[19]])
-
-delta_nrm <- tmax_delta[[(time(tmax_delta) > as.Date("1961-01-01")) & (time(tmax_delta) < as.Date("1990-01-01"))]]
-avg2 <- tapp(delta_nrm, index = "months", fun = mean)
-
-#tmax_delta <- tmax_delta[[tmin_tm > as.Date("1901-01-01")]]
-
-tm <- time(tmax_delta)
-yr <- year(tm)
-mn <- month(tm)
-nms <- paste0("Tmax",monthcodes[mn],"_",yr)
-names(tmax_delta) <- nms
 
 mswx_all <- c(ppt_delta, tmin_delta, tmax_delta)
 writeRaster(mswx_all,"../Common_Files/climr_blend_anom_ts.tif", gdal="COMPRESS=NONE", overwrite = TRUE)
