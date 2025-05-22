@@ -540,6 +540,15 @@ for(source in sources){
   lines(c(2001, 2020), rep(mean(temp[PERIOD %in% 2001:2020, get(colname)], na.rm = TRUE), 2))
 }
 
+# climr gpcc vs. mswx output for 1901-1980 (they should be the same). 
+par(mfrow=c(1,1), mar=c(3,3,1,1))
+x <- as.vector(unlist(ts.all[DATASET=="cru.gpcc" & PERIOD %in% 1901:1980, c(paste0(c("Tmin", "Tmax", "PPT")[e], "_", monthcodes[m])), with=FALSE]))
+y <- as.vector(unlist(ts.all[DATASET=="mswx.blend" & PERIOD %in% 1901:1980, c(paste0(c("Tmin", "Tmax", "PPT")[e], "_", monthcodes[m])), with=FALSE]))
+plot(x, y, xlab="climr GPCC precipitation", ylab = "MSWX blend precipitation")
+# points(ts.pt.raw, ts.pt.raw^0.5, pch=17)
+text(x, y, 1901:1980, col="gray", cex=0.7, pos=4)
+lines(c(-999, 999), c(-999, 999))
+
 
 # ---------------------------------
 # why is the gpcc and mswx different pre-1990? they should be the same
@@ -604,10 +613,10 @@ ppt_tm <- time(ppt)
 ord <- order(ppt_tm)
 ppt <- ppt[[ord]]
 ppt_tm <- time(ppt)
-ppt_nrm <- ppt[[ppt_tm >= as.Date("1961-01-01") & ppt_tm <= as.Date("1990-12-31")]] + 1 ## small error here: the end date should be "1990-12-31" 
+ppt_nrm <- ppt[[ppt_tm >= as.Date("1961-01-01") & ppt_tm <= as.Date("1990-12-31")]] ## small error here: the end date should be "1990-12-31" 
 unique(time(ppt_nrm))
 nrm <- tapp(ppt_nrm, index = "months", fun = mean)
-ppt_delta <- (ppt + 1)/(nrm)
+ppt_delta <- (ppt)/(nrm)
 time(ppt_delta)
 
 temp <- ppt_delta[[which(substr(time(ppt_delta),6,7)==monthcodes[m])]]
@@ -645,7 +654,6 @@ ts.pt.input <- as.vector(unlist(extract(temp, pt)[-1]))
 years.input <- unique(substr(names(obs.ts),19,22))[1:length(ts.pt.input)]
 points(years.input, ts.pt.input, col=2, cex=1.3, pch=2)
 
-legend
 
 # mswx input vs. climr output. 
 par(mfrow=c(1,1), mar=c(3,3,1,1))
@@ -1098,7 +1106,12 @@ print(e)
 #     plot(X, xlim=c(-120, -118.8), ylim=c(49, 50.4), col=colscheme, breaks=breaks, main=paste(month.name[m], elements[e], "(ClimateNA)"), axes=F, type="continuous")
 #     points(ahccd.locations$lon, ahccd.locations$lat, bg = as.character(z_cut), pch = 21, cex=1.6, lwd=2)
 
-    
+#calculate the ahccd anomalies
+stn <- fread("//objectstore2.nrs.bcgov/ffec/AHCCD/AHCCD_location.csv")
+ahccd <- fread("//objectstore2.nrs.bcgov/ffec/AHCCD/AHCCD.csv")
+ahccd <- ahccd[,- "tmean"]
+names(ahccd) <- c("id", "year", "month", "Tmin", "Tmax", "PPT")
+
 
 #Okanagan Valley study area
 studyarea <- ext(c(-120, -118.8, 49, 50.4))
@@ -1113,8 +1126,12 @@ clim <- downscale(stn.s,
                   which_refmap = "refmap_climr", 
                   obs_periods = "2001_2020",
                   obs_years = 1901:2020,
-                  obs_ts_dataset = c("cru.gpcc", "mswx.blend")
+                  obs_ts_dataset = c("cru.gpcc", "climatena") 
 )
+
+## climateNA time series from climr Data
+clim <- downscale(stn.s)
+
 
 e=1
 # for(e in 1:3){

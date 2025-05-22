@@ -6,10 +6,11 @@
 
 ## Enhancements
 
--   Expanded the climr mosaic of 1981-2010 gridded climatologies to the full North American domain. 
+-   Expanded the climr mosaic of 1981-2010 gridded climatologies to the full North American domain. Learn about it [here](articles/methods_mosaic.html).
+-   Added a 1901-2024 gridded observational time series based on the multi-source weather (MSWX/MSWEP) dataset. Learn about it [here](articles/guidance_timeSeries.html)
 -   New function `legend_ramp()` for simplified legend plotting on color ramp maps, including accommodation of logarithmic scaling. 
 -   New function `logVars()` for logarithmic transformation of specified columns in any data.table. 
--   Added a Known Issues section to the vignettes, including the FFP, NFFD, and PAS discrepancies with ClimateNA.
+-   Added a Known Issues section to the vignettes, including the [FFP, NFFD, and PAS discrepancies with ClimateNA](articles/knownIssues_DiscrepanciesWithClimateNA.html) and a [workaround for using custom refmaps](articles/knownIssues_customRefmap.html).
 
 # `climr` 0.1.1
 
