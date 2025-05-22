@@ -33,6 +33,7 @@ articles:
 - title: "Guidance"
   contents:
   - guidance_ensembleSelection
+  - guidance_timeSeries
 - title: "Known Issues"
   navbar: "Known Issues"
   desc: "Unresolved bugs, artefacts, and shortcomings"

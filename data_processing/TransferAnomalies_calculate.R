@@ -31,10 +31,10 @@ buff.na <- buffer(bdy.na, width=50000) # buffer coastline
 # plot(buff.na, add=T)
 
 # loop through each variable and month 
-# dir <- "//objectstore2.nrs.bcgov/ffec/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024"
-dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024" #loading locally because it takes forever on object storage
+dir <- "//objectstore2.nrs.bcgov/ffec/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024"
+# dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/data_climr_blend_monthly_anomalies/clmr_blend_ts_1901_2024" #loading locally because it takes forever on object storage
 
-e <- 1
+e <- 3
 elements.file <- c("tmin", "tmax", "prcp")
 counter=0 #counter for total iterations
 for(e in 1:3){
@@ -70,7 +70,7 @@ for(e in 1:3){
           normal <- mean(temp[[names(temp)%in%startyear:endyear]])
           
           # Calculate delta anomalies (subtract for temperature and divide for precipitation)
-            delta <- if(e!=3) normal-ref.normal else (normal+1)/(ref.normal+1)
+            delta <- if(e!=3) normal-ref.normal else (normal)/(ref.normal)
             # delta <- aggregate(delta, fact=3, na.rm=T) # reduce resolution (the spatial detail isn't warranted)
             
           # plot(delta, main=paste(month.abb[m], element))
