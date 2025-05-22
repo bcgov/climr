@@ -560,11 +560,9 @@ downscale_.SpatRaster <- function(xyz, refmap, gcms, gcm_ssp_ts, gcm_hist_ts,
     res_hist_ts <- NULL
   }
   
-  if (return_refperiod) {
-    names(res) <- paste("REFPERIOD", names(res), "1961_1990", sep = "_")
-  } else {
-    res <- NULL
-  }
+
+  names(res) <- paste("REFPERIOD", names(res), "1961_1990", sep = "_")
+
   
   lat <- get_latitude_raster(xyz)
   # Put res first to get the right dispatch for rasters
@@ -577,6 +575,7 @@ downscale_.SpatRaster <- function(xyz, refmap, gcms, gcm_ssp_ts, gcm_hist_ts,
   # print(names(res))
   # Compute extra climate variables, assign by reference
   message("Climate vars...")
+  if(!return_refperiod) res <- res[[-grep("REFPERIOD", names(res))]]
   res <- append_clim_vars(res, vars)
   return(res[[grep(paste(vars, collapse = "|"),names(res))]])
 }
