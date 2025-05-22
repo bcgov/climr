@@ -372,40 +372,40 @@ process_one_climate_db <- function(
   return(climaterast)
 }
     
-#' Check xyz conforms to standards
-#'
-#' @template xyz
-#' @param expectedCols character. Columns to look for in `xyz`.
-#'
-#' @return NULL
-#' @noRd
-.checkXYZ <- function(
-  xyz,
-  expectedCols = c("lon", "lat", "elev", "id")
-) {
-  if (!is(xyz, "data.table")) {
-    xyz <- tryCatch(as.data.table(xyz), error = function(e) e)
-    if (is(xyz, "error")) {
-      stop("Can't coherce xyz to a data.table object. Please pass a data.table object or another cohercible object class.")
-    }
-  }
-  
-  if (length(setdiff(expectedCols, names(xyz)))) {
-    stop("'xyz' must have the columns ", paste(expectedCols, collapse = ", "))
-  }
-  
-  if (length(unique(xyz$id)) != nrow(xyz)) {
-    stop("'xyz$id' must be a column of unique IDs")
-  }
-  colTypes <- c("integer", "numeric", "character", "factor")
-  if (!inherits(xyz$id, colTypes)) {
-    stop("'xyz$id' must be an column of type ", paste(colTypes, collapse = ", "))
-  } else {
-    set(xyz, j = "id", value = as.integer(xyz[["id"]]))
-  }
-  
-  return(xyz)
-}
+#' #' Check xyz conforms to standards
+#' #'
+#' #' @template xyz
+#' #' @param expectedCols character. Columns to look for in `xyz`.
+#' #'
+#' #' @return NULL
+#' #' @noRd
+#' .checkXYZ <- function(
+#'   xyz,
+#'   expectedCols = c("lon", "lat", "elev", "id")
+#' ) {
+#'   if (!is(xyz, "data.table")) {
+#'     xyz <- tryCatch(as.data.table(xyz), error = function(e) e)
+#'     if (is(xyz, "error")) {
+#'       stop("Can't coherce xyz to a data.table object. Please pass a data.table object or another cohercible object class.")
+#'     }
+#'   }
+#'   
+#'   if (length(setdiff(expectedCols, names(xyz)))) {
+#'     stop("'xyz' must have the columns ", paste(expectedCols, collapse = ", "))
+#'   }
+#'   
+#'   if (length(unique(xyz$id)) != nrow(xyz)) {
+#'     stop("'xyz$id' must be a column of unique IDs")
+#'   }
+#'   colTypes <- c("integer", "numeric", "character", "factor")
+#'   if (!inherits(xyz$id, colTypes)) {
+#'     stop("'xyz$id' must be an column of type ", paste(colTypes, collapse = ", "))
+#'   } else {
+#'     set(xyz, j = "id", value = as.integer(xyz[["id"]]))
+#'   }
+#'   
+#'   return(xyz)
+#' }
 
 
 #' Check `downscale_core` arguments
