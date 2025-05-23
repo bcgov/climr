@@ -12,6 +12,7 @@
 #' @importFrom terra rast merge sprc
 #' @importFrom RPostgres dbQuoteIdentifier dbGetQuery
 #' @importFrom DBI dbQuoteIdentifier dbGetQuery
+#' @keywords internal
 #' @export
 dbGetRaster <- function(name, tile, rast = "rast", bands = 37:73,
                        boundary) {

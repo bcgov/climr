@@ -88,6 +88,7 @@ reference:
   - get_bb
   - lapse_rate
   - legend_ramp
+  - logVars
 - title: "Data"
   desc: >
     Available climate variables and functions listing available data.
