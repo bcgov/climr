@@ -444,20 +444,16 @@ Alternatively, `get_bb` could be used to extract bounding box around the
 point locations in `xyzDT`. 
 
 ```{r}
-dbCon <- data_con()
-the_bb <- c(50, 49, -122, -124)
+the_bb <- c(-124, -122, 49, 50)
 
-## alternatively:
-# the_bb <- get_bb(xyzDT)
-
-normals <- input_refmap(dbCon,
+normals <- input_refmap(
   bbox = the_bb,
   reference = "refmap_climr"
 )
 ```
 
 ```{r, echo = FALSE, out.width = "80%", fig.cap = "Downloaded normals shown with North Vancouver area and the requested bounding box."}
-plotVect <- vect(ext(the_bb[c(4, 3, 2, 1)]), crs = "EPSG:4326")
+plotVect <- vect(ext(the_bb), crs = "EPSG:4326")
 
 plot(normals[["Tmax_07"]],
   col = hcl.colors(50, "Reds", rev = 1),
@@ -481,14 +477,14 @@ Historical observations for a given period or for individual years can
 be obtained with `input_obs` and `input_obs_ts`, respectively.
 
 ```{r}
-hist_proj <- input_gcm_hist(dbCon,
+hist_proj <- input_gcm_hist(
   bbox = the_bb,
   gcms = "EC-Earth3",
   years = 2001:2020,
   max_run = 0
 )
 
-fut_proj <- input_gcms(dbCon,
+fut_proj <- input_gcms(
   bbox = the_bb,
   gcms = "EC-Earth3",
   ssps = "ssp245",
@@ -496,7 +492,7 @@ fut_proj <- input_gcms(dbCon,
   max_run = 0
 )
 
-fut_proj_ts <- input_gcm_ssp(dbCon,
+fut_proj_ts <- input_gcm_ssp(
   bbox = the_bb,
   gcms = "EC-Earth3",
   ssps = "ssp245",
@@ -504,11 +500,11 @@ fut_proj_ts <- input_gcm_ssp(dbCon,
   max_run = 0
 )
 
-hist_obs <- input_obs(dbCon,
+hist_obs <- input_obs(
   bbox = the_bb,
   period = "2001_2020"
 )
-hist_obs_ts <- input_obs_ts(dbCon,
+hist_obs_ts <- input_obs_ts(
   bbox = the_bb,
   years = 2001:2020
 )
@@ -516,14 +512,14 @@ hist_obs_ts <- input_obs_ts(dbCon,
 
 ```{r, echo = FALSE, fig.show = 'hold', fig.cap = "Downloaded historical and future anomalies shown with North Vancouver area and the requested bounding box.", fig.dim = c(12, 5), out.width = "100%"}
 minmax <- range(
-  minmax(hist_obs_ts[["cru.gpcc"]][["cru.gpcc_Tmax_07_2001"]]),
+  minmax(hist_obs_ts[["mswx.blend"]][["mswx.blend_Tmax_07_2001"]]),
   minmax(hist_obs[[1]][["Tmax_07"]]),
   minmax(hist_proj[[1]][["EC-Earth3_Tmax_07_ensembleMean_2001"]]),
   minmax(fut_proj[[1]][["EC-Earth3_Tmax_07_ssp245_ensembleMean_2021_2040"]])
 )
 
 par(mfrow = c(1, 4))
-plot(hist_obs_ts[[1]][["cru.gpcc_Tmax_07_2001"]],
+plot(hist_obs_ts[["mswx.blend"]][["mswx.blend_Tmax_07_2001"]],
   col = hcl.colors(50, "Reds", rev = 1), type = "continuous",
   mar = c(2, 2, 1, 4), range = minmax,
   main = "Max temp. July\nobserved anomaly 2001",

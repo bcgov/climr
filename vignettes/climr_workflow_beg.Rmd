@@ -69,6 +69,8 @@ ds_out <- downscale(
   ssps = c("ssp370", "ssp245"), # specify two greenhouse gas concentration scenarios
   gcm_periods = c("2001_2020", "2041_2060"), # specify two 20-year periods
   max_run = 3, # specify 3 individual runs for each model
+  ensemble_mean = FALSE, # don't return ensemble mean of individual runs
+  db_option = "local", # perform downscaling locally (instead of in database)
   vars = c("PPT", "CMD", "CMI")
 )
 ```
@@ -92,7 +94,7 @@ list_ssps()
 These functions can be used as arguments in `downscale()`. For example, `vars = list_variables()` could be specified to obtain data for all available variables, or `gcms = list_gcm()[c(1,4,5,6,7,10,11,12)]` could be used to specify the eight-gcm ensemble recommended by Mahony et al. (2022). 
 
 ### Working with raster data
-A common use of `climr` is to obtain climate data for a user-provided raster grid. Here is some sample code showing how to do so. `climr` now supports native raster downscaling, so we can simply pass in a 1-layer `SpatRaster` containing elevation values, and `climr` will return a raster stack with the same extent and resolution as the input, where each layer corresponds to a variable. Note that the reference period raster (1961-1990) is also returned. 
+A common use of `climr` is to obtain climate data for a user-provided raster grid. Here is some sample code showing how to do so. `climr` now supports native raster downscaling, so we can simply pass in a 1-layer `SpatRaster` containing elevation values, and `climr` will return a raster stack with the same extent and resolution as the input, where each layer corresponds to a variable. 
 
 ```{r, eval = TRUE}
 library(terra)
