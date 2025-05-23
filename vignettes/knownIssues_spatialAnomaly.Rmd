@@ -1,0 +1,29 @@
+---
+title: "Spatial anomaly near Prince George in `refmap_climatena`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
+description: >
+vignette: >
+  %\VignetteIndexEntry{Spatial anomaly near Prince George in `refmap_climatena`}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+bibliography: references.bib
+link-citations: true
+code_folding: show
+---
+
+There is a spatial anomaly in the `refmap_climatena` climatologies near Prince George, BC. This appears to be due to our use of the raster output from climateNA as the climr input data. We will fix this in the database ASAP. 
+
+climr output using refmap_climatena (March Tmax):
+
+![](plots_knownIssues/spatialAnomaly_TRUE.png){width=100%}
+
+Point query output direct from ClimateNA:
+
+![](plots_knownIssues/spatialAnomaly_FALSE.png){width=100%}
+
