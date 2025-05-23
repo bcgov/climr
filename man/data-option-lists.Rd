@@ -41,7 +41,7 @@ list_gcm_hist_years()
 
 \item{ssp}{Name of scenario Must be one of the elements in list_ssps().}
 
-\item{set}{character. One of All, Monthly, Seasonal, Annual, or any combination thereof. Defaults to "All".}
+\item{set}{character. One of \code{c("All", "Monthly", "Seasonal", "Annual")} or any combination thereof. Defaults to "All".}
 
 \item{only_extra}{logical. Should Tmin, Tmax and PPT be excluded? Defaults to FALSE.}
 }
@@ -55,9 +55,9 @@ a character vector.
 
 \code{list_gcm_periods} lists available 20-year normal periods for GCM simulations.
 
-lists available runs for a given GCM/ssp.
+\code{list_runs_ssp} lists available runs for a given GCM/ssp.
 
-lists available runs from the historical simulation (1851-2014) for a specified GCM.
+\code{list_runs_historic} lists available runs from the historical simulation (1851-2014) for a specified GCM.
 
 \code{list_refmaps} lists available reference maps of gridded climate normals
 
@@ -72,12 +72,14 @@ lists available runs from the historical simulation (1851-2014) for a specified 
 \code{list_gcm_hist_years} lists available years for time series of global climate model historical simulations
 }
 \details{
+The eight-gcm ensemble recommended by Mahony et al. (2022) can be specified as \code{gcms = list_gcm()[c(1,4,5,6,7,10,11,12)]}.
+
 Currently available reference maps of gridded climate normals (\code{list_refmaps()}) are:
 \itemize{
 \item "refmap_climatena" for Climate NA derived normals
-\item "refmap_prism" for British Columbia PRISM climatologies derived normals
 \item "refmap_climr" for a composite of BC PRISM, adjusted US PRISM and
-DAYMET (Alberta and Saskatchewan), covering western Canada and western
-US.
+DAYMET (Alberta and Saskatchewan), covering North America
 }
+
+A lookup table of variable names, units, types, and other attributes is available by calling \code{data(variables)}.
 }

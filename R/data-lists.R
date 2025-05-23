@@ -4,6 +4,10 @@
 #'
 #' @description
 #' `list_gcms` lists available global climate models.
+#' 
+#' @details
+#' The eight-gcm ensemble recommended by Mahony et al. (2022) can be specified as `gcms = list_gcm()[c(1,4,5,6,7,10,11,12)]`. 
+#' 
 #'
 #' @rdname data-option-lists
 #' @export
@@ -38,7 +42,7 @@ list_gcm_periods <- function() {
 
 
 #' @description
-#' lists available runs for a given GCM/ssp.
+#' `list_runs_ssp` lists available runs for a given GCM/ssp.
 #' @param gcm Name of GCM. Must be one of the elements in list_gcms().
 #' @param ssp Name of scenario Must be one of the elements in list_ssps().
 #' @importFrom data.table fread
@@ -47,13 +51,11 @@ list_gcm_periods <- function() {
 #' @rdname data-option-lists
 #' @export
 list_runs_ssp <- function(gcm, ssp){
-  rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
-  runs <- fread(file.path(rInfoPath, "gcm_periods.csv"))
-  runs[mod == gcm & scenario == ssp, run]
+  .globals[["gcm_period_runs"]][mod %in% gcm & scenario %in% ssp, run]
 }
 
 #' @description
-#' lists available runs from the historical simulation (1851-2014) for a specified GCM.
+#' `list_runs_historic` lists available runs from the historical simulation (1851-2014) for a specified GCM.
 #' @param gcm Name of GCM
 #' @importFrom data.table fread
 #' @importFrom tools R_user_dir
@@ -61,9 +63,7 @@ list_runs_ssp <- function(gcm, ssp){
 #' @rdname data-option-lists
 #' @export
 list_runs_historic <- function(gcm){
-  rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
-  runs <- fread(file.path(rInfoPath, "gcm_hist.csv"))
-  runs[mod == gcm, run]
+  .globals[["gcm_hist_runs"]][mod %in% gcm, run]
 }
 
 #' @description
@@ -72,15 +72,13 @@ list_runs_historic <- function(gcm){
 #' @details
 #' Currently available reference maps of gridded climate normals (`list_refmaps()`) are:
 #'   * "refmap_climatena" for Climate NA derived normals
-#'   * "refmap_prism" for British Columbia PRISM climatologies derived normals
 #'   * "refmap_climr" for a composite of BC PRISM, adjusted US PRISM and
-#'     DAYMET (Alberta and Saskatchewan), covering western Canada and western
-#'     US.
+#'     DAYMET (Alberta and Saskatchewan), covering North America
 #'
 #' @rdname data-option-lists
 #' @export
 list_refmaps <- function() {
-  c("refmap_climatena", "refmap_prism", "refmap_climr")
+  c("refmap_climr", "refmap_climatena")
 }
 
 
@@ -95,8 +93,11 @@ list_obs_periods <- function() {
 
 #' @description
 #' `list_vars` lists available climate variables
-#'
-#' @param set character. One of All, Monthly, Seasonal, Annual, or any combination thereof. Defaults to "All".
+#' 
+#' @details
+#' A lookup table of variable names, units, types, and other attributes is available by calling `data(variables)`.
+#' 
+#' @param set character. One of `c("All", "Monthly", "Seasonal", "Annual")` or any combination thereof. Defaults to "All".
 #' @param only_extra logical. Should Tmin, Tmax and PPT be excluded? Defaults to FALSE.
 #'
 #' @rdname data-option-lists
@@ -107,9 +108,9 @@ list_vars <- function(set = c("All", "Monthly", "Seasonal", "Annual"), only_extr
   }
   set <- match.arg(set, several.ok = TRUE)
   if ("All" %in% set) {
-    res <- variables[["Code"]]
+    res <- climr::variables[["Code"]]
   } else {
-    res <- variables[["Code"]][variables[["Category"]] %in% set]
+    res <- climr::variables[["Code"]][climr::variables[["Category"]] %in% set]
   }
   if (isTRUE(only_extra)) {
     res <- res[!grepl("(^PPT|^Tmax|^Tmin)", res)]
@@ -124,7 +125,7 @@ list_vars <- function(set = c("All", "Monthly", "Seasonal", "Annual"), only_extr
 #' @rdname data-option-lists
 #' @export
 list_obs_years <- function() {
-  1901:2023
+  1901:2024
 }
 
 #' @description

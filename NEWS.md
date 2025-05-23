@@ -1,3 +1,31 @@
+# `climr` 0.2.0
+
+We have lots of exciting improvements in this release! Of major note, we now have:
+- Native raster downscaling, allowing SpatRaster elevation input, and returning a SpatRaster stack of downscaled variables at user-specified resolution
+- Optional in-database downscaling. This is especially useful for reducing the time required for downscaling timeseries data
+- An updated climr mosaic base climatology, covering the full North America domain, and using some cool generative deep-learning models for filling in missing areas
+- A third timeseries dataset based on MSWX/MSWEP
+
+## Breaking Changes
+- We having improved the database connection algorithm, and have removed the `dbCon` parameter from all `input_*` functions. If you supply a database connection, it will give an error. 
+- Previously, `climr` expected the bounding box vector to be in the reverse of the standard order. We have changed this so you can now directly supply a `terra::ext` object. 
+- Since all base climatologies now cover the full NA domain, we have removed the `auto` option from `which_refmap`. The default is now `refmap_climr`. 
+
+## Bug Fixes
+
+-   Fixed a bug that caused failure in downloads of gcm time series. 
+-   Fixed a bug in the CNRM-ESM2-1 future time series
+
+## Enhancements
+
+-   Added a new parameter `db_option` to downscale, with options `local`, `database`, or `auto` to specify where the downscaling should occur. Option `auto` attempts to choose the best option based on the number of points and type of query. 
+-   Added a new boolean parameter `ensemble_mean` to downscale, to optionally not return the ensemble mean of model runs. 
+-   Expanded the climr mosaic of 1981-2010 gridded climatologies to the full North American domain. Learn about it [here](articles/methods_mosaic.html).
+-   Added a 1901-2024 gridded observational time series based on the multi-source weather (MSWX/MSWEP) dataset. Learn about it [here](articles/guidance_timeSeries.html)
+-   New function `legend_ramp()` for simplified legend plotting on color ramp maps, including accommodation of logarithmic scaling. 
+-   New function `logVars()` for logarithmic transformation of specified columns in any data.table. 
+-   Added a Known Issues section to the vignettes, including the [FFP, NFFD, and PAS discrepancies with ClimateNA](articles/knownIssues_DiscrepanciesWithClimateNA.html) and a [workaround for using custom refmaps](articles/knownIssues_customRefmap.html).
+
 # `climr` 0.1.1
 
 ## Bug Fixes

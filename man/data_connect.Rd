@@ -2,13 +2,23 @@
 % Please edit documentation in R/database.R
 \name{data_connect}
 \alias{data_connect}
-\title{Connect to PostGIS database}
+\alias{connections}
+\alias{connections_clear}
+\title{List connections in cache}
 \usage{
-data_connect()
+data_connect(profile = .globals[["sessprof"]]$list())
+
+connections()
+
+connections_clear()
 }
-\value{
-pool object of database connection
+\arguments{
+\item{profile}{Either \code{climr-db-user} or \code{local}.}
 }
 \description{
-Connect to PostGIS database
+List connections in cache
+
+List connections in cache
+
+Clear connections in cache
 }

@@ -2,46 +2,73 @@
 % Please edit documentation in R/gcm.R
 \name{input_gcms}
 \alias{input_gcms}
+\alias{input_gcms_db}
 \alias{input_gcm_hist}
+\alias{input_gcm_hist_db}
 \alias{input_gcm_ssp}
+\alias{input_gcm_ssp_db}
 \title{Retrieve global climate model anomalies for \code{downscale_core}.}
 \usage{
 input_gcms(
-  dbCon,
   bbox = NULL,
   gcms = list_gcms(),
   ssps = list_ssps(),
   period = list_gcm_periods(),
   max_run = 0L,
+  ensemble_mean = TRUE,
   cache = TRUE,
+  run_nm = NULL
+)
+
+input_gcms_db(
+  gcms = list_gcms(),
+  ssps = list_ssps(),
+  period = list_gcm_periods(),
+  max_run = 0L,
+  ensemble_mean = TRUE,
   run_nm = NULL
 )
 
 input_gcm_hist(
-  dbCon,
   bbox = NULL,
   gcms = list_gcms(),
   years = 1901:2014,
   max_run = 0L,
+  ensemble_mean = TRUE,
   cache = TRUE,
   run_nm = NULL
 )
 
+input_gcm_hist_db(
+  gcms = list_gcms(),
+  years = 1901:2014,
+  max_run = 0L,
+  ensemble_mean = TRUE,
+  run_nm = NULL
+)
+
 input_gcm_ssp(
-  dbCon,
   bbox = NULL,
   gcms = list_gcms(),
   ssps = list_ssps(),
   years = 2020:2030,
   max_run = 0L,
+  ensemble_mean = TRUE,
   cache = TRUE,
   run_nm = NULL,
   fast = TRUE
 )
+
+input_gcm_ssp_db(
+  gcms = list_gcms(),
+  ssps = list_ssps(),
+  years = 2020:2030,
+  max_run = 0L,
+  ensemble_mean = TRUE,
+  run_nm = NULL
+)
 }
 \arguments{
-\item{dbCon}{A db connection object created by \code{data_connect}.}
-
 \item{bbox}{numeric. Vector of length 4 giving bounding box of study region, in the order ymax,ymin,xmax,xmin. In general this is created by \code{get_bb()}, but can also be user-defined.}
 
 \item{gcms}{character. Vector of labels of the global circulation models to use.
@@ -53,9 +80,12 @@ Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to all scenarios ava
 \item{period}{character. Vector of labels of the periods to use.
 Can be obtained from \code{\link[=list_gcm_periods]{list_gcm_periods()}}. Defaults to all periods available.}
 
-\item{max_run}{integer. Maximum number of model runs to include.
-A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
+\item{max_run}{integer. Maximum number of model runs to include, not including the ensemble mean.
+Runs are included in the order they
 are found in the models data until \code{max_run} is reached. Defaults to 0L.}
+
+\item{ensemble_mean}{Logical. Return the mean of the individual GCM runs? If \code{ensemble_mean = TRUE} and \code{max_run = 0}, only
+the mean will be returned. To return an individual run and exclude the mean, set \code{ensemble_mean = FALSE} and \code{max_run = 1}.}
 
 \item{cache}{logical. Specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 
@@ -104,16 +134,13 @@ xyz <- data.frame(lon = runif(10, -140, -106), lat = runif(10, 37, 61), elev = r
 ## get bounding box based on input points
 thebb <- get_bb(xyz)
 
-## get database connection
-dbCon <- data_connect()
 
-gcms <- input_gcms(dbCon, thebb, list_gcms()[1], list_ssps()[1])
+gcms <- input_gcms(thebb, list_gcms()[1], list_ssps()[1])
 
 ## show ensemble means only
 lyrs <- grep("ensemble", names(gcms$`ACCESS-ESM1-5`))
 
 plot(gcms$`ACCESS-ESM1-5`[[lyrs]])
-pool::poolClose(dbCon)
 }
 \seealso{
 \code{\link[=downscale_core]{downscale_core()}}

@@ -1,8 +1,496 @@
 library(data.table)
-
 library(terra)
 library(climr)
+library(RPostgres)
 
+library(climr)
+library(dplyr)
+
+xyz <- data.table(sg_id = 1, id = 9999, lon = -125.9912109375, lat = 54.901882187385, elev = 0)
+dat <- downscale(xyz = xyz, which_refmap = "refmap_climr", obs_periods = "2001_2020", 
+                 obs_years = NULL, obs_ts_dataset = NULL, return_refperiod = FALSE, 
+                 gcms = NULL, ssps = NULL, gcm_periods = NULL, gcm_ssp_years = NULL, 
+                 gcm_hist_years = NULL, max_run = 0, run_nm = NULL, vars = NULL, ppt_lr = FALSE)
+dat <- climr::downscale(xyz = in_xyz, which_refmap = "refmap_climr", obs_periods = "2001_2020", obs_years = NULL, obs_ts_dataset = NULL, return_refperiod = FALSE, gcms = NULL, ssps = NULL, gcm_periods = NULL, gcm_ssp_years = NULL, gcm_hist_years = NULL, max_run = 0, run_nm = NULL, ppt_lr = FALSE)
+
+dbCon <- data_connect()
+in_xyz <- data.frame(
+   lon = c(-127.7052, -127.6227, -127.5623, -127.7162, -127.1858, -127.125, -126.9495, -126.9550),
+   lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
+   elev = c(291, 296, 626, 377, 424, 591, 723, 633),
+   id = 1:8
+  )
+
+
+dir <- paste("//objectstore2.nrs.bcgov/ffec/Climatologies/PRISM_BC/PRISM_dem/", sep="")
+dem.bc <- rast("../Common_Files/PRISM_dem.tiff")
+
+my_grid <- as.data.frame(dem.bc, cells = TRUE, xy = TRUE)
+colnames(my_grid) <- c("id", "lon", "lat", "elev") # rename column names to what climr expects
+
+varsl = c("DD5", "DDsub0_at", "DDsub0_wt", "PPT_05", "PPT_06", "PPT_07", "PPT_08",
+          "PPT_09", "CMD", "PPT_at", "PPT_wt", "CMD_07", "SHM", "AHM", "NFFD", "PAS",
+          "CMI", "Tmax_sm", "TD", "PPT_sm", "DD5_sp",
+          "PPT_sp", "PPT_sm", "Tmax_at", "Tmax_wt", "Tmax_sp", "Tmax_sm","Tmin_at", "Tmin_wt", "Tmin_sp", "Tmin_sm")
+varsl<-unique(varsl)#make sure no dups
+
+
+clim.bcv <- downscale(
+  xyz = my_grid[0:100000,],
+  which_refmap = "refmap_climr",
+  vars = varsl)
+
+rtemp <- unwrap(dem_vancouver)
+
+clim_out <- downscale(rtemp, gcms = list_gcms()[4], ssps = "ssp245", gcm_periods = "2041_2060", vars = c("MAP","MAT"))
+
+vars_reg <- sort(sprintf(c("PPT_%02d", "Tmax_%02d", "Tmin_%02d"), sort(rep(1:12, 3))))
+temp <- climr::downscale(xyz = rtemp, which_refmap = "refmap_climr", 
+                        obs_periods = "2001_2020",  obs_years = 2024, 
+                         obs_ts_dataset = "mswx.blend", return_refperiod = FALSE,
+                         gcms = NULL, ssps = NULL, gcm_periods = NULL, 
+                         gcm_ssp_years = NULL, gcm_hist_years = NULL, 
+                         max_run = 0, run_nm = NULL, vars = vars_reg, ppt_lr = FALSE)
+
+clim <- downscale(in_xyz, 
+                  which_refmap = "refmap_climr", 
+                  obs_periods = "2001_2020",
+                  obs_years = 1901:2020,
+                  obs_ts_dataset = c("cru.gpcc", "mswx.blend"),
+                  db_option = "database")
+
+test <- downscale(in_xyz[1:4,], obs_years = 2001:2023, obs_ts_dataset = c("mswx.blend","cru.gpcc"), 
+                  return_refperiod = FALSE, vars = c("PPT_04","Tmin_12","Tmax_08")) 
+ts.climateNA <- downscale(in_xyz, which_refmap = "refmap_climr", obs_years = 1901:2023, obs_ts_dataset = "cru.gpcc", return_refperiod=F)
+
+t1 <- test[id == 1,]
+library(ggplot2)
+ggplot(t1, aes(x = PERIOD, y = PPT_04, colour = DATASET, group = DATASET)) +
+  geom_line()
+
+#low res dem for north america
+dem <- rast("//objectstore2.nrs.bcgov/ffec/DEM/DEM_NorAm/dem_noram_lowres.tif")
+
+my_grid <- as.data.frame(dem, cells = TRUE, xy = TRUE)
+colnames(my_grid) <- c("id", "lon", "lat", "elev") # rename column names to what climr expects
+climr <- downscale(xyz = my_grid, which_refmap = "refmap_climr", 
+                   obs_periods = "2001_2020", vars = c("Tmin_01","Tmin_07"))
+
+thebb <- get_bb(my_grid)
+
+dbCon <- data_connect()
+
+refmap <- input_refmap(dbCon, thebb, reference = "refmap_climr")
+
+var="Tmin_01"
+par(mfrow=c(1,2), mar=c(0,0,2,2))
+values(X) <- NA
+
+plot(refmap[[names(refmap)==var]], main=paste("climr refmap", var), axes=F)
+
+data_climr <-   climr[,get(var)]
+X[climr[, id]] <- data_climr
+plot(X, main=paste("climr downscaled", var), axes=F)
+s <- which(data_climr>100)
+points(my_grid$lon[s], my_grid$lat[s])
+
+## climr data
+climr <- downscale(xyz = my_grid, which_refmap = "refmap_climatena", vars = list_vars())
+
+
+
+# Get lat, long, and elevation for 7 locations in BC
+test_pts<-data.frame(id = seq(1,6,by=1),
+                     lon = c(-120.1879,-120.4258,-121.9251,-120.3030,-127.5062,-127.6785),
+                     lat = c(59.3396, 57.4644, 59.9900, 55.2420, 54.0191, 54.1638),
+                     elev = c(441.9092,901.2709,461.7851,926.7590,1098.2932,1022.2858)
+)
+
+clim_vars <- climr::downscale(test_pts,  
+                              vars = list_vars(), 
+                              return_refperiod = TRUE, 
+                              obs_periods = c("2001_2020"),
+                              obs_years = 2022)
+
+clim_vars <- climr::downscale(test_pts,  
+                              vars = list_vars(), 
+                              return_refperiod = TRUE, 
+                              obs_periods = c("2001_2020"),
+                              obs_years = 2022, 
+                              obs_ts_dataset = "cru.gpcc",
+                              db_option = "database")
+
+plot_bivariate(test_pts[1,])
+
+ds_out <- downscale_db(xyz = test_pts, 
+                       which_refmap = "refmap_climr",
+                       gcm_hist_years = 1960:2014,
+                       gcm_ssp_years = 2015:2100,
+                       ssps = c("ssp245"), 
+                       max_run = 1,
+                       gcms = list_gcms()[4],
+                       vars = c("Tmax_sm", "PPT_sm"))
+
+ds_out <- downscale(
+  xyz = test_pts,
+  which_refmap = "refmap_climr",
+  gcm_hist_years = 1960:2014,
+  gcm_ssp_years = 2015:2100,
+  ssps = c("ssp245"),
+  max_run = 3,
+  gcms = list_gcms()[3:4],
+  vars = c("Tmax_sm", "PPT_sm"),
+  db_option = "auto")
+
+ds_out <- downscale(
+  xyz = test_pts,
+  gcms = list_gcms()[1:4],
+  ssps = "ssp245",
+  gcm_periods = list_gcm_periods(),
+  db_option = "local")
+
+ds_out <- downscale(
+  xyz = test_pts,
+  which_refmap = "refmap_climr",
+  gcms = list_gcms()[1:4],
+  ssps = "ssp245",
+  gcm_periods = list_gcm_periods(),
+  db_option = "database")
+
+ds_out <- downscale(
+  xyz = test_pts,
+  which_refmap = "refmap_climr",
+  gcms = list_gcms()[1:4],
+  ssps = "ssp245",
+  gcm_periods = list_gcm_periods(),
+  obs_years = 1951:2010,
+  obs_ts_dataset = "cru.gpcc",
+  db_option = "auto")
+
+ds_out2<-ds_out[!is.na(GCM),]
+
+par(mfrow=c(3,2))
+for(i in 1:3){
+  x <- ds_out2[GCM=="CNRM-ESM2-1" & id == i & RUN == "r1i1p1f2", PERIOD]
+  y <- ds_out2[GCM=="CNRM-ESM2-1" & id == i & RUN == "r1i1p1f2", Tmax_sm]
+  plot(x,y, type="l", main="CNRM-ESM2-1")
+  
+  x <- ds_out2[GCM=="CanESM5" & id == i & RUN == "r2i1p1f1", PERIOD]
+  y <- ds_out2[GCM=="CanESM5" & id == i & RUN == "r2i1p1f1", Tmax_sm]
+  plot(x,y, type="l", main="CanESM5")
+}
+
+par(mfrow=c(2,2))
+for(i in unique(ds_out2[GCM=="CNRM-ESM2-1", RUN])){
+  x <- ds_out2[GCM=="CNRM-ESM2-1" & id == 1 & RUN == i, PERIOD]
+  y <- ds_out2[GCM=="CNRM-ESM2-1" & id == 1 & RUN == i, Tmax_sm]
+  plot(x,y, type="l", main=i)
+  
+}
+
+my_points <- data.frame(
+  lon = c(-127.7300, -127.7500),
+  lat = c(55.34114, 55.25),
+  elev = c(711, 500),
+  id = 1:2
+)
+
+bb <- get_bb(my_points)
+dbCon <- data_connect()
+res <- input_refmap(dbCon, bb)
+res2 <- input_refmap(dbCon, bb, reference = "refmap_climatena")
+
+
+rf <- "normal_na"
+    q <- "
+        SELECT min(ST_UpperLeftX(rast)) xmin,
+               max(ST_UpperLeftX(rast)+ST_Width(rast)*ST_PixelWidth(rast)) xmax,
+               min(ST_UpperLeftY(rast)-ST_Height(rast)*abs(ST_PixelHeight(rast))) ymin,
+               max(ST_UpperLeftY(rast)) ymax
+        FROM %s" |> sprintf(rf)
+
+tst <- climr:::db_safe_query(q)    
+
+plot(res2$Tmax_07)
+# draw the plot
+plot_bivariate(my_points)
+
+my_data <- plot_timeSeries_input(my_points)
+plot_timeSeries(my_data, var1 = "DD5")
+
+in_xyz <- data.frame(
+     lon = c(-127.7052, -127.6227, -127.5623, -127.7162, -127.1858, -127.125, -126.9495, -126.9550),
+     lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
+     elev = c(291, 296, 626, 377, 424, 591, 723, 633),
+     id = 1:8
+   )
+ clim3 <- downscale(xyz = in_xyz, 
+                   which_refmap = "refmap_climr", 
+                    gcms = list_gcms()[1], 
+                    ssps = list_ssps()[2],
+                    gcm_periods = list_gcm_periods()[3], 
+                    gcm_ssp_years = 2030:2040,
+                    db_option = "auto"
+                     )
+
+ t1 <- input_refmap(get_bb(in_xyz))
+ 
+ t2 <- input_refmap(get_bb(test_pts), reference = "refmap_climatena")
+ 
+ 
+ bc <- bcmaps::bc_bound()
+ dem <- rast("../Common_Files/PRISM_dem.tiff")
+ dir <- paste("//objectstore2.nrs.bcgov/ffec/Climatologies/PRISM_BC/PRISM_dem/", sep="")
+ dem <- rast(paste(dir, "PRISM_dem.asc", sep=""))
+ dem <- aggregate(dem, fact=3)
+ bc <- vect(bc)
+ bc <- project(bc, crs(dem))
+ dem <- mask(dem, bc)
+ dem <- trim(dem)
+ 
+ res <- downscale(dem, vars = c("MAT","CMD"))
+ 
+ # climr data
+ grid <- as.data.frame(dem, cells = TRUE, xy = TRUE)
+ colnames(grid) <- c("id", "lon", "lat", "elev") # rename column names to what climr expects
+ setDT(grid)
+ 
+ bbox <- c(-134,-124,61,65)
+ bb2 <- ext(bbox)
+ 
+ test2 <- input_gcms(bb2, gcms = list_gcms()[1], ssps = list_ssps()[2], period = "2041_2060")
+
+ test <- input_refmap(bbox, reference = "refmap_climr")
+ plot(test[[18]])
+ clim.grid <- downscale(xyz = grid, 
+                        which_refmap = "refmap_climr", 
+                        gcms = list_gcms()[1], 
+                        ssps = list_ssps()[3],
+                        gcm_periods = list_gcm_periods()[3], 
+                        ensemble_mean = TRUE,
+                        max_run = 0,
+                        vars = list_vars("Annual")
+ )
+ 
+ clim.grid <- downscale(xyz = grid, 
+                        which_refmap = "refmap_climr", 
+                        gcms = list_gcms()[1], 
+                        ssps = list_ssps()[2],
+                        gcm_periods = list_gcm_periods()[3], 
+                        max_run = 2,
+                        vars = c("CMD", "Tmin_07")
+ )
+ 
+res <- downscale(dem, 
+                 which_refmap = "refmap_climr", 
+                 gcms = list_gcms()[1], 
+                 ssps = list_ssps()[2],
+                 gcm_periods = list_gcm_periods(),
+                 vars = c("CMD", "Tmin_07"))
+
+
+library(climr)
+library(tidyverse)
+library(terra)
+library(data.table)
+
+## provide a data.frame or data.table of point coordinates, IDs and elevation
+BEC_data<-readRDS("../../../Downloads/BEC_data.rds") #change this to OS #13 
+
+#pull out plot data 
+plot_dat<-BEC_data$env #70,547 plots
+
+#make dataframe for extracting climate data
+my_points <- select(plot_dat, Longitude, Latitude, Elevation, PlotNumber, ProjectID) %>%
+  rename(lon = Longitude,   lat = Latitude, 
+         elev = Elevation)%>%
+  mutate(id = seq_along(lon)) %>%
+  na.omit() #remove NAs- 59,345 plots with GPS locations 
+
+#look at options 
+#what to select here?
+list_obs_periods()
+list_obs_years()
+list_vars() 
+
+vars<-climr::variables #look up table for vars 
+var_names<-vars$Code
+
+## climr query for the historic data - only using 1961-1990 for now 
+## what is the resolution/scale of these data? PRISM 800m downscaled to plot-level (accuracy of GPS points and elevation- double checks elev vals make bigger difference)
+#cache_clear()
+setDT(my_points)
+clim_dat <- downscale(
+  xyz = my_points, which_refmap = "refmap_climr", 
+  #historic_period = "2001_2020", 
+  #historic_ts = C(1961:1990),
+  #gcm_models = c("GFDL-ESM4", "EC-Earth3"), # specify two global climate models
+  #ssp = c("ssp370", "ssp245"), # specify two greenhouse gas concentration scenarios
+  #gcm_period = c("2001_2020", "2041_2060"), # specify two 20-year periods
+  #max_run = 3, # specify 3 individual runs for each model
+  #  vars = c("PPT", "MAT", "CMD", 'AHM', 'CMI', 'DD5', 'TD', "PPT_10"))  #TD variable?? continentality??
+  vars=list_vars()) 
+
+boundary <- bb
+dbCon <- data_con()
+bc_bb <- c(59,57,-120,-121)
+
+in_xyz <- data.frame(
+  lon = c(-127.7052, -127.6227, -127.5623, -127.7162, -127.1858, -127.125, -126.9495, -126.9550),
+  lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
+  elev = c(291, 296, 626, 377, 424, 591, 723, 633),
+  id = 1:8
+)
+data <- downscale(in_xyz, which_refmap = "refmap_climr", obs_periods = "2001_2020", vars = c("MAT","MAP","CMD"))
+dem <- rast("data-raw/dem_mosaic/climr_mosaic_dem.tif")
+dem2 <- crop(dem, ext(res2))
+
+res3 <- downscale(dem2, which_refmap = "refmap_climr", vars = c("MAT","MAP","CMD"))
+
+library(tictoc)
+tic()
+res <- dbGetRaster(dbCon, "normal_composite", TRUE, bands = 1:73, boundary = bc_bb)
+toc()
+
+conn <- data_con()
+tic()
+res2 <- pgGetTerra(conn, "normal_composite", TRUE, bands = 1:73, boundary = bc_bb)
+toc()
+
+projID <- 4326L
+rids <- climr:::db_safe_query("
+    select rid
+    from \"%s\"
+    WHERE ST_Intersects(ST_ConvexHull(%s), ST_GeomFromText('POLYGON((%s %s,%s %s,%s %s,%s %s,%s %s))', %s))" |> 
+                        sprintf("normal_composite", "rast", boundary[4], boundary[1], boundary[4], boundary[2],
+                                 boundary[3], boundary[2], boundary[3], boundary[1], boundary[4], boundary[1],
+                                 projID)
+)
+
+txt <- "select rid
+    from \"%s\"
+    WHERE ST_Intersects(ST_ConvexHull(%s), ST_GeomFromText('POLYGON((%s %s,%s %s,%s %s,%s %s,%s %s))', %s))" |> 
+  sprintf("normal_composite", "rast", boundary[4], boundary[1], boundary[4], boundary[2],
+           boundary[3], boundary[2], boundary[3], boundary[1], boundary[4], boundary[1],
+           4326)
+
+rids <- climr:::db_safe_query("
+    select rid
+    from \"%s\"
+    WHERE ST_Intersects(ST_ConvexHull(%s), ST_GeomFromText('POLYGON((%s %s,%s %s,%s %s,%s %s,%s %s))', %s))"
+                      |> sprintf("normal_composite", "rast", boundary[4], boundary[1], boundary[4], boundary[2],
+                                 boundary[3], boundary[2], boundary[3], boundary[1], boundary[4], boundary[1],
+                                 4326L)
+)
+res <- input_refmap(dbCon, bb)
+res2 <- input_refmap(dbCon, bb, reference = "refmap_climatena")
+
+projID <- climr:::db_safe_query("
+    select ST_SRID(%s) as srid
+    from \"%s\" where rid = 1;
+  " |> sprintf("rast", "normal_bc")
+)$srid[1]
+
+# generate the input data
+my_data <- plot_timeSeries_input_db(my_points[1,], gcms = list_gcms()[1])
+
+# use the input to create a plot
+plot_timeSeries(my_data, var1 = "Tmin_sm")
+
+plot_bivariate_db(my_points)
+
+plot_climate_stripes()
+
+dbCon <- data_connect()
+bbox <- c(55,51.5,-115,-128)
+
+cache_clear("reference")
+climna <- input_refmap(dbCon, bbox)
+plot(climna[[15]])
+
+pnts <- data.table(lon = c(-127.18, -123.46, -125), lat = c(54.89, 48.78, 48.3), elev = c(540,67, 102), id = 1:3)
+pnts <- data.table(lon = c(-121.20225,-126.39689,-117.97568,-127.29956,-127.12704,-118.7898,-123.45617,-123.37194), 
+                   lat = c(50.77239,54.73596,50.28127,50.28127,54.83288,50.24118,48.79616,52.49457), 
+                   elev = c(588,985,1067,55,563,799,306,1103), 
+                   id = c("BGxm1","SBSmc2","ICHmw2","CWHvm1","SBSdk","ICHxm1","CDFmm","SBPSdc"))
+
+res <- downscale(pnts, obs_years = 1961:1990, obs_ts_dataset = "cru.gpcc", return_refperiod = FALSE, indiv_tiles = TRUE, db_option = "local")
+
+name <- "normal_composite"
+bands <- 1:73
+
+dbGetTiles <- function(dbCon, name, pnts, rast = "rast", bands = 1:73){
+  
+  pnts[,mls := paste0("(",lon," ",lat,")")]
+  wkt_str <- paste0("MULTIPOINT(", paste(pnts$mls, collapse = ", "),")")
+  qry <- paste0("select rid as id,
+            st_xmax(st_envelope(rast)) as xmx,
+            st_xmin(st_envelope(rast)) as xmn,
+            st_ymax(st_envelope(rast)) as ymx,
+            st_ymin(st_envelope(rast)) as ymn,
+            st_width(rast) as cols,
+            st_height(rast) as rows
+            from
+            ", name," 
+            WHERE ST_Intersects(
+              rast,ST_SetSRID(
+                ST_GeomFromText('",wkt_str,"'),
+                4326
+              )
+            )
+            ")
+  
+  info <- dbGetQuery(dbCon,qry)
+  
+  bandqs1 <- paste0("UNNEST(ST_Dumpvalues(rast, ", bands, ")) as vals_", bands)
+  
+  qry2 <- paste0("select rid, ", 
+         paste(bandqs1, collapse = ", "),
+         " from ", name,
+         " where rid IN (",paste(info$id, collapse = ", "),")")
+  r_values <- dbGetQuery(dbCon,qry2)
+  
+  rast_vals <- suppressWarnings(melt(r_values, id.vars = c("rid")))
+  out_list <- list()
+  for(tile in unique(info$id)){
+    info_tl <- info[info$id == tile,]
+    rout <- rast(
+      nrows = info_tl$rows, ncols = info_tl$cols, xmin = info_tl$xmn,
+      xmax = info_tl$xmx, ymin = info_tl$ymn, ymax = info_tl$ymx, nlyrs = length(bands),
+      crs = paste0("EPSG:", 4326), vals = rast_vals$value[rast_vals$rid == tile]
+    )
+    out_list[[as.character(tile)]] <- rout
+  }
+  
+  rsrc <- sprc(out_list)
+  rast_res <- merge(rsrc)
+  return(rast_res)
+}
+
+out <- dbGetTiles(dbCon, "\"gcm_mpi-esm1-2-hr\"", pnts)
+plot(out[[15]])
+out <- dbGetTiles(dbCon, "normal_composite", pnts)
+plot(out[[15]])
+
+
+varsl = c("DD5", "DDsub0_at", "DDsub0_wt", "PPT_05", "PPT_06", "PPT_07", "PPT_08",
+          "PPT_09", "CMD", "PPT_at", "PPT_wt", "CMD_07", "SHM", "AHM", "NFFD", "PAS", 
+          "CMI", "Tmax_sm", "TD", "PPT_sm", "DD5_sp", "PPT_sp", "PPT_sm", "Tmax_at", "Tmax_wt", "Tmax_sp", "Tmax_sm",
+          "Tmin_at", "Tmin_wt", "Tmin_sp", "Tmin_sm")
+varsl = unique(varsl)
+
+cache_clear()
+load("my_grid.Rdata")
+setDT(my_grid)
+my_grid <- my_grid[lat < 60,]
+clim.bc <- downscale(
+  xyz = my_grid,   which_refmap = "auto",
+  obs_periods = "2001_2020", 
+  vars = varsl)
+
+
+
+bc_pnts <- c(59.9987500001111, 48.3126388889072, -114.057083333295, -138.998750000111)
 
 wlr <- rast("../Common_Files/composite_WNA_dem.tif")
 plot(wlr)
@@ -17,6 +505,10 @@ db <- data_connect()
 bbox <- get_bb(my_grid)
 bbox2 <- c(20,14.83,-80,-120)
 refmap <- input_refmap(db, bbox)
+
+db <- data_connect()
+refmap_na <- input_refmap(db, bbox = bc_pnts, reference = "refmap_climr")
+plot(refmap_na$Tmax_07)
 
 plot(refmap$Tmax_07)
 
@@ -66,7 +558,7 @@ my_points <- data.frame(
   lon = c(-123.4404, -123.5064, -124.2317),
   lat = c(48.52631, 48.46807, 49.21999),
   elev = c(52, 103, 357),
-  id = LETTERS[1:3]
+  id = seq_len(3)
 )
 
 ## climr query for the data.frame
@@ -131,7 +623,7 @@ my_points <- data.frame(
   lon = c(-123.4404, -123.5064, -124.2317),
   lat = c(48.52631, 48.46807, 49.21999),
   elev = c(52, 103, 357),
-  id = LETTERS[1:3]
+  id = seq_len(3)
 )
 
 # draw the plot
@@ -361,3 +853,58 @@ tic()
 clim_vars <- climr_downscale(coords, which_normal = "normal_composite", 
                                               vars = list_variables(), return_normal = T)
 toc()
+
+##original connection function
+#' Connect to PostGIS database
+#' 
+#' @return pool object of database connection
+#' @param local A logical. Use a local database. Default `FALSE`.
+#' @importFrom pool dbPool
+#' @importFrom RPostgres Postgres
+#' 
+#' @export
+# data_connect <- function(local = FALSE) {
+#   if(local){
+#     pool <- dbPool(
+#       drv = Postgres(),
+#       dbname = "climr",
+#       host = "localhost",
+#       port = 5432,
+#       user = "postgres",
+#       password = "climrserver"
+#     )
+#   }else{
+#     pool <- tryCatch(
+#       {
+#         dbPool(
+#           drv = Postgres(),
+#           dbname = "climr",
+#           host = "146.190.244.244",
+#           port = 5432,
+#           user = "climr_client",
+#           password = "PowerOfBEC2023"
+#         )
+#       },
+#       error = function(e) {
+#         tryCatch(
+#           {
+#             dbPool(
+#               drv = Postgres(),
+#               dbname = "climr",
+#               host = "146.190.244.244",
+#               port = 5432,
+#               user = "climr_client",
+#               password = "PowerOfBEC2023"
+#             )
+#           },
+#           error = function(f) {
+#             warning("Could not connect to database. Will try using cached data.")
+#             NULL
+#           }
+#         )
+#       }
+#     )
+#   }
+#   
+#   return(pool)
+# }

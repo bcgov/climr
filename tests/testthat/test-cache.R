@@ -1,6 +1,4 @@
 test_that("test cache in default location", {
-  dbCon <- data_connect()
-  on.exit(try(pool::poolClose(dbCon)), add = TRUE)
   xyz <- data.frame(
     lon = c(
       -127.70521, -127.62279, -127.56235, -127.7162,
@@ -8,7 +6,7 @@ test_that("test cache in default location", {
     ),
     lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
     elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
-    id = LETTERS[1:8]
+    id = seq_len(8)
   )
 
   thebb <- get_bb(xyz)
@@ -20,12 +18,11 @@ test_that("test cache in default location", {
   )
 
   #cache_clear()
-  normal <- input_refmap(dbCon = dbCon, bbox = thebb, cache = FALSE)
+  normal <- input_refmap(bbox = thebb, cache = FALSE)
   cachedirs <- normalizePath(list.dirs(cache_path(), recursive = FALSE), winslash = "/")
   #expect_false(any(expecteddirs %in% cachedirs))
 
   gcm1 <- input_gcms(
-    dbCon,
     thebb,
     gcms = "BCC-CSM2-MR",
     ssps = c("ssp126"),
@@ -36,17 +33,16 @@ test_that("test cache in default location", {
   #expect_false(any(expecteddirs %in% cachedirs))
 
   ds_res <- downscale(xyz,
-    which_refmap = "refmap_prism", obs_periods = "2001_2020",
+    which_refmap = "refmap_climr", obs_periods = "2001_2020",
     cache = FALSE
   )
   cachedirs <- normalizePath(list.dirs(cache_path(), recursive = FALSE), winslash = "/")
   #expect_false(any(expecteddirs %in% cachedirs))
 
-  normal <- input_refmap(dbCon = dbCon, bbox = thebb)
+  normal <- input_refmap(bbox = thebb)
   expect_true("reference" %in% list.files(cache_path()))
 
   gcm1 <- input_gcms(
-    dbCon,
     thebb,
     gcms = "BCC-CSM2-MR",
     ssps = c("ssp126"),
@@ -55,7 +51,7 @@ test_that("test cache in default location", {
   )
   expect_true("gcms" %in% list.files(cache_path()))
 
-  ds_res <- downscale(xyz, which_refmap = "refmap_prism", obs_periods = "2001_2020")
+  ds_res <- downscale(xyz, which_refmap = "refmap_climr", obs_periods = "2001_2020")
   expect_true("obs" %in% list.files(cache_path()))
 
 
@@ -109,7 +105,7 @@ test_that("test cache in default location", {
 #     ),
 #     lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
 #     elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
-#     id = LETTERS[1:8]
+#     id = seq_len(8)
 #   )
 # 
 #   cache_clear()
@@ -130,8 +126,6 @@ test_that("test cache in default location", {
 # })
 
 test_that("test cache works within same bbox", {
-  dbCon <- data_connect()
-  on.exit(try(pool::poolClose(dbCon)), add = TRUE)
 
   xyz <- data.frame(
     lon = c(
@@ -140,13 +134,13 @@ test_that("test cache works within same bbox", {
     ),
     lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
     elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
-    id = LETTERS[1:8]
+    id = seq_len(8)
   )
   thebb <- get_bb(xyz)
 
   #cache_clear()
-  normal <- input_refmap(dbCon = dbCon, bbox = thebb)
-  normal2 <- input_refmap(dbCon = NULL, bbox = thebb)
+  normal <- input_refmap(bbox = thebb)
+  normal2 <- input_refmap(bbox = thebb)
 
   expect_true(terra::compareGeom(normal, normal2, res = TRUE, lyrs = TRUE, stopOnError = FALSE))
 })

@@ -1,4 +1,8 @@
 test_that("calc_* functions work", {
+
+  tm <- c(2,4,5,NA,6,-14,-12,-11, NA)
+  tmr <- terra::rast(tm |> matrix(3,3, byrow = TRUE))
+  
   expect_identical(round(climr:::calc_DD_below_0(2, -14), 4), 393.9186)
   expect_identical(climr:::calc_DD_below_0(2, NA_real_), NA_real_)
 
@@ -11,50 +15,64 @@ test_that("calc_* functions work", {
   expect_identical(round(climr:::calc_DD_above_18(2, -14, "All"), 4), 0.0001)
   expect_identical(climr:::calc_DD_above_18(2, NA, "All"), NA_real_)
 
+  expect_s4_class(climr:::calc_DD_above_5(6, tmr), "SpatRaster")
+  expect_identical(climr:::calc_DD_above_5(6, tmr) |> terra::values(FALSE), climr:::calc_DD_above_5(6, tm))
+
   t_min_list <- list(
     "1" = -35, "2" = -32, "3" = -25, "4" = -10,
     "5" = -5, "6" = 3, "7" = 15, "8" = 17, "9" = 10, "10" = -5,
     "11" = -20, "12" = -30
   )
+  t_max_list <- lapply(t_min_list, \(x) -x)
+  t_min_list_r <- lapply(t_min_list, \(x) terra::rast(x |> matrix(1,1)))
+  t_max_list_r <- lapply(t_max_list, \(x) terra::rast(x |> matrix(1,1)))
+
+  a <- climr:::calc_EMT(t_min_list, climr:::calc_MCMT(t_min_list), climr:::calc_TD(climr:::calc_MCMT(t_min_list),climr:::calc_MWMT(t_max_list)))
+  b <- climr:::calc_EMT(t_min_list_r, climr:::calc_MCMT(t_min_list_r), climr:::calc_TD(climr:::calc_MCMT(t_min_list_r),climr:::calc_MWMT(t_max_list_r)))
+  expect_s4_class(b, "SpatRaster")
+  expect_equal(a, b |> terra::values(FALSE))
 
   expect_identical(
     round(climr:::calc_bFFP(td = 30, NFFD = 10, t_min_list = t_min_list), 4),
     214.5964
   )
-  expect_identical(climr:::calc_bFFP(td = 30, NFFD = NA, t_min_list = t_min_list), NA_real_)
-  expect_identical(climr:::calc_bFFP(td = NA, NFFD = 10, t_min_list = t_min_list), NA_real_)
+  expect_identical(climr::calc_bFFP(td = 30, NFFD = NA, t_min_list = t_min_list), NA_real_)
+  expect_identical(climr::calc_bFFP(td = NA, NFFD = 10, t_min_list = t_min_list), NA_real_)
+  expect_s4_class(climr::calc_bFFP(td = terra::rast(30 |> matrix(1,1)), NFFD = terra::rast(10 |> matrix(1,1)), t_min_list = t_min_list_r), "SpatRaster")
 
   expect_identical(
-    round(climr:::calc_eFFP(NFFD = 10, t_min_list = t_min_list), 4),
+    round(climr::calc_eFFP(NFFD = 10, t_min_list = t_min_list), 4),
     265.4581
   )
-  expect_identical(climr:::calc_eFFP(NFFD = NA, t_min_list = t_min_list), NA_real_)
+  expect_identical(climr::calc_eFFP(NFFD = NA, t_min_list = t_min_list), NA_real_)
+  expect_s4_class(climr::calc_eFFP(NFFD = terra::rast(10 |> matrix(1,1)), t_min_list = t_min_list), "SpatRaster")
 
   expect_identical(
-    round(climr:::calc_FFP(bFFP = 214.5964, eFFP = 265.4581), 4),
+    round(climr::calc_FFP(bFFP = 214.5964, eFFP = 265.4581), 4),
     50.8617
   )
-  expect_identical(climr:::calc_FFP(bFFP = NA, eFFP = 265.4581), NA_real_)
-  expect_identical(climr:::calc_FFP(bFFP = 214.5964, eFFP = NA), NA_real_)
+  expect_identical(climr::calc_FFP(bFFP = NA, eFFP = 265.4581), NA_real_)
+  expect_identical(climr::calc_FFP(bFFP = 214.5964, eFFP = NA), NA_real_)
+  expect_s4_class(climr::calc_FFP(bFFP = terra::rast(214.5964 |> matrix(1,1)), eFFP = terra::rast(265.4581 |> matrix(1,1))), "SpatRaster")
 
-  expect_identical(round(climr:::calc_NFFD(3, 2.05), 4), 21.1018)
-  expect_identical(climr:::calc_NFFD(3, NA_real_), NA_real_)
+  expect_identical(round(climr::calc_NFFD(3, 2.05), 4), 21.1018)
+  expect_identical(climr::calc_NFFD(3, NA_real_), NA_real_)
+  expect_s4_class(climr::calc_NFFD(3, terra::rast(2.05 |> matrix(1,1))), "SpatRaster")
 
-  expect_identical(round(climr:::calc_PAS(4, 2, 600), 4), 308.4204)
-  expect_identical(climr:::calc_PAS(4, NA, 600), NA_real_)
-  expect_identical(climr:::calc_PAS(4, 2, NA_real_), NA_real_)
+  expect_identical(round(climr::calc_PAS(4, 2, 600), 4), 308.4204)
+  expect_identical(climr::calc_PAS(4, NA, 600), NA_real_)
+  expect_identical(climr::calc_PAS(4, 2, NA_real_), NA_real_)
+  expect_s4_class(climr::calc_PAS(4, terra::rast(2 |> matrix(1,1)), terra::rast(600 |> matrix(1,1))), "SpatRaster")
 
-  expect_identical(round(climr:::calc_RH(tmmin = 10, tmmax = 40), 4), 28.5378)
-  expect_identical(climr:::calc_RH(tmmin = NA, tmmax = 40), NA_real_)
-  expect_identical(climr:::calc_RH(tmmin = 10, tmmax = NA), NA_real_)
+  expect_identical(round(climr::calc_RH(tmmin = 10, tmmax = 40), 4), 28.5378)
+  expect_identical(climr::calc_RH(tmmin = NA, tmmax = 40), NA_real_)
+  expect_identical(climr::calc_RH(tmmin = 10, tmmax = NA), NA_real_)
+  expect_s4_class(climr::calc_RH(terra::rast(10 |> matrix(1,1)), terra::rast(40 |> matrix(1,1))), "SpatRaster")
 })
 
 
 test_that("calc_* give sensible outputs", {
   testInit(c("data.table", "terra"))
-
-  dbCon <- data_connect()
-  on.exit(try(pool::poolClose(dbCon)), add = TRUE)
 
   ## the following includes NAs for the test and should be small enough
   xyz <- data.frame(
@@ -65,9 +83,9 @@ test_that("calc_* give sensible outputs", {
   )
   thebb <- get_bb(xyz)
 
-  normalbc <- input_refmap(dbCon = dbCon, reference = "refmap_prism", bbox = thebb, cache = TRUE)
+  normalbc <- input_refmap(reference = "refmap_climr", bbox = thebb, cache = TRUE)
 
-  gcm <- input_gcms(dbCon,
+  gcm <- input_gcms(
     bbox = thebb,
     gcms = c("BCC-CSM2-MR"),
     ssps = c("ssp126"),

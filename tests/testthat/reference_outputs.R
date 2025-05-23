@@ -17,7 +17,7 @@ xyz <- data.frame(
   lon = c(-127.70),
   lat = c(55.35),
   elev = c(291L),
-  id = LETTERS[1]
+  id = 1
 )
 
 cache_clear()

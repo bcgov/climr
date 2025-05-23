@@ -17,35 +17,31 @@ plot_timeSeries_input(
 )
 }
 \arguments{
-\item{xyz}{a \code{data.frame} with the following columns "long", "lat", "elev",
-and a unique "id". Any extra columns will be ignored and not output.}
+\item{xyz}{a \code{terra::SpatRaster} with a single layer containing elevation values in metres, or a \code{data.frame} with the following columns
+"long", "lat", "elev", and a unique "id". Any extra columns will be ignored and not output.}
 
-\item{gcms}{character. Vector of global climate model names. Options
-are \code{\link[=list_gcms]{list_gcms()}}. Defaults to \code{NULL}.}
+\item{gcms}{character. Vector of global climate model names. Options are \code{\link[=list_gcms]{list_gcms()}}.}
 
 \item{ssps}{character. Vector of SSP-RCP scenarios (representative concentration pathways paired with shared socioeconomic pathways).
 Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to all scenarios available.}
 
-\item{max_run}{integer. Maximum number of model runs to include.
-A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
+\item{max_run}{integer. Maximum number of model runs to include, not including the ensemble mean.
+Runs are included in the order they
 are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
 \item{obs_ts_dataset}{character. The dataset to use for observational time series data. Options
 are \code{"climatena"} for the ClimateNA gridded time series or \code{"cru.gpcc"} for the combined Climatic
 Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset
-(for precipitation). Defaults to \code{NULL}.}
+(for precipitation).}
 
 \item{obs_years}{integer. Vector of years to obtain individual years or time
-series of observational climate data. Default \code{NULL}. See \code{\link[=list_obs_years]{list_obs_years()}}
-for available years.}
+series of observational climate data. See \code{\link[=list_obs_years]{list_obs_years()}} for available years.}
 
 \item{gcm_hist_years}{character.  Timeseries years for GCM simulations of the
-historical scenario. See \code{\link[=list_gcm_hist_years]{list_gcm_hist_years()}} for available years.
-Defaults to \code{NULL}.}
+historical scenario. See \code{\link[=list_gcm_hist_years]{list_gcm_hist_years()}} for available years.}
 
 \item{gcm_ssp_years}{character. Timeseries years for GCM simulations of future
-scenarios specified by \code{ssps}. See \code{\link[=list_gcm_ssp_years]{list_gcm_ssp_years()}} for available years.
-Defaults to \code{NULL}.}
+scenarios specified by \code{ssps}. See \code{\link[=list_gcm_ssp_years]{list_gcm_ssp_years()}} for available years.}
 
 \item{vars}{character. A vector of climate variables to compute. Supported variables
 can be obtained with \code{\link[=list_vars]{list_vars()}}. Definitions can be found in this package
@@ -55,23 +51,29 @@ can be obtained with \code{\link[=list_vars]{list_vars()}}. Definitions can be f
 \code{data.table} of average downscaled climate variables for all locations.
 }
 \description{
-Input data for the \code{\link[=plot_timeSeries]{plot_timeSeries()}} function. Since these inputs are time-consuming to generate,
-the purpose of conducting the generation of the input table in a separate function is to allow users
-to make multiple calls to \code{\link[=plot_timeSeries]{plot_timeSeries()}} (e.g., for comparing different climate variables)
-without needing to generate the inputs each time.
+Input data for the \code{\link[=plot_timeSeries]{plot_timeSeries()}} function. Since these inputs are time-consuming to
+generate, the purpose of conducting the generation of the input table in a separate function is
+to allow users to make multiple calls to \code{\link[=plot_timeSeries]{plot_timeSeries()}} (e.g., for comparing different
+climate variables) without needing to generate the inputs each time.
 }
 \details{
 This function generates standardized inputs for one or multiple locations at any spatial scale.
-If multiple locations are specified, the output is the average of the climate variables for all locations.
+If multiple locations are specified, the output is the average of the climate variables for all
+locations.
 
-Downloads of GCM time series take some time. The \code{plot_timeSeries_input()} function can take ~5 minutes
-to run for the first time it is called for a location. Once the time series are cached, they
-don't need to be downloaded again.
+Downloads of GCM time series take some time. The \code{plot_timeSeries_input()} function can take
+~5 minutes to run for the first time it is called for a location. Once the time series are
+cached, they don't need to be downloaded again.
 }
 \examples{
 if (FALSE) {
   # data frame of arbitrary points
-  my_points <- data.frame(lon = c(-127.7300, -127.7500), lat = c(55.34114, 55.25), elev = c(711, 500), id = 1:2)
+  my_points <- data.frame(
+    lon = c(-127.7300, -127.7500),
+    lat = c(55.34114, 55.25),
+    elev = c(711, 500),
+    id = 1:2
+  )
 
   # generate the input data
   my_data <- plot_timeSeries_input(my_points)

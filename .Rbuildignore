@@ -23,3 +23,5 @@
 ^logo\.svg$
 ^logo_icon\.png$
 ^man-roxygen$
+^CODE_OF_CONDUCT.md$
+^CONTRIBUTING.md$

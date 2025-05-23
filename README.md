@@ -2,13 +2,14 @@
 
 <!-- badges: start -->
 
-[![Lifecycle:Stable](https://img.shields.io/badge/Lifecycle-Stable-339999)](Redirect-URL) [![Codecov test coverage - main](https://codecov.io/gh/bcgov/climr/branch/main/graph/badge.svg)](https://app.codecov.io/gh/bcgov/climr/?branch=main)
+[![Lifecycle:Maturing](https://img.shields.io/badge/Lifecycle-Maturing-007EC6)](<Redirect-URL>)
+[![Codecov test coverage - main](https://codecov.io/gh/bcgov/climr/branch/main/graph/badge.svg)](https://app.codecov.io/gh/bcgov/climr/?branch=main)
 
 <!-- badges: end -->
 
 ## `climr`: An R package of downscaled climate data for North America
 
-`climr` is an experimental R package that builds on the downscaling concepts operationalized in the <a href='https://climatena.ca/' target='_blank'>ClimateNA</a> tool (Wang et al. 2016).
+`climr` is an R package that builds on the downscaling concepts operationalized in the <a href='https://climatena.ca/' target='_blank'>ClimateNA</a> tool (Wang et al. 2016).
 It provides downscaling of observational and simulated climate data using change-factor (a.k.a. climate imprint) downscaling, a simple method that adds low-spatial-resolution climate anomalies to a high-spatial-resolution reference climatological map, with additional elevation adjustment for "scale-free" downscaling.
 `climr` is designed to be fast and to minimize local data storage requirements.
 To do so, it uses a remote PostGIS database, and optionally caches data locally.
@@ -28,22 +29,31 @@ subscribe to the `climr` GitHub repo using the following steps:
 
 `climr` provides the following data:
 
--   Two historical observational time series: (1) the 1901-2023 ClimateNA time series (Wang et al., 2016) and (2) the 1901-2022 combined Climatic Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset (for precipitation). 
+-   Three historical observational time series: (1) the 1901-2022 combined Climatic Research Unit TS dataset 
+(for temperature) and Global Precipitation Climatology Centre dataset (for precipitation); (2) the 1901-2023 ClimateNA time series 
+(Wang et al., 2024); and (3) the 1981-2024 Multi-Source Weather (MSWX; for temperature) and 
+Multi-Source Weighted-Ensemble Precipitation (MSWEP; for precipitation), extended back to 1901 using the CRU/GPCC dataset. 
 
--   Multiple historical (1851-2014) and future (2015-2100) climate model simulations for each of 13 CMIP6 global climate models, in monthly time series and 20-year normals.
+-   Multiple historical (1851-2014) and future (2015-2100) climate model simulations 
+for each of 13 CMIP6 global climate models, in monthly time series and 20-year normals.
 
--   User selection of single or multiple climate variables, with derived variables following the ClimateNA methodology of Wang et al. (2016).
+-   User selection of single or multiple climate variables, with derived variables 
+following the ClimateNA methodology of Wang et al. (2016).
 
 ### Data Sources
 
-The high resolution reference climate maps for Western Canada and Western US are a custom 800m-resolution mosaic of [BC PRISM](https://www.pacificclimate.org/data/prism-climatology-and-monthly-timeseries), adjusted [US PRISM](https://prism.oregonstate.edu/normals/), [Western Canada PRISM](https://prism.oregonstate.edu/projects/canw.php), and [Daymet](https://daymet.ornl.gov/overview) (Alberta and Saskatchewan). 
-Reference climatologies for North America are the 4km-resolution ClimateNA (Wang et al. 2016) mosaics of PRISM (BC, US, W. Canada) and WorldClim (rest of North America).
-The ClimateNA mosaics are accessed from [AdaptWest](https://adaptwest.databasin.org/pages/adaptwest-climatena/).
+The default reference climate maps for North America are a 
+custom 2.5km-resolution mosaic of [BC PRISM](https://www.pacificclimate.org/data/prism-climatology-and-monthly-timeseries), 
+[US PRISM](https://prism.oregonstate.edu/normals/), 
+deep learning prediction (Yukon, Northwest Territories, and Alberta), and 
+[Daymet](https://daymet.ornl.gov/overview) (rest of North America). 
+The climr mosaic is described in [`vignette("climr_methods_mosaic")`](https://bcgov.github.io/climr/articles/methods_mosaic.html). 
+The alternative 4km-resolution ClimateNA mosaics of PRISM (BC, US, W. Canada) and WorldClim (rest of North America) are accessed from [AdaptWest](https://adaptwest.databasin.org/pages/adaptwest-climatena/).
 
-Historical observational time series are obtained from [ClimateNA](https://climatena.ca/) (Wang et al. 2016), [Climatic Research Unit](https://crudata.uea.ac.uk/cru/data/hrg/), and [Global Precipitation Climatology Centre](https://psl.noaa.gov/data/gridded/data.gpcc.html). 
+The default historical observational time series are obtained from [Climatic Research Unit](https://crudata.uea.ac.uk/cru/data/hrg/), [Global Precipitation Climatology Centre](https://psl.noaa.gov/data/gridded/data.gpcc.html), and [ClimateNA](https://climatena.ca/) (Wang et al. 2016), . 
 
 CMIP6 global climate model simulations were downloaded from the [Earth System Grid Federation](https://aims2.llnl.gov/search/cmip6). The majority of these downloads were conducted by Tongli Wang, Associate Professor at the UBC Department of Forest and Conservation Sciences.
-The 13 global climate models selected for `climr`, and best practices for ensemble analysis, are described in Mahony et al. (2022) and summarized in `vignette("climr_methods_ensembleSelection")`. 
+The 13 global climate models selected for `climr`, and best practices for ensemble analysis, are described in Mahony et al. (2022) and summarized in [`vignette("climr_methods_ensembleSelection")`](https://bcgov.github.io/climr/articles/methods_ensembleSelection.html). 
 
 ## Installation
 
@@ -61,15 +71,7 @@ remotes::install_github("bcgov/climr@devl")
 
 ## Usage
 
-See:
-
--   `vignette("climr_workflow_beg")` for a simple `climr` workflow;
-
--   `vignette("climr_workflow_int")` for a deeper dive into `climr`
-and more advanced examples of how it can be used;
-
--   `vignette("climr_with_rasters")` for several examples of how 
-to work with `climr` using spatial inputs and outputs, such as raster and vector data.
+See `vignette("climr_workflow_beg")` to get started with simple `climr` workflows;
 
 ## Methods
 
@@ -77,7 +79,7 @@ For an overview of downscaling methods used in `climr` see `vignette("methods_do
 
 ## Known issues
 
--   Downloads of time series take a long time. We are looking into ways to speed this up, but until then we recommend users dedicate some time prior to analysis to cache their time series of interest for their areas of interest in a batch. Once the time series are cached, they don't need to be downloaded again. 
+-   Downloads of time series take a long time. We recommend users dedicate some time prior to analysis to cache their time series of interest for their areas of interest in a batch. Once the time series are cached, they don't need to be downloaded again. 
 -   We are still working on the documentation, examples, and vignettes. Please let us know if something isn't clear, preferably as a [GitHub](https://github.com/bcgov/climr) issue. 
 
 ### License
@@ -103,3 +105,5 @@ We acknowledge the World Climate Research Programme, which, through its Working 
 Mahony, C.R., T. Wang, A. Hamann, and A.J. Cannon. 2022. [A global climate model ensemble for downscaled monthly climate normals over North America](https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.7566). International Journal of Climatology. 42:5871-5891. [doi.org/10.1002/joc.7566](https://doi.org/10.1002/joc.7566)
 
 Wang, Tongli, Andreas Hamann, Dave Spittlehouse, and Carlos Carroll. 2016. “Locally Downscaled and Spatially Customizable Climate Data for Historical and Future Periods for North America.” Edited by Inés Álvarez. PLOS ONE 11 (6): [e0156720](https://doi.org/10.1371/journal.pone.0156720).
+
+Wang, Tongli, Andreas Hamann, and Zihaohan Sang. 2024. “Monthly High-Resolution Historical Climate Data for North America Since 1901.” International Journal of Climatology. early view: [https://doi.org/10.1002/joc.8726](https://doi.org/10.1002/joc.8726).
