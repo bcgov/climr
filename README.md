@@ -9,7 +9,7 @@
 
 ## `climr`: An R package of downscaled climate data for North America
 
-`climr` is an experimental R package that builds on the downscaling concepts operationalized in the <a href='https://climatena.ca/' target='_blank'>ClimateNA</a> tool (Wang et al. 2016).
+`climr` is an R package that builds on the downscaling concepts operationalized in the <a href='https://climatena.ca/' target='_blank'>ClimateNA</a> tool (Wang et al. 2016).
 It provides downscaling of observational and simulated climate data using change-factor (a.k.a. climate imprint) downscaling, a simple method that adds low-spatial-resolution climate anomalies to a high-spatial-resolution reference climatological map, with additional elevation adjustment for "scale-free" downscaling.
 `climr` is designed to be fast and to minimize local data storage requirements.
 To do so, it uses a remote PostGIS database, and optionally caches data locally.
