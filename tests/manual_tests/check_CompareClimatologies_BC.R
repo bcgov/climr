@@ -33,8 +33,7 @@ dem.bc <- rast(paste(dir, "PRISM_dem.asc", sep=""))
 my_grid <- as.data.frame(dem.bc, cells = TRUE, xy = TRUE)
 colnames(my_grid) <- c("id", "lon", "lat", "elev") # rename column names to what climr expects
 climr_climatena_all <- downscale(xyz = my_grid, which_refmap = "refmap_climatena", vars = list_vars(set="Monthly"))
-climr_climr_all <- downscale(xyz = my_grid, which_refmap = "refmap_climr", vars = list_vars(set="Monthly"))
-climr_prism_all <- downscale(xyz = my_grid, which_refmap = "refmap_prism", vars = list_vars(set="Monthly"))
+climr_prism_all <- downscale(xyz = my_grid, which_refmap = "refmap_climr", vars = list_vars(set="Monthly"))
 
 # climateNA data
 climatena_grid <- my_grid[,c(1,1,3,2,4)]
