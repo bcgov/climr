@@ -4,9 +4,16 @@
 \name{climr-package}
 \alias{climr}
 \alias{climr-package}
-\title{climr: Downscaling climate data in R}
+\title{climr: An R package of downscaled monthly climate data for North America}
 \description{
 Builds on the downscaling concepts operationalized in the 'ClimateNA' tool (\url{https://climatena.ca}) (Wang et al. 2016 \doi{10.1371/journal.pone.0156720}). It provides downscaling of observational and simulated climate data using change-factor downscaling, a simple method that adds low-spatial-resolution climate anomalies to a high-spatial-resolution reference climatological map, with additional elevation adjustment for temperature. Elevation-adjusted monthly values of basic climate elements (temperature and precipitation) are then used to estimate derived variables (e.g., degree-days) based on published equations and parameters from Wang et al. 2016. This package is designed to be fast and to minimize local data storage requirements. To do so, it uses a remote 'PostGIS' database, and optionally caches data locally.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://bcgov.github.io/climr}
+}
+
 }
 \author{
 \strong{Maintainer}: Kiri Daust \email{kiri.daust@gov.bc.ca}

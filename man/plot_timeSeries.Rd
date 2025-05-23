@@ -44,10 +44,9 @@ options are \code{\link[=list_vars]{list_vars()}}.}
 \item{obs_ts_dataset}{character. The dataset to use for observational time series data. Options
 are \code{"climatena"} for the ClimateNA gridded time series or \code{"cru.gpcc"} for the combined Climatic
 Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset
-(for precipitation). Defaults to \code{NULL}.}
+(for precipitation).}
 
-\item{gcms}{character. Vector of global climate model names. Options
-are \code{\link[=list_gcms]{list_gcms()}}. Defaults to \code{NULL}.}
+\item{gcms}{character. Vector of global climate model names. Options are \code{\link[=list_gcms]{list_gcms()}}.}
 
 \item{ssps}{character. Vector of SSP-RCP scenarios (representative concentration pathways paired with shared socioeconomic pathways).
 Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to all scenarios available.}
@@ -61,8 +60,8 @@ input table defined by \code{X}.}
 
 \item{cex}{Numeric. The magnification factor for text size. Default is 1.}
 
-\item{mar}{A numerical vector of length 4, giving the margin sizes in number of lines of text: c(bottom, left,
-top, right). The default is c(3,3,0.1,4).}
+\item{mar}{A numerical vector of length 4, giving the margin sizes in number of lines of text:
+c(bottom, left, top, right). The default is c(3,3,0.1,4).}
 
 \item{showmean}{logical. Plot the ensemble mean time series. Multi-model ensemble means are
 calculated from the mean of simulations for each model.}
@@ -97,10 +96,13 @@ to indicate the global climate model.}
 NULL. Draws a plot in the active graphics device.
 }
 \description{
-Time series plots of 20th and 21st century climate change for user-selected locations and climate variables.
+Time series plots of 20th and 21st century climate change for user-selected
+locations and climate variables.
+
 The purposes of the plot are to:
 \enumerate{
-\item view differences in interannual variability and climate change trends among global climate models (GCMs),
+\item view differences in interannual variability and climate change trends among global
+climate models (GCMs),
 \item view the differences between multiple simulations of each model,
 \item compare simulated and observed climate change from 1901 to present, and
 \item compare time series of two different variables.
@@ -108,22 +110,28 @@ The purposes of the plot are to:
 All global climate model anomalies are bias-corrected to the 1961-1990 reference period normals.
 }
 \details{
-The input table \code{X} provides climate data for a single location or the average of multiple locations.
-The purpose of conducting the generation of the input table in a separate function is to allow users
-to make multiple calls to \code{\link[=plot_timeSeries]{plot_timeSeries()}} without needing to generate the inputs each time.
+The input table \code{X} provides climate data for a single location or the average of multiple
+locations. The purpose of conducting the generation of the input table in a separate function is
+to allow users to make multiple calls to \code{\link[=plot_timeSeries]{plot_timeSeries()}} without needing to generate the
+inputs each time.
 
 Some combinations of \code{var1} and \code{var2} are not compatible or meaningful.
-Examples of meaningful combinations are winter vs summer values of the same climate var or minimum vs.
-maximum temperatures.
+Examples of meaningful combinations are winter vs summer values of the same climate var
+or minimum vs. maximum temperatures.
 
-Downloads of GCM time series take some time. The \code{plot_timeSeries_input()} function can take ~5 minutes
-to run for the first time it is called for a location. Once the time series are cached, they
-don't need to be downloaded again.
+Downloads of GCM time series take some time. The \code{plot_timeSeries_input()} function can take
+~5 minutes to run for the first time it is called for a location. Once the time series are
+cached, they don't need to be downloaded again.
 }
 \examples{
 if (FALSE) {
   # data frame of arbitrary points
-  my_points <- data.frame(lon = c(-127.7300, -127.7500), lat = c(55.34114, 55.25), elev = c(711, 500), id = 1:2)
+  my_points <- data.frame(
+    lon = c(-127.7300, -127.7500),
+    lat = c(55.34114, 55.25),
+    elev = c(711, 500),
+    id = 1:2
+  )
 
   # generate the input data
   my_data <- plot_timeSeries_input(my_points)
@@ -141,7 +149,18 @@ if (FALSE) {
   plot_timeSeries(my_data, var1 = "Tmax_sm", var2 = "Tmax_wt", simplify = FALSE)
 
   # compare global climate models
-  plot_timeSeries(my_data, gcms = list_gcms()[c(7, 13)], pal = "gcms", ssps = list_ssps()[2], showmean = FALSE, compile = FALSE, simplify = FALSE, endlabel = "gcms", mar = c(3, 3, 0.1, 6), showObserved = FALSE)
+  plot_timeSeries(
+    my_data,
+    gcms = list_gcms()[c(7, 13)],
+    pal = "gcms",
+    ssps = list_ssps()[2],
+    showmean = FALSE,
+    compile = FALSE,
+    simplify = FALSE,
+    endlabel = "gcms",
+    mar = c(3, 3, 0.1, 6),
+    showObserved = FALSE
+  )
 
   # export plot to a temporary directory, including a title
   figDir <- tempdir()

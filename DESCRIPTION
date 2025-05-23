@@ -1,7 +1,7 @@
 Package: climr
-Title: Downscaling climate data in R
-Version: 0.1.1
-Date: 19-08-2024
+Title: An R package of downscaled monthly climate data for North America
+Version: 0.2.0
+Date: 19-03-2025
 Authors@R: c(
     person("Kiri", "Daust", , "kiri.daust@gov.bc.ca", role = c("aut", "cre")),
     person("Colin", "Mahony", , "Colin.Mahony@gov.bc.ca", role = "aut",
@@ -42,22 +42,26 @@ Imports:
     terra,
     uuid,
     dplyr,
+    tidyr,
     abind,
-    dbplyr
+    dbplyr,
+    plotly,
+    stringi,
+    ggplot2
 Suggests: 
-    ggplot2,
     knitr,
     parallel,
-    plotly,
     remotes,
     rmarkdown,
     testthat (>= 3.0.0),
     utils,
+    vdiffr,
     withr
 VignetteBuilder: 
     knitr
+URL: https://bcgov.github.io/climr
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2

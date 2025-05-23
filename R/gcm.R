@@ -7,7 +7,6 @@
 #' `input_gcms` retrieves anomalies of 20-year periods for selected GCMs, SSPs,
 #'  periods and runs.
 #'
-#' @template dbCon
 #' @template bbox
 #' @template gcms
 #' @template ssps
@@ -23,7 +22,7 @@
 #'
 #' @seealso [downscale_core()]
 #'
-#' @importFrom terra rast writeRaster ext nlyr
+#' @importFrom terra rast writeRaster ext nlyr values cells rowColFromCell
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @importFrom uuid UUIDgenerate
@@ -36,19 +35,17 @@
 #' ## get bounding box based on input points
 #' thebb <- get_bb(xyz)
 #'
-#' ## get database connection
-#' dbCon <- data_connect()
 #'
-#' gcms <- input_gcms(dbCon, thebb, list_gcms()[1], list_ssps()[1])
+#' gcms <- input_gcms(thebb, list_gcms()[1], list_ssps()[1])
 #'
 #' ## show ensemble means only
 #' lyrs <- grep("ensemble", names(gcms$`ACCESS-ESM1-5`))
 #'
 #' plot(gcms$`ACCESS-ESM1-5`[[lyrs]])
-#' pool::poolClose(dbCon)
 #' @rdname gcms-input-data
 #' @export
-input_gcms <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(), period = list_gcm_periods(), max_run = 0L, cache = TRUE, run_nm = NULL) {
+input_gcms <- function(bbox = NULL, gcms = list_gcms(), ssps = list_ssps(), period = list_gcm_periods(), max_run = 0L, 
+                       ensemble_mean = TRUE, cache = TRUE, run_nm = NULL) {
   ## checks
   if (!is.null(bbox)) {
     .check_bb(bbox)
@@ -69,8 +66,8 @@ input_gcms <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(
   # Load each file individually + select layers
   res <- sapply(gcms, process_one_gcm2,
     ssps = ssps, period = period,
-    bbox = bbox, dbnames = dbnames, dbCon = dbCon,
-    max_run = max_run, cache = cache, run_nm = run_nm, 
+    bbox = bbox, dbnames = dbnames,
+    max_run = max_run,ensemble_mean = ensemble_mean, cache = cache, run_nm = run_nm, 
     USE.NAMES = TRUE, simplify = FALSE
   )
   attr(res, "builder") <- "climr"
@@ -79,17 +76,80 @@ input_gcms <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(
   return(res)
 }
 
+#' @rdname gcms-input-data
+#' @export
+input_gcms_db <- function(
+  gcms = list_gcms(),
+  ssps = list_ssps(),
+  period = list_gcm_periods(),
+  max_run = 0L,
+  ensemble_mean = TRUE,
+  run_nm = NULL
+) {
+  
+  #Remove NSE CRAN check warnings
+  if (FALSE){ dbname <- var_nm <- NULL}
+  
+  gcms <- match.arg(gcms, list_gcms(), several.ok = TRUE)
+  ssps <- match.arg(ssps, list_ssps(), several.ok = TRUE)
+  period <- match.arg(period, list_gcm_periods(), several.ok = TRUE)
+
+  if (!is(max_run, "numeric")) {
+    stop("please pass a numeric value to 'max_runs'")
+  }
+  
+  runs <- .globals[["gcm_period_runs"]]
+
+  q <- "
+  select * from esm_layers_period
+  where mod in (%s)
+    and scenario in (%s)
+    and period in (%s)" |> 
+    sprintf(
+      paste0("'", gcms, "'", collapse = ","),
+      paste0("'", ssps, "'", collapse = ","),
+      paste0("'", period, "'", collapse = ",")
+    )
+  layerinfo <- db_safe_query(q) |> data.table::setDT()
+  layerinfo[, var_nm := paste(mod, var, month, scenario, run, period, sep = "_")]
+
+  res <- lapply(gcms, function(gcm_nm) {
+    gcmcode <- dbnames[GCM == gcm_nm, dbname]
+    runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssps, run]))
+    if (is.null(run_nm)) {
+      sel_runs <- runs[1:(max_run + 1L)]
+      if(!ensemble_mean){
+        sel_runs <- sel_runs[-1]
+      }
+      if(length(sel_runs) < 1) stop("max_run must be > 0 if ensemble_mean is FALSE")
+    } else {
+      if (!run_nm %in% runs) {
+        stop("Run ", run_nm, "doesn't exist for this GCM.")
+      }
+      sel_runs <- run_nm
+    }
+
+    list(
+      tbl = gcmcode,
+      layers = layerinfo[mod %in% gcm_nm & run %in% sel_runs, list(var_nm, laynum)]
+    )
+  })
+
+  attr(res, "builder") <- "climr"
+  return(res)
+}
+
 
 #' @description
 #' `input_gcm_hist` creates GCM time series inputs for the historical scenario (1850-2014), given chosen GCMs,
 #'  years and runs.
 #'
-#' @template dbCon
 #' @template bbox
 #' @template gcms
 #' @param years numeric. Vector of desired years. Default is `1901:2014`.
 #'   See [`list_gcm_hist_years()`] for available years.
 #' @template max_run
+#' @template ensemble_mean
 #' @template cache
 #' @template run_nm
 #'
@@ -101,7 +161,7 @@ input_gcms <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(
 #' @details This function returns a list with one slot for each requested GCM. Rasters inside the list contain anomalies for all runs and years.
 #' In general this function should only be used in combination with [`downscale_core()`].
 #'
-#' @importFrom terra rast writeRaster ext nlyr
+#' @importFrom terra rast writeRaster ext nlyr values cells rowColFromCell
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @import uuid
@@ -109,8 +169,9 @@ input_gcms <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(
 #'
 #' @rdname gcms-input-data
 #' @export
-input_gcm_hist <- function(dbCon, bbox = NULL, gcms = list_gcms(),
-                           years = 1901:2014, max_run = 0L, cache = TRUE, run_nm = NULL) {
+input_gcm_hist <- function(bbox = NULL, gcms = list_gcms(),
+                           years = 1901:2014, max_run = 0L, ensemble_mean = TRUE, 
+                           cache = TRUE, run_nm = NULL) {
   ## checks
   if (!is.null(bbox)) {
     .check_bb(bbox)
@@ -119,8 +180,9 @@ input_gcm_hist <- function(dbCon, bbox = NULL, gcms = list_gcms(),
   # Load each file individually + select layers
   res <- sapply(gcms, process_one_gcm3,
     years = years,
-    dbCon = dbCon, bbox = bbox, dbnames = dbnames_hist,
-    max_run = max_run, cache = cache, run_nm = run_nm, USE.NAMES = TRUE, simplify = FALSE
+    bbox = bbox, dbnames = dbnames_hist,
+    max_run = max_run, ensemble_mean = ensemble_mean, 
+    cache = cache, run_nm = run_nm, USE.NAMES = TRUE, simplify = FALSE
   )
   res <- res[!sapply(res, is.null)] ## remove NULL
   attr(res, "builder") <- "climr"
@@ -129,7 +191,62 @@ input_gcm_hist <- function(dbCon, bbox = NULL, gcms = list_gcms(),
   return(res)
 }
 
+#' @rdname gcms-input-data
+#' @export
+input_gcm_hist_db <- function(
+  gcms = list_gcms(),
+  years = 1901:2014,
+  max_run = 0L,
+  ensemble_mean = TRUE, 
+  run_nm = NULL
+) {
 
+  #Remove NSE CRAN check warnings
+  if (FALSE){ dbname <- var_nm <- NULL}
+  
+  runs <- .globals[["gcm_hist_runs"]]
+
+  q <- "
+  select mod, var, month,
+         run, year, laynum
+    from esm_layers_hist
+   where mod in (%s)
+     and year in (%s)" |>
+    sprintf(
+      paste0("'", gcms, "'", collapse = ","),
+      paste0("'", years, "'", collapse = ",")
+    )
+  layerinfo <- db_safe_query(q) |> data.table::setDT()
+  layerinfo[, var_nm := paste(mod, var, month, run, year, sep = "_")]
+
+  res <- lapply(gcms, function(gcm_nm) {
+    if (!gcm_nm %in% dbnames_hist$GCM) return(NULL)
+    gcmcode <- dbnames_hist[GCM == gcm_nm, dbname]
+    runs <- sort(unique(runs[mod == gcm_nm, run]))
+    if (is.null(run_nm)) {
+      sel_runs <- runs[1:(max_run + 1L)]
+      if(!ensemble_mean){
+        sel_runs <- sel_runs[-1]
+      }
+      if(length(sel_runs) < 1) stop("max_run must be > 0 if ensemble_mean is FALSE")
+    } else {
+      if (!run_nm %in% runs) {
+        stop("Run ", run_nm, "doesn't exist for this GCM.")
+      }
+      sel_runs <- run_nm
+    }
+
+    list(
+      tbl = gcmcode,
+      layers = layerinfo[mod %in% gcm_nm & run %in% sel_runs, list(var_nm, laynum)]
+    )
+  })
+
+  res <- res[!sapply(res, is.null)] ## remove NULL
+  attr(res, "builder") <- "climr"
+  return(res)
+
+}
 
 # gcm_nm <- "ACCESS-ESM1-5"
 # ssps <- c("ssp245","ssp370")
@@ -139,13 +256,13 @@ input_gcm_hist <- function(dbCon, bbox = NULL, gcms = list_gcms(),
 #' `input_gcm_ssp` creates future GCM time series inputs, given chosen GCMs, SSPs,
 #'  years and runs.
 #'
-#' @template dbCon
 #' @template bbox
 #' @template gcms
 #' @template ssps
 #' @param years Numeric or character vector in `2020:2100`. Defaults to `2020:2030`.
 #'   See [`list_gcm_ssp_years()`] for available years.
 #' @template max_run
+#' @template ensemble_mean
 #' @template cache
 #' @template run_nm
 #' @param fast Logical. Should we use the faster method of downloading data from the database using arrays instead of Postgis rasters?
@@ -157,18 +274,20 @@ input_gcm_hist <- function(dbCon, bbox = NULL, gcms = list_gcms(),
 #' In general this function should only be used in combination with [`downscale_core()`]. Note that if you request multiple runs, multiple SSPs, and a lot of years,
 #' it will take a while to download the data (there's lot of it).
 #'
-#' @importFrom terra rast writeRaster ext nlyr
+#' @importFrom terra rast writeRaster ext nlyr values cells rowColFromCell
 #' @importFrom utils head
 #' @importFrom RPostgres dbGetQuery
 #' @importFrom dplyr tbl sql collect mutate
+#' @importFrom dbplyr db_collect
 #' @import uuid
 #' @import data.table
 #' @import abind
 #'
 #' @rdname gcms-input-data
 #' @export
-input_gcm_ssp <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ssps(),
-                         years = 2020:2030, max_run = 0L, cache = TRUE, run_nm = NULL, fast = TRUE) {
+input_gcm_ssp <- function(bbox = NULL, gcms = list_gcms(), ssps = list_ssps(),
+                         years = 2020:2030, max_run = 0L, ensemble_mean = TRUE,
+                         cache = TRUE, run_nm = NULL, fast = TRUE) {
 
   ## checks
   if (!is.null(bbox)) {
@@ -180,14 +299,16 @@ input_gcm_ssp <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ss
   if(fast){
     res <- sapply(gcms, process_one_gcmts_fast,
                   ssps = ssps, period = years,
-                  dbnames = dbnames_ts_fast, bbox = bbox, dbCon = dbCon,
-                  max_run = max_run, cache = cache, run_nm = run_nm, USE.NAMES = TRUE, simplify = FALSE
+                  dbnames = dbnames_ts_fast, bbox = bbox,
+                  max_run = max_run,
+                  cache = cache, run_nm = run_nm, USE.NAMES = TRUE, simplify = FALSE
     )
   }else{
     res <- sapply(gcms, process_one_gcm4,
                   ssps = ssps, period = years,
-                  dbnames = dbnames_ts, bbox = bbox, dbCon = dbCon,
-                  max_run = max_run, cache = cache, run_nm = run_nm, USE.NAMES = TRUE, simplify = FALSE
+                  dbnames = dbnames_ts, bbox = bbox,
+                  max_run = max_run, ensemble_mean = ensemble_mean,  cache = cache, 
+                  run_nm = run_nm, USE.NAMES = TRUE, simplify = FALSE
     )
   }
   
@@ -197,6 +318,72 @@ input_gcm_ssp <- function(dbCon, bbox = NULL, gcms = list_gcms(), ssps = list_ss
 
   # Return a list of SpatRasters, one element for each model
   return(res)
+}
+
+#' @rdname gcms-input-data
+#' @export
+input_gcm_ssp_db <- function(
+  gcms = list_gcms(),
+  ssps = list_ssps(),
+  years = 2020:2030,
+  max_run = 0L,
+  ensemble_mean = TRUE,
+  run_nm = NULL
+) {
+
+  #Remove NSE CRAN check warnings
+  if (FALSE){ dbname <- var_nm <- NULL}
+  
+  if (nrow(dbnames_ts) < 1) stop("That isn't a valid GCM")
+ 
+  runs <- .globals[["gcm_ts_runs"]]
+  
+  q <-  "
+  select fullnm as var_nm, laynum, run, mod
+    from esm_layers_ts
+   where mod in (%s)
+     and scenario in (%s)
+     and period in (%s)" |>
+    sprintf(
+      paste0("'", gcms, "'", collapse = ","),
+      paste0("'", ssps, "'", collapse = ","),
+      paste0("'", years, "'", collapse = ",")
+    )
+  layerinfo <- db_safe_query(q) |> data.table::setDT()
+
+  res <- lapply(gcms, function(gcm_nm) {
+    if (!gcm_nm %in% dbnames_ts[["GCM"]]) return()
+    gcmcode <- dbnames_ts[GCM == gcm_nm, dbname]
+    runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssps, run]))
+    if (length(runs) < 1) {
+      warning("That GCM isn't in our database yet.")
+      return()
+    }
+    
+    if (is.null(run_nm)) {
+      sel_runs <- runs[1:(max_run + 1L)]
+      if(!ensemble_mean){
+        sel_runs <- sel_runs[-1]
+      }
+      if(length(sel_runs) < 1) stop("max_run must be > 0 if ensemble_mean is FALSE")
+    } else {
+      if (!run_nm %in% runs) {
+        stop("Run ", run_nm, "doesn't exist for this GCM.")
+      }
+      sel_runs <- run_nm
+    }
+  
+    list(
+      tbl = gcmcode,
+      layers = layerinfo[mod %in% gcm_nm & run %in% sel_runs, list(var_nm, laynum)],
+      VAR = c("PPT", "Tmin", "Tmax")
+    )
+  })
+    
+  res <- res[!sapply(res, is.null)] ##remove NULL
+  attr(res, "builder") <- "climr"
+  return(res)
+
 }
 
 
@@ -239,25 +426,27 @@ list_unique <- function(files, col_num) {
 #' @template max_run
 #' @param dbnames `data.frame` with the list of available GCMs and their
 #'   corresponding names in the PostGIS data base.  See climr:::dbnames
-#' @template dbCon
 #' @template cache
 #' @template run_nm
-#'
+#' @template ensemble_mean
 #' @importFrom tools R_user_dir
 #' @importFrom data.table fread
 #'
 #' @return `SpatRaster`
 #' @noRd
-process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run, dbnames = dbnames, dbCon, cache, run_nm) { ## need to update to all GCMs
+process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run, 
+                             ensemble_mean, dbnames = dbnames, cache, run_nm) { ## need to update to all GCMs
   gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
   # gcm_nm <- gsub("-", ".", gcm_nm)
 
-  rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
-  
-  runs <- fread(file.path(rInfoPath, "gcm_periods.csv"))
+  runs <- .globals[["gcm_period_runs"]]
   runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssps, run]))
   if(is.null(run_nm)){
     sel_runs <- runs[1:(max_run + 1L)]
+    if(!ensemble_mean){
+      sel_runs <- sel_runs[-1]
+    }
+    if(length(sel_runs) < 1) stop("max_run must be > 0 if ensemble_mean is FALSE")
   }else{
     if(!run_nm %in% runs){
       stop("Run ", run_nm, "doesn't exist for this GCM.")
@@ -289,7 +478,7 @@ process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run, dbnames = dbna
     setorder(bnds, -numlay)
 
     spat_match <- lapply(1:nrow(bnds), FUN = function(x){
-      if (is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]
+      if (is_in_bbox(bbox, matrix(bnds[x, .(xmin,xmax,ymin,ymax)]))) bnds$uid[x]
     })
     spat_match <- spat_match[!sapply(spat_match, is.null)]
 
@@ -331,9 +520,9 @@ process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run, dbnames = dbna
       "') and period in ('", paste(period, collapse = "','"), "') and run in ('", paste(sel_runs, collapse = "','"), "')"
     )
     # print(q)
-    layerinfo <- as.data.table(dbGetQuery(dbCon, q))
+    layerinfo <- as.data.table(db_safe_query(q))
     message("Downloading GCM anomalies")
-    gcm_rast <- pgGetTerra(dbCon, gcmcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
+    gcm_rast <- pgGetTerra(gcmcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
     layerinfo[, fullnm := paste(mod, var, month, scenario, run, period, sep = "_")]
     names(gcm_rast) <- layerinfo$fullnm
 
@@ -364,29 +553,30 @@ process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run, dbnames = dbna
 #' @template gcm_nm
 #' @param years numeric. Vector of desired years. Must be in `1851:2015`.
 #'   Can be obtained from [`list_gcm_periods()`]. Default to [`list_gcm_periods()`].
-#' @template dbCon
 #' @template bbox
 #' @template max_run
 #' @param dbnames `data.frame` with the list of available GCMs (historical projections)
 #'   and their corresponding names in the PostGIS data base. See climr:::dbnames_hist
 #' @template cache
 #' @template run_nm
-#'
+#' @template ensemble_mean
 #' @importFrom tools R_user_dir
 #' @importFrom data.table fread
 #'
 #' @return `SpatRaster`
 #' @noRd
-process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbnames_hist, cache, run_nm) { ## need to update to all GCMs
+process_one_gcm3 <- function(gcm_nm, years, bbox, max_run,ensemble_mean, dbnames = dbnames_hist, cache, run_nm) { ## need to update to all GCMs
   if (gcm_nm %in% dbnames$GCM) {
     gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
 
-    rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
-
-    runs <- fread(file.path(rInfoPath, "gcm_hist.csv"))
+    runs <- .globals[["gcm_hist_runs"]]
     runs <- sort(unique(runs[mod == gcm_nm, run]))
     if(is.null(run_nm)){
       sel_runs <- runs[1:(max_run + 1L)]
+      if(!ensemble_mean){
+        sel_runs <- sel_runs[-1]
+      }
+      if(length(sel_runs) < 1) stop("max_run must be > 0 if ensemble_mean is FALSE")
     }else{
       if(!run_nm %in% runs){
         stop("Run ", run_nm, "doesn't exist for this GCM.")
@@ -418,7 +608,7 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
       setorder(bnds, -numlay)
 
       spat_match <- lapply(1:nrow(bnds), FUN = function(x){
-        if (is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]
+        if (is_in_bbox(bbox, matrix(bnds[x, .(xmin,xmax,ymin,ymax)]))) bnds$uid[x]
       })
       spat_match <- spat_match[!sapply(spat_match, is.null)]
 
@@ -454,10 +644,10 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
     if (needDownload) {
       q <- paste0("select mod, var, month, run, year, laynum from esm_layers_hist where mod = '", gcm_nm, "' and year in ('", paste(years, collapse = "','"), "') and run in ('", paste(sel_runs, collapse = "','"), "')")
       # print(q)
-      layerinfo <- as.data.table(dbGetQuery(dbCon, q))
+      layerinfo <- as.data.table(db_safe_query(q))
       layerinfo[, fullnm := paste(mod, var, month, run, year, sep = "_")]
       message("Downloading GCM anomalies")
-      gcm_rast <- pgGetTerra(dbCon, gcmcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
+      gcm_rast <- pgGetTerra(gcmcode, tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
       names(gcm_rast) <- layerinfo$fullnm
 
       if (cache) {
@@ -490,28 +680,29 @@ process_one_gcm3 <- function(gcm_nm, years, dbCon, bbox, max_run, dbnames = dbna
 #' @param dbnames `data.frame` with the list of available GCMs (time series projections)
 #'   and their corresponding names in the PostGIS data base. See climr:::dbnames_ts
 #' @template bbox
-#' @template dbCon
 #' @template cache
 #' @template run_nm
-#'
+#' @template ensemble_mean
 #' @importFrom tools R_user_dir
 #' @importFrom data.table fread
 #'
 #' @return a `SpatRaster`
 #' @noRd
-process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache, run_nm) { ## need to update to all GCMs
+process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, ensemble_mean, dbnames = dbnames_ts, bbox, cache, run_nm) { ## need to update to all GCMs
   if (gcm_nm %in% dbnames$GCM) {
     gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
 
-    rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
-
-    runs <- fread(file.path(rInfoPath, "gcm_ts.csv"))
+    runs <- .globals[["gcm_ts_runs"]]
     runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssps, run]))
     if (length(runs) < 1) {
       warning("That GCM isn't in our database yet.")
     } else {
       if(is.null(run_nm)){
         sel_runs <- runs[1:(max_run + 1L)]
+        if(!ensemble_mean){
+          sel_runs <- sel_runs[-1]
+        }
+        if(length(sel_runs) < 1) stop("max_run must be > 0 if ensemble_mean is FALSE")
       }else{
         if(!run_nm %in% runs){
           stop("Run ", run_nm, "doesn't exist for this GCM.")
@@ -543,7 +734,7 @@ process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts
         setorder(bnds, -numlay)
 
         spat_match <- lapply(1:nrow(bnds), FUN = function(x){
-          if (is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]
+          if (is_in_bbox(bbox, matrix(bnds[x, .(xmin,xmax,ymin,ymax)]))) bnds$uid[x]
         })
         spat_match <- spat_match[!sapply(spat_match, is.null)]
 
@@ -589,16 +780,16 @@ process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts
           "') and period in ('", paste(period, collapse = "','"), "') and run in ('", paste(sel_runs, collapse = "','"), "')"
         )
         # print(q)
-        layerinfo <- dbGetQuery(dbCon, q)
+        layerinfo <- db_safe_query(q)
         message("Downloading GCM anomalies")
         message("Precip...")
-        gcm_rast_ppt <- pgGetTerra(dbCon, gsub("VAR", "ppt", gcmcode), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
+        gcm_rast_ppt <- pgGetTerra(gsub("VAR", "ppt", gcmcode), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
         names(gcm_rast_ppt) <- gsub("PPT", "PPT", layerinfo$fullnm)
         message("Tmax...")
-        gcm_rast_tmax <- pgGetTerra(dbCon, gsub("VAR", "tmax", gcmcode), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
+        gcm_rast_tmax <- pgGetTerra(gsub("VAR", "tmax", gcmcode), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
         names(gcm_rast_tmax) <- gsub("PPT", "Tmax", layerinfo$fullnm)
         message("Tmin...")
-        gcm_rast_tmin <- pgGetTerra(dbCon, gsub("VAR", "tmin", gcmcode), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
+        gcm_rast_tmin <- pgGetTerra(gsub("VAR", "tmin", gcmcode), tile = FALSE, bands = layerinfo$laynum, boundary = bbox)
         names(gcm_rast_tmin) <- gsub("PPT", "Tmin", layerinfo$fullnm)
         gcm_rast <- c(gcm_rast_ppt, gcm_rast_tmax, gcm_rast_tmin)
 
@@ -639,21 +830,25 @@ process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts
 #' @param dbnames `data.frame` with the list of available GCMs (time series projections)
 #'   and their corresponding names in the PostGIS data base. See climr:::dbnames_ts
 #' @template bbox
-#' @template dbCon
 #' @template cache
 #' @template run_nm
 #'
 #' @importFrom tools R_user_dir
+#' @importFrom tidyr unnest
+#' @importFrom dplyr collect tbl mutate
 #'
 #' @return a `SpatRaster`
 #' @noRd
-process_one_gcmts_fast <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts, bbox, dbCon, cache, run_nm) { 
+process_one_gcmts_fast <- function(gcm_nm, ssps, period, max_run, dbnames = dbnames_ts, bbox, cache, run_nm) { 
+  
+  #Remove NSE CRAN check warnings
+  if (FALSE){ vals <- cellid <- ssp <- i.row <- i.col <- NULL}
+  
   if(gcm_nm %in% dbnames$GCM){
     gcmcode <- dbnames$dbname[dbnames$GCM == gcm_nm]
     gcmarray <- dbnames$dbarray[dbnames$GCM == gcm_nm]
-    rInfoPath <- file.path(R_user_dir("climr", "data"), "run_info")
     
-    runs <- fread(file.path(rInfoPath, "gcm_ts.csv"))
+    runs <- .globals[["gcm_ts_runs"]]
     runs <- sort(unique(runs[mod == gcm_nm & scenario %in% ssps, run]))
     if (length(runs) < 1) {
       warning("That GCM isn't in our database yet.")
@@ -692,7 +887,7 @@ process_one_gcmts_fast <- function(gcm_nm, ssps, period, max_run, dbnames = dbna
         setorder(bnds, -numlay)
         
         spat_match <- lapply(1:nrow(bnds), FUN = \(x){
-          if (is_in_bbox(bbox, matrix(bnds[x, 2:5]))) bnds$uid[x]
+          if (is_in_bbox(bbox, matrix(bnds[x, .(xmin,xmax,ymin,ymax)]))) bnds$uid[x]
         })
         spat_match <- spat_match[!sapply(spat_match, is.null)]
         
@@ -733,13 +928,13 @@ process_one_gcmts_fast <- function(gcm_nm, ssps, period, max_run, dbnames = dbna
       }
       
       if (needDownload) {
-        template <- pgGetTerra(dbCon, name = gcmcode, tile = F, bands = 1, boundary = bbox) 
+        template <- pgGetTerra(name = gcmcode, tile = F, bands = 1, boundary = bbox) 
         
         if(length(period) >= 79){ ##faster if almost all years are selected
-          results <- tbl(dbCon, sql(paste0("select cellid, ssp, year, run, vals from ",gcmarray," where cellid in (",paste0(values(template)[,1], collapse = ','),") 
+          results <- tbl(data_connect(), sql(paste0("select cellid, ssp, year, run, vals from ",gcmarray," where cellid in (",paste0(values(template)[,1], collapse = ','),") 
                                   and ssp in ('",paste(ssps, collapse = "','"),"') and run in ('", paste(sel_runs, collapse = "','"), "')")))
         }else{
-          results <- tbl(dbCon, sql(paste0("select cellid, ssp, year, run, vals from ",gcmarray," where cellid in (",paste0(values(template)[,1], collapse = ','),") 
+          results <- tbl(data_connect(), sql(paste0("select cellid, ssp, year, run, vals from ",gcmarray," where cellid in (",paste0(values(template)[,1], collapse = ','),") 
                                   and year in ('",paste(period, collapse = "','"),"') and ssp in ('",paste(ssps, collapse = "','"),"') and run in ('", paste(sel_runs, collapse = "','"), "')")))
         }
         
@@ -765,7 +960,7 @@ process_one_gcmts_fast <- function(gcm_nm, ssps, period, max_run, dbnames = dbna
         t_array = split(as.data.frame(t2[,!c("fullnm","row")]), t2$fullnm)
         t3 <- abind(t_array, along = 3)
         gcm_rast <- rast(t3)
-        ext(gcm_rast) <- ext(template)
+        terra::ext(gcm_rast) <- ext(template)
         names(gcm_rast) <- paste0(gcm_nm,"_", names(t_array))
         
         if (cache) {
@@ -794,3 +989,4 @@ process_one_gcmts_fast <- function(gcm_nm, ssps, period, max_run, dbnames = dbna
     }
   }
 }
+

@@ -1,9 +1,6 @@
 test_that("test dowscale basic and spatial", {
   testInit("data.table")
 
-  dbCon <- data_connect()
-  on.exit(try(pool::poolClose(dbCon)), add = TRUE)
-
   ## a small area
   xyz <- data.frame(
     lon = c(
@@ -12,14 +9,14 @@ test_that("test dowscale basic and spatial", {
     ),
     lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
     elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
-    id = LETTERS[1:8]
+    id = seq_len(8)
   )
 
   ## get bounding box based on input points
   thebb <- get_bb(xyz)
 
   ds_hist <- downscale(
-    xyz = xyz, which_refmap = "auto",
+    xyz = xyz,
     obs_periods = "2001_2020",
     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07")
   ) ## specify desired variablesds_hist <- climr_downscale(xyz = xyz, which_refmap = "auto",
@@ -36,7 +33,7 @@ test_that("test dowscale basic and spatial", {
 
 
   ds_hist2 <- downscale(
-    xyz = xyz, which_refmap = "auto",
+    xyz = xyz, 
     obs_periods = "2001_2020",
     return_refperiod = FALSE, ## put this to TRUE if you want the 1961-1990 period
     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07")
@@ -46,7 +43,7 @@ test_that("test dowscale basic and spatial", {
   expect_false(any(is.na(test)))
 
   ds_hist_spatial <- downscale(
-    xyz = xyz, which_refmap = "auto",
+    xyz = xyz, 
     obs_periods = "2001_2020",
     return_refperiod = TRUE, ## put this to TRUE if you want the 1961-1990 period
     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
@@ -57,7 +54,7 @@ test_that("test dowscale basic and spatial", {
   expect_true(all(test[, .N, by = id][, N] == 2))
 
   ds_hist_spatial2 <- downscale(
-    xyz = xyz, which_refmap = "auto",
+    xyz = xyz,
     obs_periods = "2001_2020",
     return_refperiod = FALSE, ## put this to TRUE if you want the 1961-1990 period
     vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
@@ -120,13 +117,13 @@ test_that("test downscale with different argument combinations", {
     ),
     lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
     elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
-    id = LETTERS[1:8],
+    id = seq_len(8),
     Zone = c(rep("CWH", 3), rep("CDF", 5)),
     Subzone = c("vm1", "vm2", "vs1", rep("mm", 3), "dk", "dc")
   )
 
   argsCombos <- expand.grid(
-    which_refmap = c("auto", "refmap_climr"), obs_periods = c(NA, "2001_2020"),
+    which_refmap = c("refmap_climatena", "refmap_climr"), obs_periods = c(NA, "2001_2020"),
     obs_years = c(NA, "1990:2010"), obs_ts_dataset = c(NA,"cru.gpcc","climatena"),
     gcms = c(NA, "list_gcms()[2]"),
     ssps = c(NA, "list_ssps()[1:3]"), gcm_periods = c(NA, "list_gcm_periods()[1]"),
@@ -165,6 +162,7 @@ test_that("test downscale with different argument combinations", {
   argsCombos <- argsCombos[89:108,]
   
   out <- apply(argsCombos, 1, function(args, xyz) {
+    #browser()
     args <- args[!is.na(args)]
     suppressWarnings(args$xyz <- xyz) # coerces to list.
     args$vars <- c("PPT", "CMD") ## for faster results.
@@ -249,10 +247,10 @@ test_that("test climr_dowscale all periods, all GCMs, all SSPS, all years", {
     ),
     lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
     elev = c(291L, 296L, 626L, 377L, 424L, 591L, 723L, 633L),
-    id = LETTERS[1:8]
+    id = seq_len(8)
   )
 
-  normals <- c("auto", "refmap_prism", "refmap_climatena")
+  normals <- c("refmap_climr")
 
   sapply(normals, function(normal) {
     maxrun <- 2
@@ -299,3 +297,13 @@ test_that("test climr_dowscale all periods, all GCMs, all SSPS, all years", {
     lapply(testOut, function(x) expect_true(all(x)))
   })
 })
+
+
+# out <- downscale(xyz, 
+#                  which_refmap = "refmap_climatena",
+#                  obs_years = 1990:2010,
+#                  obs_ts_dataset = "cru.gpcc",
+#                  gcms = list_gcms()[2],
+#                  ssps = list_ssps()[1:3],
+#                  gcm_ssp_years = 2040:2050,
+#                  gcm_hist_years = 1990:2010)

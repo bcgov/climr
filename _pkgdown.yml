@@ -23,17 +23,24 @@ articles:
   contents:
   - climr_workflow_beg
   - climr_workflow_int
-  - climr_with_rasters
 - title: "Methods"
   navbar: "Methods"
   desc: "Climate downscaling methods used in `climr`"
   contents:
   - methods_downscaling
+  - methods_mosaic
   - methods_ensembleSelection
-  - lapse_rates
 - title: "Guidance"
   contents:
   - guidance_ensembleSelection
+  - guidance_timeSeries
+- title: "Known Issues"
+  navbar: "Known Issues"
+  desc: "Unresolved bugs, artefacts, and shortcomings"
+  contents:
+  - knownIssues_DiscrepanciesWithClimateNA
+  - knownIssues_customRefmap
+  - knownIssues_spatialAnomaly
 - title: "Caching"
   contents:
   - caching
@@ -56,6 +63,12 @@ reference:
   - input_gcm_hist
   - input_obs
   - input_obs_ts
+  - input_refmap_db
+  - input_gcms_db
+  - input_gcm_ssp_db
+  - input_gcm_hist_db
+  - input_obs_db
+  - input_obs_ts_db
 - title: "Database and caching"
   desc: > 
     Functions for interacting with the PostGIS server
@@ -64,6 +77,7 @@ reference:
   - cache_clear
   - cache_path
   - data_connect
+  - data_con
   - pgGetTerra
 - title: "Utilities"
   desc: >
@@ -72,8 +86,18 @@ reference:
   - plot_bivariate
   - plot_timeSeries  
   - plot_timeSeries_input
+  - plot_bivariate_db
+  - plot_timeSeries_input_db
+  - plot_climate_stripes
+  - plot_climate_diagram
+  - create_climate_diagram
+  - create_climate_diagram_input
+  - create_boxplot
+  - create_boxplot_input
+  - plot_ensemble
   - get_bb
   - lapse_rate
+  - legend_ramp
 - title: "Data"
   desc: >
     Available climate variables and functions listing available data.
@@ -86,7 +110,8 @@ reference:
   - list_gcms
   - list_gcm_periods
   - list_ssps
-  - list_run 
+  - list_runs_ssp
+  - list_runs_historic
   - list_vars
   - xyzDT
   - BECz_vancouver

@@ -1,0 +1,34 @@
+---
+title: "Suboptimal handling of custom refmaps in `downscale_core`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
+description: >
+vignette: >
+  %\VignetteIndexEntry{Suboptimal handling of custom refmaps in `downscale_core`}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+bibliography: references.bib
+link-citations: true
+code_folding: show
+---
+
+`climr` facilitates downscaling to a user-provided basemap, such as the US PRISM maps. However there are several awkward elements to the process that we intend to resolve in the near future. 
+
+1. the name of the digital elevation model (the last layer in the spatraster) is required to be "dem2_WNA".
+2. it is required that `isTRUE(attr(refmap, "builder") == "climr")`. This is easily added to a user script, but it is obscure and unnecessary. 
+
+currently a user needs two extra lines to bypass these restrictions: 
+
+```
+names(refmap_custom)[length(names(refmap_custom))] <- "dem2_WNA" # required name for the digital elevation model
+attr(refmap_custom, "builder") <- "climr" # necessary to trick the package into thinking this is climr input
+climr_custom <- downscale_core(points, refmap = refmap_custom, vars = list_vars(set="Monthly")) # example call to a custom refmap. 
+```
+
+
+

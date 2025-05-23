@@ -24,8 +24,8 @@ plot_bivariate(
 )
 }
 \arguments{
-\item{xyz}{a \code{data.frame} with the following columns "long", "lat", "elev",
-and a unique "id". Any extra columns will be ignored and not output.}
+\item{xyz}{a \code{terra::SpatRaster} with a single layer containing elevation values in metres, or a \code{data.frame} with the following columns
+"long", "lat", "elev", and a unique "id". Any extra columns will be ignored and not output.}
 
 \item{xvar}{character. x-axis variable. options are \code{list_vars()}.}
 
@@ -34,8 +34,7 @@ and a unique "id". Any extra columns will be ignored and not output.}
 \item{period_focal}{character. The 20-year period for which to plot the ensemble
 detail. options are \code{list_gcm_periods()}.}
 
-\item{gcms}{character. Vector of global climate model names. Options
-are \code{\link[=list_gcms]{list_gcms()}}. Defaults to \code{NULL}.}
+\item{gcms}{character. Vector of global climate model names. Options are \code{\link[=list_gcms]{list_gcms()}}.}
 
 \item{ssp}{character. A single SSP-RCP scenario (representative concentration pathways paired with shared socioeconomic pathways).
 Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to SSP2-4.5.}
@@ -44,10 +43,10 @@ Options are \code{\link[=list_ssps]{list_ssps()}}. Defaults to SSP2-4.5.}
 Options are \code{list_obs_periods()}.}
 
 \item{gcm_periods}{character. 20-year reference periods for GCM simulations.
-Options are \code{\link[=list_gcm_periods]{list_gcm_periods()}}. Defaults to \code{NULL}.}
+Options are \code{\link[=list_gcm_periods]{list_gcm_periods()}}.}
 
-\item{max_run}{integer. Maximum number of model runs to include.
-A value of 0 returns the \code{ensembleMean} only. Runs are included in the order they
+\item{max_run}{integer. Maximum number of model runs to include, not including the ensemble mean.
+Runs are included in the order they
 are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
 \item{legend_pos}{character. Position of the legend. Options are \code{c("bottomright", "bottom", "bottomleft", "left", "topleft", "top", "topright", "right", "center")}.}
@@ -99,16 +98,14 @@ my_points <- data.frame(
   lon = c(-123.4404, -123.5064, -124.2317),
   lat = c(48.52631, 48.46807, 49.21999),
   elev = c(52, 103, 357),
-  id = LETTERS[1:3]
+  id = seq_len(3)
 )
 
 # draw the plot
 plot_bivariate(my_points)
 
 # draw an interactive (plotly) plot
-if (interactive()) {
-  plot_bivariate(my_points, interactive = TRUE)
-}
+plot_bivariate(my_points, xvar="MAT", yvar="PAS", interactive = TRUE)
 
 # export plot to a temporary directory
 figDir <- tempdir()
