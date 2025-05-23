@@ -165,7 +165,6 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
     xyz[, id_orig := NULL]
   }
 
-  #dbCon <- data_con(if (local) "local")
   thebb <- get_bb(xyz) ## get bounding box based on input points
   db_ts <- db_option
   if((db_option == "auto" & nrow(xyz) < 5) | db_option == "database"){

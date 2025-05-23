@@ -105,9 +105,7 @@ my_points <- data.frame(
 plot_bivariate(my_points)
 
 # draw an interactive (plotly) plot
-if (interactive()) {
-  plot_bivariate(my_points, interactive = TRUE)
-}
+plot_bivariate(my_points, xvar="MAT", yvar="PAS", interactive = TRUE)
 
 # export plot to a temporary directory
 figDir <- tempdir()

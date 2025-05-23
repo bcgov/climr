@@ -116,7 +116,6 @@ refmap <- input_refmap(thebb, reference = "refmap_climatena")
 
 # obtain the low-resolution climate data for a single gcm, 20-year period, and ssp scenario.
 gcm_raw <- input_gcms(
-  dbCon,
   thebb,
   list_gcms()[3],
   list_ssps()[1],
