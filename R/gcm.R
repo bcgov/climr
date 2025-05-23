@@ -149,6 +149,7 @@ input_gcms_db <- function(
 #' @param years numeric. Vector of desired years. Default is `1901:2014`.
 #'   See [`list_gcm_hist_years()`] for available years.
 #' @template max_run
+#' @template ensemble_mean
 #' @template cache
 #' @template run_nm
 #'
@@ -261,6 +262,7 @@ input_gcm_hist_db <- function(
 #' @param years Numeric or character vector in `2020:2100`. Defaults to `2020:2030`.
 #'   See [`list_gcm_ssp_years()`] for available years.
 #' @template max_run
+#' @template ensemble_mean
 #' @template cache
 #' @template run_nm
 #' @param fast Logical. Should we use the faster method of downloading data from the database using arrays instead of Postgis rasters?
@@ -426,7 +428,7 @@ list_unique <- function(files, col_num) {
 #'   corresponding names in the PostGIS data base.  See climr:::dbnames
 #' @template cache
 #' @template run_nm
-#'
+#' @template ensemble_mean
 #' @importFrom tools R_user_dir
 #' @importFrom data.table fread
 #'
@@ -557,7 +559,7 @@ process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run,
 #'   and their corresponding names in the PostGIS data base. See climr:::dbnames_hist
 #' @template cache
 #' @template run_nm
-#'
+#' @template ensemble_mean
 #' @importFrom tools R_user_dir
 #' @importFrom data.table fread
 #'
@@ -680,7 +682,7 @@ process_one_gcm3 <- function(gcm_nm, years, bbox, max_run,ensemble_mean, dbnames
 #' @template bbox
 #' @template cache
 #' @template run_nm
-#'
+#' @template ensemble_mean
 #' @importFrom tools R_user_dir
 #' @importFrom data.table fread
 #'

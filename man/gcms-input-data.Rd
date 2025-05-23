@@ -84,6 +84,9 @@ Can be obtained from \code{\link[=list_gcm_periods]{list_gcm_periods()}}. Defaul
 Runs are included in the order they
 are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 
+\item{ensemble_mean}{Logical. Return the mean of the individual GCM runs? If \code{ensemble_mean = TRUE} and \code{max_run = 0}, only
+the mean will be returned. To return an individual run and exclude the mean, set \code{ensemble_mean = FALSE} and \code{max_run = 1}.}
+
 \item{cache}{logical. Specifying whether to cache new data locally or no. Defaults to \code{TRUE}.}
 
 \item{run_nm}{character. \code{NULL} or length >= 1. Name of specified run(s) to return, instead of using \code{max_run}. Use the \verb{list_runs_*()} functions to list available runs.Defaults to \code{NULL}.}

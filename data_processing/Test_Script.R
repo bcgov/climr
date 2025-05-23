@@ -6,6 +6,67 @@ library(RPostgres)
 library(climr)
 library(dplyr)
 
+xyz <- data.table(sg_id = 1, id = 9999, lon = -125.9912109375, lat = 54.901882187385, elev = 0)
+dat <- downscale(xyz = xyz, which_refmap = "refmap_climr", obs_periods = "2001_2020", 
+                 obs_years = NULL, obs_ts_dataset = NULL, return_refperiod = FALSE, 
+                 gcms = NULL, ssps = NULL, gcm_periods = NULL, gcm_ssp_years = NULL, 
+                 gcm_hist_years = NULL, max_run = 0, run_nm = NULL, vars = NULL, ppt_lr = FALSE)
+dat <- climr::downscale(xyz = in_xyz, which_refmap = "refmap_climr", obs_periods = "2001_2020", obs_years = NULL, obs_ts_dataset = NULL, return_refperiod = FALSE, gcms = NULL, ssps = NULL, gcm_periods = NULL, gcm_ssp_years = NULL, gcm_hist_years = NULL, max_run = 0, run_nm = NULL, ppt_lr = FALSE)
+
+dbCon <- data_connect()
+in_xyz <- data.frame(
+   lon = c(-127.7052, -127.6227, -127.5623, -127.7162, -127.1858, -127.125, -126.9495, -126.9550),
+   lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
+   elev = c(291, 296, 626, 377, 424, 591, 723, 633),
+   id = 1:8
+  )
+
+
+dir <- paste("//objectstore2.nrs.bcgov/ffec/Climatologies/PRISM_BC/PRISM_dem/", sep="")
+dem.bc <- rast("../Common_Files/PRISM_dem.tiff")
+
+my_grid <- as.data.frame(dem.bc, cells = TRUE, xy = TRUE)
+colnames(my_grid) <- c("id", "lon", "lat", "elev") # rename column names to what climr expects
+
+varsl = c("DD5", "DDsub0_at", "DDsub0_wt", "PPT_05", "PPT_06", "PPT_07", "PPT_08",
+          "PPT_09", "CMD", "PPT_at", "PPT_wt", "CMD_07", "SHM", "AHM", "NFFD", "PAS",
+          "CMI", "Tmax_sm", "TD", "PPT_sm", "DD5_sp",
+          "PPT_sp", "PPT_sm", "Tmax_at", "Tmax_wt", "Tmax_sp", "Tmax_sm","Tmin_at", "Tmin_wt", "Tmin_sp", "Tmin_sm")
+varsl<-unique(varsl)#make sure no dups
+
+
+clim.bcv <- downscale(
+  xyz = my_grid[0:100000,],
+  which_refmap = "refmap_climr",
+  vars = varsl)
+
+rtemp <- unwrap(dem_vancouver)
+
+clim_out <- downscale(rtemp, gcms = list_gcms()[4], ssps = "ssp245", gcm_periods = "2041_2060", vars = c("MAP","MAT"))
+
+vars_reg <- sort(sprintf(c("PPT_%02d", "Tmax_%02d", "Tmin_%02d"), sort(rep(1:12, 3))))
+temp <- climr::downscale(xyz = rtemp, which_refmap = "refmap_climr", 
+                        obs_periods = "2001_2020",  obs_years = 2024, 
+                         obs_ts_dataset = "mswx.blend", return_refperiod = FALSE,
+                         gcms = NULL, ssps = NULL, gcm_periods = NULL, 
+                         gcm_ssp_years = NULL, gcm_hist_years = NULL, 
+                         max_run = 0, run_nm = NULL, vars = vars_reg, ppt_lr = FALSE)
+
+clim <- downscale(in_xyz, 
+                  which_refmap = "refmap_climr", 
+                  obs_periods = "2001_2020",
+                  obs_years = 1901:2020,
+                  obs_ts_dataset = c("cru.gpcc", "mswx.blend"),
+                  db_option = "database")
+
+test <- downscale(in_xyz[1:4,], obs_years = 2001:2023, obs_ts_dataset = c("mswx.blend","cru.gpcc"), 
+                  return_refperiod = FALSE, vars = c("PPT_04","Tmin_12","Tmax_08")) 
+ts.climateNA <- downscale(in_xyz, which_refmap = "refmap_climr", obs_years = 1901:2023, obs_ts_dataset = "cru.gpcc", return_refperiod=F)
+
+t1 <- test[id == 1,]
+library(ggplot2)
+ggplot(t1, aes(x = PERIOD, y = PPT_04, colour = DATASET, group = DATASET)) +
+  geom_line()
 
 #low res dem for north america
 dem <- rast("//objectstore2.nrs.bcgov/ffec/DEM/DEM_NorAm/dem_noram_lowres.tif")
@@ -353,7 +414,7 @@ pnts <- data.table(lon = c(-121.20225,-126.39689,-117.97568,-127.29956,-127.1270
                    elev = c(588,985,1067,55,563,799,306,1103), 
                    id = c("BGxm1","SBSmc2","ICHmw2","CWHvm1","SBSdk","ICHxm1","CDFmm","SBPSdc"))
 
-res <- downscale(pnts, obs_years = 1961:1990, obs_ts_dataset = "cru.gpcc", indiv_tiles = TRUE)
+res <- downscale(pnts, obs_years = 1961:1990, obs_ts_dataset = "cru.gpcc", return_refperiod = FALSE, indiv_tiles = TRUE, db_option = "local")
 
 name <- "normal_composite"
 bands <- 1:73
