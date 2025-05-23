@@ -74,9 +74,6 @@ test_that("calc_* functions work", {
 test_that("calc_* give sensible outputs", {
   testInit(c("data.table", "terra"))
 
-  dbCon <- data_connect()
-  on.exit(try(pool::poolClose(dbCon)), add = TRUE)
-
   ## the following includes NAs for the test and should be small enough
   xyz <- data.frame(
     lon = c(-128, -125, -128, -125),
@@ -86,9 +83,9 @@ test_that("calc_* give sensible outputs", {
   )
   thebb <- get_bb(xyz)
 
-  normalbc <- input_refmap(dbCon = dbCon, reference = "refmap_climr", bbox = thebb, cache = TRUE)
+  normalbc <- input_refmap(reference = "refmap_climr", bbox = thebb, cache = TRUE)
 
-  gcm <- input_gcms(dbCon,
+  gcm <- input_gcms(
     bbox = thebb,
     gcms = c("BCC-CSM2-MR"),
     ssps = c("ssp126"),
