@@ -1126,23 +1126,23 @@ clim <- downscale(stn.s,
                   which_refmap = "refmap_climr", 
                   obs_periods = "2001_2020",
                   obs_years = 1901:2020,
-                  obs_ts_dataset = c("cru.gpcc", "climatena") 
+                  obs_ts_dataset = c("cru.gpcc", "mswx.blend", "climatena") 
 )
-
-## climateNA time series from climr Data
-clim <- downscale(stn.s)
-
 
 e=1
 # for(e in 1:3){
-m=2
+m=7
 # for(m in 1:12){
-ts.x.mswx <- as.numeric(unique(clim[PERIOD %in% 1901:2020 & DATASET == "climatena", PERIOD]))
-ts.y.mswx <- unname(unlist(clim[clim$PERIOD %in% 1901:2020 & DATASET == "climatena",
+ts.x.climatena <- as.numeric(unique(clim[PERIOD %in% 1901:2020 & DATASET == "climatena", PERIOD]))
+ts.y.climatena <- unname(unlist(clim[clim$PERIOD %in% 1901:2020 & DATASET == "climatena",
                                      lapply(.SD, function(x) mean(x, na.rm = TRUE)), by = PERIOD, 
                                      .SDcols = paste(c("Tmin", "Tmax", "PPT")[e], monthcodes[m], sep="_")][, 2]))
 ts.x.cru <- as.numeric(unique(clim[PERIOD %in% 1901:2020 & DATASET == "cru.gpcc", PERIOD]))
 ts.y.cru <- unname(unlist(clim[clim$PERIOD %in% 1901:2020 & DATASET == "cru.gpcc",
+                               lapply(.SD, function(x) mean(x, na.rm = TRUE)), by = PERIOD, 
+                               .SDcols = paste(c("Tmin", "Tmax", "PPT")[e], monthcodes[m], sep="_")][, 2]))
+ts.x.mswx <- as.numeric(unique(clim[PERIOD %in% 1901:2020 & DATASET == "mswx.blend", PERIOD]))
+ts.y.mswx <- unname(unlist(clim[clim$PERIOD %in% 1901:2020 & DATASET == "mswx.blend",
                                lapply(.SD, function(x) mean(x, na.rm = TRUE)), by = PERIOD, 
                                .SDcols = paste(c("Tmin", "Tmax", "PPT")[e], monthcodes[m], sep="_")][, 2]))
 ts.ref <- mean(ts.y.climatena[ts.x.climatena%in%1961:1990])
@@ -1152,7 +1152,7 @@ png(filename=paste("vignettes/plots_timeseries/CRUvsClimateNA_ts", elements[e], 
 
 par(mar = c(2,3,0.5,0.5), mgp = c(1.75, 0.25, 0), mfrow=c(1,1))
 ylim <- range(ts.y.climatena, na.rm = T) + c(-1.5,1.5)
-plot(ts.x.cru, rep(NA, length(ts.x.cru)), ylim=ylim, type="o", tck=-0.01, col="white", xlab="", ylab=element.names[e])
+plot(ts.x.cru, rep(NA, length(ts.x.cru)), ylim=ylim, type="o", tck=-0.01, col="white", xlab="", ylab=paste(month.name[m], element.names[e]))
 
 recent <- vector()
 for(station in stations){
@@ -1169,14 +1169,16 @@ for(station in stations){
   }
 }
 
+lines(ts.x.mswx,ts.y.mswx, col="orange", lwd=2)
 lines(ts.x.cru,ts.y.cru, col="dodgerblue", lwd=3)
 lines(ts.x.climatena,ts.y.climatena, col="black", lwd=2)
 lines(c(1961,1990), rep(mean(ts.y.cru[ts.x.cru%in%1961:1990]),2), lty=2, col=1, lwd=2)
+lines(c(2001,2020), rep(mean(ts.y.mswx[ts.x.mswx%in%2001:2020]),2), col="orange", lty=2, lwd=2)
 lines(c(2001,2020), rep(mean(ts.y.cru[ts.x.cru%in%2001:2020]),2), lty=2, col="dodgerblue", lwd=2)
 lines(c(2001,2020), rep(mean(ts.y.climatena[ts.x.climatena%in%2001:2020]),2), lty=2, lwd=2)
 boxplot(recent, add=T, at=2021, width=5, range=0)
-legend("topleft", legend=c("ClimateNA", "CRU", "AHCCD stations"), pch=c(NA, NA, NA), 
-       col = c(1,"dodgerblue", "gray80"), lty=c(1,1,1), lwd=c(3,2,2), bty="n")
+legend("topleft", legend=c("AHCCD stations", "ClimateNA", "CRU", "MSWX blend"), pch=c(NA, NA, NA, NA), 
+       col = c("gray80", 1,"dodgerblue","orange"), lty=c(1,1,1,1), lwd=c(2,3,2,2), bty="n")
 
 dev.off()
 month.abb[m]

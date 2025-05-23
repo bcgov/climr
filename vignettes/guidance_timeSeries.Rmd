@@ -81,15 +81,15 @@ knitr::include_graphics("plots_timeseries/CRUvsMSWXvsClimateNA_BCAB.Tmin.02.png"
 ```
 </div>
 
-The Okanagan Valley (outlined with the black rectangle in [Figure 4](#fig4)) has a high density of AHCCD stations that help to put the differences between the gridded products into context. The CRU and ClimateNA time series are very similar during the 20th century, but diverge in 1998 coincident with the sharp decline in CRU station density ([Figure 5](#fig5)). This divergence produces a slight cooling trend in CRU and a slight warming trend in ClimateNA. The 6 AHCCD stations corroborate the CRU trend, as indicated by the boxplot. However, the year-to-year variability is much greater than the difference in the trends, and is syncronous between the products. 
+The Okanagan Valley (outlined with the black rectangle in [Figure 4](#fig4)) has a high density of AHCCD stations that help to put the differences between the gridded products into context. The CRU and ClimateNA time series are very similar during the 20th century, but diverge in 1998 coincident with the sharp decline in CRU station density ([Figure 5](#fig5)). This divergence produces a slight cooling trend in CRU and a slight warming trend in ClimateNA. The 6 AHCCD stations corroborate the CRU trend, as indicated by the boxplot. However, the year-to-year variability is much greater than the difference in the trends, and is synchronous between the products. 
 
 <div id="fig5">
-```{r, echo=FALSE, fig.cap = "Figure 5: Comparison of the ClimateNA and CRU February Tmin time series for the Okanagan Valley study area mapped in Figure 5. Solid grey lines are the station records for the six AHCCD stations located in the study area. Dashed lines are the 2001-2020 mean of each time series. The boxplot shows the distribution of the AHCCD station 2001-2020 means.", results='asis', out.width = "100%"}
+```{r, echo=FALSE, fig.cap = "Figure 5: Comparison of the ClimateNA, MSWX blend, and CRU February Tmin time series for the Okanagan Valley study area mapped in Figure 5. Solid grey lines are the station records for the six AHCCD stations located in the study area. Dashed lines are the 2001-2020 mean of each time series. The boxplot shows the distribution of the AHCCD station 2001-2020 means.", results='asis', out.width = "100%"}
 knitr::include_graphics("plots_timeseries/CRUvsClimateNA_ts.Tmin.02.png")
 ```
 </div>
 
-The July temperature time series is instructive ([Figure 6](#fig6)). The post-1998 divergence of the products is much greater relative to natural variability. Unlike in February, the CRU trend is below the distribution of AHCCD station trends. This example illustrates that the differences between products is not trivial and could have substantial implications both for trend detection and analysis of interannual variation. The February and July examples suggest that neither product provides a consistently more reliable trend, even in station-dense regions.
+The July temperature time series is instructive ([Figure 6](#fig6)). The post-1998 divergence of the products is much greater relative to natural variability. Unlike in February, the CRU trend is below the distribution of AHCCD station trends. This example illustrates that the differences between products is not trivial and could have substantial implications both for trend detection and analysis of interannual variation. The February and July examples illustrate that one product doesn't necessarily provide a consistently more reliable trend, even in station-dense regions.
 
 <div id="fig6">
 ```{r, echo=FALSE, fig.cap = "Figure 6: As in Figure 5, but for July Tmin. ", results='asis', out.width = "100%"}
