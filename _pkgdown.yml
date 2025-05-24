@@ -18,19 +18,21 @@ home:
 
 articles:
 - title: "`climr` workflows"
-  desc: "How to use `climr`, from beginner to advanced operations"
+  desc: "How to use climr, from beginner to advanced operations"
   navbar: "`climr` workflows"
   contents:
   - climr_workflow_beg
   - climr_workflow_int
 - title: "Methods"
   navbar: "Methods"
-  desc: "Climate downscaling methods used in `climr`"
+  desc: "How climr works and how the input data were created"
   contents:
   - methods_downscaling
   - methods_mosaic
   - methods_ensembleSelection
 - title: "Guidance"
+  navbar: "Guidance"
+  desc: "Best practices and other perspectives"
   contents:
   - guidance_ensembleSelection
   - guidance_timeSeries
