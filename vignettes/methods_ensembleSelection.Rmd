@@ -187,7 +187,7 @@ emphasizes that uncertainty in future emissions overshadows the
 differences between the 13-model and 8-model ensemble means.
 
 The range of year-to-year variability is much greater in the 13-model
-ensemble (Figure 1, top). This is largely due to the extreme warming
+ensemble (Figure 1, bottom). This is largely due to the extreme warming
 produced at high latitudes by the UKESM1-0 model. While interannual
 variability of individual model runs does not affect most users of climr
 (since they are averaged out in the climate normals), Figure 1 (bottom)
