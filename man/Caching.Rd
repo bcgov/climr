@@ -26,11 +26,39 @@ Clear the package's local cache path
 Attempts to delete all folder/files in \code{cache_path()}.
 }
 \details{
-By default, it uses \code{\link[tools:userdir]{tools::R_user_dir()}}. The cache location can be
-set using the \code{climr.cache.path} option with \code{options("climr.cache.path" = "your_path")}.
+By default, it uses \code{\link[tools:userdir]{tools::R_user_dir()}}.
+The cache location can be set using the \code{CLIMR_CACHE_PATH} environment variable,
+or using the \code{climr.cache.path} option. The value set via the option takes precedence.
 
 It may fail if R has no permission to delete files/folders
 in the \code{cache_path()} directory
+}
+\examples{
+\dontshow{
+  ## record previous settings for post-example cleanup
+  prev_envvar <- Sys.getenv("CLIMR_CACHE_PATH")
+  prev_opts <- getOption("climr.cache.path")
+}
+cache_path() ## the current cache path
+
+## set via environment variable
+Sys.setenv(CLIMR_CACHE_PATH = file.path(tempdir(), "climr-cache"))
+cache_path() ## e.g., /tmp/Rtmpbo9VC7/climr-cache
+
+## set via option (takes precedence over envvar)
+options(climr.cache.path = file.path(tempdir(), "climr-cache-2"))
+cache_path() ## e.g., /tmp/Rtmpbo9VC7/climr-cache-2
+
+\dontshow{
+  ## unset/cleanup
+  if (nzchar(prev_envvar)) {
+    Sys.unsetenv("CLIMR_CACHE_PATH")
+  } else {
+    Sys.setenv(CLIMR_CACHE_PATH = prev_envvar)
+  }
+  options(prev_opts)
+}
+
 }
 \seealso{
 \code{\link[=cache_path]{cache_path()}}
