@@ -18,19 +18,21 @@ home:
 
 articles:
 - title: "`climr` workflows"
-  desc: "How to use `climr`, from beginner to advanced operations"
+  desc: "How to use climr, from beginner to advanced operations"
   navbar: "`climr` workflows"
   contents:
   - climr_workflow_beg
   - climr_workflow_int
 - title: "Methods"
   navbar: "Methods"
-  desc: "Climate downscaling methods used in `climr`"
+  desc: "How climr works and how the input data were created"
   contents:
   - methods_downscaling
   - methods_mosaic
   - methods_ensembleSelection
 - title: "Guidance"
+  navbar: "Guidance"
+  desc: "Best practices and other perspectives"
   contents:
   - guidance_ensembleSelection
   - guidance_timeSeries
@@ -41,6 +43,9 @@ articles:
   - knownIssues_DiscrepanciesWithClimateNA
   - knownIssues_customRefmap
   - knownIssues_spatialAnomaly
+- title: "Caching"
+  contents:
+  - caching
 
 reference:
 - title: "Downscaling functions"
@@ -50,7 +55,6 @@ reference:
   - climr
   - downscale
   - downscale_core
-  - downscale_db_core
 - title: "Downloading raw climate inputs"
   desc: >
     Functions to generate inputs for downscale_core()
@@ -75,8 +79,8 @@ reference:
   - cache_clear
   - cache_path
   - data_connect
+  - data_con
   - pgGetTerra
-  - dbGetTiles
 - title: "Utilities"
   desc: >
     Other useful functions
@@ -84,17 +88,25 @@ reference:
   - plot_bivariate
   - plot_timeSeries  
   - plot_timeSeries_input
+  - plot_bivariate_db
+  - plot_timeSeries_input_db
+  - plot_climate_stripes
+  - plot_climate_diagram
+  - create_climate_diagram
+  - create_climate_diagram_input
+  - create_boxplot
+  - create_boxplot_input
   - plot_ensemble
   - get_bb
   - lapse_rate
   - legend_ramp
-  - logVars
 - title: "Data"
   desc: >
     Available climate variables and functions listing available data.
     Datasets used in vignettes and examples.
   contents:
-  - list_vars
+  - variables
+  - name_changes
   - list_refmaps
   - list_obs_periods
   - list_gcms
@@ -104,7 +116,6 @@ reference:
   - list_runs_historic
   - list_vars
   - xyzDT
-  - variables
   - BECz_vancouver
   - BECz_vancouver_ras
   - BECcols
