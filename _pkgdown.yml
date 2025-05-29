@@ -84,8 +84,6 @@ reference:
   - plot_bivariate
   - plot_timeSeries  
   - plot_timeSeries_input
-  - create_boxplot
-  - create_boxplot_input
   - plot_ensemble
   - get_bb
   - lapse_rate
