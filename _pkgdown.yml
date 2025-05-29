@@ -84,8 +84,6 @@ reference:
   - plot_bivariate
   - plot_timeSeries  
   - plot_timeSeries_input
-  - plot_bivariate_db
-  - plot_timeSeries_input_db
   - plot_climate_stripes
   - plot_climate_diagram
   - create_climate_diagram
