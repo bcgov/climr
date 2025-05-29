@@ -43,9 +43,6 @@ articles:
   - knownIssues_DiscrepanciesWithClimateNA
   - knownIssues_customRefmap
   - knownIssues_spatialAnomaly
-- title: "Caching"
-  contents:
-  - caching
 
 reference:
 - title: "Downscaling functions"
@@ -79,7 +76,6 @@ reference:
   - cache_clear
   - cache_path
   - data_connect
-  - data_con
   - pgGetTerra
 - title: "Utilities"
   desc: >
