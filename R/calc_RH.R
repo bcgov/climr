@@ -22,7 +22,7 @@ calc_RH <- function(tmmin, tmmax) {
 #'
 #' Based on simplified Penman - Monteith method from Hogg (1997)
 #'
-#' @param tave numeric. Monthly average minimum air temperature.
+#' @param tave numeric. Monthly average air temperature.
 #' @template tmmin
 #' @template tmmax
 #' @param alt numeric. Altitude in m.
