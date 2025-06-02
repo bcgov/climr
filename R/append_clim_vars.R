@@ -331,7 +331,7 @@ append_clim_vars.SpatRaster <- function(dt, vars) {
   "TD"         = function(v) {v("MWMT") - v("MCMT")},
   "EXT"        = function(v) {calc_EXT(list(v("Tmax_01"), v("Tmax_02"), v("Tmax_03"), v("Tmax_04"), v("Tmax_05"), v("Tmax_06"), v("Tmax_07"), v("Tmax_08"), v("Tmax_09"), v("Tmax_10"), v("Tmax_11"), v("Tmax_12")), v("MWMT"), v("TD"))},
   "EMT"        = function(v) {calc_EMT(list(v("Tmin_01"), v("Tmin_02"), v("Tmin_03"), v("Tmin_04"), v("Tmin_05"), v("Tmin_06"), v("Tmin_07"), v("Tmin_08"), v("Tmin_09"), v("Tmin_10"), v("Tmin_11"), v("Tmin_12")), v("MCMT"), v("TD"))},
-  "bFFP"       = function(v) {calc_bFFP(v("TD"), v("NFFD"), list(v("Tmin_01"), v("Tmin_02"), v("Tmin_03"), v("Tmin_04"), v("Tmin_05"), v("Tmin_06"), v("Tmin_07"), v("Tmin_08"), v("Tmin_09"), v("Tmin_10"), v("Tmin_11"), v("Tmin_12")))},
-  "eFFP"       = function(v) {calc_eFFP(v("NFFD"), list(v("Tmin_01"), v("Tmin_02"), v("Tmin_03"), v("Tmin_04"), v("Tmin_05"), v("Tmin_06"), v("Tmin_07"), v("Tmin_08"), v("Tmin_09"), v("Tmin_10"), v("Tmin_11"), v("Tmin_12")))},
+  "bFFP"       = function(v) {calc_bFFP(v("TD"), v("NFFD_an"), list(v("Tmin_01"), v("Tmin_02"), v("Tmin_03"), v("Tmin_04"), v("Tmin_05"), v("Tmin_06"), v("Tmin_07"), v("Tmin_08"), v("Tmin_09"), v("Tmin_10"), v("Tmin_11"), v("Tmin_12")))},
+  "eFFP"       = function(v) {calc_eFFP(v("NFFD_an"), list(v("Tmin_01"), v("Tmin_02"), v("Tmin_03"), v("Tmin_04"), v("Tmin_05"), v("Tmin_06"), v("Tmin_07"), v("Tmin_08"), v("Tmin_09"), v("Tmin_10"), v("Tmin_11"), v("Tmin_12")))},
   "FFP"        = function(v) {calc_FFP(v("bFFP"), v("eFFP"))}
 )
