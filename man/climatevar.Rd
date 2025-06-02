@@ -97,7 +97,7 @@ the mean coldest monthly temperature.}
 
 \item{tmin}{numeric. Minimum temperature for the \code{m} month.}
 
-\item{tave}{numeric. Monthly average minimum air temperature.}
+\item{tave}{numeric. Monthly average air temperature.}
 
 \item{alt}{numeric. Altitude in m.}
 
