@@ -8,11 +8,20 @@ library(dplyr)
 
 dem_vancouver <- get(data("dem_vancouver")) |> unwrap() 
 cache_clear("gcms")
+ds_out <- downscale(xyz = dem_vancouver,
+                    obs_periods = NULL,
+                    gcms = list_gcms()[1],
+                    ssps = list_ssps()[1],
+                    gcm_periods = list_gcm_periods()[1],    
+                    vars = c("AHM") )
+
+dem_vancouver <- get(data("dem_vancouver")) |> unwrap() 
+cache_clear("gcms")
 ds_out <- downscale( xyz = dem_vancouver, obs_periods = NULL, gcms = list_gcms()[1], 
                      ssps = list_ssps()[1], gcm_periods = "2001_2020", vars = c("AHM") ) 
 
 ds_out <- downscale( xyz = dem_vancouver,  obs_periods = "2001_2020",  gcms = list_gcms()[1], ssps = list_ssps()[2],
-                     gcm_periods = "2041_2060", vars = c("MCMT","CMI_an") )
+                     gcm_periods = "2041_2060", vars = c("FFP") )
 
 
 dem_vancouver <- get(data("dem_vancouver")) |> unwrap() 
@@ -34,6 +43,7 @@ in_xyz <- data.frame(
    id = 1:8
   )
 
+dat <- downscale(in_xyz[1:3,], which_refmap = "refmap_climr", return_refperiod = TRUE)
 
 dir <- paste("//objectstore2.nrs.bcgov/ffec/Climatologies/PRISM_BC/PRISM_dem/", sep="")
 dem.bc <- rast("../Common_Files/PRISM_dem.tiff")
