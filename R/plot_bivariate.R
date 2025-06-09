@@ -120,7 +120,6 @@ plot_bivariate <- function(
     # )
     
     # extract info for xvar and yvar from downscaled data
-    browser()
     data <- X[, c("id", "GCM", "SSP", "RUN", "PERIOD", xvar, yvar), with = FALSE]
 
     # convert absolute values to anomalies
