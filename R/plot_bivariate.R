@@ -77,7 +77,7 @@
 
 plot_bivariate <- function(
     # xyz,
-    data,
+    X,
     xvar = "Tave_sm",
     yvar = "PPT_sm",
     # percent_x = NULL, TODO: set up an override for ratio variables being expressed as percent anomalies
@@ -121,7 +121,7 @@ plot_bivariate <- function(
     
     # extract info for xvar and yvar from downscaled data
     browser()
-    data = data[, c("id", "GCM", "SSP", "RUN", "PERIOD", xvar, yvar), with = FALSE]
+    data <- X[, c("id", "GCM", "SSP", "RUN", "PERIOD", xvar, yvar), with = FALSE]
 
     # convert absolute values to anomalies
     data[, xanom := if (xvar_type == "ratio") (get(xvar) / get(xvar)[1] - 1) else (get(xvar) - get(xvar)[1]), by = id]
