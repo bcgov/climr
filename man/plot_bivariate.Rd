@@ -5,7 +5,7 @@
 \title{Bivariate climate change plots}
 \usage{
 plot_bivariate(
-  xyz,
+  data,
   xvar = "Tave_sm",
   yvar = "PPT_sm",
   period_focal = list_gcm_periods()[1],
@@ -24,9 +24,6 @@ plot_bivariate(
 )
 }
 \arguments{
-\item{xyz}{a \code{terra::SpatRaster} with a single layer containing elevation values in metres, or a \code{data.frame} with the following columns
-"long", "lat", "elev", and a unique "id". Any extra columns will be ignored and not output.}
-
 \item{xvar}{character. x-axis variable. options are \code{list_vars()}.}
 
 \item{yvar}{character. y-axis variable. options are \code{list_vars()}.}
@@ -67,6 +64,9 @@ interpolation spline.}
 If FALSE, a plot is generated using base graphics.}
 
 \item{cache}{logical. Cache data locally? Default \code{TRUE}}
+
+\item{xyz}{a \code{terra::SpatRaster} with a single layer containing elevation values in metres, or a \code{data.frame} with the following columns
+"long", "lat", "elev", and a unique "id". Any extra columns will be ignored and not output.}
 }
 \value{
 NULL. Draws a plot in the active graphics device.
