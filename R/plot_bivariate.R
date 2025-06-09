@@ -76,7 +76,8 @@
 #' @export
 
 plot_bivariate <- function(
-    xyz,
+    # xyz,
+    data,
     xvar = "Tave_sm",
     yvar = "PPT_sm",
     # percent_x = NULL, TODO: set up an override for ratio variables being expressed as percent anomalies
@@ -106,17 +107,21 @@ plot_bivariate <- function(
     colors <- c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C", "#FB9A99", "#E31A1C", "#FDBF6F", "#FF7F00", "#CAB2D6", "#6A3D9A", "#1e90ff", "#B15928", "#FFFF99")
     ColScheme <- colors[1:length(gcms)]
 
-    # generate the climate data
-    data <- downscale(xyz,
-      obs_periods = obs_period,
-      gcms = gcms,
-      ssps = ssp,
-      gcm_periods = gcm_periods,
-      max_run = max_run,
-      vars = c(xvar, yvar),
-      db_option = "database",
-      cache = cache
-    )
+    # # generate the climate data
+    # data <- downscale(xyz,
+    #   obs_periods = obs_period,
+    #   gcms = gcms,
+    #   ssps = ssp,
+    #   gcm_periods = gcm_periods,
+    #   max_run = max_run,
+    #   vars = c(xvar, yvar),
+    #   db_option = "database",
+    #   cache = cache
+    # )
+    
+    # extract info for xvar and yvar from downscaled data
+    browser()
+    data = data[, c("id", "GCM", "SSP", "RUN", "PERIOD", xvar, yvar), with = FALSE]
 
     # convert absolute values to anomalies
     data[, xanom := if (xvar_type == "ratio") (get(xvar) / get(xvar)[1] - 1) else (get(xvar) - get(xvar)[1]), by = id]
