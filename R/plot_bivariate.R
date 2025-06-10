@@ -280,8 +280,8 @@ plot_bivariate <- function(
           )
         }
 
-        if (xvar_type == "ratio") fig <- fig %>% plotly::layout(xaxis = list(tickformat = "%"))
-        if (yvar_type == "ratio") fig <- fig %>% plotly::layout(yaxis = list(tickformat = "%"))
+        if (xvar_type == "ratio") fig <- fig %>% plotly::layout(xaxis = list(tickformat = ".2%"))
+        if (yvar_type == "ratio") fig <- fig %>% plotly::layout(yaxis = list(tickformat = ".2%"))
 
         fig
       }
