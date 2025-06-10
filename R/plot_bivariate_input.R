@@ -53,10 +53,5 @@ plot_bivariate_input <- function(
     db_option = "database",
     cache = cache
   )
-  # data[, (names(data)) := lapply(.SD, function(col) {
-  #   if (is.numeric(col)) col[is.nan(col)] <- 0
-  #   return(col)
-  # })]
-  #data.agg <- data[, lapply(.SD, mean), by = .(GCM, SSP, RUN, PERIOD), .SDcols = -c("id", "GCM", "SSP", "RUN", "PERIOD")]
   return(data)
 }
