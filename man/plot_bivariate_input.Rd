@@ -8,7 +8,7 @@ plot_bivariate_input(
   xyz,
   obs_period = list_obs_periods()[1],
   gcms = list_gcms(),
-  ssps = list_ssps(),
+  ssps = list_ssps()[1, 2, 3],
   gcm_periods = list_gcm_periods(),
   max_run = 10,
   vars = list_vars()
