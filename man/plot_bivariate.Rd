@@ -5,7 +5,7 @@
 \title{Bivariate climate change plots}
 \usage{
 plot_bivariate(
-  data,
+  X,
   xvar = "Tave_sm",
   yvar = "PPT_sm",
   period_focal = list_gcm_periods()[1],
