@@ -53,5 +53,6 @@ plot_bivariate_input <- function(
     db_option = "database",
     cache = cache
   )
+  data <- na.omit(data)
   return(data)
 }
