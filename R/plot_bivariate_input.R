@@ -37,8 +37,8 @@
 plot_bivariate_input <- function(
     xyz,
     obs_period = list_obs_periods()[1],
-    gcms = list_gcms(),
-    ssps = list_ssps()[c(1:3)],
+    gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)],
+    ssps = list_ssps()[2],
     gcm_periods = list_gcm_periods(),
     max_run = 10,
     vars = list_vars()) {
@@ -53,6 +53,5 @@ plot_bivariate_input <- function(
     db_option = "database",
     cache = cache
   )
-  data <- na.omit(data)
   return(data)
 }
