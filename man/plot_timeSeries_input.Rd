@@ -9,7 +9,7 @@ plot_timeSeries_input(
   gcms = list_gcms(),
   ssps = list_ssps(),
   max_run = 10,
-  obs_ts_dataset = c("cru.gpcc", "climatena"),
+  obs_ts_dataset = c("mswx.blend", "cru.gpcc", "climatena"),
   obs_years = list_obs_years(),
   gcm_hist_years = list_gcm_hist_years(),
   gcm_ssp_years = list_gcm_ssp_years(),
