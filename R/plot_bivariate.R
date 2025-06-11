@@ -215,8 +215,11 @@ plot_bivariate <- function(
 
         # axis titles
         fig <- fig %>% plotly::layout(
-          xaxis = list(title = paste("Change in", variables$Variable[which(variables$Code == xvar)]), range = range(data.all$xanom)),
-          yaxis = list(title = paste("Change in", variables$Variable[which(variables$Code == yvar)]), range = range(data.all$yanom))
+          # xaxis = list(title = paste("Change in", variables$Variable[which(variables$Code == xvar)]), range = range(data.all$xanom)),
+          xaxis = list(title = stringi::stri_unescape_unicode(paste("Change in", variables$Variable[which(variables$Code == xvar)])), range = range(data.all$xanom)),
+          # yaxis = list(title = paste("Change in", variables$Variable[which(variables$Code == yvar)]), range = range(data.all$yanom))
+          yaxis = list(title = stringi::stri_unescape_unicode(paste("Change in", variables$Variable[which(variables$Code == yvar)])), range = range(data.all$yanom))
+          
         )
 
         # observed climate
