@@ -46,7 +46,7 @@
 #' @examples
 #'
 #' \dontrun{
-#' in_xyz <- data.frame(lon = -124, lat = 50.3557, elev = 291, id = 1)
+#' in_xyz <- data.frame(lon = -120.3273, lat = 50.6745, elev = 384, id = 1) # Kamloops, BC
 #' 
 #' # Obtain the input data for the plot
 #' my_data <- plot_WalterLieth_input(in_xyz, 
@@ -132,8 +132,8 @@ plot_WalterLieth <- function(X, diurnal = FALSE,
   all_info <- unique(rbind(df_humid, df_dry))
   
   gg <- ggplot(data = all_info, aes(x = month)) + 
-    geom_line(aes(month, y_tave), colour = 'red') +
-    geom_line(aes(month, y_precip), colour = 'blue') +
+    geom_line(aes(month, y_tave), colour = 'red', linewidth = 1) +
+    geom_line(aes(month, y_precip), colour = 'blue', linewidth = 1) +
     geom_hline(yintercept = 50) +
     geom_hline(yintercept = 0) +
     geom_ribbon(data = df_humid, aes(ymax = y_precip, ymin = y_tave), fill = "blue", alpha = 0.25) +

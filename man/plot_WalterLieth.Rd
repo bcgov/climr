@@ -63,7 +63,7 @@ Interpretation tips:
 \examples{
 
 \dontrun{
-in_xyz <- data.frame(lon = -124, lat = 50.3557, elev = 291, id = 1)
+in_xyz <- data.frame(lon = -120.3273, lat = 50.6745, elev = 384, id = 1) # Kamloops, BC
 
 # Obtain the input data for the plot
 my_data <- plot_WalterLieth_input(in_xyz, 
