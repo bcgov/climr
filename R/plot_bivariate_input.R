@@ -41,7 +41,8 @@ plot_bivariate_input <- function(
     ssps = list_ssps()[2],
     gcm_periods = list_gcm_periods(),
     max_run = 10,
-    vars = list_vars()) {
+    vars = list_vars(), 
+    db_option = "auto") {
   data <- downscale(
     xyz = xyz,
     obs_period = obs_period,
@@ -50,8 +51,7 @@ plot_bivariate_input <- function(
     gcm_periods = gcm_periods,
     max_run = max_run,
     vars = vars,
-    db_option = "database",
-    cache = cache
+    db_option = db_option
   )
   return(data)
 }

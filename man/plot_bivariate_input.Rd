@@ -11,7 +11,8 @@ plot_bivariate_input(
   ssps = list_ssps()[2],
   gcm_periods = list_gcm_periods(),
   max_run = 10,
-  vars = list_vars()
+  vars = list_vars(),
+  db_option = "auto"
 )
 }
 \arguments{
@@ -33,6 +34,8 @@ are found in the models data until \code{max_run} is reached. Defaults to 0L.}
 \item{vars}{character. A vector of climate variables to compute. Supported variables
 can be obtained with \code{\link[=list_vars]{list_vars()}}. Definitions can be found in this package
 \code{variables} dataset. Default to monthly PPT, Tmax, Tmin.}
+
+\item{db_option}{character. One of \code{auto}, \code{database}, or \code{local}. Default \code{auto}.}
 }
 \value{
 \code{data.table} of average downscaled climate variables for all locations.
