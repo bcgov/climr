@@ -1,3 +1,13 @@
+# `climr` 0.2.1
+
+## Bug Fixes
+
+-   
+
+## Enhancements
+
+-   New function "plot_WalterLieth" for creating a Walter-Lieth climate diagram for a specified location(s) and time periods. 
+
 # `climr` 0.2.0
 
 We have lots of exciting improvements in this release! Of major note, we now have:
