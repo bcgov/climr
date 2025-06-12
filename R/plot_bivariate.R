@@ -11,8 +11,11 @@
 #' All climate changes are relative to the 1961-1990 reference period normals.
 #'
 #' @details
-#' The input table `xyz` can be a single location or multiple locations. If multiple
-#' locations, the plot provides the mean of the anomalies for these locations.
+#' The input table `X` provides climate data for a single location or the average of multiple
+#' locations. The purpose of conducting the generation of the input table in a separate function is
+#' to allow users to make multiple calls to [`plot_timeSeries()`] without needing to generate the
+#' inputs each time.
+#' 
 #' The climate change trajectories provided by `show_trajectories` are points for
 #' each of the five 20-year periods specified by `list_gcm_periods()`. These points
 #' are connected with an interpolation spline when the x variable is monotonic;
@@ -21,7 +24,9 @@
 #' are passed to the plot, the GCM means and ensemble mean are averaged across the
 #' scenarios, but the individual runs for all scenarios are plotted separately.
 #'
-#' @template xyz
+#' @param X  A `data.table` object produced using the function [`plot_bivariate_input()`]. This
+#' table can include more models, scenarios, and variables than are used in individual calls to
+#' [`plot_bivariate()`].
 #' @param xvar character. x-axis variable. options are `list_vars()`.
 #' @param yvar character. y-axis variable. options are `list_vars()`.
 #' @param period_focal character. The 20-year period for which to plot the ensemble
@@ -76,7 +81,6 @@
 #' @export
 
 plot_bivariate <- function(
-    # xyz,
     X,
     xvar = "Tave_sm",
     yvar = "PPT_sm",
@@ -107,18 +111,6 @@ plot_bivariate <- function(
     colors <- c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C", "#FB9A99", "#E31A1C", "#FDBF6F", "#FF7F00", "#CAB2D6", "#6A3D9A", "#1e90ff", "#B15928", "#FFFF99")
     ColScheme <- colors[1:length(gcms)]
 
-    # # generate the climate data
-    # data <- downscale(xyz,
-    #   obs_periods = obs_period,
-    #   gcms = gcms,
-    #   ssps = ssp,
-    #   gcm_periods = gcm_periods,
-    #   max_run = max_run,
-    #   vars = c(xvar, yvar),
-    #   db_option = "database",
-    #   cache = cache
-    # )
-    
     # extract info for xvar and yvar from downscaled data
     data <- X[, c("id", "GCM", "SSP", "RUN", "PERIOD", xvar, yvar), with = FALSE]
 
