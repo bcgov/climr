@@ -162,8 +162,8 @@ plot_WalterLieth <- function(X, diurnal = FALSE,
                              max(y_precip_rel, tave, tmax, 50, na.rm=TRUE)),
                     clip = 'off',
                     expand = FALSE) +
-    labs(title = sprintf('Walter-Lieth Climate Diagram           ( %.1f\u00B0C )      ( %1.fmm )', mean(tave), sum(ppt)),
-         subtitle = ifelse(is.null(elev), "", sprintf("( %1.fm )", elev))) +
+    labs(title = sprintf('Walter-Lieth Climate Diagram     (MAT = %.1f\u00B0C; MAP = %1.fmm )', mean(tave), sum(ppt)),
+         subtitle = ifelse(is.null(elev), "", sprintf("(Elev. = %1.fm )", elev))) +
     theme_classic()
   
   # Wet Periods
