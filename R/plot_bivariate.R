@@ -110,7 +110,7 @@ plot_bivariate <- function(
 
     colors <- c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C", "#FB9A99", "#E31A1C", "#FDBF6F", "#FF7F00", "#CAB2D6", "#6A3D9A", "#1e90ff", "#B15928", "#FFFF99")
     ColScheme <- colors[1:length(gcms)]
-    browser()
+
     if ("id" %in% names(data)) {
       # extract info for xvar and yvar from downscaled data
       data <- X[, c("id", "GCM", "SSP", "RUN", "PERIOD", xvar, yvar), with = FALSE]
@@ -120,30 +120,26 @@ plot_bivariate <- function(
       data[, yanom := if (yvar_type == "ratio") (get(yvar) / get(yvar)[1] - 1) else (get(yvar) - get(yvar)[1]), by = id]
       
       # collapse the points down to a mean anomaly
-      data.all <- copy(data[, .(xanom = mean(xanom), yanom = mean(yanom)), by = .(GCM, SSP, RUN, PERIOD)])
-      # collapse the SSP field to calculate a single-model ensemble mean
-      data <- copy(data.all[, .(xanom = mean(xanom), yanom = mean(yanom)), by = .(GCM, RUN, PERIOD)])
-      # ensemble mean for the selected period
-      ensMean <- data[!is.na(GCM) & RUN == "ensembleMean" & PERIOD == period_focal, .(xanom = mean(xanom), yanom = mean(yanom)), ]
-      # observed climate
-      obs <- data[is.na(GCM) & PERIOD == obs_period]
+      #data.all <- copy(data[, .(xanom = mean(xanom), yanom = mean(yanom)), by = .(GCM, SSP, RUN, PERIOD)])
+
     } else {
-      data <- X
+      data <- X[, c("GCM", "SSP", "RUN", "PERIOD", xvar, yvar), with = FALSE]
       
       # convert absolute values to anomalies
       data[, xanom := if (xvar_type == "ratio") (get(xvar) / get(xvar)[1] - 1) else (get(xvar) - get(xvar)[1])]
       data[, yanom := if (yvar_type == "ratio") (get(yvar) / get(yvar)[1] - 1) else (get(yvar) - get(yvar)[1])]
       
       # make a copy of data (already collapsed down to a mean anomaly)
-      data.all <- copy(data)
-      # collapse the SSP field to calculate a single-model ensemble mean
-      data <- copy(data.all[, .(xanom = mean(xanom), yanom = mean(yanom)), by = .(GCM, RUN, PERIOD)])
-      # ensemble mean for the selected period
-      ensMean <- data[!is.na(GCM) & RUN == "ensembleMean" & PERIOD == period_focal, .(xanom = mean(xanom), yanom = mean(yanom)), ]
-      # observed climate
-      obs <- data[is.na(GCM) & PERIOD == obs_period]
     }
 
+    # collapse the SSP field to calculate a single-model ensemble mean
+    data <- na.omit(data, cols = c("xanom","yanom"))
+    data.all <- copy(data)
+    data <- data[, .(xanom = mean(xanom), yanom = mean(yanom)), by = .(GCM, RUN, PERIOD)]
+    # ensemble mean for the selected period
+    ensMean <- data[!is.na(GCM) & RUN == "ensembleMean" & PERIOD == period_focal, .(xanom = mean(xanom), yanom = mean(yanom)), ]
+    # observed climate
+    obs <- data[is.na(GCM) & PERIOD == obs_period]
     if (interactive == FALSE) {
       # BASE PLOT
       # initiate the plot
