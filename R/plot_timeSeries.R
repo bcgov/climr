@@ -146,7 +146,7 @@ plot_timeSeries <- function(
     yearmarkers = TRUE,
     yearlines = FALSE,
     legend_pos = "topleft") {
-  
+
   ## checks
   if (!requireNamespace("scales", quietly = TRUE)) {
     stop("package scales must be installed to use this function")
@@ -203,13 +203,18 @@ plot_timeSeries <- function(
   par(mfrow = c(1, 1), mar = mar, mgp = c(1.75, 0.25, 0), cex = cex)
   # y axis title.
   if (is.null(var2)) { # if there is no second var
-    ylab <- paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"])
+    # ylab <- paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"])
+    ylab <- stringi::stri_unescape_unicode(paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"]))
   } else if (element1 == element2) { # if both variables have the same element
-    ylab <- variables[Code == var1, "Element"]
+    # ylab <- variables[Code == var1, "Element"]
+    ylab <- stringi::stri_unescape_unicode(variables[Code == var1, "Element"])
   } else if (yeartime1 == yeartime2) { # if both variables have the same yeartime
-    ylab <- paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"])
+    # ylab <- paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"])
+    ylab <- stringi::stri_unescape_unicode(paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"]))
   } else { # if variables1 and 2 have different elements and yeartimes
-    ylab <- paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"])
+    # ylab <- paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"])
+    ylab <- stringi::stri_unescape_unicode(paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"]))
+    
   }
   plot(0, col = "white", xlim = c(1900, 2100), 
        ylim = range(if (yfit) visibledata else alldata, na.rm = TRUE), 
@@ -435,6 +440,7 @@ plot_ensemble <- function(x, var, scenarios.selected, scenarios,
           knots.proj <- which(x5 %in% c(seq(2030, 2090, 20), 2100))
           s.ensmin3 <- stinterp(x5[c(knots.hist, knots.proj)], c(s.ensmin$y[knots.hist], s.ensmin2$y[knots.proj]), x5)
           s.ensmax3 <- stinterp(x5[c(knots.hist, knots.proj)], c(s.ensmax$y[knots.hist], s.ensmax2$y[knots.proj]), x5)
+          
           
           colSel <- colSelect(scenario, gcm, pal.scenario, scenarios, pal, pal.gcms)
           
