@@ -98,12 +98,15 @@ plot_WalterLieth <- function(X, diurnal = FALSE,
     data <- X[PERIOD=="1961_1990"]
   }
   
-  ppt <- as.numeric(data[, grep("^PPT_", names(data), value = TRUE), with = FALSE])
-  tmin <- as.numeric(data[, grep("^Tmin_", names(data), value = TRUE), with = FALSE])
-  tmax <- as.numeric(data[, grep("^Tmax_", names(data), value = TRUE), with = FALSE])
+  ppt <- as.numeric(unlist(data[, grep("^PPT_", names(data), value = TRUE), with = FALSE]))
+  tmin <- as.numeric(unlist(data[, grep("^Tmin_", names(data), value = TRUE), with = FALSE]))
+  tmax <- as.numeric(unlist(data[, grep("^Tmax_", names(data), value = TRUE), with = FALSE]))
   tave <- (tmin + tmax) / 2
-  elev <- as.numeric(data[, elev])
-  
+  if ("elev" %in% names(data)) {
+    elev <- as.numeric(data[, elev])
+  } else {
+    elev <- NULL
+  }
   
   # Remove CRAN check warnings
   if (FALSE) {
