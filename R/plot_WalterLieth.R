@@ -93,7 +93,11 @@ plot_WalterLieth <- function(X, diurnal = FALSE,
     data <- X[SSP==ssp & PERIOD==gcm_period] 
     data <- data[, lapply(.SD, mean, na.rm = TRUE), .SDcols = !c("GCM", "SSP", "RUN", "PERIOD")]
   } else if(!is.null(obs_period)){ 
-    data <- X[is.na(GCM) & PERIOD==obs_period]
+    if ("GCM" %in% names(X)) {
+      data <- X[is.na(GCM) & PERIOD==obs_period]
+    } else {
+      data <- X[PERIOD==obs_period]
+    }
   } else {
     data <- X[PERIOD=="1961_1990"]
   }
