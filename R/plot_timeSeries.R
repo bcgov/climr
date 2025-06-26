@@ -241,7 +241,7 @@ plot_timeSeries <- function(
                     scenarios.selected = scenarios.selected, scenarios = scenarios,
                     showrange = showrange, simplify = simplify)
     } else {
-      for (gcm in gcms) { # this plots of individual GCM ensembles.
+      for (gcm in gcms) { # this plots individual GCM ensembles.
         temp.data <- X[GCM == gcm, c("PERIOD", "SSP", "RUN", var), with = FALSE]
         plot_ensemble(temp.data,
                       var = var, var2 = var2,
@@ -299,7 +299,7 @@ plot_timeSeries <- function(
         }
       }
     }
-    print(num)
+    # print(num)
   }
   
   if (showObserved) {

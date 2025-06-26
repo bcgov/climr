@@ -2,7 +2,7 @@
 
 ## Bug Fixes
 
--   
+-   Fixed a bug in `plot_timeSeries()` that prevented plotting of mswx.blend dataset
 
 ## Enhancements
 
