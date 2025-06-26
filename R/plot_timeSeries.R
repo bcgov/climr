@@ -128,7 +128,7 @@ plot_timeSeries <- function(
     var1 = "Tmin_sm",
     var2 = NULL,
     showObserved = TRUE,
-    obs_ts_dataset = "climatena",
+    obs_ts_dataset = "mswx.blend",
     gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)],
     ssps = list_ssps()[1:3],
     showrange = TRUE,
@@ -267,7 +267,7 @@ plot_timeSeries <- function(
     if (showObserved) {
       # add in observations
       obs.colors <- c("black", "blue", "red")
-      obs.options <- c("climatena", "cru.gpcc") ## , "era5"
+      obs.options <- c("mswx.blend", "cru.gpcc", "climatena") 
       for (obs.dataset in obs_ts_dataset) { # TODO update this code block once i know how the datasets are identified in the climr output
         obs.color <- obs.colors[which(obs.options == obs.dataset)]
         x.obs <- as.numeric(X[DATASET == obs.dataset & PERIOD %in% 1900:2100, "PERIOD"][[1]])
@@ -304,9 +304,9 @@ plot_timeSeries <- function(
   
   if (showObserved) {
     # Sources legend
-    a <- if ("climatena" %in% obs_ts_dataset) 1 else NA
+    a <- if ("mswx.blend" %in% obs_ts_dataset) 1 else NA
     b <- if ("cru.gpcc" %in% obs_ts_dataset) 2 else NA
-    c <- if ("era5" %in% obs_ts_dataset) 3 else NA
+    c <- if ("climatena" %in% obs_ts_dataset) 3 else NA
     d <- if (length(gcms > 0)) 4 else NA
     s <- !is.na(c(a, b, c, d))
     legend.GCM <- if (length(gcms) > 1) { 
@@ -316,7 +316,7 @@ plot_timeSeries <- function(
     }
     legend(legend_pos,
            title = "", 
-           legend = c("Observed (ClimateNA)", "Observed (CRU/GPCC)", "Observed (ERA5)", legend.GCM)[s],
+           legend = c("Observed (MSWX blend)", "Observed (CRU/GPCC)", "Observed (ClimateNA)", legend.GCM)[s],
            bty = "n",
            lty = rep(1, 4)[s],
            col = c(obs.colors, "gray")[s],
