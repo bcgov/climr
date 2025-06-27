@@ -372,10 +372,14 @@ input_gcm_ssp_db <- function(
       }
       sel_runs <- run_nm
     }
-  
+    
+    layerinfo[,c("Model","Var","Month","SSP","RUN","PERIOD") := tstrsplit(var_nm, "_")]
+    setorder(layerinfo, Model, SSP, RUN, PERIOD, Month)
+    tmp <- layerinfo[mod %in% gcm_nm & run %in% sel_runs, list(var_nm, laynum)] 
+
     list(
       tbl = gcmcode,
-      layers = layerinfo[mod %in% gcm_nm & run %in% sel_runs, list(var_nm, laynum)],
+      layers = tmp,
       VAR = c("PPT", "Tmin", "Tmax")
     )
   })
