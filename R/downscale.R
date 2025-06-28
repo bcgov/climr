@@ -273,10 +273,12 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
 
   results <- results_ts <- NULL
   return_ref_orig <- return_refperiod
+  refperiod_done <- FALSE
   if(any(!is.null(c(obs_periods_db, obs_years_db, gcm_ssp_periods_db, gcm_ssp_ts, gcm_hist_ts)))) return_refperiod <- FALSE
   if(any(!is.null(c(obs_periods_reg, obs_years_reg, gcm_ssp_periods, gcm_ssp_ts_reg, gcm_hist_ts_reg))) | 
      (return_ref_orig & db_option == "local") | 
      inherits(xyz, "SpatRaster")){
+    refperiod_done <- TRUE
     reference <- input_refmap(reference = which_refmap, bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)
     message("Downscaling...")
     results <- downscale_core(
@@ -293,7 +295,7 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
     )
   }
   
-  if(any(!is.null(c(obs_periods_db, obs_years_db, gcm_ssp_periods_db, gcm_ssp_ts, gcm_hist_ts))) | (return_ref_orig & !inherits(xyz, "SpatRaster"))){ ##always returns refperiod
+  if(any(!is.null(c(obs_periods_db, obs_years_db, gcm_ssp_periods_db, gcm_ssp_ts, gcm_hist_ts))) | (!refperiod_done & !inherits(xyz, "SpatRaster"))){ ##always returns refperiod
     write_xyz(xyz)
     reference_db <- input_refmap_db(reference = which_refmap)
     message("Downscaling in database...")
