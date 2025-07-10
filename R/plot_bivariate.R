@@ -115,6 +115,17 @@ plot_bivariate <- function(
       # extract info for xvar and yvar from downscaled data
       data <- X[, c("id", "GCM", "SSP", "RUN", "PERIOD", xvar, yvar), with = FALSE]
       
+      # error handling for calculating percent change with a zero baseline
+      if (any(data[PERIOD == "1961_1990", get(xvar)] == 0)) {
+        if (nrow(data[get(xvar) != 0]) > 0) {
+          stop(sprintf("Error: Non-zero values found in %s during periods while reference period is 0. Unable to calculate percent change.", xvar))
+        }
+      } else if (any(data[PERIOD == "1961_1990", get(yvar)] == 0)) {
+        if (nrow(data[get(yvar) != 0]) > 0) {
+          stop(sprintf("Error: Non-zero values found in %s during periods while reference period is 0. Unable to calculate percent change.", yvar))
+        }
+      }
+
       # convert absolute values to anomalies
       data[, xanom := if (xvar_type == "ratio") (get(xvar) / get(xvar)[1] - 1) else (get(xvar) - get(xvar)[1]), by = id]
       data[, yanom := if (yvar_type == "ratio") (get(yvar) / get(yvar)[1] - 1) else (get(yvar) - get(yvar)[1]), by = id]
@@ -124,6 +135,17 @@ plot_bivariate <- function(
 
     } else {
       data <- X[, c("GCM", "SSP", "RUN", "PERIOD", xvar, yvar), with = FALSE]
+      
+      # error handling for calculating percent change with a zero baseline
+      if (any(data[PERIOD == "1961_1990", get(xvar)] == 0)) {
+        if (nrow(data[get(xvar) != 0]) > 0) {
+          stop(sprintf("Error: Non-zero values found in %s during periods while reference period is 0. Unable to calculate percent change.", xvar))
+        }
+      } else if (any(data[PERIOD == "1961_1990", get(yvar)] == 0)) {
+        if (nrow(data[get(yvar) != 0]) > 0) {
+          stop(sprintf("Error: Non-zero values found in %s during periods while reference period is 0. Unable to calculate percent change.", yvar))
+        }
+      }
       
       # convert absolute values to anomalies
       data[, xanom := if (xvar_type == "ratio") (get(xvar) / get(xvar)[1] - 1) else (get(xvar) - get(xvar)[1])]
