@@ -88,7 +88,8 @@ append_clim_vars.SpatRaster <- function(dt, vars) {
       newrast <- expr(v)
       names(newrast) <- gsub("{VAR}", nm, var_nm_template, fixed = TRUE)
       message("Appending... [%s]" |> sprintf(nm))
-      dt <<- c(dt, newrast)
+      add(dt) <- newrast
+      #dt <<- c(dt, newrast)
 
     }
   }
