@@ -257,7 +257,7 @@ process_ensemble <- function(dt, x, var, scenarios.selected, scenarios,
                           refline = FALSE, showmean = TRUE,
                           element, compile = TRUE, var2 = NULL, element1, element2,
                           yeartime.names, yeartimes, yeartime) {
-  
+
   temp.historical <- x[is.na(SSP), c("PERIOD", "RUN", var), with = FALSE]
   x.historical <- as.numeric(temp.historical[, .(min = min(get(var))), by = PERIOD][["PERIOD"]])
   ensmin.historical <- temp.historical[RUN != "ensembleMean", .(min = min(get(var), na.rm = TRUE)), by = PERIOD][["min"]]
@@ -288,8 +288,11 @@ process_ensemble <- function(dt, x, var, scenarios.selected, scenarios,
           y.ensmax <- c(ensmax.historical, get(paste("ensmax", scenario, sep = "."))[-1])
           s.ensmin <- smooth.spline(x4, y.ensmin, df = 8)
           s.ensmax <- smooth.spline(x4, y.ensmax, df = 8)
-          subset.hist <- which(x4 %in% x.historical)
-          subset.proj <- which(x4 %in% get(paste("x", scenario, sep = ".")))
+          x.hist <- x.historical[(x.historical %% 5 == 0 & x.historical >= 1855 & x.historical <= 2014) | x.historical == 2014]
+          subset.hist <- which(x4 %in% x.hist)
+          y.proj <- get(paste("x", scenario, sep = "."))
+          y.proj <- y.proj[(y.proj %% 5 == 0 & y.proj >= 2014 & y.proj <= 2100) | y.proj == 2014]
+          subset.proj <- which(x4 %in% y.proj)
           
           ## add data for historical & projected envelope
           
@@ -399,11 +402,13 @@ process_ensemble <- function(dt, x, var, scenarios.selected, scenarios,
       x4 <- c(x.historical, get(paste("x", scenarios.selected[2], sep = ".")))
       y4 <- c(ensmean.historical, get(paste("ensmean", scenarios.selected[2], sep = ".")))
     } else {
-      x4 <- c(x.historical, get(paste("x", scenario, sep = ".")))
-      y4 <- c(ensmean.historical, get(paste("ensmean", scenario, sep = ".")))
+      x4 <- c(x.historical, get(paste("x", scenario, sep = "."))[-1])
+      y4 <- c(ensmean.historical, get(paste("ensmean", scenario, sep = "."))[-1])
     }
     s4 <- smooth.spline(x4, y4, df = 10)
-    subset <- which(x4 %in% get(paste("x", scenario, sep = ".")))
+    years <- get(paste("x", scenario, sep = "."))
+    years <- years[(years %% 5 == 0 & years >= 1855 & years <= 2100) | years == 2014]
+    subset <- which(x4 %in% years)
     
     # add data for ensemble means for all scenarios
     if (length(s4$x[subset]) == length(s4$y[subset])) {
