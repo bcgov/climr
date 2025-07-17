@@ -146,7 +146,7 @@ plot_timeSeries <- function(
     yearmarkers = TRUE,
     yearlines = FALSE,
     legend_pos = "topleft") {
-
+ 
   ## checks
   if (!requireNamespace("scales", quietly = TRUE)) {
     stop("package scales must be installed to use this function")
@@ -178,8 +178,8 @@ plot_timeSeries <- function(
   # yeartime definitions
   monthcodes <- as.character(c(paste0("0", 1:9), 10:12))
   seasonmonth.mat <- matrix(monthcodes[c(12, 1:11)], 4, byrow = TRUE)
-  seasons <- c("wt", "sp", "sm", "at")
-  season.names <- c("Winter", "Spring", "Summer", "Autumn")
+  seasons <- c("", "wt", "sp", "sm", "at")
+  season.names <- c("Annual", "Winter", "Spring", "Summer", "Autumn")
   yeartimes <- c(seasons, monthcodes)
   yeartime.names <- c(season.names, month.name)
   
@@ -376,6 +376,7 @@ plot_ensemble <- function(x, var, scenarios.selected, scenarios,
                           endlabel = "change", element,
                           compile = TRUE, var2 = NULL, element1, element2,
                           yeartime.names, yeartimes, yeartime) {
+  
   # scenario <- scenarios.selected[1]
   temp.historical <- x[is.na(SSP), c("PERIOD", "RUN", var), with = FALSE]
   x.historical <- as.numeric(temp.historical[, .(min = min(get(var))), by = PERIOD][["PERIOD"]])

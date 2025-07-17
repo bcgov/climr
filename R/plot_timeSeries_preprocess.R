@@ -146,7 +146,7 @@ plot_timeSeries_preprocess <- function(
     yearmarkers = TRUE,
     yearlines = FALSE,
     legend_pos = "topleft") {
-  
+
   ## checks
   if (!requireNamespace("scales", quietly = TRUE)) {
     stop("package scales must be installed to use this function")
@@ -178,8 +178,8 @@ plot_timeSeries_preprocess <- function(
   # yeartime definitions
   monthcodes <- as.character(c(paste0("0", 1:9), 10:12))
   seasonmonth.mat <- matrix(monthcodes[c(12, 1:11)], 4, byrow = TRUE)
-  seasons <- c("wt", "sp", "sm", "at")
-  season.names <- c("Winter", "Spring", "Summer", "Autumn")
+  seasons <- c("", "wt", "sp", "sm", "at")
+  season.names <- c("Annual", "Winter", "Spring", "Summer", "Autumn")
   yeartimes <- c(seasons, monthcodes)
   yeartime.names <- c(season.names, month.name)
   
@@ -220,7 +220,7 @@ plot_timeSeries_preprocess <- function(
     
     if (compile) { # this plots a single envelope for the ensemble as a whole
       temp.data <- X[is.na(DATASET) & !is.na(PERIOD)]
-      plot_ensemble(temp.data,
+      plot_preprocess_ensemble(temp.data,
                     var = var, var2 = var2,
                     refline = refline, showmean = showmean,
                     endlabel = endlabel, element = element,
@@ -347,7 +347,7 @@ plot_timeSeries_preprocess <- function(
 #'
 #' @importFrom graphics polygon
 #' @importFrom stats smooth.spline
-plot_ensemble <- function(x, var, scenarios.selected, scenarios,
+plot_preprocess_ensemble <- function(x, var, scenarios.selected, scenarios,
                           showrange = TRUE, simplify = TRUE, gcm = NULL,
                           pal, pal.scenario, pal.gcms, refline = FALSE, showmean = TRUE,
                           endlabel = "change", element,
@@ -490,7 +490,7 @@ plot_ensemble <- function(x, var, scenarios.selected, scenarios,
 #' function for specifying the color
 #'
 #' @param scenario TODO
-#' @inheritParams plot_ensemble
+#' @inheritParams plot_preprocess_ensemble
 #' @keywords internal
 colSelect <- function(scenario, gcm, pal.scenario, scenarios, pal, pal.gcms) {
   if (is.null(gcm)) {

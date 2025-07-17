@@ -130,7 +130,7 @@ plot_timeSeries_input_preprocess <- function(
     simplify = TRUE,
     refline = FALSE,
     refline.obs = TRUE) {
-  
+
   ## checks
   if (!requireNamespace("scales", quietly = TRUE)) {
     stop("package scales must be installed to use this function")
@@ -138,6 +138,11 @@ plot_timeSeries_input_preprocess <- function(
   
   if (!requireNamespace("stinepack", quietly = TRUE)) {
     stop("package stinepack must be installed to use this function")
+  }
+  
+  # only keep variables of interest in X
+  if (is.null(var2)) {
+    X <- as.data.table(X[, c("GCM", "SSP", "RUN", "PERIOD", "DATASET", var1), drop = FALSE])
   }
   
   ## create empty data table to store processed data
@@ -163,13 +168,13 @@ plot_timeSeries_input_preprocess <- function(
   yeartimes <- c(seasons, monthcodes)
   yeartime.names <- c(season.names, month.name)
   
-  # ensemble statistics definitions
-  ensstats <- c("ensmin", "ensmax", "ensmean")
-  
-  ## Assemble the data that will be used in the plot (for setting the ylim)
-  alldata <- X[, if (is.null(var2)) get(var1) else c(get(var1), get(var2))] # a vector of all potential data on the plot for setting the ylim (y axis range)
-  visibledata <- X[GCM %in% c(NA, gcms) & SSP %in% c(NA, ssps), 
-                   (if (is.null(var2)) get(var1) else c(get(var1), get(var2)))] # a vector of all visible data on the plot for setting the ylim (y axis range)
+  # # ensemble statistics definitions
+  # ensstats <- c("ensmin", "ensmax", "ensmean")
+  # 
+  # ## Assemble the data that will be used in the plot (for setting the ylim)
+  # alldata <- X[, if (is.null(var2)) get(var1) else c(get(var1), get(var2))] # a vector of all potential data on the plot for setting the ylim (y axis range)
+  # visibledata <- X[GCM %in% c(NA, gcms) & SSP %in% c(NA, ssps), 
+  #                  (if (is.null(var2)) get(var1) else c(get(var1), get(var2)))] # a vector of all visible data on the plot for setting the ylim (y axis range)
   
   # components of the var
   nums <- if (is.null(var2)) 1 else 1:2 # nums is the set of var numbers (var1 or var2) (this is used later on as well)
