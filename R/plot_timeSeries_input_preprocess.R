@@ -142,7 +142,8 @@ plot_timeSeries_input_preprocess <- function(
   
   # only keep variables of interest in X
   if (is.null(var2)) {
-    X <- as.data.table(X[, c("GCM", "SSP", "RUN", "PERIOD", "DATASET", var1), drop = FALSE])
+    X <- as.data.table(X)
+    X <- X[, .SD, .SDcols = c("GCM", "SSP", "RUN", "PERIOD", "DATASET", var1)]
   }
   
   ## create empty data table to store processed data
