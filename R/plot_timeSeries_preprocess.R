@@ -123,7 +123,7 @@
 #'
 #' @export
 
-plot_timeSeries <- function(
+plot_timeSeries_preprocess <- function(
     X,
     var1 = "Tmin_sm",
     var2 = NULL,
@@ -146,7 +146,7 @@ plot_timeSeries <- function(
     yearmarkers = TRUE,
     yearlines = FALSE,
     legend_pos = "topleft") {
- 
+
   ## checks
   if (!requireNamespace("scales", quietly = TRUE)) {
     stop("package scales must be installed to use this function")
@@ -183,13 +183,8 @@ plot_timeSeries <- function(
   yeartimes <- c(seasons, monthcodes)
   yeartime.names <- c(season.names, month.name)
   
-  # ensemble statistics definitions
-  ensstats <- c("ensmin", "ensmax", "ensmean")
-  
-  ## Assemble the data that will be used in the plot (for setting the ylim)
-  alldata <- X[, if (is.null(var2)) get(var1) else c(get(var1), get(var2))] # a vector of all potential data on the plot for setting the ylim (y axis range)
-  visibledata <- X[GCM %in% c(NA, gcms) & SSP %in% c(NA, ssps), 
-                   (if (is.null(var2)) get(var1) else c(get(var1), get(var2)))] # a vector of all visible data on the plot for setting the ylim (y axis range)
+  # # ensemble statistics definitions
+  # ensstats <- c("ensmin", "ensmax", "ensmean")
   
   # components of the var
   nums <- if (is.null(var2)) 1 else 1:2 # nums is the set of var numbers (var1 or var2) (this is used later on as well)
@@ -203,21 +198,17 @@ plot_timeSeries <- function(
   par(mfrow = c(1, 1), mar = mar, mgp = c(1.75, 0.25, 0), cex = cex)
   # y axis title.
   if (is.null(var2)) { # if there is no second var
-    # ylab <- paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"])
     ylab <- stringi::stri_unescape_unicode(paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"]))
   } else if (element1 == element2) { # if both variables have the same element
-    # ylab <- variables[Code == var1, "Element"]
     ylab <- stringi::stri_unescape_unicode(variables[Code == var1, "Element"])
   } else if (yeartime1 == yeartime2) { # if both variables have the same yeartime
-    # ylab <- paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"])
     ylab <- stringi::stri_unescape_unicode(paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"]))
   } else { # if variables1 and 2 have different elements and yeartimes
-    # ylab <- paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"])
     ylab <- stringi::stri_unescape_unicode(paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"]))
     
   }
   plot(0, col = "white", xlim = c(1900, 2100), 
-       ylim = range(if (yfit) visibledata else alldata, na.rm = TRUE), 
+       ylim = range(as.integer(X[,VAL]), na.rm = TRUE), 
        xaxs = "i", xaxt = "n", tck = 0, xlab = "", ylab = ylab)
   axis(1, at = seq(1850, 2100, 25), labels = seq(1850, 2100, 25), tck = 0)
   
@@ -228,8 +219,8 @@ plot_timeSeries <- function(
     var <- get(paste("var", num, sep = ""))
     
     if (compile) { # this plots a single envelope for the ensemble as a whole
-      temp.data <- X[GCM %in% gcms, c("PERIOD", "SSP", "RUN", var), with = FALSE]
-      plot_ensemble(temp.data,
+      temp.data <- X[is.na(DATASET) & !is.na(PERIOD)]
+      plot_preprocess_ensemble(temp.data,
                     var = var, var2 = var2,
                     refline = refline, showmean = showmean,
                     endlabel = endlabel, element = element,
@@ -242,18 +233,7 @@ plot_timeSeries <- function(
                     showrange = showrange, simplify = simplify)
     } else {
       for (gcm in gcms) { # this plots individual GCM ensembles.
-        temp.data <- X[GCM == gcm, c("PERIOD", "SSP", "RUN", var), with = FALSE]
-        plot_ensemble(temp.data,
-                      var = var, var2 = var2,
-                      refline = refline, showmean = showmean,
-                      endlabel = endlabel, element = element,
-                      element1 = element1, element2 = element2,
-                      compile = compile, yeartime.names = yeartime.names,
-                      yeartimes = yeartimes, yeartime = yeartime,
-                      gcm = gcm, pal = pal, pal.scenario = pal.scenario,
-                      pal.gcms = pal.gcms,
-                      scenarios.selected = scenarios.selected, scenarios = scenarios,
-                      showrange = showrange, simplify = simplify)
+        stop(sprintf("Error: This function is not currently set up to handle individual GCM ensembles."))
       }
     }
     
@@ -268,10 +248,10 @@ plot_timeSeries <- function(
       # add in observations
       obs.colors <- c("black", "blue", "red")
       obs.options <- c("mswx.blend", "cru.gpcc", "climatena") 
-      for (obs.dataset in obs_ts_dataset) { # TODO update this code block once i know how the datasets are identified in the climr output
+      for (obs.dataset in obs_ts_dataset) { 
         obs.color <- obs.colors[which(obs.options == obs.dataset)]
         x.obs <- as.numeric(X[DATASET == obs.dataset & PERIOD %in% 1900:2100, "PERIOD"][[1]])
-        y.obs <- X[DATASET == obs.dataset & PERIOD %in% 1900:2100, get(var)]
+        y.obs <- as.numeric(X[DATASET == obs.dataset & PERIOD %in% 1900:2100, VAL])
         recent.obs <- mean(y.obs[which(x.obs %in% 2014:2023)], na.rm = TRUE)
         baseline.obs <- mean(y.obs[which(x.obs %in% 1961:1990)], na.rm = TRUE)
         end <- max(which(!is.na(y.obs)))
@@ -299,7 +279,6 @@ plot_timeSeries <- function(
         }
       }
     }
-    # print(num)
   }
   
   if (showObserved) {
@@ -345,8 +324,6 @@ plot_timeSeries <- function(
     )
   }
   
-  # mtext(paste(" Created using climr (https://bcgov.github.io/climr/)"), side=1, line=1.5, adj=0.0, font=1, cex=1.1, col="gray")
-  
   box()
 }
 
@@ -370,83 +347,56 @@ plot_timeSeries <- function(
 #'
 #' @importFrom graphics polygon
 #' @importFrom stats smooth.spline
-plot_ensemble <- function(x, var, scenarios.selected, scenarios,
+plot_preprocess_ensemble <- function(x, var, scenarios.selected, scenarios,
                           showrange = TRUE, simplify = TRUE, gcm = NULL,
                           pal, pal.scenario, pal.gcms, refline = FALSE, showmean = TRUE,
                           endlabel = "change", element,
                           compile = TRUE, var2 = NULL, element1, element2,
                           yeartime.names, yeartimes, yeartime) {
   
-  # scenario <- scenarios.selected[1]
-  temp.historical <- x[is.na(SSP), c("PERIOD", "RUN", var), with = FALSE]
-  x.historical <- as.numeric(temp.historical[, .(min = min(get(var))), by = PERIOD][["PERIOD"]])
-  ensmin.historical <- temp.historical[RUN != "ensembleMean", .(min = min(get(var), na.rm = TRUE)), by = PERIOD][["min"]]
-  ensmax.historical <- temp.historical[RUN != "ensembleMean", .(max = max(get(var), na.rm = TRUE)), by = PERIOD][["max"]]
-  ensmean.historical <- temp.historical[RUN == "ensembleMean", .(mean = mean(get(var), na.rm = TRUE)), by = PERIOD][["mean"]] # calculate mean using the single-model ensembleMean, to ensure that the mean isn't biased towards models with more runs
-  
-  for (scenario in scenarios.selected[order(c(1, 4, 5, 3, 2)[which(scenarios %in% scenarios.selected)])][-1]) {
-    temp <- x[SSP == scenario, c("PERIOD", "RUN", var), with = FALSE]
-    x.temp <- as.numeric(temp[, .(min = min(get(var))), by = PERIOD][["PERIOD"]])
-    ensmin.temp <- temp[RUN != "ensembleMean", .(min = min(get(var), na.rm = TRUE)), by = PERIOD][["min"]]
-    ensmax.temp <- temp[RUN != "ensembleMean", .(max = max(get(var), na.rm = TRUE)), by = PERIOD][["max"]]
-    ensmean.temp <- temp[RUN == "ensembleMean", .(mean = mean(get(var), na.rm = TRUE)), by = PERIOD][["mean"]] # calculate mean using the single-model ensembleMean, to ensure that the mean isn't biased towards models with more runs
-    assign(paste("x", scenario, sep = "."), c(x.historical[length(x.historical)], x.temp)) # add last year of historical runs. this is necessary to get a seamless transition from the historical polygon to the future polygon.
-    assign(paste("ensmin", scenario, sep = "."), c(ensmin.historical[length(ensmin.historical)], ensmin.temp)) # add last year of historical runs. this is necessary to get a seamless transition from the historical polygon to the future polygon.
-    assign(paste("ensmax", scenario, sep = "."), c(ensmax.historical[length(ensmax.historical)], ensmax.temp)) # add last year of historical runs. this is necessary to get a seamless transition from the historical polygon to the future polygon.
-    assign(paste("ensmean", scenario, sep = "."), c(ensmean.historical[length(ensmean.historical)], ensmean.temp)) # add last year of historical runs. this is necessary to get a seamless transition from the historical polygon to the future polygon.
-  }
-  
   if (showrange) {
     if (isFALSE(simplify)) {
-      for (scenario in scenarios.selected[order(c(1, 4, 5, 3, 2)[which(scenarios %in% scenarios.selected)])]) {
-        x3 <- get(paste("x", scenario, sep = "."))
-        colSel <- colSelect(scenario, gcm, pal.scenario, scenarios, pal, pal.gcms)
-        polygon(c(x3, rev(x3)),
-                c(get(paste("ensmin", scenario, sep = ".")), rev(get(paste("ensmax", scenario, sep = ".")))),
-                col = alpha(colSel, 0.35),
-                border = colSel
-        )
-      }
+      stop(sprintf("Error: This function is not currently set up to handle simplify == FALSE."))
     } else {
       scenarios.select <- scenarios.selected[order(c(1, 4, 5, 3, 2)[which(scenarios %in% scenarios.selected)])][-1]
       for (scenario in scenarios.select) {
         if (scenario == scenarios.select[1]) { # we need to run spline through the historical/projected transition
-          x4 <- c(x.historical, get(paste("x", scenario, sep = "."))[-1])
-          y.ensmin <- c(ensmin.historical, get(paste("ensmin", scenario, sep = "."))[-1])
-          y.ensmax <- c(ensmax.historical, get(paste("ensmax", scenario, sep = "."))[-1])
-          s.ensmin <- smooth.spline(x4, y.ensmin, df = 8)
-          s.ensmax <- smooth.spline(x4, y.ensmax, df = 8)
-          subset.hist <- which(x4 %in% x.historical)
-          subset.proj <- which(x4 %in% get(paste("x", scenario, sep = ".")))
+          hist.ensmin.x <- x[SSP == "historical" & TYPE == "ensmin", PERIOD]
+          hist.ensmin.y <- x[SSP == "historical" & TYPE == "ensmin", VAL]
+          
+          hist.ensmax.x <- x[SSP == "historical" & TYPE == "ensmax", PERIOD]
+          hist.ensmax.y <- x[SSP == "historical" & TYPE == "ensmax", VAL]
           
           colSel <- colSelect(scenario, gcm, pal.scenario, scenarios, pal, pal.gcms)
           
-          polygon(c(s.ensmin$x[subset.hist], rev(s.ensmax$x[subset.hist])),
-                  c(s.ensmin$y[subset.hist], rev(s.ensmax$y[subset.hist])),
+          polygon(c(hist.ensmin.x, rev(hist.ensmax.x)),
+                  c(hist.ensmin.y, rev(hist.ensmax.y)), 
                   col = alpha(ifelse(pal == "gcms", colSel, pal.scenario[which(scenarios == "historical")]), 0.35),
                   border = NA
           )
-          polygon(c(s.ensmin$x[subset.proj], rev(s.ensmax$x[subset.proj])),
-                  c(s.ensmin$y[subset.proj], rev(s.ensmax$y[subset.proj])),
+          
+          proj.ensmin.x <- x[SSP == scenario & TYPE == "ensmin", PERIOD]
+          proj.ensmin.y <- x[SSP == scenario & TYPE == "ensmin", VAL]
+          
+          proj.ensmax.x <- x[SSP == scenario & TYPE == "ensmax", PERIOD]
+          proj.ensmax.y <- x[SSP == scenario & TYPE == "ensmax", VAL]
+          
+          polygon(c(proj.ensmin.x, rev(proj.ensmax.x)), 
+                  c(proj.ensmin.y, rev(proj.ensmax.y)),
                   col = alpha(colSel, 0.35),
                   border = NA
           )
         } else { # this second routine uses interpolation splines so that the starting point for all scenarios is the same
-          x5 <- c(x.historical, get(paste("x", scenario, sep = "."))[-1])
-          y.ensmin2 <- c(ensmin.historical, get(paste("ensmin", scenario, sep = "."))[-1])
-          y.ensmax2 <- c(ensmax.historical, get(paste("ensmax", scenario, sep = "."))[-1])
-          s.ensmin2 <- smooth.spline(x5, y.ensmin2, df = 8)
-          s.ensmax2 <- smooth.spline(x5, y.ensmax2, df = 8)
-          knots.hist <- which(x5 %in% c(seq(1860, 2000, 20), 2014))
-          knots.proj <- which(x5 %in% c(seq(2030, 2090, 20), 2100))
-          s.ensmin3 <- stinterp(x5[c(knots.hist, knots.proj)], c(s.ensmin$y[knots.hist], s.ensmin2$y[knots.proj]), x5)
-          s.ensmax3 <- stinterp(x5[c(knots.hist, knots.proj)], c(s.ensmax$y[knots.hist], s.ensmax2$y[knots.proj]), x5)
+          proj.ensmin.x <- x[SSP == scenario & TYPE == "ensmin", PERIOD]
+          proj.ensmin.y <- x[SSP == scenario & TYPE == "ensmin", VAL]
           
+          proj.ensmax.x <- x[SSP == scenario & TYPE == "ensmax", PERIOD]
+          proj.ensmax.y <- x[SSP == scenario & TYPE == "ensmax", VAL]
           
           colSel <- colSelect(scenario, gcm, pal.scenario, scenarios, pal, pal.gcms)
           
-          polygon(c(s.ensmin3$x[subset.proj], rev(s.ensmax3$x[subset.proj])),
-                  c(s.ensmin3$y[subset.proj], rev(s.ensmax3$y[subset.proj])),
+          polygon(c(proj.ensmin.x, rev(proj.ensmax.x)),
+                  c(proj.ensmin.y, rev(proj.ensmax.y)),
                   col = alpha(colSel, 0.35),
                   border = NA
           )
@@ -456,33 +406,21 @@ plot_ensemble <- function(x, var, scenarios.selected, scenarios,
   }
   
   if (refline) {
-    ref.temp <- mean(ensmean.historical[which(x.historical %in% 1961:1990)])
-    lines(1961:1990, rep(ref.temp, 30), lwd = 2)
-    lines(c(1990, 2100), rep(ref.temp, 2), lty = 2)
+    stop(sprintf("Error: This function is not currently set up to handle refline == TRUE."))
   }
   
   # overlay the ensemble mean lines on top of all polygons
   for (scenario in scenarios.selected[order(c(1, 4, 5, 3, 2)[which(scenarios %in% scenarios.selected)])]) {
-    # calculate a spline through the time series (used for plotting and the text warming value)
-    if (scenario == "historical") { # need to run spline through the historical/projected transition
-      x4 <- c(x.historical, get(paste("x", scenarios.selected[2], sep = ".")))
-      y4 <- c(ensmean.historical, get(paste("ensmean", scenarios.selected[2], sep = ".")))
-    } else {
-      x4 <- c(x.historical, get(paste("x", scenario, sep = ".")))
-      y4 <- c(ensmean.historical, get(paste("ensmean", scenario, sep = ".")))
-    }
-    s4 <- smooth.spline(x4, y4, df = 10)
-    subset <- which(x4 %in% get(paste("x", scenario, sep = ".")))
-    
     # plot the ensemble mean
+    ensmean.x <- x[SSP == scenario & TYPE == "ensmean", PERIOD]
+    ensmean.y <- x[SSP == scenario & TYPE == "ensmean", VAL]
+    
     colSel <- colSelect(scenario, gcm, pal.scenario, scenarios, pal, pal.gcms)
     if (showmean) {
       if (simplify) {
-        lines(x = s4$x[subset], y = s4$y[subset], col = colSel, lwd = 2)
+        lines(x = ensmean.x, y = ensmean.y, col = colSel, lwd = 2)
       } else {
-        lines(x = get(paste("x", scenario, sep = ".")), 
-              y = get(paste("ensmean", scenario, sep = ".")), 
-              col = colSel, lwd = 2)
+        stop(sprintf("Error: This function is not currently set up to handle simplify == FALSE."))
       }
     }
     
@@ -490,8 +428,12 @@ plot_ensemble <- function(x, var, scenarios.selected, scenarios,
     if (!is.null(endlabel)) {
       if (scenario != "historical") {
         par(xpd = TRUE)
-        baseline <- mean(ensmean.historical[which(x.historical %in% 1961:1990)])
-        projected <- s4$y[length(s4$y)]
+        # baseline <- mean(ensmean.historical[which(x.historical %in% 1961:1990)])
+        # projected <- s4$y[length(s4$y)]
+        ensmean.hist <- x[SSP == "historical" & TYPE == "ensmean", .(PERIOD, VAL)]
+        baseline <- mean(as.numeric(ensmean.hist[PERIOD %in% 1961:1990, VAL]))
+        s <- x[SSP == scenario & TYPE == "ensmean", VAL]
+        projected <- as.numeric(s[length(s)])
         
         colSel <- colSelect(scenario, gcm, pal.scenario, scenarios, pal, pal.gcms)
         
@@ -548,7 +490,7 @@ plot_ensemble <- function(x, var, scenarios.selected, scenarios,
 #' function for specifying the color
 #'
 #' @param scenario TODO
-#' @inheritParams plot_ensemble
+#' @inheritParams plot_preprocess_ensemble
 #' @keywords internal
 colSelect <- function(scenario, gcm, pal.scenario, scenarios, pal, pal.gcms) {
   if (is.null(gcm)) {

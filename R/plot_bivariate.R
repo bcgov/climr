@@ -99,6 +99,7 @@ plot_bivariate <- function(
     show_trajectories = TRUE,
     interactive = FALSE,
     cache = TRUE) {
+
   if (!requireNamespace("stinepack", quietly = TRUE)) {
     stop("package stinepack must be installed to use this function")
   } else {
@@ -168,10 +169,15 @@ plot_bivariate <- function(
       par(mar = c(3, 4, 0.5, 0.5), mgp = c(1.25, 0.25, 0), cex = 1.5)
       plot(data.all$xanom, data.all$yanom,
         col = "white", tck = 0, xaxt = "n", yaxt = "n", ylab = "",
-        xlab = paste("Change in", variables$Variable[which(variables$Code == xvar)])
+        # xlab = paste("Change in", variables$Variable[which(variables$Code == xvar)])
+        xlab = paste(
+          if (variables$Category[which(variables$Code == xvar)] == "Annual") "Change in Annual" else "Change in",
+          variables$Variable[which(variables$Code == xvar)]
+        )
+        
       )
       par(mgp = c(2.5, 0.25, 0))
-      title(ylab = paste("Change in", variables$Variable[which(variables$Code == yvar)]))
+      title(ylab = paste(if (variables$Category[which(variables$Code == yvar)] == "Annual") "Change in Annual" else "Change in", variables$Variable[which(variables$Code == yvar)]))
       lines(c(0, 0), c(-99, 99), lty = 2, col = "gray")
       lines(c(-99, 99), c(0, 0), lty = 2, col = "gray")
 
