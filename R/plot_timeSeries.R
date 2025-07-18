@@ -145,7 +145,8 @@ plot_timeSeries <- function(
     endlabel = "change",
     yearmarkers = TRUE,
     yearlines = FALSE,
-    legend_pos = "topleft") {
+    legend_pos = "topleft",
+    app = FALSE) {
  
   ## checks
   if (!requireNamespace("scales", quietly = TRUE)) {
@@ -218,8 +219,8 @@ plot_timeSeries <- function(
   }
   plot(0, col = "white", xlim = c(1900, 2100), 
        ylim = range(if (yfit) visibledata else alldata, na.rm = TRUE), 
-       xaxs = "i", xaxt = "n", tck = 0, xlab = "", ylab = ylab, cex.lab = 1.5, cex.axis = 1.25)
-  axis(1, at = seq(1850, 2100, 25), labels = seq(1850, 2100, 25), tck = 0)
+       xaxs = "i", xaxt = "n", tck = 0, xlab = "", ylab = ylab, cex.lab = 1.5, cex.axis = if (app) 1.25 else 1)
+  axis(1, at = seq(1850, 2100, 25), labels = seq(1850, 2100, 25), tck = 0, cex.axis = if (app) 1.25 else 1)
   
   num <- 1
   for (num in nums) {
@@ -324,7 +325,7 @@ plot_timeSeries <- function(
            pch = rep(NA, 4)[s],
            pt.bg = rep(NA, 4)[s],
            pt.cex = rep(NA, 4)[s],
-           cex = 1.5
+           cex = if (app) 1.5 else 1
     )
   }
   
@@ -333,7 +334,7 @@ plot_timeSeries <- function(
     s <- which(list_gcms() %in% gcms)
     legend(ifelse(grepl("top", legend_pos), "top", "bottom"),
            title = "GCMs", legend = gcms, bty = "n",
-           col = pal.gcms[s], pch = 22, pt.bg = alpha(pal.gcms[s], 0.35), pt.cex = 2, cex = 1.5
+           col = pal.gcms[s], pch = 22, pt.bg = alpha(pal.gcms[s], 0.35), pt.cex = 2, cex = if (app) 1.5 else 1
     )
   } else {
     s <- rev(which(scenarios[-1] %in% scenarios.selected))
@@ -342,7 +343,7 @@ plot_timeSeries <- function(
            lty = rep(NA, 5)[c(1, s + 1)], col = pal.scenario[c(1, s + 1)], 
            lwd = rep(NA, 5)[c(1, s + 1)], pch = rep(22, 5)[c(1, s + 1)], 
            pt.bg = alpha(pal.scenario[c(1, s + 1)], 0.35), 
-           pt.cex = rep(2, 5)[c(1, s + 1)], cex = 1.5
+           pt.cex = rep(2, 5)[c(1, s + 1)], cex = if (app) 1.5 else 1
     )
   }
   
