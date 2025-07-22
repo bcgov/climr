@@ -10,7 +10,8 @@ plot_WalterLieth(
   obs_period = NULL,
   gcm = NULL,
   ssp = NULL,
-  gcm_period = NULL
+  gcm_period = NULL,
+  app = FALSE
 )
 }
 \arguments{

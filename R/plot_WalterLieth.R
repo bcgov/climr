@@ -39,7 +39,7 @@
 #' @importFrom data.table fcase fifelse
 #' @importFrom ggplot2 aes geom_hline geom_line geom_ribbon geom_polygon
 #' @importFrom ggplot2 scale_x_continuous scale_y_continuous sec_axis
-#' @importFrom ggplot2 annotate coord_cartesian labs theme_classic
+#' @importFrom ggplot2 annotate coord_cartesian labs theme_classic theme element_text
 #'
 #' @export
 #'
@@ -77,7 +77,9 @@ plot_WalterLieth <- function(X, diurnal = FALSE,
                              obs_period = NULL,
                              gcm = NULL,
                              ssp = NULL,
-                             gcm_period = NULL) {
+                             gcm_period = NULL,
+                             location = NULL,
+                             app = FALSE) {
   
   if (!inherits(X, "data.table")) X <- as.data.table(X)
   
@@ -170,8 +172,20 @@ plot_WalterLieth <- function(X, diurnal = FALSE,
                     clip = 'off',
                     expand = FALSE) +
     labs(title = sprintf('Walter-Lieth Climate Diagram     (MAT = %.1f\u00B0C; MAP = %1.fmm )', mean(tave), sum(ppt)),
-         subtitle = ifelse(is.null(elev), "", sprintf("(Elev. = %1.fm )", elev))) +
+         subtitle = ifelse(is.null(elev), sprintf("(Loc. = %s, Period = %s)", location, obs_period), sprintf("(Loc. = %s, Elev. = %1.fm, Period = %s)", location, elev, obs_period))) +
     theme_classic()
+  if (app) {
+    gg <- gg + theme(
+      plot.title = element_text(size = 20),
+      plot.subtitle = element_text(size = 18),
+      axis.title.x = element_text(size = 18),
+      axis.title.y = element_text(size = 18),
+      axis.title.y.right = element_text(size = 18),
+      axis.text.x = element_text(size = 15),
+      axis.text.y = element_text(size = 15),
+      axis.text.y.right = element_text(size = 15)
+    )
+  }
   
   # Wet Periods
   if (any(period_type == 'Wet')) {

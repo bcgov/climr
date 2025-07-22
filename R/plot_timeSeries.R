@@ -204,16 +204,15 @@ plot_timeSeries <- function(
   par(mfrow = c(1, 1), mar = mar, mgp = c(1.75, 0.25, 0), cex = cex)
   # y axis title.
   if (is.null(var2)) { # if there is no second var
-    # ylab <- paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"])
     ylab <- stringi::stri_unescape_unicode(paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"]))
+    if (variables[Code == var1, "Unit"] != "") {
+      ylab <- stringi::stri_unescape_unicode(paste0(ylab, " (", variables[Code == var1, "Unit"], ")"))
+    }
   } else if (element1 == element2) { # if both variables have the same element
-    # ylab <- variables[Code == var1, "Element"]
     ylab <- stringi::stri_unescape_unicode(variables[Code == var1, "Element"])
   } else if (yeartime1 == yeartime2) { # if both variables have the same yeartime
-    # ylab <- paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"])
     ylab <- stringi::stri_unescape_unicode(paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"]))
   } else { # if variables1 and 2 have different elements and yeartimes
-    # ylab <- paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"])
     ylab <- stringi::stri_unescape_unicode(paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"]))
     
   }
