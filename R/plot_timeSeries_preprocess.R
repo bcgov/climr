@@ -145,7 +145,8 @@ plot_timeSeries_preprocess <- function(
     endlabel = "change",
     yearmarkers = TRUE,
     yearlines = FALSE,
-    legend_pos = "topleft") {
+    legend_pos = "topleft",
+    app = FALSE) {
 
   ## checks
   if (!requireNamespace("scales", quietly = TRUE)) {
@@ -209,8 +210,8 @@ plot_timeSeries_preprocess <- function(
   }
   plot(0, col = "white", xlim = c(1900, 2100), 
        ylim = range(as.integer(X[,VAL]), na.rm = TRUE), 
-       xaxs = "i", xaxt = "n", tck = 0, xlab = "", ylab = ylab)
-  axis(1, at = seq(1850, 2100, 25), labels = seq(1850, 2100, 25), tck = 0)
+       xaxs = "i", xaxt = "n", tck = 0, xlab = "", ylab = ylab, cex.lab = if (app) 1.5 else 1, cex.axis = if (app) 1.25 else 1)
+  axis(1, at = seq(1850, 2100, 25), labels = seq(1850, 2100, 25), tck = 0, cex.axis = if (app) 1.25 else 1)
   
   num <- 1
   for (num in nums) {
@@ -219,7 +220,7 @@ plot_timeSeries_preprocess <- function(
     var <- get(paste("var", num, sep = ""))
     
     if (compile) { # this plots a single envelope for the ensemble as a whole
-      temp.data <- X[is.na(DATASET) & !is.na(PERIOD)]
+      temp.data <- X[is.na(DATASET) & !is.na(PERIOD) & !is.na(VAL)]
       plot_preprocess_ensemble(temp.data,
                     var = var, var2 = var2,
                     refline = refline, showmean = showmean,
@@ -236,7 +237,7 @@ plot_timeSeries_preprocess <- function(
         stop(sprintf("Error: This function is not currently set up to handle individual GCM ensembles."))
       }
     }
-    
+
     # overlay the 5-year lines on top of all polygons
     if (yearlines) {
       for (n in seq(1905, 2095, 5)) {
@@ -302,7 +303,8 @@ plot_timeSeries_preprocess <- function(
            lwd = c(4, 4, 4, 2)[s],
            pch = rep(NA, 4)[s],
            pt.bg = rep(NA, 4)[s],
-           pt.cex = rep(NA, 4)[s]
+           pt.cex = rep(NA, 4)[s],
+           cex = if (app) 1.25 else 1
     )
   }
   
@@ -311,7 +313,7 @@ plot_timeSeries_preprocess <- function(
     s <- which(list_gcms() %in% gcms)
     legend(ifelse(grepl("top", legend_pos), "top", "bottom"),
            title = "GCMs", legend = gcms, bty = "n",
-           col = pal.gcms[s], pch = 22, pt.bg = alpha(pal.gcms[s], 0.35), pt.cex = 2
+           col = pal.gcms[s], pch = 22, pt.bg = alpha(pal.gcms[s], 0.35), pt.cex = 2, cex = if (app) 1.25 else 1
     )
   } else {
     s <- rev(which(scenarios[-1] %in% scenarios.selected))
@@ -320,7 +322,7 @@ plot_timeSeries_preprocess <- function(
            lty = rep(NA, 5)[c(1, s + 1)], col = pal.scenario[c(1, s + 1)], 
            lwd = rep(NA, 5)[c(1, s + 1)], pch = rep(22, 5)[c(1, s + 1)], 
            pt.bg = alpha(pal.scenario[c(1, s + 1)], 0.35), 
-           pt.cex = rep(2, 5)[c(1, s + 1)]
+           pt.cex = rep(2, 5)[c(1, s + 1)], cex = if (app) 1.25 else 1
     )
   }
   
@@ -353,7 +355,7 @@ plot_preprocess_ensemble <- function(x, var, scenarios.selected, scenarios,
                           endlabel = "change", element,
                           compile = TRUE, var2 = NULL, element1, element2,
                           yeartime.names, yeartimes, yeartime) {
-  
+
   if (showrange) {
     if (isFALSE(simplify)) {
       stop(sprintf("Error: This function is not currently set up to handle simplify == FALSE."))
