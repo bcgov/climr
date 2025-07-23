@@ -177,7 +177,7 @@ plot_WalterLieth <- function(X, diurnal = FALSE,
   if (app) {
     gg <- gg + theme(
       plot.title = element_text(size = 20),
-      plot.subtitle = element_text(size = 18),
+      plot.subtitle = element_text(size = 15),
       axis.title.x = element_text(size = 18),
       axis.title.y = element_text(size = 18),
       axis.title.y.right = element_text(size = 18),
