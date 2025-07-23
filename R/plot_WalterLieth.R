@@ -24,6 +24,8 @@
 #' @param gcm Character (optional). A specific global climate model (GCM). If unspecified, then the mean of all global climate models will be shown for the specified `ssp` and `gcm_period`.  
 #' @param ssp Character (optional). A Shared Socioeconomic Pathway scenario (SSP), required when a `gcm_period` is specified.
 #' @param gcm_period Character (optional). A GCM simulation period (e.g., `"2041_2060"`), used for ensemble means or GCM-specific plots. Required when a `gcm_period` is specified.
+#' @param location Character (optional). Include the location in plot title.
+#' @param app Logical. If `TRUE`, it will increase the font size.
 #'
 #' @return A `ggplot2` object showing the Walter-Lieth climate diagram.
 #'

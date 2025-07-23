@@ -11,6 +11,7 @@ plot_WalterLieth(
   gcm = NULL,
   ssp = NULL,
   gcm_period = NULL,
+  location = NULL,
   app = FALSE
 )
 }
@@ -28,6 +29,10 @@ table can include more models, scenarios, and variables than are used in individ
 \item{ssp}{Character (optional). A Shared Socioeconomic Pathway scenario (SSP), required when a \code{gcm_period} is specified.}
 
 \item{gcm_period}{Character (optional). A GCM simulation period (e.g., \code{"2041_2060"}), used for ensemble means or GCM-specific plots. Required when a \code{gcm_period} is specified.}
+
+\item{location}{Character (optional). Include the location in plot title.}
+
+\item{app}{Logical. If \code{TRUE}, it will increase the font size.}
 }
 \value{
 A \code{ggplot2} object showing the Walter-Lieth climate diagram.
