@@ -173,7 +173,7 @@ plot_WalterLieth <- function(X, diurnal = FALSE,
                              max(y_precip_rel, tave, tmax, 50, na.rm=TRUE)),
                     clip = 'off',
                     expand = FALSE) +
-    labs(title = sprintf('Walter-Lieth Climate Diagram     (MAT = %.1f\u00B0C; MAP = %1.fmm )', mean(tave), sum(ppt)),
+    labs(title = sprintf('Walter-Lieth Climate Diagram  (MAT = %.1f\u00B0C; MAP = %1.fmm)', mean(tave), sum(ppt)),
          subtitle = ifelse(is.null(elev), sprintf("(Loc. = %s, Period = %s)", location, obs_period), sprintf("(Loc. = %s, Elev. = %1.fm, Period = %s)", location, elev, obs_period))) +
     theme_classic()
   if (app) {
