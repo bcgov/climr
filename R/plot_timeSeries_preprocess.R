@@ -28,9 +28,7 @@
 #' ~5 minutes to run for the first time it is called for a location. Once the time series are
 #' cached, they don't need to be downloaded again.
 #'
-#' @param X  A `data.table` object produced using the function [`plot_timeSeries_input()`]. This
-#' table can include more models, scenarios, and variables than are used in individual calls to
-#' [`plot_timeSeries()`].
+#' @param X  A `data.table` object produced using the function [`plot_timeSeries_input_preprocess()`].
 #' @inheritParams downscale
 #' @param var1 character. A climate var. options are [`list_vars()`].
 #' @param var2 character. A second climate var to plot in combination with `var1`.
@@ -66,55 +64,6 @@
 #'
 #' @return NULL. Draws a plot in the active graphics device.
 #'
-#' @examples
-#' if (FALSE) {
-#'   # data frame of arbitrary points
-#'   my_points <- data.frame(
-#'     lon = c(-127.7300, -127.7500),
-#'     lat = c(55.34114, 55.25),
-#'     elev = c(711, 500),
-#'     id = 1:2
-#'   )
-#'
-#'   # generate the input data
-#'   my_data <- plot_timeSeries_input(my_points)
-#'
-#'   # use the input to create a plot
-#'   plot_timeSeries(my_data, var1 = "Tmin_sm")
-#'
-#'   # compare observational time series
-#'   plot_timeSeries(my_data, var1 = "Tmin_sm", obs_ts_dataset = c("cru.gpcc", "climatena"))
-#'
-#'   # compare mean daily minimum and maximum temperatures
-#'   plot_timeSeries(my_data, var1 = "Tmin_sm", var2 = "Tmax_sm")
-#'
-#'   # compare summer and winter temperatures (without simplifying the ensemble range)
-#'   plot_timeSeries(my_data, var1 = "Tmax_sm", var2 = "Tmax_wt", simplify = FALSE)
-#'
-#'   # compare global climate models
-#'   plot_timeSeries(
-#'     my_data,
-#'     gcms = list_gcms()[c(7, 13)],
-#'     pal = "gcms",
-#'     ssps = list_ssps()[2],
-#'     showmean = FALSE,
-#'     compile = FALSE,
-#'     simplify = FALSE,
-#'     endlabel = "gcms",
-#'     mar = c(3, 3, 0.1, 6),
-#'     showObserved = FALSE
-#'   )
-#'
-#'   # export plot to a temporary directory, including a title
-#'   figDir <- tempdir()
-#'   png(
-#'     filename = file.path(figDir, "plot_test.png"), type = "cairo", units = "in",
-#'     width = 6, height = 5, pointsize = 10, res = 300
-#'   )
-#'   plot_timeSeries(my_data, var1 = "Tmin_sm", mar = c(3, 3, 2, 4))
-#'   title("Historical and projected summer night-time warming in the Bulkley Valley, BC")
-#'   dev.off()
-#' }
 #'
 #' @importFrom scales alpha
 #' @importFrom stinepack stinterp
@@ -145,7 +94,8 @@ plot_timeSeries_preprocess <- function(
     endlabel = "change",
     yearmarkers = TRUE,
     yearlines = FALSE,
-    legend_pos = "topleft") {
+    legend_pos = "topleft",
+    app = FALSE) {
 
   ## checks
   if (!requireNamespace("scales", quietly = TRUE)) {
@@ -199,6 +149,9 @@ plot_timeSeries_preprocess <- function(
   # y axis title.
   if (is.null(var2)) { # if there is no second var
     ylab <- stringi::stri_unescape_unicode(paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"]))
+    if (variables[Code == var1, "Unit"] != "") {
+      ylab <- stringi::stri_unescape_unicode(paste0(ylab, " (", variables[Code == var1, "Unit"], ")"))
+    }
   } else if (element1 == element2) { # if both variables have the same element
     ylab <- stringi::stri_unescape_unicode(variables[Code == var1, "Element"])
   } else if (yeartime1 == yeartime2) { # if both variables have the same yeartime
@@ -209,8 +162,8 @@ plot_timeSeries_preprocess <- function(
   }
   plot(0, col = "white", xlim = c(1900, 2100), 
        ylim = range(as.integer(X[,VAL]), na.rm = TRUE), 
-       xaxs = "i", xaxt = "n", tck = 0, xlab = "", ylab = ylab)
-  axis(1, at = seq(1850, 2100, 25), labels = seq(1850, 2100, 25), tck = 0)
+       xaxs = "i", xaxt = "n", tck = 0, xlab = "", ylab = ylab, cex.lab = if (app) 1.5 else 1, cex.axis = if (app) 1.25 else 1)
+  axis(1, at = seq(1850, 2100, 25), labels = seq(1850, 2100, 25), tck = 0, cex.axis = if (app) 1.25 else 1)
   
   num <- 1
   for (num in nums) {
@@ -219,7 +172,7 @@ plot_timeSeries_preprocess <- function(
     var <- get(paste("var", num, sep = ""))
     
     if (compile) { # this plots a single envelope for the ensemble as a whole
-      temp.data <- X[is.na(DATASET) & !is.na(PERIOD)]
+      temp.data <- X[is.na(DATASET) & !is.na(PERIOD) & !is.na(VAL)]
       plot_preprocess_ensemble(temp.data,
                     var = var, var2 = var2,
                     refline = refline, showmean = showmean,
@@ -236,7 +189,7 @@ plot_timeSeries_preprocess <- function(
         stop(sprintf("Error: This function is not currently set up to handle individual GCM ensembles."))
       }
     }
-    
+
     # overlay the 5-year lines on top of all polygons
     if (yearlines) {
       for (n in seq(1905, 2095, 5)) {
@@ -302,7 +255,8 @@ plot_timeSeries_preprocess <- function(
            lwd = c(4, 4, 4, 2)[s],
            pch = rep(NA, 4)[s],
            pt.bg = rep(NA, 4)[s],
-           pt.cex = rep(NA, 4)[s]
+           pt.cex = rep(NA, 4)[s],
+           cex = if (app) 1.25 else 1
     )
   }
   
@@ -311,7 +265,7 @@ plot_timeSeries_preprocess <- function(
     s <- which(list_gcms() %in% gcms)
     legend(ifelse(grepl("top", legend_pos), "top", "bottom"),
            title = "GCMs", legend = gcms, bty = "n",
-           col = pal.gcms[s], pch = 22, pt.bg = alpha(pal.gcms[s], 0.35), pt.cex = 2
+           col = pal.gcms[s], pch = 22, pt.bg = alpha(pal.gcms[s], 0.35), pt.cex = 2, cex = if (app) 1.25 else 1
     )
   } else {
     s <- rev(which(scenarios[-1] %in% scenarios.selected))
@@ -320,7 +274,7 @@ plot_timeSeries_preprocess <- function(
            lty = rep(NA, 5)[c(1, s + 1)], col = pal.scenario[c(1, s + 1)], 
            lwd = rep(NA, 5)[c(1, s + 1)], pch = rep(22, 5)[c(1, s + 1)], 
            pt.bg = alpha(pal.scenario[c(1, s + 1)], 0.35), 
-           pt.cex = rep(2, 5)[c(1, s + 1)]
+           pt.cex = rep(2, 5)[c(1, s + 1)], cex = if (app) 1.25 else 1
     )
   }
   
@@ -353,7 +307,7 @@ plot_preprocess_ensemble <- function(x, var, scenarios.selected, scenarios,
                           endlabel = "change", element,
                           compile = TRUE, var2 = NULL, element1, element2,
                           yeartime.names, yeartimes, yeartime) {
-  
+
   if (showrange) {
     if (isFALSE(simplify)) {
       stop(sprintf("Error: This function is not currently set up to handle simplify == FALSE."))

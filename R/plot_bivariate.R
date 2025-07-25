@@ -131,9 +131,6 @@ plot_bivariate <- function(
       data[, xanom := if (xvar_type == "ratio") (get(xvar) / get(xvar)[1] - 1) else (get(xvar) - get(xvar)[1]), by = id]
       data[, yanom := if (yvar_type == "ratio") (get(yvar) / get(yvar)[1] - 1) else (get(yvar) - get(yvar)[1]), by = id]
       
-      # collapse the points down to a mean anomaly
-      #data.all <- copy(data[, .(xanom = mean(xanom), yanom = mean(yanom)), by = .(GCM, SSP, RUN, PERIOD)])
-
     } else {
       data <- X[, c("GCM", "SSP", "RUN", "PERIOD", xvar, yvar), with = FALSE]
       
@@ -169,15 +166,19 @@ plot_bivariate <- function(
       par(mar = c(3, 4, 0.5, 0.5), mgp = c(1.25, 0.25, 0), cex = 1.5)
       plot(data.all$xanom, data.all$yanom,
         col = "white", tck = 0, xaxt = "n", yaxt = "n", ylab = "",
-        # xlab = paste("Change in", variables$Variable[which(variables$Code == xvar)])
         xlab = paste(
           if (variables$Category[which(variables$Code == xvar)] == "Annual") "Change in Annual" else "Change in",
-          variables$Variable[which(variables$Code == xvar)]
+          stringi::stri_unescape_unicode(variables$Variable[which(variables$Code == xvar)]),
+          if (variables[Code == xvar, "Unit"] != "") stringi::stri_unescape_unicode(paste0("(", variables[Code == xvar, "Unit"], ")")) else NULL
         )
         
       )
       par(mgp = c(2.5, 0.25, 0))
-      title(ylab = paste(if (variables$Category[which(variables$Code == yvar)] == "Annual") "Change in Annual" else "Change in", variables$Variable[which(variables$Code == yvar)]))
+      ylab <- paste(if (variables$Category[which(variables$Code == yvar)] == "Annual") "Change in Annual" else "Change in", stringi::stri_unescape_unicode(variables$Variable[which(variables$Code == yvar)]))
+      if (variables[Code == yvar, "Unit"] != "") {
+        ylab <- stringi::stri_unescape_unicode(paste0(ylab, " (", variables[Code == yvar, "Unit"], ")"))
+      }
+      title(ylab = ylab)
       lines(c(0, 0), c(-99, 99), lty = 2, col = "gray")
       lines(c(-99, 99), c(0, 0), lty = 2, col = "gray")
 
@@ -247,11 +248,19 @@ plot_bivariate <- function(
         fig <- plotly::plot_ly(x = data.all$xanom, y = data.all$yanom, type = "scatter", mode = "markers", marker = list(color = "lightgray", size = 5), hoverinfo = "none", color = "All models/scenarios/runs/periods")
 
         # axis titles
+        if (variables[Code == xvar, "Unit"] != "") {
+          xlab <- stringi::stri_unescape_unicode(paste0("Change in ", variables$Variable[which(variables$Code == xvar)], " (", variables[Code == xvar, "Unit"], ")"))
+        } else {
+          xlab <- stringi::stri_unescape_unicode(paste("Change in", variables$Variable[which(variables$Code == xvar)]))
+        }
+        if (variables[Code == yvar, "Unit"] != "") {
+          ylab <- stringi::stri_unescape_unicode(paste0("Change in ", variables$Variable[which(variables$Code == yvar)], " (", variables[Code == yvar, "Unit"], ")"))
+        } else {
+          ylab <- stringi::stri_unescape_unicode(paste("Change in", variables$Variable[which(variables$Code == yvar)]))
+        }
         fig <- fig %>% plotly::layout(
-          # xaxis = list(title = paste("Change in", variables$Variable[which(variables$Code == xvar)]), range = range(data.all$xanom)),
-          xaxis = list(title = stringi::stri_unescape_unicode(paste("Change in", variables$Variable[which(variables$Code == xvar)])), range = range(data.all$xanom)),
-          # yaxis = list(title = paste("Change in", variables$Variable[which(variables$Code == yvar)]), range = range(data.all$yanom))
-          yaxis = list(title = stringi::stri_unescape_unicode(paste("Change in", variables$Variable[which(variables$Code == yvar)])), range = range(data.all$yanom))
+          xaxis = list(title = xlab, range = range(data.all$xanom)),
+          yaxis = list(title = ylab, range = range(data.all$yanom))
           
         )
 

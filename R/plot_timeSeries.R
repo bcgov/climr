@@ -145,7 +145,8 @@ plot_timeSeries <- function(
     endlabel = "change",
     yearmarkers = TRUE,
     yearlines = FALSE,
-    legend_pos = "topleft") {
+    legend_pos = "topleft",
+    app = FALSE) {
  
   ## checks
   if (!requireNamespace("scales", quietly = TRUE)) {
@@ -203,23 +204,22 @@ plot_timeSeries <- function(
   par(mfrow = c(1, 1), mar = mar, mgp = c(1.75, 0.25, 0), cex = cex)
   # y axis title.
   if (is.null(var2)) { # if there is no second var
-    # ylab <- paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"])
     ylab <- stringi::stri_unescape_unicode(paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"]))
+    if (variables[Code == var1, "Unit"] != "") {
+      ylab <- stringi::stri_unescape_unicode(paste0(ylab, " (", variables[Code == var1, "Unit"], ")"))
+    }
   } else if (element1 == element2) { # if both variables have the same element
-    # ylab <- variables[Code == var1, "Element"]
     ylab <- stringi::stri_unescape_unicode(variables[Code == var1, "Element"])
   } else if (yeartime1 == yeartime2) { # if both variables have the same yeartime
-    # ylab <- paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"])
     ylab <- stringi::stri_unescape_unicode(paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"]))
   } else { # if variables1 and 2 have different elements and yeartimes
-    # ylab <- paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"])
     ylab <- stringi::stri_unescape_unicode(paste(yeartime.names[which(yeartimes == yeartime1)], variables[Code == var1, "Element"], "or", variables[Code == var2, "Element"]))
     
   }
   plot(0, col = "white", xlim = c(1900, 2100), 
        ylim = range(if (yfit) visibledata else alldata, na.rm = TRUE), 
-       xaxs = "i", xaxt = "n", tck = 0, xlab = "", ylab = ylab)
-  axis(1, at = seq(1850, 2100, 25), labels = seq(1850, 2100, 25), tck = 0)
+       xaxs = "i", xaxt = "n", tck = 0, xlab = "", ylab = ylab, cex.lab = if (app) 1.5 else 1, cex.axis = if (app) 1.25 else 1)
+  axis(1, at = seq(1850, 2100, 25), labels = seq(1850, 2100, 25), tck = 0, cex.axis = if (app) 1.25 else 1)
   
   num <- 1
   for (num in nums) {
@@ -323,7 +323,8 @@ plot_timeSeries <- function(
            lwd = c(4, 4, 4, 2)[s],
            pch = rep(NA, 4)[s],
            pt.bg = rep(NA, 4)[s],
-           pt.cex = rep(NA, 4)[s]
+           pt.cex = rep(NA, 4)[s],
+           cex = if (app) 1.25 else 1
     )
   }
   
@@ -332,7 +333,7 @@ plot_timeSeries <- function(
     s <- which(list_gcms() %in% gcms)
     legend(ifelse(grepl("top", legend_pos), "top", "bottom"),
            title = "GCMs", legend = gcms, bty = "n",
-           col = pal.gcms[s], pch = 22, pt.bg = alpha(pal.gcms[s], 0.35), pt.cex = 2
+           col = pal.gcms[s], pch = 22, pt.bg = alpha(pal.gcms[s], 0.35), pt.cex = 2, cex = if (app) 1.25 else 1
     )
   } else {
     s <- rev(which(scenarios[-1] %in% scenarios.selected))
@@ -341,7 +342,7 @@ plot_timeSeries <- function(
            lty = rep(NA, 5)[c(1, s + 1)], col = pal.scenario[c(1, s + 1)], 
            lwd = rep(NA, 5)[c(1, s + 1)], pch = rep(22, 5)[c(1, s + 1)], 
            pt.bg = alpha(pal.scenario[c(1, s + 1)], 0.35), 
-           pt.cex = rep(2, 5)[c(1, s + 1)]
+           pt.cex = rep(2, 5)[c(1, s + 1)], cex = if (app) 1.25 else 1
     )
   }
   
