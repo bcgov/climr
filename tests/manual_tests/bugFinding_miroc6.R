@@ -1,5 +1,8 @@
 ## Troubleshooting a mystery bug with the MIROC6 data. 
-
+library(climr)
+library(data.table)
+library(ggplot2)
+library(terra)
 # data frame of arbitrary points
 my_points <- data.frame(
   lon = c(-127.7300),
@@ -8,14 +11,86 @@ my_points <- data.frame(
   id = 1
 )
 
+dat <- rast("../Common_Files/northamerica_elevation_cec_2023.tif")
+d2 <- project(dat, "EPSG:4326", res = 0.0022)
+d2 <- rast("../Common_Files/NA_DEM_250.tif")
+
+d1 <- plot_bivariate_input(my_points)
+plot_bivariate(d1)
+
 system.time(
-  my_data <- plot_timeSeries_input(my_points)
+  my_data <- plot_timeSeries_input(my_points, gcms = list_gcms()[10])
 )
 
 # use the input to create a plot
 plot_timeSeries(my_data, var1 = "Tmax_sm", simplify = F,
                 gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)[6]]
 )
+
+dat1 <- downscale(my_points, gcms = list_gcms()[10], ssps = list_ssps()[1], 
+                  max_run = 4, gcm_ssp_years = 2015:2050, vars = "Tmax_sm", db_option = "database")
+dat1 <- dat1[PERIOD != "1961_1990"]
+dat1[, PERIOD := as.numeric(PERIOD)]
+dat1[,ssp_run := paste0(SSP,"_", RUN)]
+
+ggplot(dat1, aes(x = PERIOD, y = Tmax_sm)) +
+  geom_line() +
+  facet_wrap(~ssp_run)
+
+#######################################################
+dat1 <- downscale(my_points, gcms = list_gcms()[10], ssps = list_ssps()[1], 
+                  run_nm = "r10i1p1f1", ensemble_mean = FALSE, gcm_ssp_years = 2018:2022, vars = c("Tmax_08"),
+                  db_option = "database")
+dat1 <- dat1[PERIOD != "1961_1990"]
+dat1[, PERIOD := as.numeric(PERIOD)]
+dat1[,ssp_run := paste0(SSP,"_", RUN)]
+
+ggplot(dat1, aes(x = PERIOD, y = Tmax_08)) +
+  geom_line() +
+  facet_wrap(~ssp_run)
+
+####testing
+labels <- vapply(
+  strsplit(names(res), "_"),
+  function(x) {
+    paste0(x[1:2], collapse = "_")
+  },
+  character(1)
+)
+
+labels_cr <- vapply(
+  strsplit(names(climaterast), "_"),
+  function(x) {
+    paste0(x[2:3], collapse = "_")
+  },
+  character(1)
+)
+
+if (type %in% c("obs")) {
+  ## Create match set to match with res names
+  labels <- nm
+}
+setcolorder(res, neworder = c(1,(match(labels_cr[-1], labels[-1])+1)))  
+##############################
+my_points <- data.frame(
+  lon = c(-127.7300, -127.5),
+  lat = c(55.34114, 55.6),
+  elev = c(711,711),
+  id = 1:2
+)
+bb <- get_bb(my_points)
+
+dat2 <- input_gcm_ssp(bbox = bb, 
+                      gcms = list_gcms()[10], 
+                      ssps = list_ssps()[1],
+                      years = 2018:2025,
+                      run_nm = "r10i1p1f1",
+                      ensemble_mean = FALSE)
+dat2 <- dat2$MIROC6
+nms <- data.table(layer = 1:nlyr(dat2))
+nms[,c("Mod","Var","Month","Ssp","Run","Year") := tstrsplit(names(dat2), "_")]
+dat3 <- dat2[[nms[Var == "Tmax" & Month == "08" & Year %in% 2018:2022,layer]]]
+plot(dat3)
 
 system.time(
   # generate the input data

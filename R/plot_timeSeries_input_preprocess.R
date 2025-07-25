@@ -28,9 +28,7 @@
 #' ~5 minutes to run for the first time it is called for a location. Once the time series are
 #' cached, they don't need to be downloaded again.
 #'
-#' @param X  A `data.table` object produced using the function [`plot_timeSeries_input()`]. This
-#' table can include more models, scenarios, and variables than are used in individual calls to
-#' [`plot_timeSeries()`].
+#' @param X  A `data.table`.
 #' @inheritParams downscale
 #' @param var1 character. A climate var. options are [`list_vars()`].
 #' @param var2 character. A second climate var to plot in combination with `var1`.
@@ -54,56 +52,8 @@
 #' @param refline.obs logical. Plot the 1961-1990 reference period mean for the observational data.
 #' This should be the same as the reference line for the GCM time series..
 #'
-#' @return NULL. Draws a plot in the active graphics device.
+#' @return NULL.
 #'
-#' @examples
-#' if (FALSE) {
-#'   # data frame of arbitrary points
-#'   my_points <- data.frame(
-#'     lon = c(-127.7300, -127.7500),
-#'     lat = c(55.34114, 55.25),
-#'     elev = c(711, 500),
-#'     id = 1:2
-#'   )
-#'
-#'   # generate the input data
-#'   my_data <- plot_timeSeries_input(my_points)
-#'
-#'   # use the input to create a plot
-#'   plot_timeSeries(my_data, var1 = "Tmin_sm")
-#'
-#'   # compare observational time series
-#'   plot_timeSeries(my_data, var1 = "Tmin_sm", obs_ts_dataset = c("cru.gpcc", "climatena"))
-#'
-#'   # compare mean daily minimum and maximum temperatures
-#'   plot_timeSeries(my_data, var1 = "Tmin_sm", var2 = "Tmax_sm")
-#'
-#'   # compare summer and winter temperatures (without simplifying the ensemble range)
-#'   plot_timeSeries(my_data, var1 = "Tmax_sm", var2 = "Tmax_wt", simplify = FALSE)
-#'
-#'   # compare global climate models
-#'   plot_timeSeries(
-#'     my_data,
-#'     gcms = list_gcms()[c(7, 13)],
-#'     pal = "gcms",
-#'     ssps = list_ssps()[2],
-#'     showmean = FALSE,
-#'     compile = FALSE,
-#'     simplify = FALSE,
-#'     mar = c(3, 3, 0.1, 6),
-#'     showObserved = FALSE
-#'   )
-#'
-#'   # export plot to a temporary directory, including a title
-#'   figDir <- tempdir()
-#'   png(
-#'     filename = file.path(figDir, "plot_test.png"), type = "cairo", units = "in",
-#'     width = 6, height = 5, pointsize = 10, res = 300
-#'   )
-#'   plot_timeSeries(my_data, var1 = "Tmin_sm", mar = c(3, 3, 2, 4))
-#'   title("Historical and projected summer night-time warming in the Bulkley Valley, BC")
-#'   dev.off()
-#' }
 #'
 #' @importFrom scales alpha
 #' @importFrom stinepack stinterp
