@@ -1,4 +1,5 @@
 # create a 250m latlon DEM from the 250m CEC Lambert DEM
+# NB we didn't end up using this dem and went with another 150m dem created by @kdaust
 
 library(sf)
 library(data.table)
@@ -22,14 +23,14 @@ dem_latlon[is.na(dem_latlon)] <- 0
 # writeRaster(dem_latlon, paste("//objectstore2.nrs.bcgov/ffec/DEM/DEM_NorAm/dem_noram_5arcsec.tif", sep=""), overwrite=T)
 writeRaster(dem_latlon, paste("C:/Users/CMAHONY/OneDrive - Government of BC/Data/DEM/dem_noram_5arcsec.tif", sep=""), overwrite=T)
 
-# dem_latlon <- rast("C:/Users/CMAHONY/OneDrive - Government of BC/Data/DEM/dem_noram_5arcsec.tif")
+dem_latlon <- rast("C:/Users/CMAHONY/OneDrive - Government of BC/Data/DEM/dem_noram_5arcsec.tif")
 
 # ------------------------------
 # Test for the nimpkish study area
 # ------------------------------
 
-dir <- "//objectstore2.nrs.bcgov/ffec/Data_Sharing/"
-# dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/bdy/"
+# dir <- "//objectstore2.nrs.bcgov/ffec/Data_Sharing/"
+dir <- "C:/Users/CMAHONY/OneDrive - Government of BC/Data/bdy/"
 bnd <- vect(paste0(dir, "NimpkishTest.gpkg")) #boundary file
 
 ##make study area dem from generalized 25m DEM
@@ -56,7 +57,7 @@ climr_cec <- downscale(
 )
 
 ## climr-app export data
-app_out <- rast(paste0(dir, "NimpkishTest_Tmax_07.tif"))
+app_out <- rast(paste0(dir, "NimpkishTest_Tmax_07.tif"))[[1]]
 app_out <- crop(app_out, climr_out)
 
 
