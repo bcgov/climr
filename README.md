@@ -68,6 +68,11 @@ If you want to install the development version:
 ``` r
 remotes::install_github("bcgov/climr@devl")
 ```
+If you get an error on installation, try the following:
+```r
+options(download.file.method = "libcurl")
+```
+and then rerun `install_github()`. On some computers, the default R download method doesn't play nicely with github. 
 
 ## Usage
 
