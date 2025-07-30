@@ -24,9 +24,7 @@ plot_timeSeries_input_preprocess(
 )
 }
 \arguments{
-\item{X}{A \code{data.table} object produced using the function \code{\link[=plot_timeSeries_input]{plot_timeSeries_input()}}. This
-table can include more models, scenarios, and variables than are used in individual calls to
-\code{\link[=plot_timeSeries]{plot_timeSeries()}}.}
+\item{X}{A \code{data.table}.}
 
 \item{var1}{character. A climate var. options are \code{\link[=list_vars]{list_vars()}}.}
 
@@ -72,7 +70,7 @@ and extend this line to the year 2100 as a visual reference.}
 This should be the same as the reference line for the GCM time series..}
 }
 \value{
-NULL. Draws a plot in the active graphics device.
+NULL.
 }
 \description{
 Time series plots of 20th and 21st century climate change for user-selected
@@ -101,54 +99,4 @@ or minimum vs. maximum temperatures.
 Downloads of GCM time series take some time. The \code{plot_timeSeries_input()} function can take
 ~5 minutes to run for the first time it is called for a location. Once the time series are
 cached, they don't need to be downloaded again.
-}
-\examples{
-if (FALSE) {
-  # data frame of arbitrary points
-  my_points <- data.frame(
-    lon = c(-127.7300, -127.7500),
-    lat = c(55.34114, 55.25),
-    elev = c(711, 500),
-    id = 1:2
-  )
-
-  # generate the input data
-  my_data <- plot_timeSeries_input(my_points)
-
-  # use the input to create a plot
-  plot_timeSeries(my_data, var1 = "Tmin_sm")
-
-  # compare observational time series
-  plot_timeSeries(my_data, var1 = "Tmin_sm", obs_ts_dataset = c("cru.gpcc", "climatena"))
-
-  # compare mean daily minimum and maximum temperatures
-  plot_timeSeries(my_data, var1 = "Tmin_sm", var2 = "Tmax_sm")
-
-  # compare summer and winter temperatures (without simplifying the ensemble range)
-  plot_timeSeries(my_data, var1 = "Tmax_sm", var2 = "Tmax_wt", simplify = FALSE)
-
-  # compare global climate models
-  plot_timeSeries(
-    my_data,
-    gcms = list_gcms()[c(7, 13)],
-    pal = "gcms",
-    ssps = list_ssps()[2],
-    showmean = FALSE,
-    compile = FALSE,
-    simplify = FALSE,
-    mar = c(3, 3, 0.1, 6),
-    showObserved = FALSE
-  )
-
-  # export plot to a temporary directory, including a title
-  figDir <- tempdir()
-  png(
-    filename = file.path(figDir, "plot_test.png"), type = "cairo", units = "in",
-    width = 6, height = 5, pointsize = 10, res = 300
-  )
-  plot_timeSeries(my_data, var1 = "Tmin_sm", mar = c(3, 3, 2, 4))
-  title("Historical and projected summer night-time warming in the Bulkley Valley, BC")
-  dev.off()
-}
-
 }

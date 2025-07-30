@@ -24,6 +24,8 @@
 #' @param gcm Character (optional). A specific global climate model (GCM). If unspecified, then the mean of all global climate models will be shown for the specified `ssp` and `gcm_period`.  
 #' @param ssp Character (optional). A Shared Socioeconomic Pathway scenario (SSP), required when a `gcm_period` is specified.
 #' @param gcm_period Character (optional). A GCM simulation period (e.g., `"2041_2060"`), used for ensemble means or GCM-specific plots. Required when a `gcm_period` is specified.
+#' @param location Character (optional). Include the location in plot title.
+#' @param app Logical. If `TRUE`, it will increase the font size.
 #'
 #' @return A `ggplot2` object showing the Walter-Lieth climate diagram.
 #'
@@ -39,7 +41,7 @@
 #' @importFrom data.table fcase fifelse
 #' @importFrom ggplot2 aes geom_hline geom_line geom_ribbon geom_polygon
 #' @importFrom ggplot2 scale_x_continuous scale_y_continuous sec_axis
-#' @importFrom ggplot2 annotate coord_cartesian labs theme_classic
+#' @importFrom ggplot2 annotate coord_cartesian labs theme_classic theme element_text
 #'
 #' @export
 #'
@@ -77,7 +79,9 @@ plot_WalterLieth <- function(X, diurnal = FALSE,
                              obs_period = NULL,
                              gcm = NULL,
                              ssp = NULL,
-                             gcm_period = NULL) {
+                             gcm_period = NULL,
+                             location = NULL,
+                             app = FALSE) {
   
   if (!inherits(X, "data.table")) X <- as.data.table(X)
   
@@ -169,9 +173,21 @@ plot_WalterLieth <- function(X, diurnal = FALSE,
                              max(y_precip_rel, tave, tmax, 50, na.rm=TRUE)),
                     clip = 'off',
                     expand = FALSE) +
-    labs(title = sprintf('Walter-Lieth Climate Diagram     (MAT = %.1f\u00B0C; MAP = %1.fmm )', mean(tave), sum(ppt)),
-         subtitle = ifelse(is.null(elev), "", sprintf("(Elev. = %1.fm )", elev))) +
+    labs(title = sprintf('Walter-Lieth Climate Diagram  (MAT = %.1f\u00B0C; MAP = %1.fmm)', mean(tave), sum(ppt)),
+         subtitle = ifelse(is.null(elev), sprintf("(Loc. = %s, Period = %s)", location, obs_period), sprintf("(Loc. = %s, Elev. = %1.fm, Period = %s)", location, elev, obs_period))) +
     theme_classic()
+  if (app) {
+    gg <- gg + theme(
+      plot.title = element_text(size = 18),
+      plot.subtitle = element_text(size = 15),
+      axis.title.x = element_text(size = 18),
+      axis.title.y = element_text(size = 18),
+      axis.title.y.right = element_text(size = 18),
+      axis.text.x = element_text(size = 15),
+      axis.text.y = element_text(size = 15),
+      axis.text.y.right = element_text(size = 15)
+    )
+  }
   
   # Wet Periods
   if (any(period_type == 'Wet')) {
