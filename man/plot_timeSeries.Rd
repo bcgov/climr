@@ -26,7 +26,8 @@ plot_timeSeries(
   endlabel = "change",
   yearmarkers = TRUE,
   yearlines = FALSE,
-  legend_pos = "topleft"
+  legend_pos = "topleft",
+  app = FALSE
 )
 }
 \arguments{
