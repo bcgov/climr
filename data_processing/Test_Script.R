@@ -6,6 +6,15 @@ library(climr)
 library(terra)
 library(data.table)
 library(climr)
+library(sf)
+
+bgc <- st_read("../Common_Files/BEC13Draft_Simplified.gpkg")
+BG <- bgc[grep("^BG.*", bgc$BGC),]
+ar <- sum(st_area(BG))
+
+pre_cache(region = "BC", gcms = list_gcms()[1:3], ssps = list_ssps()[2], gcm_periods = list_gcm_periods())
+
+
 
 list.files(file.path(cache_path(),"reference","refmap_climr"))
 tmp <- rast(file.path(cache_path(),"reference","refmap_climr","fc34492b-0013-4e3a-b293-c5e78a1a54b6.tif"))
@@ -103,7 +112,7 @@ in_xyz <- data.frame(
   id = 1:8
 )
 
-ds_out <- downscale(xyz = in_xyz, obs_periods = list_obs_periods(), obs_years = 2005, obs_ts_dataset = "mswx.blend", 
+ds_out <- downscale(xyz = in_xyz, obs_periods = list_obs_periods(), gcms = list_gcms()[1], ssps = "ssp245", gcm_periods = "2041_2060",
                     vars = c("Tmax_05", "Tmin_05","Tmax_06", "Tmin_06","Tmax_07", "Tmin_07","Tmax_08", "Tmin_08","CMI_05", "CMI_06","CMI_07","CMI_08", "CMD_05", "CMD_06","CMD_07","CMD_08", "PPT_05", "PPT_06","PPT_07","PPT_08" )) 
 
 
