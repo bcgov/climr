@@ -223,7 +223,7 @@ ds_out <- downscale(
   ssps = "ssp245",
   max_run = 2,
   return_refperiod = TRUE, ## to return the 1961-1990 normals period
-  vars = c("MAT", "PPT", "PAS")
+  vars = c("MAT", "PPT_an", "PAS_an")
 )
 ```
 
@@ -246,7 +246,7 @@ We can now do a simple visualisation of climate variation by
 biogeoclimatic zone ('ZONE'), in the normals period of 1961-1990:
 
 ```{r, echo = TRUE, class.source = 'fold-hide', out.width = "80%", fig.dim = c(8,5), eval = require(ggplot2)}
-plotdata <- melt(ds_out, measure.vars = c("MAT", "PPT", "PAS"))
+plotdata <- melt(ds_out, measure.vars = c("MAT", "PPT_an", "PAS_an"))
 cols <- plotdata$HEX
 names(cols) <- plotdata$ZONE
 cols <- cols[!duplicated(cols)]
@@ -271,15 +271,15 @@ values so that they align with their observed counterpart. See
 
 ```{r, message = TRUE}
 ds_out_ts <- downscale(
-  xyz = xyzDT,
+  xyz = xyzDT[,.(id,lon,lat,elev)],
   obs_years = 2001:2023,
   gcm_hist_years = 2001:2014,
   gcm_ssp_years = 2015:2040,
-  gcms = "EC-Earth3",
+  gcms = list_gcms()[5],
   ssps = "ssp245",
   max_run = 1,
-  return_refperiod = TRUE, ## to return the 1961-1990 normals period
-  vars = c("MAT", "PPT", "PAS")
+  ensemble_mean = FALSE,
+  vars = c("MAT", "PPT_an", "PAS_an")
 )
 ```
 
@@ -291,10 +291,9 @@ climate projections (`proj_fut`).
 
 ```{r, echo = TRUE, class.source = 'fold-hide', fig.cap = "Time series outputs from `downscale`. Pannels show mean annual temperature (MAT), total annual precipitation (PPT) and precipitation as snow (PAS). Line colours refer to observed historic values (grey), projected historic values (gren) and future projected values (blue) for a single location, GCM, emissions scenario and model run.", out.width = "80%", eval = require(ggplot2), fig.dim = c(7,8)}
 ds_out_ts[is.na(GCM), GCM := "Historic"]
-ds_out_ts <- ds_out_ts[!grepl("ensemble", RUN)]
 ds_out_ts <- ds_out_ts[!grepl("1961_1990", PERIOD)]
 
-plotdata <- melt(ds_out_ts, measure.vars = c("MAT", "PPT", "PAS"))
+plotdata <- melt(ds_out_ts, measure.vars = c("MAT", "PPT_an", "PAS_an"))
 plotdata[, PERIOD := as.numeric(PERIOD)]
 plotdata <- plotdata[id == head(id, 1)]
 
@@ -358,7 +357,7 @@ ds_out_spatial <- downscale(
   return_refperiod = FALSE, ## don't return the 1961-1990 normals period
   out_spatial = TRUE,
   plot = "MAT",
-  vars = c("MAT", "PPT", "PAS")
+  vars = c("MAT", "PPT_an", "PAS_an")
 )
 ```
 
@@ -388,7 +387,7 @@ plot(vancouver_poly,
   mar = c(4, 1, 1, 4)
 )
 plot(vancouver, add = TRUE, col = "black")
-plot(ds_out_spatial, "PPT",
+plot(ds_out_spatial, "PPT_an",
   col = hcl.colors(50, palette = "Blues"),
   add = TRUE, type = "continuous",
   plg = list(x = "right", title = "PPT")

@@ -808,6 +808,7 @@ process_one_climaterast.SpatRaster <- function(climaterast, res, xyz, timeseries
   if (type %in% c("obs")) {
     ## Create match set to match with res names
     labels <- nm
+    
   } else {
     labels <- vapply(
       strsplit(nm, "_"),
@@ -825,6 +826,8 @@ process_one_climaterast.SpatRaster <- function(climaterast, res, xyz, timeseries
   climaterast_ppt <- terra::subset(climaterast, ppt) * terra::subset(res, match(labels[ppt], names(res))) ## PPT
   climaterast_temp <- terra::subset(climaterast, temp) + terra::subset(res, match(labels[-ppt], names(res))) ## Temperature
   climaterast <- terra::subset(c(climaterast_ppt, climaterast_temp), origorder)
+  
+  if(type == "obs") names(climaterast) <- paste0("OBS_",names(climaterast),"_2001_2020") ##will need to change this with more obs periods
   
   return(climaterast)
   
