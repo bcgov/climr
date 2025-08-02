@@ -1,3 +1,17 @@
+# `climr` 0.2.2
+
+## Bug Fixes
+
+- Various minor bug fixes to plotting functions, predominantly for use in the climr-app
+- Added MSWX dataset to `plot_timeSeries`
+- Fixed very strange mystery bug due to postgres not preserving row order
+
+## Enhancements
+
+- When downscaling SpatRasters, new variables are now added by reference, which substantially reduces memory foot print and prevents crashes.
+- Added database retry function (hopefully fixes issues on internal government networks)
+- Added `pre_cache` function for efficiently downloading data fro an AOI to avoid delays in analysis.
+
 # `climr` 0.2.1
 
 ## Bug Fixes
