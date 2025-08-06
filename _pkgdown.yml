@@ -17,35 +17,36 @@ home:
 
 
 articles:
-- title: "`climr` workflows"
-  desc: "How to use climr, from beginner to advanced operations"
-  navbar: "`climr` workflows"
-  contents:
-  - climr_workflow_beg
-  - climr_workflow_int
-- title: "Methods"
-  navbar: "Methods"
-  desc: "How climr works and how the input data were created"
-  contents:
-  - methods_downscaling
-  - methods_mosaic
-  - methods_ensembleSelection
-- title: "Guidance"
-  navbar: "Guidance"
-  desc: "Best practices and other perspectives"
-  contents:
-  - guidance_ensembleSelection
-  - guidance_timeSeries
-- title: "Known Issues"
-  navbar: "Known Issues"
-  desc: "Unresolved bugs, artefacts, and shortcomings"
-  contents:
-  - knownIssues_DiscrepanciesWithClimateNA
-  - knownIssues_customRefmap
-  - knownIssues_spatialAnomaly
-- title: "Caching"
-  contents:
-  - caching
+  - title: "`climr` workflows"
+    desc: "How to use climr, from beginner to advanced operations"
+    navbar: "`climr` workflows"
+    contents:
+    - climr_workflow_beg
+    - climr_workflow_int
+  - title: "Methods"
+    navbar: "Methods"
+    desc: "How climr works and how the input data were created"
+    contents:
+    - methods_downscaling
+    - methods_mosaic
+    - methods_ensembleSelection
+    - lapse_rates
+  - title: "Guidance"
+    navbar: "Guidance"
+    desc: "Best practices and other perspectives"
+    contents:
+    - guidance_ensembleSelection
+    - guidance_timeSeries
+  - title: "Known Issues"
+    navbar: "Known Issues"
+    desc: "Unresolved bugs, artefacts, and shortcomings"
+    contents:
+    - knownIssues_DiscrepanciesWithClimateNA
+    - knownIssues_customRefmap
+    - knownIssues_spatialAnomaly
+  - title: "Caching"
+    contents:
+    - caching
 
 reference:
 - title: "Downscaling functions"
