@@ -122,3 +122,4 @@ Downloads of GCM time series take some time. The \code{plot_timeSeries_input()} 
 ~5 minutes to run for the first time it is called for a location. Once the time series are
 cached, they don't need to be downloaded again.
 }
+\keyword{internal}

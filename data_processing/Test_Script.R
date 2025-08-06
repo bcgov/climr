@@ -8,6 +8,85 @@ library(data.table)
 library(climr)
 library(sf)
 
+## get the sample digital elevation model (dem) provided with `climr`
+dem <- get(data("dem_vancouver")) |> terra::unwrap()
+## convert the DEM to a data.frame
+grid <- as.data.frame(dem, cells = TRUE, xy = TRUE)
+## rename column names to what climr expects
+colnames(grid) <- c("id", "lon", "lat", "elev")
+## A simple climr query.
+## This will return the observed 1961-1990 normals for the raster grid points.
+var <- "MAP"
+ds_out <- downscale(grid, which_refmap = "refmap_climr", vars = var)
+clim <- terra::rast(dem) # use the DEM as a template raster
+## populate the raster cells with the 2001-2020 annual precipitation (MAP) values,
+## using the `id` field as the link.
+clim[ds_out[, id]] <- ds_out[, var, with = FALSE]
+## log-transform precipitation for more meaningful scaling
+clim <- log2(clim)
+## increment for the ramp
+inc=diff(range(terra::values(clim)))/500
+## color breaks
+breaks=seq(min(terra::values(clim))-inc, max(terra::values(clim))+inc, inc)
+## color scheme
+ColScheme <- rev(hcl.colors(length(breaks)-1, "GnBu"))
+terra::plot(clim, col=ColScheme, breaks=breaks, legend=FALSE, main="", mar=NA)
+legend_ramp(
+  clim,
+  title = paste(var, "(mm)"),
+  ColScheme = ColScheme,
+  breaks = breaks,
+  pos=c(0.05, 0.45, 0.1, 0.125),
+  log = 2,
+  horizontal = TRUE
+)
+
+## weather station locations
+weather_stations <- get(data("weather_stations")) |>
+  unwrap()
+
+## study area of interest (North Vancouver)
+vancouver_poly <- get(data("vancouver_poly")) |>
+  unwrap()
+
+## subset to points in study area
+weather_stations <- mask(weather_stations, vancouver_poly)
+
+## convert to data.table and subset/rename columns needed by climr
+xyzDT <- as.data.table(weather_stations, geom = "XY")
+cols <- c("Station ID", "x", "y", "Elevation (m)")
+xyzDT <- xyzDT[, ..cols]
+setnames(xyzDT, c("id", "lon", "lat", "elev"))
+
+## join BEC zones and colours
+BECz_vancouver <- get(data("BECz_vancouver")) |>
+  unwrap()
+
+BECz_points <- extract(BECz_vancouver, weather_stations) |>
+  as.data.table()
+BECz_points <- BECz_points[, .(ZONE, HEX)]
+
+xyzDT <- cbind(xyzDT, BECz_points)
+
+## remove duplicates
+xyzDT <- unique(xyzDT)
+
+## there are some duplicate stations with slightly different
+## coordinates. We'll take the first
+xyzDT <- xyzDT[!duplicated(id)]
+
+ds_out_ts <- downscale(
+  xyz = xyzDT,
+  obs_years = 2001:2023,
+  gcm_hist_years = 2001:2014,
+  gcm_ssp_years = 2015:2040,
+  gcms = list_gcms()[1],
+  ssps = "ssp245",
+  max_run = 0,
+  vars = c("MAT", "PPT_an", "PAS_an")
+)
+
+
 bgc <- st_read("../Common_Files/BEC13Draft_Simplified.gpkg")
 BG <- bgc[grep("^BG.*", bgc$BGC),]
 ar <- sum(st_area(BG))
