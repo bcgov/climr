@@ -79,14 +79,14 @@
 #' )
 #'
 #' ## historic observational time series
-#' vars <- c("PPT", "CMD", "Tave_07")
+#' vars <- c("PPT_an", "CMD_an", "Tave_07")
 #' climate_norms_hist <- downscale(
 #'   xyz = in_xyz,
 #'   which_refmap = "refmap_climr",
 #'   return_refperiod = TRUE,
 #'   obs_periods = "2001_2020",
 #'   vars = vars,
-#'   out_spatial = TRUE, plot = "PPT"
+#'   out_spatial = TRUE, plot = "PPT_an"
 #' ) ## specify desired variables to plot
 #'
 #' ## as a data.table
@@ -94,7 +94,7 @@
 #'   xyz = in_xyz, which_refmap = "refmap_climr",
 #'   return_refperiod = TRUE,
 #'   vars = vars,
-#'   out_spatial = FALSE, plot = "PPT"
+#'   out_spatial = FALSE, plot = "PPT_an"
 #' ) ## specify desired variables to plot
 #'
 #' ## future projections for annual variables from three models
