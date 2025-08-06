@@ -47,7 +47,9 @@ Imports:
     dbplyr,
     plotly,
     stringi,
-    ggplot2
+    ggplot2,
+    curl,
+    httr
 Suggests: 
     knitr,
     parallel,

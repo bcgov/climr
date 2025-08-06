@@ -63,6 +63,7 @@
 #'   "bottomleft", "topleft", "topright")`.
 #'
 #' @return NULL. Draws a plot in the active graphics device.
+#' @keywords internal
 #'
 #'
 #' @importFrom scales alpha
@@ -301,6 +302,8 @@ plot_timeSeries_preprocess <- function(
 #'
 #' @importFrom graphics polygon
 #' @importFrom stats smooth.spline
+#' 
+#' @keywords internal
 plot_preprocess_ensemble <- function(x, var, scenarios.selected, scenarios,
                           showrange = TRUE, simplify = TRUE, gcm = NULL,
                           pal, pal.scenario, pal.gcms, refline = FALSE, showmean = TRUE,
