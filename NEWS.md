@@ -8,6 +8,7 @@
 
 ## Enhancements
 
+- Updated some climate variable names to specify annual timeperiod (e.g. `PAS` --> `PAS_an`). Please see `list_vars()` for the updated names.
 - When downscaling SpatRasters, new variables are now added by reference, which substantially reduces memory foot print and prevents crashes.
 - Added database retry function (hopefully fixes issues on internal government networks)
 - Added `pre_cache` function for efficiently downloading data fro an AOI to avoid delays in analysis.
