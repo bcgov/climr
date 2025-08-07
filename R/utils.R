@@ -41,9 +41,9 @@ get_bb <- function(xyz) {
 
 #' @export
 #' @rdname get_bb
-get_bb.data.frame <- function(in_xyz) {
-  .checkXYZ(copy(in_xyz))
-  thebb <- c(min(in_xyz[, "lon"]), max(in_xyz[, "lon"]), min(in_xyz[, "lat"]), max(in_xyz[, "lat"]))
+get_bb.data.frame <- function(xyz) {
+  .checkXYZ(copy(xyz))
+  thebb <- c(min(xyz[, "lon"]), max(xyz[, "lon"]), min(xyz[, "lat"]), max(xyz[, "lat"]))
 
   if (any(is.na(thebb))) {
     stop("Couldn't guess bounding box. Are there NA's in 'xyz'?")
@@ -56,8 +56,8 @@ get_bb.data.frame <- function(in_xyz) {
 
 #' @rdname get_bb
 #' @export
-get_bb.SpatRaster <- function(in_xyz) {
-  ext <- terra::ext(in_xyz)
+get_bb.SpatRaster <- function(xyz) {
+  ext <- terra::ext(xyz)
   return(ext)
 }
 

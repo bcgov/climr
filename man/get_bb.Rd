@@ -8,9 +8,9 @@
 \usage{
 get_bb(xyz)
 
-\method{get_bb}{data.frame}(in_xyz)
+\method{get_bb}{data.frame}(xyz)
 
-\method{get_bb}{SpatRaster}(in_xyz)
+\method{get_bb}{SpatRaster}(xyz)
 }
 \arguments{
 \item{xyz}{\code{data.table} (or \code{data.frame}) of points to downscale
