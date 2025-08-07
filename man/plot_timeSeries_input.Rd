@@ -6,14 +6,15 @@
 \usage{
 plot_timeSeries_input(
   xyz,
-  gcms = list_gcms(),
-  ssps = list_ssps(),
+  gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)],
+  ssps = list_ssps()[1:3],
   max_run = 10,
-  obs_ts_dataset = c("cru.gpcc", "climatena"),
+  obs_ts_dataset = c("mswx.blend", "cru.gpcc", "climatena"),
   obs_years = list_obs_years(),
   gcm_hist_years = list_gcm_hist_years(),
   gcm_ssp_years = list_gcm_ssp_years(),
-  vars = list_vars()
+  vars = list_vars(),
+  db_option = "database"
 )
 }
 \arguments{
@@ -46,6 +47,8 @@ scenarios specified by \code{ssps}. See \code{\link[=list_gcm_ssp_years]{list_gc
 \item{vars}{character. A vector of climate variables to compute. Supported variables
 can be obtained with \code{\link[=list_vars]{list_vars()}}. Definitions can be found in this package
 \code{variables} dataset. Default to monthly PPT, Tmax, Tmin.}
+
+\item{db_option}{character. One of \code{auto}, \code{database}, or \code{local}. Default \code{auto}.}
 }
 \value{
 \code{data.table} of average downscaled climate variables for all locations.

@@ -1,3 +1,28 @@
+# `climr` 0.2.2
+
+## Bug Fixes
+
+- Various minor bug fixes to plotting functions, predominantly for use in the climr-app
+- Added MSWX dataset to `plot_timeSeries`
+- Fixed very strange mystery bug due to postgres not preserving row order
+
+## Enhancements
+
+- Updated some climate variable names to specify annual timeperiod (e.g. `PAS` --> `PAS_an`). Please see `list_vars()` for the updated names.
+- When downscaling SpatRasters, new variables are now added by reference, which substantially reduces memory foot print and prevents crashes.
+- Added database retry function (hopefully fixes issues on internal government networks)
+- Added `pre_cache` function for efficiently downloading data fro an AOI to avoid delays in analysis.
+
+# `climr` 0.2.1
+
+## Bug Fixes
+
+-   Fixed a bug in `plot_timeSeries()` that prevented plotting of mswx.blend dataset
+
+## Enhancements
+
+-   New function "plot_WalterLieth" for creating a Walter-Lieth climate diagram for a specified location(s) and time periods. 
+
 # `climr` 0.2.0
 
 We have lots of exciting improvements in this release! Of major note, we now have:

@@ -160,6 +160,12 @@ Knutti, R. 2008. Should we believe model predictions of future climate
 change? Philosophical Transactions of the Royal Society A: Mathematical,
 Physical and Engineering Sciences 366:4647–4664.
 
+Mahony, C.R., T. Wang, A. Hamann, and A.J. Cannon. 2022. [A global
+climate model ensemble for downscaled monthly climate normals over North
+America](https://rmets.onlinelibrary.wiley.com/doi/full/10.1002/joc.7566).
+International Journal of Climatology. 42:5871-5891.
+[doi.org/10.1002/joc.7566](https://doi.org/10.1002/joc.7566)
+
 McSweeney, C. F., R. G. Jones, R. W. Lee, and D. P. Rowell. 2014.
 Selecting CMIP5 GCMs for downscaling over multiple regions. Climate
 Dynamics 44:3237–3260.

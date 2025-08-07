@@ -1,7 +1,7 @@
 Package: climr
 Title: An R package of downscaled monthly climate data for North America
-Version: 0.2.0
-Date: 19-03-2025
+Version: 0.2.2
+Date: 12-06-2025
 Authors@R: c(
     person("Kiri", "Daust", , "kiri.daust@gov.bc.ca", role = c("aut", "cre")),
     person("Colin", "Mahony", , "Colin.Mahony@gov.bc.ca", role = "aut",
@@ -47,7 +47,9 @@ Imports:
     dbplyr,
     plotly,
     stringi,
-    ggplot2
+    ggplot2,
+    curl,
+    httr
 Suggests: 
     knitr,
     parallel,

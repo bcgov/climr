@@ -42,14 +42,16 @@
 
 plot_timeSeries_input <- function(
     xyz,
-    gcms = list_gcms(),
-    ssps = list_ssps(),
+    gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)],
+    ssps = list_ssps()[1:3],
     max_run = 10,
-    obs_ts_dataset = c("cru.gpcc", "climatena"),
+    obs_ts_dataset = c("mswx.blend", "cru.gpcc", "climatena"),
     obs_years = list_obs_years(),
     gcm_hist_years = list_gcm_hist_years(),
     gcm_ssp_years = list_gcm_ssp_years(),
-    vars = list_vars()) {
+    vars = list_vars(),
+    db_option = "database"
+    ) {
   data <- downscale(
     xyz = xyz,
     gcms = gcms,
@@ -60,7 +62,7 @@ plot_timeSeries_input <- function(
     gcm_hist_years = gcm_hist_years,
     gcm_ssp_years = gcm_ssp_years,
     vars = vars,
-    db_option = "database"
+    db_option = db_option
   )
   data.agg <- data[, lapply(.SD, mean), by = .(GCM, SSP, RUN, PERIOD, DATASET), .SDcols = -c("id", "GCM", "SSP", "RUN", "PERIOD", "DATASET")]
   return(data.agg)
