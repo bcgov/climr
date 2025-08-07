@@ -30,7 +30,6 @@ articles:
   - methods_downscaling
   - methods_mosaic
   - methods_ensembleSelection
-  - lapse_rates
 - title: "Guidance"
   navbar: "Guidance"
   desc: "Best practices and other perspectives"
