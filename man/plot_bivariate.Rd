@@ -5,7 +5,7 @@
 \title{Bivariate climate change plots}
 \usage{
 plot_bivariate(
-  xyz,
+  X,
   xvar = "Tave_sm",
   yvar = "PPT_sm",
   period_focal = list_gcm_periods()[1],
@@ -24,8 +24,9 @@ plot_bivariate(
 )
 }
 \arguments{
-\item{xyz}{a \code{terra::SpatRaster} with a single layer containing elevation values in metres, or a \code{data.frame} with the following columns
-"long", "lat", "elev", and a unique "id". Any extra columns will be ignored and not output.}
+\item{X}{A \code{data.table} object produced using the function \code{\link[=plot_bivariate_input]{plot_bivariate_input()}}. This
+table can include more models, scenarios, and variables than are used in individual calls to
+\code{\link[=plot_bivariate]{plot_bivariate()}}.}
 
 \item{xvar}{character. x-axis variable. options are \code{list_vars()}.}
 
@@ -82,8 +83,11 @@ The purposes of the plot are to:
 All climate changes are relative to the 1961-1990 reference period normals.
 }
 \details{
-The input table \code{xyz} can be a single location or multiple locations. If multiple
-locations, the plot provides the mean of the anomalies for these locations.
+The input table \code{X} provides climate data for a single location or the average of multiple
+locations. The purpose of conducting the generation of the input table in a separate function is
+to allow users to make multiple calls to \code{\link[=plot_timeSeries]{plot_timeSeries()}} without needing to generate the
+inputs each time.
+
 The climate change trajectories provided by \code{show_trajectories} are points for
 each of the five 20-year periods specified by \code{list_gcm_periods()}. These points
 are connected with an interpolation spline when the x variable is monotonic;
@@ -94,7 +98,7 @@ scenarios, but the individual runs for all scenarios are plotted separately.
 }
 \examples{
 # data frame of arbitrary points on Vancouver Island
-my_points <- data.frame(
+my_points <- data.table(
   lon = c(-123.4404, -123.5064, -124.2317),
   lat = c(48.52631, 48.46807, 49.21999),
   elev = c(52, 103, 357),
@@ -105,7 +109,7 @@ my_points <- data.frame(
 plot_bivariate(my_points)
 
 # draw an interactive (plotly) plot
-plot_bivariate(my_points, xvar="MAT", yvar="PAS", interactive = TRUE)
+plot_bivariate(my_points, xvar="MAT", yvar="PAS_an", interactive = TRUE)
 
 # export plot to a temporary directory
 figDir <- tempdir()

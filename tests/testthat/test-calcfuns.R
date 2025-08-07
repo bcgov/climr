@@ -108,7 +108,7 @@ test_that("calc_* give sensible outputs", {
 
   sample_xyz$ID <- 1:nrow(sample_xyz)
   ds_res_bc <- as.data.table(sample_xyz)[ds_res_bc, on = .(id)]
-  ds_res_bc[, .(lat, lon, elev, Tmax, PPT_01, CMD, Eref)]
+  ds_res_bc[, .(lat, lon, elev, Tmax_an, PPT_01, CMD_an, Eref_an)]
 
   ## if elevation of input climate data are NA, downscaled variables should be as well.
   expect_true(all(is.na(ds_res_bc[is.na(elev), .SD, .SDcols = list_vars()])))

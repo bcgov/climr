@@ -50,18 +50,10 @@ scaling is applied to the labels if the \code{log} parameter is specified.
 \examples{
 ## get the sample digital elevation model (dem) provided with `climr`
 dem <- get(data("dem_vancouver")) |> terra::unwrap()
-## convert the DEM to a data.frame
-grid <- as.data.frame(dem, cells = TRUE, xy = TRUE)
-## rename column names to what climr expects
-colnames(grid) <- c("id", "lon", "lat", "elev")
 ## A simple climr query.
 ## This will return the observed 1961-1990 normals for the raster grid points.
 var <- "MAP"
-ds_out <- downscale(grid, which_refmap = "refmap_climr", vars = var)
-clim <- terra::rast(dem) # use the DEM as a template raster
-## populate the raster cells with the 2001-2020 annual precipitation (MAP) values,
-## using the `id` field as the link.
-clim[ds_out[, id]] <- ds_out[, var, with = FALSE]
+clim <- downscale(dem, which_refmap = "refmap_climr", vars = var)
 ## log-transform precipitation for more meaningful scaling
 clim <- log2(clim)
 ## increment for the ramp
@@ -82,3 +74,4 @@ legend_ramp(
 )
 
 }
+\keyword{internal}

@@ -18,7 +18,7 @@ test_that("test dowscale basic and spatial", {
   ds_hist <- downscale(
     xyz = xyz,
     obs_periods = "2001_2020",
-    vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07")
+    vars = c("PPT_an", "CMD_an", "Tave_01", "Tave_07")
   ) ## specify desired variablesds_hist <- climr_downscale(xyz = xyz, which_refmap = "auto",
 
   test <- length(setdiff(ds_hist$id, xyz$id)) + length(setdiff(xyz$id, ds_hist$id))
@@ -36,7 +36,7 @@ test_that("test dowscale basic and spatial", {
     xyz = xyz, 
     obs_periods = "2001_2020",
     return_refperiod = FALSE, ## put this to TRUE if you want the 1961-1990 period
-    vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07")
+    vars = c("PPT_an", "CMD_an", "CMI_an", "Tave_01", "Tave_07")
   )
   expect_true(all(ds_hist2[, .N, by = id][, N] == 1)) ## should have  only historic period per ID
   test <- as.data.table(xyz)[ds_hist2, on = .(id), nomatch = NA]
@@ -46,7 +46,7 @@ test_that("test dowscale basic and spatial", {
     xyz = xyz, 
     obs_periods = "2001_2020",
     return_refperiod = TRUE, ## put this to TRUE if you want the 1961-1990 period
-    vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
+    vars = c("PPT_an", "CMD_an", "CMI_an", "Tave_01", "Tave_07"),
     out_spatial = TRUE
   )
   expect_true(is(ds_hist_spatial, "SpatVector"))
@@ -57,7 +57,7 @@ test_that("test dowscale basic and spatial", {
     xyz = xyz,
     obs_periods = "2001_2020",
     return_refperiod = FALSE, ## put this to TRUE if you want the 1961-1990 period
-    vars = c("PPT", "CMD", "CMI", "Tave_01", "Tave_07"),
+    vars = c("PPT_an", "CMD_an", "CMI_an", "Tave_01", "Tave_07"),
     out_spatial = TRUE
   )
   expect_true(is(ds_hist_spatial2, "SpatVector"))
@@ -165,7 +165,7 @@ test_that("test downscale with different argument combinations", {
     #browser()
     args <- args[!is.na(args)]
     suppressWarnings(args$xyz <- xyz) # coerces to list.
-    args$vars <- c("PPT", "CMD") ## for faster results.
+    args$vars <- c("PPT_an", "CMD_an") ## for faster results.
 
     if (!is.null(args$obs_years)) {
       args$obs_years <- eval(parse(text = args$obs_years))

@@ -79,7 +79,7 @@
 #'   xyz = xyz,
 #'   refmap = refmap,
 #'   gcms = gcm_raw,
-#'   vars = c("MAT", "PAS")
+#'   vars = c("MAT", "PAS_an")
 #' )
 #'
 #' # create an input of uniform warming of 2 degrees Celsius and no precipitation change, for use as
@@ -94,7 +94,7 @@
 #' } #' repopulate with the null values
 #'
 #' # downscale the null values for variables of interest
-#' null_downscaled <- downscale_core(xyz = xyz, refmap = refmap, gcms = null, vars = c("MAT", "PAS"))
+#' null_downscaled <- downscale_core(xyz = xyz, refmap = refmap, gcms = null, vars = c("MAT", "PAS_an"))
 #'
 downscale_core <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NULL,
                            gcm_hist_ts = NULL, obs_ts = NULL, return_refperiod = TRUE,
@@ -808,6 +808,7 @@ process_one_climaterast.SpatRaster <- function(climaterast, res, xyz, timeseries
   if (type %in% c("obs")) {
     ## Create match set to match with res names
     labels <- nm
+    
   } else {
     labels <- vapply(
       strsplit(nm, "_"),
@@ -825,6 +826,8 @@ process_one_climaterast.SpatRaster <- function(climaterast, res, xyz, timeseries
   climaterast_ppt <- terra::subset(climaterast, ppt) * terra::subset(res, match(labels[ppt], names(res))) ## PPT
   climaterast_temp <- terra::subset(climaterast, temp) + terra::subset(res, match(labels[-ppt], names(res))) ## Temperature
   climaterast <- terra::subset(c(climaterast_ppt, climaterast_temp), origorder)
+  
+  if(type == "obs") names(climaterast) <- paste0("OBS_",names(climaterast),"_2001_2020") ##will need to change this with more obs periods
   
   return(climaterast)
   

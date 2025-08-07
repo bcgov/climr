@@ -10,6 +10,7 @@ vignette: >
   %\VignetteIndexEntry{Lapse rates}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+as_is: true
 editor_options: 
   markdown: 
     wrap: 72

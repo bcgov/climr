@@ -44,6 +44,7 @@ articles:
   - knownIssues_customRefmap
   - knownIssues_spatialAnomaly
 
+
 reference:
 - title: "Downscaling functions"
   desc: >
@@ -75,20 +76,25 @@ reference:
   contents:
   - cache_clear
   - cache_path
+  - pre_cache
   - data_connect
   - pgGetTerra
+
 - title: "Utilities"
   desc: >
     Other useful functions
   contents:
   - plot_bivariate
+  - plot_bivariate_input
   - plot_timeSeries  
   - plot_timeSeries_input
+  - plot_WalterLieth
+  - plot_WalterLieth_input
   - plot_ensemble
   - get_bb
   - lapse_rate
-  - legend_ramp
   - logVars
+  - summarize_downscale_output
 - title: "Data"
   desc: >
     Available climate variables and functions listing available data.

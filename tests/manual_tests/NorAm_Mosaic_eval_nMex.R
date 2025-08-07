@@ -3,7 +3,6 @@
 # Colin Mahony 
 
 library(terra)
-library(terra)
 library(data.table)
 library(leaflet)
 library(RColorBrewer)

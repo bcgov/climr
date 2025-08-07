@@ -494,14 +494,6 @@ process_one_climate_db <- function(
     )
   }
   
-  ## check for "silly" parameter combinations
-  if (all(
-    is.null(gcms), is.null(gcm_ssp_ts), is.null(gcm_hist_ts),
-    is.null(obs), is.null(obs_ts)
-  )) {
-    warning("'gcms', 'gcm_ssp_ts', 'gcm_hist_ts', 'obs' and 'obs_ts' are missing. Nothing to downscale.")
-  }
-  
   return(invisible(NULL))
 }
       
