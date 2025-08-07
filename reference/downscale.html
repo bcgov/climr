@@ -25,7 +25,7 @@ downscale() is a user-friendly wrapper for downscale_core()"><meta property="og:
 
     <a class="navbar-brand me-2" href="../index.html">climr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -233,14 +233,14 @@ be done locally, and timeseries will be done on the database.</p>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## historic observational time series</span></span></span>
-<span class="r-in"><span><span class="va">vars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PPT"</span>, <span class="st">"CMD"</span>, <span class="st">"Tave_07"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">vars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PPT_an"</span>, <span class="st">"CMD_an"</span>, <span class="st">"Tave_07"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">climate_norms_hist</span> <span class="op">&lt;-</span> <span class="fu">downscale</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  xyz <span class="op">=</span> <span class="va">in_xyz</span>,</span></span>
 <span class="r-in"><span>  which_refmap <span class="op">=</span> <span class="st">"refmap_climr"</span>,</span></span>
 <span class="r-in"><span>  return_refperiod <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>  obs_periods <span class="op">=</span> <span class="st">"2001_2020"</span>,</span></span>
 <span class="r-in"><span>  vars <span class="op">=</span> <span class="va">vars</span>,</span></span>
-<span class="r-in"><span>  out_spatial <span class="op">=</span> <span class="cn">TRUE</span>, plot <span class="op">=</span> <span class="st">"PPT"</span></span></span>
+<span class="r-in"><span>  out_spatial <span class="op">=</span> <span class="cn">TRUE</span>, plot <span class="op">=</span> <span class="st">"PPT_an"</span></span></span>
 <span class="r-in"><span><span class="op">)</span> <span class="co">## specify desired variables to plot</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Welcome to climr!</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Getting observed anomalies...</span>
@@ -259,7 +259,7 @@ be done locally, and timeseries will be done on the database.</p>
 <span class="r-in"><span>  xyz <span class="op">=</span> <span class="va">in_xyz</span>, which_refmap <span class="op">=</span> <span class="st">"refmap_climr"</span>,</span></span>
 <span class="r-in"><span>  return_refperiod <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>  vars <span class="op">=</span> <span class="va">vars</span>,</span></span>
-<span class="r-in"><span>  out_spatial <span class="op">=</span> <span class="cn">FALSE</span>, plot <span class="op">=</span> <span class="st">"PPT"</span></span></span>
+<span class="r-in"><span>  out_spatial <span class="op">=</span> <span class="cn">FALSE</span>, plot <span class="op">=</span> <span class="st">"PPT_an"</span></span></span>
 <span class="r-in"><span><span class="op">)</span> <span class="co">## specify desired variables to plot</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Welcome to climr!</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Retrieving from cache...</span>

@@ -19,7 +19,7 @@ function."><meta property="og:image" content="https://bcgov.github.io/climr/logo
 
     <a class="navbar-brand me-2" href="../index.html">climr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -236,7 +236,7 @@ global climate model (GCM), shared socioeconomic pathway scenario (SSP), model r
 <span class="r-in"><span>  xyz <span class="op">=</span> <span class="va">xyz</span>,</span></span>
 <span class="r-in"><span>  refmap <span class="op">=</span> <span class="va">refmap</span>,</span></span>
 <span class="r-in"><span>  gcms <span class="op">=</span> <span class="va">gcm_raw</span>,</span></span>
-<span class="r-in"><span>  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MAT"</span>, <span class="st">"PAS"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MAT"</span>, <span class="st">"PAS_an"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># create an input of uniform warming of 2 degrees Celsius and no precipitation change, for use as</span></span></span>
@@ -251,7 +251,7 @@ global climate model (GCM), shared socioeconomic pathway scenario (SSP), model r
 <span class="r-in"><span><span class="op">}</span> <span class="co">#' repopulate with the null values</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># downscale the null values for variables of interest</span></span></span>
-<span class="r-in"><span><span class="va">null_downscaled</span> <span class="op">&lt;-</span> <span class="fu">downscale_core</span><span class="op">(</span>xyz <span class="op">=</span> <span class="va">xyz</span>, refmap <span class="op">=</span> <span class="va">refmap</span>, gcms <span class="op">=</span> <span class="va">null</span>, vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MAT"</span>, <span class="st">"PAS"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">null_downscaled</span> <span class="op">&lt;-</span> <span class="fu">downscale_core</span><span class="op">(</span>xyz <span class="op">=</span> <span class="va">xyz</span>, refmap <span class="op">=</span> <span class="va">refmap</span>, gcms <span class="op">=</span> <span class="va">null</span>, vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MAT"</span>, <span class="st">"PAS_an"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

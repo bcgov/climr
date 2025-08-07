@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">climr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -125,24 +125,18 @@ scaling is applied to the labels if the <code>log</code> parameter is specified.
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## get the sample digital elevation model (dem) provided with `climr`</span></span></span>
 <span class="r-in"><span><span class="va">dem</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/get.html" class="external-link">get</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"dem_vancouver"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/wrap.html" class="external-link">unwrap</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co">## convert the DEM to a data.frame</span></span></span>
-<span class="r-in"><span><span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">dem</span>, cells <span class="op">=</span> <span class="cn">TRUE</span>, xy <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co">## rename column names to what climr expects</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">grid</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id"</span>, <span class="st">"lon"</span>, <span class="st">"lat"</span>, <span class="st">"elev"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co">## A simple climr query.</span></span></span>
 <span class="r-in"><span><span class="co">## This will return the observed 1961-1990 normals for the raster grid points.</span></span></span>
 <span class="r-in"><span><span class="va">var</span> <span class="op">&lt;-</span> <span class="st">"MAP"</span></span></span>
-<span class="r-in"><span><span class="va">ds_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="downscale.html">downscale</a></span><span class="op">(</span><span class="va">grid</span>, which_refmap <span class="op">=</span> <span class="st">"refmap_climr"</span>, vars <span class="op">=</span> <span class="va">var</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">clim</span> <span class="op">&lt;-</span> <span class="fu"><a href="downscale.html">downscale</a></span><span class="op">(</span><span class="va">dem</span>, which_refmap <span class="op">=</span> <span class="st">"refmap_climr"</span>, vars <span class="op">=</span> <span class="va">var</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Welcome to climr!</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Not fully cached :( Will download more</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Downloading new data from refmap_climr...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> .</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Caching data...</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Downscaling...</span>
-<span class="r-in"><span><span class="va">clim</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="va">dem</span><span class="op">)</span> <span class="co"># use the DEM as a template raster</span></span></span>
-<span class="r-in"><span><span class="co">## populate the raster cells with the 2001-2020 annual precipitation (MAP) values,</span></span></span>
-<span class="r-in"><span><span class="co">## using the `id` field as the link.</span></span></span>
-<span class="r-in"><span><span class="va">clim</span><span class="op">[</span><span class="va">ds_out</span><span class="op">[</span>, <span class="va">id</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">ds_out</span><span class="op">[</span>, <span class="va">var</span>, with <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Climate vars...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Appending... [MAP]</span>
 <span class="r-in"><span><span class="co">## log-transform precipitation for more meaningful scaling</span></span></span>
 <span class="r-in"><span><span class="va">clim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="va">clim</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co">## increment for the ramp</span></span></span>

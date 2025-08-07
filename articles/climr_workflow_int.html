@@ -30,7 +30,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">climr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -239,10 +239,12 @@ variables (in this case only the annual ones).</p>
 <span><span class="co">#&gt; [1] "ssp126" "ssp245" "ssp370" "ssp585"</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/data-option-lists.html">list_vars</a></span><span class="op">(</span>set <span class="op">=</span> <span class="st">"Annual"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "AHM"     "bFFP"    "CMD"     "CMI"     "DD18"    "DD5"     "DDsub0" </span></span>
-<span><span class="co">#&gt;  [8] "DDsub18" "eFFP"    "EMT"     "Eref"    "EXT"     "FFP"     "MAP"    </span></span>
-<span><span class="co">#&gt; [15] "MAT"     "MCMT"    "MSP"     "MWMT"    "NFFD"    "PAS"     "PPT"    </span></span>
-<span><span class="co">#&gt; [22] "RH"      "SHM"     "Tave"    "TD"      "Tmax"    "Tmin"</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] "AHM"        "bFFP"       "CMD_an"     "CMI_an"     "DD18_an"   </span></span>
+<span><span class="co">#&gt;  [6] "DD5_an"     "DDsub0_an"  "DDsub18_an" "eFFP"       "EMT"       </span></span>
+<span><span class="co">#&gt; [11] "Eref_an"    "EXT"        "FFP"        "MAP"        "MAT"       </span></span>
+<span><span class="co">#&gt; [16] "MCMT"       "MSP"        "MWMT"       "NFFD_an"    "PAS_an"    </span></span>
+<span><span class="co">#&gt; [21] "PPT_an"     "RH_an"      "SHM"        "Tave_an"    "TD"        </span></span>
+<span><span class="co">#&gt; [26] "Tmax_an"    "Tmin_an"</span></span></code></pre></div>
 <p>We will chose the only available historic period (2001-2020), the
 2021-2040 future period, the ‘EC-Earth3’ GCM and the SSP 2.45 scenario.
 MAT, PPT and PAS will be selected as output variables.</p>
@@ -258,7 +260,7 @@ composite reference climatology (<code>refmap_climr</code>).</p>
 <span>  ssps <span class="op">=</span> <span class="st">"ssp245"</span>,</span>
 <span>  max_run <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  return_refperiod <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co">## to return the 1961-1990 normals period</span></span>
-<span>  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MAT"</span>, <span class="st">"PPT"</span>, <span class="st">"PAS"</span><span class="op">)</span></span>
+<span>  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MAT"</span>, <span class="st">"PPT_an"</span>, <span class="st">"PAS_an"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Welcome to climr!</span></span>
 <span><span class="co">#&gt; Getting observed anomalies...</span></span>
@@ -297,8 +299,8 @@ are show for one location (‘id’)</caption>
 <th align="left">RUN</th>
 <th align="left">PERIOD</th>
 <th align="right">MAT</th>
-<th align="right">PPT</th>
-<th align="right">PAS</th>
+<th align="right">PPT_an</th>
+<th align="right">PAS_an</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -359,7 +361,7 @@ are show for one location (‘id’)</caption>
 <p>We can now do a simple visualisation of climate variation by
 biogeoclimatic zone (‘ZONE’), in the normals period of 1961-1990:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">plotdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/melt.data.table.html" class="external-link">melt</a></span><span class="op">(</span><span class="va">ds_out</span>, measure.vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MAT"</span>, <span class="st">"PPT"</span>, <span class="st">"PAS"</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">plotdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/melt.data.table.html" class="external-link">melt</a></span><span class="op">(</span><span class="va">ds_out</span>, measure.vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MAT"</span>, <span class="st">"PPT_an"</span>, <span class="st">"PAS_an"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">cols</span> <span class="op">&lt;-</span> <span class="va">plotdata</span><span class="op">$</span><span class="va">HEX</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">cols</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">plotdata</span><span class="op">$</span><span class="va">ZONE</span></span>
 <span><span class="va">cols</span> <span class="op">&lt;-</span> <span class="va">cols</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">duplicated</a></span><span class="op">(</span><span class="va">cols</span><span class="op">)</span><span class="op">]</span></span>
@@ -380,21 +382,21 @@ See <code>vignette("methods_downscaling.Rmd")</code> for details.</p>
 <!-- missing data for years 2016-2020 -->
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ds_out_ts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/downscale.html">downscale</a></span><span class="op">(</span></span>
-<span>  xyz <span class="op">=</span> <span class="va">xyzDT</span>,</span>
+<span>  xyz <span class="op">=</span> <span class="va">xyzDT</span><span class="op">[</span>,<span class="fu">.</span><span class="op">(</span><span class="va">id</span>,<span class="va">lon</span>,<span class="va">lat</span>,<span class="va">elev</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>  obs_years <span class="op">=</span> <span class="fl">2001</span><span class="op">:</span><span class="fl">2023</span>,</span>
 <span>  gcm_hist_years <span class="op">=</span> <span class="fl">2001</span><span class="op">:</span><span class="fl">2014</span>,</span>
 <span>  gcm_ssp_years <span class="op">=</span> <span class="fl">2015</span><span class="op">:</span><span class="fl">2040</span>,</span>
-<span>  gcms <span class="op">=</span> <span class="st">"EC-Earth3"</span>,</span>
+<span>  gcms <span class="op">=</span> <span class="fu"><a href="../reference/data-option-lists.html">list_gcms</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="fl">5</span><span class="op">]</span>,</span>
 <span>  ssps <span class="op">=</span> <span class="st">"ssp245"</span>,</span>
 <span>  max_run <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  return_refperiod <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co">## to return the 1961-1990 normals period</span></span>
-<span>  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MAT"</span>, <span class="st">"PPT"</span>, <span class="st">"PAS"</span><span class="op">)</span></span>
+<span>  ensemble_mean <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MAT"</span>, <span class="st">"PPT_an"</span>, <span class="st">"PAS_an"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Welcome to climr!</span></span>
 <span><span class="co">#&gt; Downscaling in database...</span></span>
 <span><span class="co">#&gt; Extracting [73] bands from refmap_climr</span></span>
-<span><span class="co">#&gt; Extracting [624] bands from gcmts_VAR_ec-earth3</span></span>
-<span><span class="co">#&gt; Extracting [1,008] bands from hist_ec-earth3</span></span></code></pre></div>
+<span><span class="co">#&gt; Extracting [312] bands from gcmts_VAR_ec-earth3</span></span>
+<span><span class="co">#&gt; Extracting [504] bands from hist_ec-earth3</span></span></code></pre></div>
 <p>To plot the time series, we will filter the data to a single model
 run (i.e. in this case discard the ensemble means) and to a single point
 location. Note that we plot both the observed (<code>obs_hist</code>)
@@ -402,10 +404,9 @@ and the projected historical (<code>proj_hist</code>) climate values
 along with future climate projections (<code>proj_fut</code>).</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ds_out_ts</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">GCM</span><span class="op">)</span>, <span class="va">GCM</span> <span class="op">:=</span> <span class="st">"Historic"</span><span class="op">]</span></span>
-<span><span class="va">ds_out_ts</span> <span class="op">&lt;-</span> <span class="va">ds_out_ts</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"ensemble"</span>, <span class="va">RUN</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="va">ds_out_ts</span> <span class="op">&lt;-</span> <span class="va">ds_out_ts</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"1961_1990"</span>, <span class="va">PERIOD</span><span class="op">)</span><span class="op">]</span></span>
 <span></span>
-<span><span class="va">plotdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/melt.data.table.html" class="external-link">melt</a></span><span class="op">(</span><span class="va">ds_out_ts</span>, measure.vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MAT"</span>, <span class="st">"PPT"</span>, <span class="st">"PAS"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">plotdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/melt.data.table.html" class="external-link">melt</a></span><span class="op">(</span><span class="va">ds_out_ts</span>, measure.vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MAT"</span>, <span class="st">"PPT_an"</span>, <span class="st">"PAS_an"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">plotdata</span><span class="op">[</span>, <span class="va">PERIOD</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">PERIOD</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="va">plotdata</span> <span class="op">&lt;-</span> <span class="va">plotdata</span><span class="op">[</span><span class="va">id</span> <span class="op">==</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">id</span>, <span class="fl">1</span><span class="op">)</span><span class="op">]</span></span>
 <span></span>
@@ -478,7 +479,7 @@ climate variable from the list passed to
 <span>  return_refperiod <span class="op">=</span> <span class="cn">FALSE</span>, <span class="co">## don't return the 1961-1990 normals period</span></span>
 <span>  out_spatial <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  plot <span class="op">=</span> <span class="st">"MAT"</span>,</span>
-<span>  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MAT"</span>, <span class="st">"PPT"</span>, <span class="st">"PAS"</span><span class="op">)</span></span>
+<span>  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MAT"</span>, <span class="st">"PPT_an"</span>, <span class="st">"PAS_an"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="climr_workflow_int_files/figure-html/unnamed-chunk-15-1.png" width="80%" style="display: block; margin: auto;"></p>
 <p>And of course we can now use the vector output to map all variables
@@ -506,7 +507,7 @@ on top of our DEM raster, for prettier visuals:</p>
 <span>  mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">vancouver</span>, add <span class="op">=</span> <span class="cn">TRUE</span>, col <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ds_out_spatial</span>, <span class="st">"PPT"</span>,</span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ds_out_spatial</span>, <span class="st">"PPT_an"</span>,</span>
 <span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">50</span>, palette <span class="op">=</span> <span class="st">"Blues"</span><span class="op">)</span>,</span>
 <span>  add <span class="op">=</span> <span class="cn">TRUE</span>, type <span class="op">=</span> <span class="st">"continuous"</span>,</span>
 <span>  plg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"right"</span>, title <span class="op">=</span> <span class="st">"PPT"</span><span class="op">)</span></span>
