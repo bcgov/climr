@@ -20,4 +20,4 @@ name_changes
 A table of correspondence between old and new names for functions, parameters, and options.
 For changes in climate variable names, see \code{data(variables)}.
 }
-\keyword{datasets}
+\keyword{internal}

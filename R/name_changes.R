@@ -2,7 +2,7 @@
 #'
 #' A table of correspondence between old and new names for functions, parameters, and options.
 #' For changes in climate variable names, see `data(variables)`.
-#'
+#' @keywords internal
 #' @format A `data.table` with columns:
 #' \describe{
 #'   \item{type}{The type of object that was renamed}

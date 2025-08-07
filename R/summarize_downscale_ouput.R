@@ -8,6 +8,7 @@
 #' @param vars character vector of the vars that needs to be summarize
 #' @param use_downscale_db Should the function `downscale_db` be used instead of `downscale`
 #' @param ... Additional arguments passed to `downscale` or `downscale_db`
+#' @keywords internal
 #'
 #' @return A data.table containing averaged climate variables by period, 
 #'    including monthly temperature (average, min, max) and precipitation
