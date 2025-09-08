@@ -171,29 +171,31 @@ plot_timeSeries_preprocess <- function(
     element <- get(paste("element", num, sep = ""))
     var <- get(paste("var", num, sep = ""))
     
-    if (compile) { # this plots a single envelope for the ensemble as a whole
-      temp.data <- X[is.na(DATASET) & !is.na(PERIOD) & !is.na(VAL)]
-      plot_preprocess_ensemble(temp.data,
-                    var = var, var2 = var2,
-                    refline = refline, showmean = showmean,
-                    endlabel = endlabel, element = element,
-                    element1 = element1, element2 = element2,
-                    compile = compile, yeartime.names = yeartime.names,
-                    yeartimes = yeartimes, yeartime = yeartime,
-                    gcm = NULL, pal = pal, pal.scenario = pal.scenario,
-                    pal.gcms = pal.gcms,
-                    scenarios.selected = scenarios.selected, scenarios = scenarios,
-                    showrange = showrange, simplify = simplify)
-    } else {
-      for (gcm in gcms) { # this plots individual GCM ensembles.
-        stop(sprintf("Error: This function is not currently set up to handle individual GCM ensembles."))
+    if(!is.null(ssps)){
+      if (compile) { # this plots a single envelope for the ensemble as a whole
+        temp.data <- X[is.na(DATASET) & !is.na(PERIOD) & !is.na(VAL)]
+        plot_preprocess_ensemble(temp.data,
+                                 var = var, var2 = var2,
+                                 refline = refline, showmean = showmean,
+                                 endlabel = endlabel, element = element,
+                                 element1 = element1, element2 = element2,
+                                 compile = compile, yeartime.names = yeartime.names,
+                                 yeartimes = yeartimes, yeartime = yeartime,
+                                 gcm = NULL, pal = pal, pal.scenario = pal.scenario,
+                                 pal.gcms = pal.gcms,
+                                 scenarios.selected = scenarios.selected, scenarios = scenarios,
+                                 showrange = showrange, simplify = simplify)
+      } else {
+        for (gcm in gcms) { # this plots individual GCM ensembles.
+          stop(sprintf("Error: This function is not currently set up to handle individual GCM ensembles."))
+        }
       }
-    }
-
-    # overlay the 5-year lines on top of all polygons
-    if (yearlines) {
-      for (n in seq(1905, 2095, 5)) {
-        lines(c(n, n), c(-9999, 9999), col = "grey", lty = 2)
+      
+      # overlay the 5-year lines on top of all polygons
+      if (yearlines) {
+        for (n in seq(1905, 2095, 5)) {
+          lines(c(n, n), c(-9999, 9999), col = "grey", lty = 2)
+        }
       }
     }
     

@@ -147,7 +147,7 @@ plot_timeSeries <- function(
     yearlines = FALSE,
     legend_pos = "topleft",
     app = FALSE) {
- 
+  
   ## checks
   if (!requireNamespace("scales", quietly = TRUE)) {
     stop("package scales must be installed to use this function")
@@ -227,22 +227,9 @@ plot_timeSeries <- function(
     element <- get(paste("element", num, sep = ""))
     var <- get(paste("var", num, sep = ""))
     
-    if (compile) { # this plots a single envelope for the ensemble as a whole
-      temp.data <- X[GCM %in% gcms, c("PERIOD", "SSP", "RUN", var), with = FALSE]
-      plot_ensemble(temp.data,
-                    var = var, var2 = var2,
-                    refline = refline, showmean = showmean,
-                    endlabel = endlabel, element = element,
-                    element1 = element1, element2 = element2,
-                    compile = compile, yeartime.names = yeartime.names,
-                    yeartimes = yeartimes, yeartime = yeartime,
-                    gcm = NULL, pal = pal, pal.scenario = pal.scenario,
-                    pal.gcms = pal.gcms,
-                    scenarios.selected = scenarios.selected, scenarios = scenarios,
-                    showrange = showrange, simplify = simplify)
-    } else {
-      for (gcm in gcms) { # this plots individual GCM ensembles.
-        temp.data <- X[GCM == gcm, c("PERIOD", "SSP", "RUN", var), with = FALSE]
+    if(!is.null(ssps)){
+      if (compile) { # this plots a single envelope for the ensemble as a whole
+        temp.data <- X[GCM %in% gcms, c("PERIOD", "SSP", "RUN", var), with = FALSE]
         plot_ensemble(temp.data,
                       var = var, var2 = var2,
                       refline = refline, showmean = showmean,
@@ -250,13 +237,27 @@ plot_timeSeries <- function(
                       element1 = element1, element2 = element2,
                       compile = compile, yeartime.names = yeartime.names,
                       yeartimes = yeartimes, yeartime = yeartime,
-                      gcm = gcm, pal = pal, pal.scenario = pal.scenario,
+                      gcm = NULL, pal = pal, pal.scenario = pal.scenario,
                       pal.gcms = pal.gcms,
                       scenarios.selected = scenarios.selected, scenarios = scenarios,
                       showrange = showrange, simplify = simplify)
+      } else {
+        for (gcm in gcms) { # this plots individual GCM ensembles.
+          temp.data <- X[GCM == gcm, c("PERIOD", "SSP", "RUN", var), with = FALSE]
+          plot_ensemble(temp.data,
+                        var = var, var2 = var2,
+                        refline = refline, showmean = showmean,
+                        endlabel = endlabel, element = element,
+                        element1 = element1, element2 = element2,
+                        compile = compile, yeartime.names = yeartime.names,
+                        yeartimes = yeartimes, yeartime = yeartime,
+                        gcm = gcm, pal = pal, pal.scenario = pal.scenario,
+                        pal.gcms = pal.gcms,
+                        scenarios.selected = scenarios.selected, scenarios = scenarios,
+                        showrange = showrange, simplify = simplify)
+        }
       }
     }
-    
     # overlay the 5-year lines on top of all polygons
     if (yearlines) {
       for (n in seq(1905, 2095, 5)) {
