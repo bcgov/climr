@@ -71,7 +71,7 @@ ds_out <- downscale(
   max_run = 3, # specify 3 individual runs for each model
   ensemble_mean = FALSE, # don't return ensemble mean of individual runs
   db_option = "local", # perform downscaling locally (instead of in database)
-  vars = c("PPT", "CMD", "CMI")
+  vars = c("PPT_an", "CMD_an", "CMI_an")
 )
 ```
 

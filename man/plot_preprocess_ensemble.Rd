@@ -82,3 +82,4 @@ options are \code{\link[=list_vars]{list_vars()}}.}
 \description{
 Function for plotting time series for gcms or compiled ensemble
 }
+\keyword{internal}

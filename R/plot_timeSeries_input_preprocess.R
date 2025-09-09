@@ -53,7 +53,7 @@
 #' This should be the same as the reference line for the GCM time series..
 #'
 #' @return NULL.
-#'
+#' @keywords internal
 #'
 #' @importFrom scales alpha
 #' @importFrom stinepack stinterp
@@ -202,6 +202,7 @@ plot_timeSeries_input_preprocess <- function(
 #'
 #' @importFrom graphics polygon
 #' @importFrom stats smooth.spline
+#' @keywords internal
 process_ensemble <- function(dt, x, var, scenarios.selected, scenarios,
                           showrange = TRUE, simplify = TRUE, gcm = NULL,
                           refline = FALSE, showmean = TRUE,

@@ -56,7 +56,7 @@
 #'
 #' @examples
 #' # data frame of arbitrary points on Vancouver Island
-#' my_points <- data.frame(
+#' my_points <- data.table(
 #'   lon = c(-123.4404, -123.5064, -124.2317),
 #'   lat = c(48.52631, 48.46807, 49.21999),
 #'   elev = c(52, 103, 357),
@@ -67,7 +67,7 @@
 #' plot_bivariate(my_points)
 #'
 #' # draw an interactive (plotly) plot
-#' plot_bivariate(my_points, xvar="MAT", yvar="PAS", interactive = TRUE)
+#' plot_bivariate(my_points, xvar="MAT", yvar="PAS_an", interactive = TRUE)
 #'
 #' # export plot to a temporary directory
 #' figDir <- tempdir()

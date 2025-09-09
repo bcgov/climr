@@ -79,7 +79,7 @@
 #'   xyz = xyz,
 #'   refmap = refmap,
 #'   gcms = gcm_raw,
-#'   vars = c("MAT", "PAS")
+#'   vars = c("MAT", "PAS_an")
 #' )
 #'
 #' # create an input of uniform warming of 2 degrees Celsius and no precipitation change, for use as
@@ -94,7 +94,7 @@
 #' } #' repopulate with the null values
 #'
 #' # downscale the null values for variables of interest
-#' null_downscaled <- downscale_core(xyz = xyz, refmap = refmap, gcms = null, vars = c("MAT", "PAS"))
+#' null_downscaled <- downscale_core(xyz = xyz, refmap = refmap, gcms = null, vars = c("MAT", "PAS_an"))
 #'
 downscale_core <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NULL,
                            gcm_hist_ts = NULL, obs_ts = NULL, return_refperiod = TRUE,
