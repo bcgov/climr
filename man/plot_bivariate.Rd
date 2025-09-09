@@ -85,7 +85,7 @@ All climate changes are relative to the 1961-1990 reference period normals.
 \details{
 The input table \code{X} provides climate data for a single location or the average of multiple
 locations. The purpose of conducting the generation of the input table in a separate function is
-to allow users to make multiple calls to \code{\link[=plot_timeSeries]{plot_timeSeries()}} without needing to generate the
+to allow users to make multiple calls to \code{\link[=plot_bivariate]{plot_bivariate()}} without needing to generate the
 inputs each time.
 
 The climate change trajectories provided by \code{show_trajectories} are points for
@@ -106,10 +106,13 @@ my_points <- data.table(
 )
 
 # draw the plot
-plot_bivariate(my_points)
+my_data <- plot_bivariate_input(my_points)
+
+# draw the plot
+plot_bivariate(my_data)
 
 # draw an interactive (plotly) plot
-plot_bivariate(my_points, xvar="MAT", yvar="PAS_an", interactive = TRUE)
+plot_bivariate(my_data, xvar="MAT", yvar="PAS_an", interactive = TRUE)
 
 # export plot to a temporary directory
 figDir <- tempdir()
@@ -117,7 +120,7 @@ png(
   filename = file.path(figDir, "plot_test.png"), type = "cairo", units = "in",
   width = 6, height = 5, pointsize = 10, res = 300
 )
-plot_bivariate(my_points)
+plot_bivariate(my_data)
 dev.off()
 
 }
