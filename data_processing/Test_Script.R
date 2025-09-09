@@ -1,19 +1,225 @@
 library(data.table)
 library(terra)
 library(climr)
-library(RPostgres)
 
+
+library(terra)
+library(data.table)
 library(climr)
-library(dplyr)
+library(sf)
+
+## get the sample digital elevation model (dem) provided with `climr`
+dem <- get(data("dem_vancouver")) |> terra::unwrap()
+## convert the DEM to a data.frame
+grid <- as.data.frame(dem, cells = TRUE, xy = TRUE)
+## rename column names to what climr expects
+colnames(grid) <- c("id", "lon", "lat", "elev")
+## A simple climr query.
+## This will return the observed 1961-1990 normals for the raster grid points.
+var <- "MAP"
+ds_out <- downscale(grid, which_refmap = "refmap_climr", vars = var)
+clim <- terra::rast(dem) # use the DEM as a template raster
+## populate the raster cells with the 2001-2020 annual precipitation (MAP) values,
+## using the `id` field as the link.
+clim[ds_out[, id]] <- ds_out[, var, with = FALSE]
+## log-transform precipitation for more meaningful scaling
+clim <- log2(clim)
+## increment for the ramp
+inc=diff(range(terra::values(clim)))/500
+## color breaks
+breaks=seq(min(terra::values(clim))-inc, max(terra::values(clim))+inc, inc)
+## color scheme
+ColScheme <- rev(hcl.colors(length(breaks)-1, "GnBu"))
+terra::plot(clim, col=ColScheme, breaks=breaks, legend=FALSE, main="", mar=NA)
+legend_ramp(
+  clim,
+  title = paste(var, "(mm)"),
+  ColScheme = ColScheme,
+  breaks = breaks,
+  pos=c(0.05, 0.45, 0.1, 0.125),
+  log = 2,
+  horizontal = TRUE
+)
+
+## weather station locations
+weather_stations <- get(data("weather_stations")) |>
+  unwrap()
+
+## study area of interest (North Vancouver)
+vancouver_poly <- get(data("vancouver_poly")) |>
+  unwrap()
+
+## subset to points in study area
+weather_stations <- mask(weather_stations, vancouver_poly)
+
+## convert to data.table and subset/rename columns needed by climr
+xyzDT <- as.data.table(weather_stations, geom = "XY")
+cols <- c("Station ID", "x", "y", "Elevation (m)")
+xyzDT <- xyzDT[, ..cols]
+setnames(xyzDT, c("id", "lon", "lat", "elev"))
+
+## join BEC zones and colours
+BECz_vancouver <- get(data("BECz_vancouver")) |>
+  unwrap()
+
+BECz_points <- extract(BECz_vancouver, weather_stations) |>
+  as.data.table()
+BECz_points <- BECz_points[, .(ZONE, HEX)]
+
+xyzDT <- cbind(xyzDT, BECz_points)
+
+## remove duplicates
+xyzDT <- unique(xyzDT)
+
+## there are some duplicate stations with slightly different
+## coordinates. We'll take the first
+xyzDT <- xyzDT[!duplicated(id)]
+
+ds_out_ts <- downscale(
+  xyz = xyzDT,
+  obs_years = 2001:2023,
+  gcm_hist_years = 2001:2014,
+  gcm_ssp_years = 2015:2040,
+  gcms = list_gcms()[1],
+  ssps = "ssp245",
+  max_run = 0,
+  vars = c("MAT", "PPT_an", "PAS_an")
+)
+
+
+bgc <- st_read("../Common_Files/BEC13Draft_Simplified.gpkg")
+BG <- bgc[grep("^BG.*", bgc$BGC),]
+ar <- sum(st_area(BG))
+
+pre_cache(region = "BC", gcms = list_gcms()[1:3], ssps = list_ssps()[2], gcm_periods = list_gcm_periods())
+
+
+
+list.files(file.path(cache_path(),"reference","refmap_climr"))
+tmp <- rast(file.path(cache_path(),"reference","refmap_climr","fc34492b-0013-4e3a-b293-c5e78a1a54b6.tif"))
+wlrdem <- rast(file.path(cache_path(),"reference","refmap_climr","climr_mosaic_wlrdem.tif"))
+names(wlrdem) <- names(tmp)
+writeRaster(wlrdem,file.path(cache_path(),"reference","refmap_climr","climr_mosaic_wlrdem2.tif"), overwrite = T)
+
+rorig <- get(data("dem_vancouver")) |> unwrap()
+rtile <- makeTiles(rorig, 150)
+rvrt <- vrt(rtile)
+
+dat <- downscale(rvrt, return_refperiod = TRUE, vars = c("DD5_an"))
+
+# Download the GeoTIFF
+download.file(
+  url = "https://github.com/bcgov/climr/raw/devl/data-raw/dem_mosaic/climr_mosaic_dem_800m.tif",
+  destfile = "climr_dem_800.tif",
+  mode = "wb"  # write as binary!
+)
+
+# Load as SpatRaster
+dem <- rast("climr_dem_800.tif")
+wrf_ext <- ext(-147,-108,43,67)
+d2 <- crop(dem, wrf_ext)
+plot(d2)
+writeCDF(d2, "WRF_Region.nc")
+
+# define an extent
+# e <- ext(-120.93, -119.73, 50.22, 51.12)
+e <- ext(-179.054166666518, -52.0041666680861, 13.9958333334196, 83.4958333325618)
+e2 <- ext(-179.0625 + 1, -51.5625 -1, 14.375 + 1, 83.125 -1)
+dem_wgs <- project(dem, "EPSG:4326")
+
+dem_cropped <- crop(dem_wgs, e) |> crop(e2)
+tmp <- makeTiles(dem_cropped, 1500, filename = "temp_rast/tile_.tif")
+demvrt <- vrt(tmp)
+#demvrt <- crop(demvrt, e)
+plot(dem_cropped)
+
+tmp <- rast("temp_rast/tile_24.tif")
+
+data <- downscale(
+  xyz = dem_cropped,
+  return_refperiod = TRUE,
+  vars = c("DD5_an","DDsub18_an")
+)
+
+plot(data[[33]])
+
+tmp <- as.data.frame(dem_cropped, xy = TRUE, cells = TRUE) ##convert to data.frame
+names(tmp) <- c("id","lon","lat","elev")
+setDT(tmp)
+tmp <- tmp[elev > 0,]
+
+
+
+bnds <- vect("../CCISS_ShinyApp/app/cciss_spatial/flp_bnds.gpkg")
+lrp <- bnds[bnds$ORG_UNIT == "Lakes Resiliency Project",]
+dem <- rast("../CCISS_ShinyApp/BC_DEM_100m.tif")
+lrpdem <- crop(dem, lrp)
+lrpdem <- aggregate(lrpdem, fact = 2)
+lrpdem <- mask(lrpdem, lrp)
+
+tmp <- as.data.frame(lrpdem, xy = TRUE, cells = TRUE)
+names(tmp) <- c("id","lon","lat","elev")
+lrp_ds <- downscale(tmp, 
+                    gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)],
+                    ssps = list_ssps()[-4],
+                    gcm_ssp_years = c(2035, 2080),
+                    vars = "DD18_an",
+                    return_refperiod = FALSE,
+                    db_option = "local")
+
+lrp_summary <- lrp_ds[,.(DD18_mean = mean(DD18_an)), by = .(id,PERIOD)]
+dd18_2035 <- copy(lrpdem)
+values(dd18_2035) <- NA
+dd18_2035[lrp_summary[PERIOD == 2035,id]] <- lrp_summary[PERIOD == 2035,DD18_mean]
+plot(dd18_2035)
+
+
+dat <- fread("./bivariate_data 1.csv")
+dat[,V1 := NULL]
+dat[,id := 1]
+plot_bivariate(dat, xvar = "MAT", yvar = "MAP", interactive = FALSE)
+
+plot_timeSeries(dat, var1 = "Tmax_an")
+
+dat <- fread("../../../Downloads/bivariate_data.csv")
+plot_bivariate(dat, xvar = "MAT", yvar = "MAP")
+
+in_xyz <- data.frame(
+  lon = c(-127.7052, -127.6227, -127.5623, -127.7162, -127.1858, -127.125, -126.9495, -126.9550),
+  lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
+  elev = c(291, 296, 626, 377, 424, 591, 723, 633),
+  id = 1:8
+)
+
+ds_out <- downscale(xyz = in_xyz, obs_periods = list_obs_periods(), gcms = list_gcms()[1], ssps = "ssp245", gcm_periods = "2041_2060",
+                    vars = c("Tmax_05", "Tmin_05","Tmax_06", "Tmin_06","Tmax_07", "Tmin_07","Tmax_08", "Tmin_08","CMI_05", "CMI_06","CMI_07","CMI_08", "CMD_05", "CMD_06","CMD_07","CMD_08", "PPT_05", "PPT_06","PPT_07","PPT_08" )) 
+
+
+dat <- plot_bivariate_input(in_xyz,
+                            obs_period = "2001_2020",
+                            gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)], #
+                            ssps = list_ssps()[c(2)],
+                            gcm_periods = list_gcm_periods(),
+                            max_run = 10)
+
+plot_bivariate(dat, xvar = "MAT", yvar = "MAP")
+data <- downscale(
+  xyz = in_xyz,
+  obs_period = "2001_2020",
+  gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)], #
+  ssps = list_ssps()[c(4)],
+  gcm_periods = list_gcm_periods(),
+  max_run = 10,
+  vars = list_vars(),
+  db_option = "database")
+
+data <- na.omit(data)
+plot_bivariate(data, xvar = "AHM", yvar = "CMD_an", interactive = TRUE)
 
 dem_vancouver <- get(data("dem_vancouver")) |> unwrap() 
 cache_clear("gcms")
 ds_out <- downscale(xyz = dem_vancouver,
-                    obs_periods = NULL,
-                    gcms = list_gcms()[1],
-                    ssps = list_ssps()[1],
-                    gcm_periods = list_gcm_periods()[1],    
-                    vars = c("AHM") )
+                    return_refperiod = TRUE)
 
 dem_vancouver <- get(data("dem_vancouver")) |> unwrap() 
 cache_clear("gcms")

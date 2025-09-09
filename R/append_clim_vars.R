@@ -51,6 +51,7 @@ append_clim_vars.data.frame <- function(dt, vars) {
 }
 
 #' @noRd
+#' @importFrom terra `add<-`
 #' @export 
 append_clim_vars.SpatRaster <- function(dt, vars) {
   # Return variable or create it if not found in dt

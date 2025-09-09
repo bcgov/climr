@@ -79,14 +79,14 @@
 #' )
 #'
 #' ## historic observational time series
-#' vars <- c("PPT", "CMD", "Tave_07")
+#' vars <- c("PPT_an", "CMD_an", "Tave_07")
 #' climate_norms_hist <- downscale(
 #'   xyz = in_xyz,
 #'   which_refmap = "refmap_climr",
 #'   return_refperiod = TRUE,
 #'   obs_periods = "2001_2020",
 #'   vars = vars,
-#'   out_spatial = TRUE, plot = "PPT"
+#'   out_spatial = TRUE, plot = "PPT_an"
 #' ) ## specify desired variables to plot
 #'
 #' ## as a data.table
@@ -94,7 +94,7 @@
 #'   xyz = in_xyz, which_refmap = "refmap_climr",
 #'   return_refperiod = TRUE,
 #'   vars = vars,
-#'   out_spatial = FALSE, plot = "PPT"
+#'   out_spatial = FALSE, plot = "PPT_an"
 #' ) ## specify desired variables to plot
 #'
 #' ## future projections for annual variables from three models
@@ -274,9 +274,13 @@ downscale <- function(xyz, which_refmap = "refmap_climr",
   results <- results_ts <- NULL
   return_ref_orig <- return_refperiod
   refperiod_done <- FALSE
-  if(any(!is.null(c(obs_periods_db, obs_years_db, gcm_ssp_periods_db, gcm_ssp_ts, gcm_hist_ts)))) return_refperiod <- FALSE
+  use_db <- FALSE
+  if(any(!is.null(c(obs_periods_db, obs_years_db, gcm_ssp_periods_db, gcm_ssp_ts, gcm_hist_ts)))){
+    return_refperiod <- FALSE
+    use_db <- TRUE
+  } 
   if(any(!is.null(c(obs_periods_reg, obs_years_reg, gcm_ssp_periods, gcm_ssp_ts_reg, gcm_hist_ts_reg))) | 
-     (return_ref_orig & db_option == "local") | 
+     (return_ref_orig & !use_db) | 
      inherits(xyz, "SpatRaster")){
     refperiod_done <- TRUE
     reference <- input_refmap(reference = which_refmap, bbox = thebb, cache = cache, indiv_tiles = indiv_tiles, xyz = xyz)

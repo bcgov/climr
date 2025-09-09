@@ -24,3 +24,4 @@ A \code{SpatRaster}
 \description{
 Download raster with bounding box from PostGIS (boostao version)
 }
+\keyword{internal}
