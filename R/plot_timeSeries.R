@@ -308,8 +308,9 @@ plot_timeSeries <- function(
     a <- if ("mswx.blend" %in% obs_ts_dataset) 1 else NA
     b <- if ("cru.gpcc" %in% obs_ts_dataset) 2 else NA
     c <- if ("climatena" %in% obs_ts_dataset) 3 else NA
-    d <- if (length(gcms > 0)) 4 else NA
+    d <- if (length(gcms > 0) & !is.null(ssps)) 4 else NA
     s <- !is.na(c(a, b, c, d))
+    
     legend.GCM <- if (length(gcms) > 1) { 
       paste("Simulated (", length(gcms), " GCMs)", sep = "") 
     } else {
@@ -330,23 +331,24 @@ plot_timeSeries <- function(
   }
   
   # Scenario legend
-  if (pal == "gcms") {
-    s <- which(list_gcms() %in% gcms)
-    legend(ifelse(grepl("top", legend_pos), "top", "bottom"),
-           title = "GCMs", legend = gcms, bty = "n",
-           col = pal.gcms[s], pch = 22, pt.bg = alpha(pal.gcms[s], 0.35), pt.cex = 2, cex = if (app) 1.25 else 1
-    )
-  } else {
-    s <- rev(which(scenarios[-1] %in% scenarios.selected))
-    legend(ifelse(grepl("top", legend_pos), "top", "bottom"),
-           title = "Scenarios", legend = c("Historical", scenario.names[-1][s]), bty = "n",
-           lty = rep(NA, 5)[c(1, s + 1)], col = pal.scenario[c(1, s + 1)], 
-           lwd = rep(NA, 5)[c(1, s + 1)], pch = rep(22, 5)[c(1, s + 1)], 
-           pt.bg = alpha(pal.scenario[c(1, s + 1)], 0.35), 
-           pt.cex = rep(2, 5)[c(1, s + 1)], cex = if (app) 1.25 else 1
-    )
+  if(!is.null(ssps)){
+    if (pal == "gcms") {
+      s <- which(list_gcms() %in% gcms)
+      legend(ifelse(grepl("top", legend_pos), "top", "bottom"),
+             title = "GCMs", legend = gcms, bty = "n",
+             col = pal.gcms[s], pch = 22, pt.bg = alpha(pal.gcms[s], 0.35), pt.cex = 2, cex = if (app) 1.25 else 1
+      )
+    } else {
+      s <- rev(which(scenarios[-1] %in% scenarios.selected))
+      legend(ifelse(grepl("top", legend_pos), "top", "bottom"),
+             title = "Scenarios", legend = c("Historical", scenario.names[-1][s]), bty = "n",
+             lty = rep(NA, 5)[c(1, s + 1)], col = pal.scenario[c(1, s + 1)], 
+             lwd = rep(NA, 5)[c(1, s + 1)], pch = rep(22, 5)[c(1, s + 1)], 
+             pt.bg = alpha(pal.scenario[c(1, s + 1)], 0.35), 
+             pt.cex = rep(2, 5)[c(1, s + 1)], cex = if (app) 1.25 else 1
+      )
+    }
   }
-  
   # mtext(paste(" Created using climr (https://bcgov.github.io/climr/)"), side=1, line=1.5, adj=0.0, font=1, cex=1.1, col="gray")
   
   box()
