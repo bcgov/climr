@@ -172,29 +172,31 @@ plot_timeSeries_preprocess <- function(
     element <- get(paste("element", num, sep = ""))
     var <- get(paste("var", num, sep = ""))
     
-    if (compile) { # this plots a single envelope for the ensemble as a whole
-      temp.data <- X[is.na(DATASET) & !is.na(PERIOD) & !is.na(VAL)]
-      plot_preprocess_ensemble(temp.data,
-                    var = var, var2 = var2,
-                    refline = refline, showmean = showmean,
-                    endlabel = endlabel, element = element,
-                    element1 = element1, element2 = element2,
-                    compile = compile, yeartime.names = yeartime.names,
-                    yeartimes = yeartimes, yeartime = yeartime,
-                    gcm = NULL, pal = pal, pal.scenario = pal.scenario,
-                    pal.gcms = pal.gcms,
-                    scenarios.selected = scenarios.selected, scenarios = scenarios,
-                    showrange = showrange, simplify = simplify)
-    } else {
-      for (gcm in gcms) { # this plots individual GCM ensembles.
-        stop(sprintf("Error: This function is not currently set up to handle individual GCM ensembles."))
+    if(!is.null(ssps)){
+      if (compile) { # this plots a single envelope for the ensemble as a whole
+        temp.data <- X[is.na(DATASET) & !is.na(PERIOD) & !is.na(VAL)]
+        plot_preprocess_ensemble(temp.data,
+                                 var = var, var2 = var2,
+                                 refline = refline, showmean = showmean,
+                                 endlabel = endlabel, element = element,
+                                 element1 = element1, element2 = element2,
+                                 compile = compile, yeartime.names = yeartime.names,
+                                 yeartimes = yeartimes, yeartime = yeartime,
+                                 gcm = NULL, pal = pal, pal.scenario = pal.scenario,
+                                 pal.gcms = pal.gcms,
+                                 scenarios.selected = scenarios.selected, scenarios = scenarios,
+                                 showrange = showrange, simplify = simplify)
+      } else {
+        for (gcm in gcms) { # this plots individual GCM ensembles.
+          stop(sprintf("Error: This function is not currently set up to handle individual GCM ensembles."))
+        }
       }
-    }
-
-    # overlay the 5-year lines on top of all polygons
-    if (yearlines) {
-      for (n in seq(1905, 2095, 5)) {
-        lines(c(n, n), c(-9999, 9999), col = "grey", lty = 2)
+      
+      # overlay the 5-year lines on top of all polygons
+      if (yearlines) {
+        for (n in seq(1905, 2095, 5)) {
+          lines(c(n, n), c(-9999, 9999), col = "grey", lty = 2)
+        }
       }
     }
     
@@ -240,7 +242,7 @@ plot_timeSeries_preprocess <- function(
     a <- if ("mswx.blend" %in% obs_ts_dataset) 1 else NA
     b <- if ("cru.gpcc" %in% obs_ts_dataset) 2 else NA
     c <- if ("climatena" %in% obs_ts_dataset) 3 else NA
-    d <- if (length(gcms > 0)) 4 else NA
+    d <- if (length(gcms > 0) & !is.null(ssps)) 4 else NA
     s <- !is.na(c(a, b, c, d))
     legend.GCM <- if (length(gcms) > 1) { 
       paste("Simulated (", length(gcms), " GCMs)", sep = "") 
@@ -262,23 +264,24 @@ plot_timeSeries_preprocess <- function(
   }
   
   # Scenario legend
-  if (pal == "gcms") {
-    s <- which(list_gcms() %in% gcms)
-    legend(ifelse(grepl("top", legend_pos), "top", "bottom"),
-           title = "GCMs", legend = gcms, bty = "n",
-           col = pal.gcms[s], pch = 22, pt.bg = alpha(pal.gcms[s], 0.35), pt.cex = 2, cex = if (app) 1.25 else 1
-    )
-  } else {
-    s <- rev(which(scenarios[-1] %in% scenarios.selected))
-    legend(ifelse(grepl("top", legend_pos), "top", "bottom"),
-           title = "Scenarios", legend = c("Historical", scenario.names[-1][s]), bty = "n",
-           lty = rep(NA, 5)[c(1, s + 1)], col = pal.scenario[c(1, s + 1)], 
-           lwd = rep(NA, 5)[c(1, s + 1)], pch = rep(22, 5)[c(1, s + 1)], 
-           pt.bg = alpha(pal.scenario[c(1, s + 1)], 0.35), 
-           pt.cex = rep(2, 5)[c(1, s + 1)], cex = if (app) 1.25 else 1
-    )
+  if(!is.null(ssps)){
+    if (pal == "gcms") {
+      s <- which(list_gcms() %in% gcms)
+      legend(ifelse(grepl("top", legend_pos), "top", "bottom"),
+             title = "GCMs", legend = gcms, bty = "n",
+             col = pal.gcms[s], pch = 22, pt.bg = alpha(pal.gcms[s], 0.35), pt.cex = 2, cex = if (app) 1.25 else 1
+      )
+    } else {
+      s <- rev(which(scenarios[-1] %in% scenarios.selected))
+      legend(ifelse(grepl("top", legend_pos), "top", "bottom"),
+             title = "Scenarios", legend = c("Historical", scenario.names[-1][s]), bty = "n",
+             lty = rep(NA, 5)[c(1, s + 1)], col = pal.scenario[c(1, s + 1)], 
+             lwd = rep(NA, 5)[c(1, s + 1)], pch = rep(22, 5)[c(1, s + 1)], 
+             pt.bg = alpha(pal.scenario[c(1, s + 1)], 0.35), 
+             pt.cex = rep(2, 5)[c(1, s + 1)], cex = if (app) 1.25 else 1
+      )
+    }
   }
-  
   box()
 }
 

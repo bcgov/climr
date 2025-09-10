@@ -13,7 +13,7 @@
 #' @inheritParams downscale
 #' @template vars
 #'
-#' @return `data.table` of average downscaled climate variables for all locations.
+#' @return `data.table` of downscaled climate variables for all locations.
 #'
 #' @examples
 #' if (FALSE) {
