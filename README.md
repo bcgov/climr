@@ -57,22 +57,17 @@ The 13 global climate models selected for `climr`, and best practices for ensemb
 
 ## Installation
 
-`climr` is only available on GitHub. To install please use:
+`climr` is currently only available on GitHub. Although `remotes` is the most common package manager, we have had interminant issues with it. We suggest using `pak` instead: 
 
 ``` r
-remotes::install_github("bcgov/climr")
+pak::pkg_install("bcgov/climr")
 ```
 
 If you want to install the development version:
 
 ``` r
-remotes::install_github("bcgov/climr@devl")
+pak::pkg_install("bcgov/climr@devl")
 ```
-If you get an error on installation, try the following:
-```r
-options(download.file.method = "libcurl")
-```
-and then rerun `install_github()`. On some computers, the default R download method doesn't play nicely with github. 
 
 ## Usage
 
