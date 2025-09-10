@@ -181,7 +181,7 @@ If FALSE, a plot is generated using base graphics.</p></dd>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The input table <code>X</code> provides climate data for a single location or the average of multiple
 locations. The purpose of conducting the generation of the input table in a separate function is
-to allow users to make multiple calls to <code><a href="plot_timeSeries.html">plot_timeSeries()</a></code> without needing to generate the
+to allow users to make multiple calls to <code>plot_bivariate()</code> without needing to generate the
 inputs each time.</p>
 <p>The climate change trajectories provided by <code>show_trajectories</code> are points for
 each of the five 20-year periods specified by <code><a href="data-option-lists.html">list_gcm_periods()</a></code>. These points
@@ -204,12 +204,17 @@ scenarios, but the individual runs for all scenarios are plotted separately.</p>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in data.table(lon = c(-123.4404, -123.5064, -124.2317), lat = c(48.52631,     48.46807, 49.21999), elev = c(52, 103, 357), id = seq_len(3)):</span> could not find function "data.table"</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># draw the plot</span></span></span>
-<span class="r-in"><span><span class="fu">plot_bivariate</span><span class="op">(</span><span class="va">my_points</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">my_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="plot_bivariate_input.html">plot_bivariate_input</a></span><span class="op">(</span><span class="va">my_points</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Welcome to climr!</span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'my_points' not found</span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># draw the plot</span></span></span>
+<span class="r-in"><span><span class="fu">plot_bivariate</span><span class="op">(</span><span class="va">my_data</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'my_data' not found</span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># draw an interactive (plotly) plot</span></span></span>
-<span class="r-in"><span><span class="fu">plot_bivariate</span><span class="op">(</span><span class="va">my_points</span>, xvar<span class="op">=</span><span class="st">"MAT"</span>, yvar<span class="op">=</span><span class="st">"PAS_an"</span>, interactive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'my_points' not found</span>
+<span class="r-in"><span><span class="fu">plot_bivariate</span><span class="op">(</span><span class="va">my_data</span>, xvar<span class="op">=</span><span class="st">"MAT"</span>, yvar<span class="op">=</span><span class="st">"PAS_an"</span>, interactive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'my_data' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># export plot to a temporary directory</span></span></span>
 <span class="r-in"><span><span class="va">figDir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span></span>
@@ -217,8 +222,8 @@ scenarios, but the individual runs for all scenarios are plotted separately.</p>
 <span class="r-in"><span>  filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">figDir</span>, <span class="st">"plot_test.png"</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"cairo"</span>, units <span class="op">=</span> <span class="st">"in"</span>,</span></span>
 <span class="r-in"><span>  width <span class="op">=</span> <span class="fl">6</span>, height <span class="op">=</span> <span class="fl">5</span>, pointsize <span class="op">=</span> <span class="fl">10</span>, res <span class="op">=</span> <span class="fl">300</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">plot_bivariate</span><span class="op">(</span><span class="va">my_points</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'my_points' not found</span>
+<span class="r-in"><span><span class="fu">plot_bivariate</span><span class="op">(</span><span class="va">my_data</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'my_data' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> agg_record_1533633155 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                     2 </span>
