@@ -13,7 +13,7 @@
 #' @details
 #' The input table `X` provides climate data for a single location or the average of multiple
 #' locations. The purpose of conducting the generation of the input table in a separate function is
-#' to allow users to make multiple calls to [`plot_timeSeries()`] without needing to generate the
+#' to allow users to make multiple calls to [`plot_bivariate()`] without needing to generate the
 #' inputs each time.
 #' 
 #' The climate change trajectories provided by `show_trajectories` are points for
@@ -64,10 +64,13 @@
 #' )
 #'
 #' # draw the plot
-#' plot_bivariate(my_points)
+#' my_data <- plot_bivariate_input(my_points)
+#'
+#' # draw the plot
+#' plot_bivariate(my_data)
 #'
 #' # draw an interactive (plotly) plot
-#' plot_bivariate(my_points, xvar="MAT", yvar="PAS_an", interactive = TRUE)
+#' plot_bivariate(my_data, xvar="MAT", yvar="PAS_an", interactive = TRUE)
 #'
 #' # export plot to a temporary directory
 #' figDir <- tempdir()
@@ -75,7 +78,7 @@
 #'   filename = file.path(figDir, "plot_test.png"), type = "cairo", units = "in",
 #'   width = 6, height = 5, pointsize = 10, res = 300
 #' )
-#' plot_bivariate(my_points)
+#' plot_bivariate(my_data)
 #' dev.off()
 #'
 #' @export
@@ -112,7 +115,7 @@ plot_bivariate <- function(
     colors <- c("#A6CEE3", "#1F78B4", "#B2DF8A", "#33A02C", "#FB9A99", "#E31A1C", "#FDBF6F", "#FF7F00", "#CAB2D6", "#6A3D9A", "#1e90ff", "#B15928", "#FFFF99")
     ColScheme <- colors[1:length(gcms)]
 
-    if ("id" %in% names(data)) {
+    if ("id" %in% names(X)) {
       # extract info for xvar and yvar from downscaled data
       data <- X[, c("id", "GCM", "SSP", "RUN", "PERIOD", xvar, yvar), with = FALSE]
       
@@ -152,10 +155,12 @@ plot_bivariate <- function(
       # make a copy of data (already collapsed down to a mean anomaly)
     }
 
+    # collapse the points down to a mean anomaly
+    data.all <- copy(data[, .(xanom = mean(xanom), yanom = mean(yanom)), by = .(GCM, SSP, RUN, PERIOD)])    
+    
     # collapse the SSP field to calculate a single-model ensemble mean
-    data <- na.omit(data, cols = c("xanom","yanom"))
-    data.all <- copy(data)
-    data <- data[, .(xanom = mean(xanom), yanom = mean(yanom)), by = .(GCM, RUN, PERIOD)]
+    # data <- na.omit(data, cols = c("xanom","yanom"))
+    data <- copy(data.all[, .(xanom = mean(xanom), yanom = mean(yanom)), by = .(GCM, RUN, PERIOD)])
     # ensemble mean for the selected period
     ensMean <- data[!is.na(GCM) & RUN == "ensembleMean" & PERIOD == period_focal, .(xanom = mean(xanom), yanom = mean(yanom)), ]
     # observed climate

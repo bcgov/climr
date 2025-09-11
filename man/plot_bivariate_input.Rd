@@ -38,7 +38,7 @@ can be obtained with \code{\link[=list_vars]{list_vars()}}. Definitions can be f
 \item{db_option}{character. One of \code{auto}, \code{database}, or \code{local}. Default \code{auto}.}
 }
 \value{
-\code{data.table} of average downscaled climate variables for all locations.
+\code{data.table} of downscaled climate variables for all locations.
 }
 \description{
 Input data for the \code{\link[=plot_bivariate]{plot_bivariate()}} function. Since these inputs are time-consuming to
