@@ -1,32 +1,12 @@
-#' Time series plots of climate change
+#' Preprocessed input for Time series plots of climate change - for climr app
 #'
 #' @description
-#' Time series plots of 20th and 21st century climate change for user-selected
-#' locations and climate variables.
-#' 
-#' The purposes of the plot are to:
-#' \enumerate{
-#'   \item view differences in interannual variability and climate change trends among global
-#' climate models (GCMs),
-#'   \item view the differences between multiple simulations of each model,
-#'   \item compare simulated and observed climate change from 1901 to present, and
-#'   \item compare time series of two different variables.
-#' }
-#' All global climate model anomalies are bias-corrected to the 1961-1990 reference period normals.
+#' Preprocessed input for time series plots of 20th and 21st century climate change for Ecoregions and FLP Areas for climr app.
 #'
 #' @details
-#' The input table `X` provides climate data for a single location or the average of multiple
-#' locations. The purpose of conducting the generation of the input table in a separate function is
-#' to allow users to make multiple calls to [`plot_timeSeries()`] without needing to generate the
-#' inputs each time.
-#'
-#' Some combinations of `var1` and `var2` are not compatible or meaningful.
-#' Examples of meaningful combinations are winter vs summer values of the same climate var
-#' or minimum vs. maximum temperatures.
-#'
-#' Downloads of GCM time series take some time. The `plot_timeSeries_input()` function can take
-#' ~5 minutes to run for the first time it is called for a location. Once the time series are
-#' cached, they don't need to be downloaded again.
+#' The input table `X` provides climate data for a FLP Area or Ecoregion. 
+#' The purpose of conducting the generation of the input table in a separate function is
+#' to save the results on the server for the app to access when generating time series plots.
 #'
 #' @param X  A `data.table`.
 #' @inheritParams downscale
@@ -60,8 +40,6 @@
 #' @importFrom utils data
 #' @importFrom graphics box
 #' @importFrom data.table data.table
-#'
-#' @export
 
 plot_timeSeries_input_preprocess <- function(
     X,

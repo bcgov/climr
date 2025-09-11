@@ -1,8 +1,8 @@
-#' Time series plots of climate change
+#' Time series plots of climate change - for climr app
 #'
 #' @description
 #' Time series plots of 20th and 21st century climate change for user-selected
-#' locations and climate variables.
+#' locations and climate variables within the climr app.
 #' 
 #' The purposes of the plot are to:
 #' \enumerate{
@@ -15,18 +15,9 @@
 #' All global climate model anomalies are bias-corrected to the 1961-1990 reference period normals.
 #'
 #' @details
-#' The input table `X` provides climate data for a single location or the average of multiple
-#' locations. The purpose of conducting the generation of the input table in a separate function is
-#' to allow users to make multiple calls to [`plot_timeSeries()`] without needing to generate the
-#' inputs each time.
-#'
-#' Some combinations of `var1` and `var2` are not compatible or meaningful.
-#' Examples of meaningful combinations are winter vs summer values of the same climate var
-#' or minimum vs. maximum temperatures.
-#'
-#' Downloads of GCM time series take some time. The `plot_timeSeries_input()` function can take
-#' ~5 minutes to run for the first time it is called for a location. Once the time series are
-#' cached, they don't need to be downloaded again.
+#' The input table `X` provides climate data for a FLP Area or Ecoregion. 
+#' The purpose of conducting the generation of the input table in a separate function is
+#' to save the results on the server for the app to access when generating time series plots.
 #'
 #' @param X  A `data.table` object produced using the function [`plot_timeSeries_input_preprocess()`].
 #' @inheritParams downscale
@@ -70,8 +61,6 @@
 #' @importFrom stinepack stinterp
 #' @importFrom utils data
 #' @importFrom graphics box
-#'
-#' @export
 
 plot_timeSeries_preprocess <- function(
     X,
@@ -368,17 +357,35 @@ plot_preprocess_ensemble <- function(x, var, scenarios.selected, scenarios,
   if (refline) {
     stop(sprintf("Error: This function is not currently set up to handle refline == TRUE."))
   }
+  # overlay the ensemble mean lines on top of all polygons using an smoothing spline then an interpolation spline
+  hist.x <- x[SSP == "historical" & TYPE == "ensmean", PERIOD]
+  hist.y <- x[SSP == "historical" & TYPE == "ensmean", VAL]
+  years <- c(1855, 1875, 1895, 1915, 1935, 1955, 1980, 2000, 2014, 2030, 2060, 2090, 2100)
   
-  # overlay the ensemble mean lines on top of all polygons
   for (scenario in scenarios.selected[order(c(1, 4, 5, 3, 2)[which(scenarios %in% scenarios.selected)])]) {
-    # plot the ensemble mean
     ensmean.x <- x[SSP == scenario & TYPE == "ensmean", PERIOD]
     ensmean.y <- x[SSP == scenario & TYPE == "ensmean", VAL]
-    
+    if (scenario == "historical") {
+      xm <- as.numeric(c(hist.x[-length(hist.x)], x[SSP == scenarios.selected[2] & TYPE == "ensmean", PERIOD][3:5]))
+      plot_years <- which(xm %in% years)
+      xm1 <- xm[plot_years]
+      ym <- as.numeric(c(hist.y[-length(hist.y)], x[SSP == scenarios.selected[2] & TYPE == "ensmean", VAL][3:5]))
+      ym1 <- ym[plot_years]
+      int <- stinterp(xm1, ym1, 1855:2030)
+    } else {
+      # scenarios
+      xm <- as.numeric(c(hist.x[-length(hist.x)], x[SSP == scenario & TYPE == "ensmean", PERIOD][3:length(x[SSP == scenarios.selected[2] & TYPE == "ensmean", PERIOD])]))
+      plot_years <- which(xm %in% years)
+      xm1 <- xm[plot_years]
+      ym <- as.numeric(c(hist.y[-length(hist.y)], x[SSP == scenario & TYPE == "ensmean", VAL][3:length(x[SSP == scenarios.selected[2] & TYPE == "ensmean", VAL])]))
+      ym1 <- ym[plot_years]
+      int <- stinterp(xm1, ym1, 2014:2100)
+    }
+    # plot the ensemble mean
     colSel <- colSelect(scenario, gcm, pal.scenario, scenarios, pal, pal.gcms)
     if (showmean) {
       if (simplify) {
-        lines(x = ensmean.x, y = ensmean.y, col = colSel, lwd = 2)
+        lines(x = int$x, y = int$y, col = colSel, lwd = 2)
       } else {
         stop(sprintf("Error: This function is not currently set up to handle simplify == FALSE."))
       }
