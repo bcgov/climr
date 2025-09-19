@@ -13,6 +13,7 @@
 #'   proportions of the raster extent. The format is `c(xmin, xmax, ymin, ymax)`.
 #' @param log Numeric or NULL. The base of the logarithm used to compute legend labels. 
 #'   If `NULL`, values are displayed as-is.
+#' @param log.relative logical. If TRUE, legend labels represent a percent difference.
 #' @param horizontal Logical. Should the legend be drawn horizontally? Default is `FALSE`.
 #' @param title.height Numeric. Scaling factor for the height of the legend title relative to the legend size.
 #'
@@ -58,10 +59,10 @@
 
 # Function for plotting a color ramp legend with optional log scaling
 legend_ramp <- function(r, title, ColScheme, breaks,
-                       pos = c(0.2, 0.23, 0.1, 0.5), 
-                       log = NULL, 
-                       horizontal = FALSE, 
-                       title.height = 1) {
+                        pos = c(0.2, 0.23, 0.1, 0.5), 
+                        log = NULL, log.relative = FALSE,
+                        horizontal = FALSE, 
+                        title.height = 1) {
   
   # Define legend position
   xmin <- ext(r)[1] + diff(ext(r)[1:2]) * pos[1]  # Left boundary of the legend
@@ -75,7 +76,7 @@ legend_ramp <- function(r, title, ColScheme, breaks,
   # Define legend values and labels
   legend.values <- pretty(breaks)
   legend.values <- legend.values[which(legend.values >= min(breaks) & legend.values <= max(breaks) )]
-  legend.labels <- if(is.null(log)) legend.values else round(log^legend.values) 
+  legend.labels <- if(is.null(log)) legend.values else {if(log.relative) paste((round(log^legend.values,2)*100-100), "%") else round(log^legend.values)}
   
   par(xpd=TRUE) # allow plotting outside the plotting window. 
   
