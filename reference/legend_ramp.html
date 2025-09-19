@@ -65,6 +65,7 @@
 <span>  <span class="va">breaks</span>,</span>
 <span>  pos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">0.23</span>, <span class="fl">0.1</span>, <span class="fl">0.5</span><span class="op">)</span>,</span>
 <span>  log <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  log.relative <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  horizontal <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  title.height <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -100,6 +101,10 @@ proportions of the raster extent. The format is <code>c(xmin, xmax, ymin, ymax)<
 <dt id="arg-log">log<a class="anchor" aria-label="anchor" href="#arg-log"></a></dt>
 <dd><p>Numeric or NULL. The base of the logarithm used to compute legend labels.
 If <code>NULL</code>, values are displayed as-is.</p></dd>
+
+
+<dt id="arg-log-relative">log.relative<a class="anchor" aria-label="anchor" href="#arg-log-relative"></a></dt>
+<dd><p>logical. If TRUE, legend labels represent a percent difference.</p></dd>
 
 
 <dt id="arg-horizontal">horizontal<a class="anchor" aria-label="anchor" href="#arg-horizontal"></a></dt>
