@@ -3,11 +3,169 @@ library(terra)
 library(data.table)
 library(climr)
 
+curr_lay <- climr:::db_safe_query("select * from historic_cru_gpcc_layers")
+req_yr <- unique(yr[!yr %in% curr_lay$period])
+req_lay <- tmax[[yr %in% req_yr]]
+
 monthcodes <- c("01", "02", "03", "04", "05", "06", "07", "08", "09","10","11","12")
+table_name <- "historic_cru_gpcc"
+ext_sql <- paste0("SELECT
+    ST_XMin(extent) AS xmin,
+    ST_YMin(extent) AS ymin,
+    ST_XMax(extent) AS xmax,
+    ST_YMax(extent) AS ymax
+FROM (
+    SELECT ST_Extent(ST_Envelope(rast)) AS extent
+    FROM ",table_name,"
+) sub;")
+
+r_ext <- climr:::db_safe_query(ext_sql)
+r_ext <- ext(r_ext$xmin, r_ext$xmax, r_ext$ymin, r_ext$ymax)
 
 ## cru.gpcc update
 
+process_deltas <- function(fpath, r_ext, sel_name, precip = FALSE){
+  tmax <- rast(fpath)
+  tmax <- tmax[[grep(sel_name,names(tmax))]]
+  tmax <- crop(tmax,r_ext)
+  tm <- time(tmax)
+  nrm_per <- tmax[[tm >= as.Date("1961-01-01") & tm <= as.Date("1990-12-31")]]
+  nrm <- tapp(nrm_per, index = "months", fun = mean)
+  if(precip){
+    delta <- tmax/nrm
+  } else {
+    delta <- tmax - nrm
+  }
+   return(delta)
+}
 
+tmax_delta <- process_deltas("../Common_Files/cru_gpcc/cru_ts4.09.1901.2024.tmx.dat.nc", r_ext, "tmx")
+tmin_delta <- process_deltas("../Common_Files/cru_gpcc/cru_ts4.09.1901.2024.tmn.dat.nc", r_ext, "tmn")
+
+tmp <- rast("../Common_Files/cru_gpcc/cru_ts4.09.1901.2024.tmx.dat.nc")
+
+ppt <- rast("../Common_Files/cru_gpcc/precip.comb.v2020to2019-v2020monitorafter.total.nc")
+tm <- time(ppt)
+tm_ym <- format(tm, "%Y-%m")
+tm_tmax <- format(time(tmax_delta), "%Y-%m")
+ppt <- ppt[[tm_ym %in% tm_tmax]]
+ppt <- project(ppt, tmax_delta)
+ppt <- crop(ppt, r_ext)
+plot(ppt[[1484]])
+tm <- time(ppt)
+nrm_per <- ppt[[tm >= as.Date("1961-01-01") & tm <= as.Date("1990-12-31")]]
+nrm <- tapp(nrm_per, index = "months", fun = mean)
+ppt_delta <- ppt/nrm
+plot(ppt_delta[[1488]])
+
+cru_gpcc <- c(ppt_delta, tmin_delta, tmax_delta)
+
+var_nms <- rep(c("PPT","Tmin","Tmax"), each = nlyr(tmax_delta))
+dir.create("cru_gpcc")
+tm <- time(cru_gpcc)
+yr <- year(tm)
+mn <- month(tm)
+
+cru_sub <- cru_gpcc[[yr %in% c(2023,2024)]]
+# for(i in 1:nlyr(cru_gpcc)){
+#   cat(".")
+#   nm <- paste0(var_nms[i],"_",monthcodes[mn[i]],"_",yr[i],".tif")
+#   writeRaster(cru_gpcc[[i]], file.path("cru_gpcc",nm))
+# }
+
+
+qry <- "UPDATE historic_cru_gpcc t
+SET rast = ST_AddBand(t.rast, r2.rast)
+FROM cru_temp r2
+WHERE t.rid = r2.rid;"
+
+q1 <- "SELECT (ST_MetaData(rast)).width  AS tile_width,
+       (ST_MetaData(rast)).height AS tile_height
+FROM historic_cru_gpcc
+LIMIT 1;"
+
+q2 <- "SELECT (ST_MetaData(rast)).scalex AS pixel_width,
+       (ST_MetaData(rast)).scaley AS pixel_height,
+       (ST_MetaData(rast)).upperleftx AS origin_x,
+       (ST_MetaData(rast)).upperlefty AS origin_y,
+       (ST_SRID(rast)) AS srid,
+       (ST_BandMetaData(rast)).nodatavalue as ndv
+FROM historic_cru_gpcc
+LIMIT 1;"
+
+q3 <- paste0("SELECT
+    ST_XMin(extent) AS xmin,
+    ST_YMin(extent) AS ymin,
+    ST_XMax(extent) AS xmax,
+    ST_YMax(extent) AS ymax
+FROM (
+    SELECT ST_Extent(ST_Envelope(rast)) AS extent
+    FROM ",table_name,"
+) sub;")
+
+tilesize <- dbGetQuery(conn, q1)
+resalign <- dbGetQuery(conn, q2)
+extent <- dbGetQuery(conn, q3)
+r_ext <- ext(extent$xmin, extent$xmax, extent$ymin, extent$ymax)
+
+template <- rast(extent = r_ext, resolution = resalign$pixel_width, crs = "epsg:4326")
+cru_resamp <- resample(cru_sub, template)
+plot(cru_resamp[[5]])
+
+writeRaster(cru_resamp, "temp_raster.tif", overwrite = T)
+r2p <- "C:/Program Files/PostgreSQL/17/bin/raster2pgsql.exe"
+psql <- "C:/Program Files/PostgreSQL/17/bin/psql.exe"
+
+sqlfile <- tempfile(fileext = ".sql")
+
+system2(
+  r2p,
+  args = c("-s", "4326", "-M", "-t", "10x10",
+           "temp_raster.tif", "cru_temp"),
+  stdout = sqlfile
+)
+
+dbExecute(conn, "drop table cru_temp")
+system2(
+  psql,
+  args = c("-h", "146.190.244.244",
+           "-p", "5432",
+           "-U", "postgres",
+           "-d", "climr",
+           "-f", sqlfile)
+)
+
+qry <- "UPDATE historic_cru_gpcc t
+SET rast = ST_AddBand(t.rast, r2.rast)
+FROM cru_temp r2
+WHERE t.rid = r2.rid;"
+
+dbExecute(conn, qry)
+
+nms <- names(cru_sub)
+metadt <- data.table(var = nms, period = year(time(cru_sub)), month = monthcodes[month(time(cru_sub))])
+metadt[,var := gsub("precip.*","PPT",var)]
+metadt[,var := gsub("tmn.*","Tmin",var)]
+metadt[,var := gsub("tmx.*","Tmax",var)]
+old_laymax <- climr:::db_safe_query("select * from historic_cru_gpcc_layers where laynum = (select max(laynum) from historic_cru_gpcc_layers)")
+
+metadt[,laynum := (old_laymax$laynum+1):(old_laymax$laynum + nrow(metadt))]
+metadt[,var_nm := paste0(var, "_", month)]
+metadt[,month := NULL]
+metadt[,fullnm := paste0(var_nm,"_",period)]
+setcolorder(metadt, names(old_laymax))
+dbWriteTable(conn, "historic_cru_gpcc_layers", metadt, append = TRUE)
+###########################################################################
+
+
+library(RPostgres)
+conn <- dbConnect(RPostgres::Postgres(),dbname = 'climr',
+                  host = '146.190.244.244',
+                  port = 5432,
+                  user = 'postgres',
+                  password = '')
+
+dbExecute(conn, qry)
 
 ##aseem blended ts
 
