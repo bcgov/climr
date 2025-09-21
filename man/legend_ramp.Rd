@@ -11,6 +11,7 @@ legend_ramp(
   breaks,
   pos = c(0.2, 0.23, 0.1, 0.5),
   log = NULL,
+  log.relative = FALSE,
   horizontal = FALSE,
   title.height = 1
 )
@@ -31,6 +32,8 @@ proportions of the raster extent. The format is \code{c(xmin, xmax, ymin, ymax)}
 
 \item{log}{Numeric or NULL. The base of the logarithm used to compute legend labels.
 If \code{NULL}, values are displayed as-is.}
+
+\item{log.relative}{logical. If TRUE, legend labels represent a percent difference.}
 
 \item{horizontal}{Logical. Should the legend be drawn horizontally? Default is \code{FALSE}.}
 
