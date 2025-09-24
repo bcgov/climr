@@ -315,7 +315,7 @@ plot_timeSeries <- function(
     } else {
       paste("Simulated (", gcms, ")", sep = "")
     }
-    if(length(s)>0){
+    if(sum(s)>0){
       legend(legend_pos,
              title = "", 
              legend = c("Observed (MSWX blend)", "Observed (CRU/GPCC)", "Observed (ClimateNA)", legend.GCM)[s],
