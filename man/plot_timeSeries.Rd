@@ -10,6 +10,7 @@ plot_timeSeries(
   var2 = NULL,
   showObserved = TRUE,
   obs_ts_dataset = "mswx.blend",
+  obs_ts_colors = c(1, 2, 4),
   gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)],
   ssps = list_ssps()[1:3],
   showrange = TRUE,
@@ -42,10 +43,8 @@ options are \code{\link[=list_vars]{list_vars()}}.}
 
 \item{showObserved}{logical. Plot a time series of observed climate.}
 
-\item{obs_ts_dataset}{character. The dataset to use for observational time series data. Options
-are \code{"climatena"} for the ClimateNA gridded time series or \code{"cru.gpcc"} for the combined Climatic
-Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset
-(for precipitation).}
+\item{obs_ts_dataset}{character. The dataset(s) to use for observational time series data. Options
+are \code{[}list_obs_ts_datasets()`].}
 
 \item{gcms}{character. Vector of global climate model names. Options are \code{\link[=list_gcms]{list_gcms()}}.}
 

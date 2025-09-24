@@ -129,6 +129,7 @@ plot_timeSeries <- function(
     var2 = NULL,
     showObserved = TRUE,
     obs_ts_dataset = "mswx.blend",
+    obs_ts_colors=c(1,2,4),
     gcms = list_gcms()[c(1, 4, 5, 6, 7, 10, 11, 12)],
     ssps = list_ssps()[1:3],
     showrange = TRUE,
@@ -267,13 +268,11 @@ plot_timeSeries <- function(
     
     if (showObserved) {
       # add in observations
-      obs.colors <- c("black", "blue", "red")
-      obs.options <- c("mswx.blend", "cru.gpcc", "climatena") 
       for (obs.dataset in obs_ts_dataset) { # TODO update this code block once i know how the datasets are identified in the climr output
-        obs.color <- obs.colors[which(obs.options == obs.dataset)]
+        obs.color <- obs_ts_colors[which(list_obs_ts_datasets() == obs.dataset)]
         x.obs <- as.numeric(X[DATASET == obs.dataset & PERIOD %in% 1900:2100, "PERIOD"][[1]])
         y.obs <- X[DATASET == obs.dataset & PERIOD %in% 1900:2100, get(var)]
-        recent.obs <- mean(y.obs[which(x.obs %in% 2014:2023)], na.rm = TRUE)
+        recent.obs <- mean(y.obs[(length(y.obs)-10):length(y.obs)], na.rm = TRUE)
         baseline.obs <- mean(y.obs[which(x.obs %in% 1961:1990)], na.rm = TRUE)
         end <- max(which(!is.na(y.obs)))
         lines(x.obs[which(x.obs < 1951)], y.obs[which(x.obs < 1951)], lwd = 3, lty = 3, col = obs.color)
@@ -321,7 +320,7 @@ plot_timeSeries <- function(
            legend = c("Observed (MSWX blend)", "Observed (CRU/GPCC)", "Observed (ClimateNA)", legend.GCM)[s],
            bty = "n",
            lty = rep(1, 4)[s],
-           col = c(obs.colors, "gray")[s],
+           col = c(obs_ts_colors, "gray")[s],
            lwd = c(4, 4, 4, 2)[s],
            pch = rep(NA, 4)[s],
            pt.bg = rep(NA, 4)[s],

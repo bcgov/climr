@@ -7,6 +7,7 @@
 \alias{list_runs_ssp}
 \alias{list_runs_historic}
 \alias{list_refmaps}
+\alias{list_obs_ts_datasets}
 \alias{list_obs_periods}
 \alias{list_vars}
 \alias{list_obs_years}
@@ -25,6 +26,8 @@ list_runs_ssp(gcm, ssp)
 list_runs_historic(gcm)
 
 list_refmaps()
+
+list_obs_ts_datasets()
 
 list_obs_periods()
 
@@ -61,6 +64,8 @@ a character vector.
 
 \code{list_refmaps} lists available reference maps of gridded climate normals
 
+\code{list_obs_ts_datasets} lists available observational time series datasets
+
 \code{list_obs_periods} lists available normal periods for observational climate data
 
 \code{list_vars} lists available climate variables
@@ -79,6 +84,13 @@ Currently available reference maps of gridded climate normals (\code{list_refmap
 \item "refmap_climatena" for Climate NA derived normals
 \item "refmap_climr" for a composite of BC PRISM, adjusted US PRISM and
 DAYMET (Alberta and Saskatchewan), covering North America
+}
+
+Three historical observational time series are available:
+\itemize{
+\item "cru.gpcc"---The 1901-2024 combined Climatic Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset (for precipitation);
+\item "climatena"---The 1901-2023 ClimateNA time series (Wang et al., 2024); and
+\item "mswx.blend"---the 1981-2024 Multi-Source Weather (MSWX; for temperature) and Multi-Source Weighted-Ensemble Precipitation (MSWEP; for precipitation), extended back to 1901 using the CRU/GPCC dataset.
 }
 
 A lookup table of variable names, units, types, and other attributes is available by calling \code{data(variables)}.

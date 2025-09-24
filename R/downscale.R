@@ -28,10 +28,8 @@
 #'   data, averaged over this period. Options are [`list_obs_periods()`].
 #' @param obs_years integer. Vector of years to obtain individual years or time
 #'   series of observational climate data. See [`list_obs_years()`] for available years.
-#' @param obs_ts_dataset character. The dataset to use for observational time series data. Options
-#'   are `"climatena"` for the ClimateNA gridded time series or `"cru.gpcc"` for the combined Climatic
-#'   Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset
-#'   (for precipitation). 
+#' @param obs_ts_dataset character. The dataset(s) to use for observational time series data. Options
+#'   are `[`list_obs_ts_datasets()`]. 
 #' @param gcms character. Vector of global climate model names. Options are [`list_gcms()`]. 
 #' @template ssps
 #' @param gcm_periods character. 20-year reference periods for GCM simulations.

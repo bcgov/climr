@@ -81,6 +81,20 @@ list_refmaps <- function() {
   c("refmap_climr", "refmap_climatena")
 }
 
+#' @description
+#' `list_obs_ts_datasets` lists available observational time series datasets
+#'
+#' @details
+#' Three historical observational time series are available: 
+#'   * "cru.gpcc"---The 1901-2024 combined Climatic Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset (for precipitation); 
+#'   * "climatena"---The 1901-2023 ClimateNA time series (Wang et al., 2024); and 
+#'   * "mswx.blend"---the 1981-2024 Multi-Source Weather (MSWX; for temperature) and Multi-Source Weighted-Ensemble Precipitation (MSWEP; for precipitation), extended back to 1901 using the CRU/GPCC dataset. 
+#'
+#' @rdname data-option-lists
+#' @export
+list_obs_ts_datasets <- function() {
+  c("mswx.blend", "cru.gpcc", "climatena") 
+}
 
 #' @description
 #' `list_obs_periods` lists available normal periods for observational climate data
