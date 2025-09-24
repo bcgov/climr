@@ -315,18 +315,20 @@ plot_timeSeries <- function(
     } else {
       paste("Simulated (", gcms, ")", sep = "")
     }
-    legend(legend_pos,
-           title = "", 
-           legend = c("Observed (MSWX blend)", "Observed (CRU/GPCC)", "Observed (ClimateNA)", legend.GCM)[s],
-           bty = "n",
-           lty = rep(1, 4)[s],
-           col = c(obs_ts_colors, "gray")[s],
-           lwd = c(4, 4, 4, 2)[s],
-           pch = rep(NA, 4)[s],
-           pt.bg = rep(NA, 4)[s],
-           pt.cex = rep(NA, 4)[s],
-           cex = if (app) 1.25 else 1
-    )
+    if(length(s)>0){
+      legend(legend_pos,
+             title = "", 
+             legend = c("Observed (MSWX blend)", "Observed (CRU/GPCC)", "Observed (ClimateNA)", legend.GCM)[s],
+             bty = "n",
+             lty = rep(1, 4)[s],
+             col = c(obs_ts_colors, "gray")[s],
+             lwd = c(4, 4, 4, 2)[s],
+             pch = rep(NA, 4)[s],
+             pt.bg = rep(NA, 4)[s],
+             pt.cex = rep(NA, 4)[s],
+             cex = if (app) 1.25 else 1
+      )
+    }
   }
   
   # Scenario legend
