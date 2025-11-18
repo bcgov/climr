@@ -174,7 +174,7 @@ dem_to_table <- function(dem) {
 #' 
 #' X <- dem # use the dem as a template raster
 #' X <- raster::setValues(X,NA) # clear the values from the template raster
-#' values(X)[dt$id] <- dt$elev # populate the template raster with a climate variables
+#' values(X)[dt$id] <- clim$Tmax_01 # populate the template raster with a climate variables
 #' terra::plot(X) # plot a map of the climate values
 #' }
 #' @export
