@@ -2,7 +2,7 @@
 #'
 #' This function draws a color ramp legend in two modes:
 #' 1. **Raster mode**: relative to a raster's spatial extent (if a `terra` raster is supplied).
-#' 2. **Device mode**: using normalized device coordinates (0–1) if no raster is supplied,
+#' 2. **Device mode**: using plot coordinates if no raster is supplied,
 #'    allowing placement in empty plots or arbitrary plot regions.
 #'
 #' The function can automatically determine horizontal vs vertical orientation
@@ -13,7 +13,7 @@
 #' @param ColScheme Character vector of colors for the legend.
 #' @param breaks Numeric vector with length = length(ColScheme) + 1.
 #' @param pos Numeric vector length 4: \code{c(xmin, xmax, ymin, ymax)}.  
-#'   Interpreted relative to raster extent if `r` is provided; otherwise as 0–1 device coordinates.
+#'   Interpreted relative to raster extent if `r` is provided; otherwise plot coordinates.
 #' @param log Numeric or NULL. Base of logarithm to transform labels.
 #' @param log.relative Logical. If TRUE, labels show percent change from 1 (useful for relative log scales).
 #' @param horizontal Logical or NULL. If NULL, orientation is chosen automatically based on bounding box shape.
@@ -24,9 +24,6 @@
 #'
 #' @details
 #' This function can be used to add a legend to maps plotted with `terra::plot()` or to any plot window.
-#' When `r` is provided, the legend is placed proportionally inside the raster extent.
-#' When `r` is `NULL`, the legend uses normalized device coordinates (0–1), so it can be placed
-#' in an empty plot window or layout panel. Margins prevent labels or title from touching the edges.
 #'
 #' @examples
 #' ## DEVICE MODE: Empty plot
@@ -36,7 +33,7 @@
 #' brks <- seq(0,1,length.out=21)
 #' legend_ramp(
 #'   r = NULL,
-#'   title = "Device Legend",
+#'   title = "Legend",
 #'   ColScheme = cols,
 #'   breaks = brks,
 #'   pos = c(0.1, 0.9, 0.1, 0.18),
@@ -87,12 +84,11 @@ legend_ramp <- function(r = NULL, title, ColScheme, breaks,
     ymin <- e[3] + (e[4] - e[3]) * pos[3]
     ymax <- e[3] + (e[4] - e[3]) * pos[4]
   } else {
-    x_user <- function(x) grconvertX(x, from = "ndc", to = "user")
-    y_user <- function(y) grconvertY(y, from = "ndc", to = "user")
-    xmin <- x_user(pos[1])
-    xmax <- x_user(pos[2])
-    ymin <- y_user(pos[3])
-    ymax <- y_user(pos[4])
+    # In plot mode, pos is in plot coordinates already
+    xmin <- pos[1]
+    xmax <- pos[2]
+    ymin <- pos[3]
+    ymax <- pos[4]
   }
   
   # Apply margin

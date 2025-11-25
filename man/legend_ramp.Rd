@@ -27,7 +27,7 @@ legend_ramp(
 \item{breaks}{Numeric vector with length = length(ColScheme) + 1.}
 
 \item{pos}{Numeric vector length 4: \code{c(xmin, xmax, ymin, ymax)}.
-Interpreted relative to raster extent if \code{r} is provided; otherwise as 0–1 device coordinates.}
+Interpreted relative to raster extent if \code{r} is provided; otherwise plot coordinates.}
 
 \item{log}{Numeric or NULL. Base of logarithm to transform labels.}
 
@@ -46,7 +46,7 @@ NULL. Draws a legend on the current plot device.
 This function draws a color ramp legend in two modes:
 \enumerate{
 \item \strong{Raster mode}: relative to a raster's spatial extent (if a \code{terra} raster is supplied).
-\item \strong{Device mode}: using normalized device coordinates (0–1) if no raster is supplied,
+\item \strong{Device mode}: using plot coordinates if no raster is supplied,
 allowing placement in empty plots or arbitrary plot regions.
 }
 }
@@ -55,9 +55,6 @@ The function can automatically determine horizontal vs vertical orientation
 and supports optional margins around the legend.
 
 This function can be used to add a legend to maps plotted with \code{terra::plot()} or to any plot window.
-When \code{r} is provided, the legend is placed proportionally inside the raster extent.
-When \code{r} is \code{NULL}, the legend uses normalized device coordinates (0–1), so it can be placed
-in an empty plot window or layout panel. Margins prevent labels or title from touching the edges.
 }
 \examples{
 ## DEVICE MODE: Empty plot
@@ -67,7 +64,7 @@ cols <- hcl.colors(20, "GnBu")
 brks <- seq(0,1,length.out=21)
 legend_ramp(
   r = NULL,
-  title = "Device Legend",
+  title = "Legend",
   ColScheme = cols,
   breaks = brks,
   pos = c(0.1, 0.9, 0.1, 0.18),
