@@ -1,3 +1,16 @@
+# `climr` 0.2.3
+
+## Bug Fixes
+
+- 
+
+## Enhancements
+
+- Updated the documentation for observational time series datasets `list_obs_ts_datasets()` and new functionality for custom color scheme for obs time series in `plot_timeSeries()`
+- Updated the `cru.gpcc` time series to 2024. 
+- Added function `dem_to_table()` for converting a digital elevation model into a data table for climr input
+- Improved functionality in `legend_ramp()`, allowing for placement in any type of plot.
+
 # `climr` 0.2.2
 
 ## Bug Fixes

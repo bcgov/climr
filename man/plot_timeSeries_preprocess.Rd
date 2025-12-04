@@ -40,10 +40,8 @@ options are \code{\link[=list_vars]{list_vars()}}.}
 
 \item{showObserved}{logical. Plot a time series of observed climate.}
 
-\item{obs_ts_dataset}{character. The dataset to use for observational time series data. Options
-are \code{"climatena"} for the ClimateNA gridded time series or \code{"cru.gpcc"} for the combined Climatic
-Research Unit TS dataset (for temperature) and Global Precipitation Climatology Centre dataset
-(for precipitation).}
+\item{obs_ts_dataset}{character. The dataset(s) to use for observational time series data. Options
+are \code{[}list_obs_ts_datasets()`].}
 
 \item{gcms}{character. Vector of global climate model names. Options are \code{\link[=list_gcms]{list_gcms()}}.}
 

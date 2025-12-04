@@ -108,6 +108,98 @@ tif_folder_gen <- function(dir, overwrite = FALSE) {
   }
 }
 
+#' Extract raster cell centers (lon/lat) and values into a data.table
+#'
+#' This function converts a digital elevation model in `SpatRaster` to a `data.table` containing:
+#' * `id`   – the raster cell index (in terra’s internal order)
+#' * `lon`  – longitude of the cell center (decimal degrees, EPSG:4326)
+#' * `lat`  – latitude of the cell center (decimal degrees, EPSG:4326)
+#' * `elev` – raster values (i.e., elevation)
+#'
+#' The raster is not reprojected. Instead, the native-CRS cell center
+#' coordinates are transformed on the fly to lon/lat, preserving grid alignment.
+#'
+#' @param dem A `SpatRaster` (terra).
+#'
+#' @return A `data.table` with columns `id`, `lon`, `lat`, and `elev`, where
+#'   each row corresponds to a raster cell.
+#'
+#' @examples
+#' \dontrun{
+#' library(terra)
+#' dem <- rast("dem_BC2kmGrid.tif")
+#' dt <- raster_to_table(dem)
+#' head(dt)
+#' }
+#'
+#' @export
+dem_to_table <- function(dem) {
+  if (!inherits(dem, "SpatRaster")) {
+    stop("Input must be a terra SpatRaster.")
+  }
+  n <- terra::ncell(dem)
+  xy_native <- terra::xyFromCell(dem, 1:n) 
+  xy_ll <- terra::project(xy_native, terra::crs("EPSG:4326")) 
+  vals <- terra::values(dem)
+  data.table::data.table(
+    id   = seq_len(n),
+    lon  = xy_ll[, 1],
+    lat  = xy_ll[, 2],
+    elev = vals
+  )
+}
+
+#' Convert a SpatRaster digital elevation model to a data.table with lon/lat and values
+#'
+#' This function converts a digital elevation model in `SpatRaster` format to a 
+#' `data.table` with fields required for `climr::downscale()`:
+#' * `id`   – raster cell index
+#' * `lon`  – longitude (decimal degrees, EPSG:4326)
+#' * `lat`  – latitude (decimal degrees, EPSG:4326)
+#' * `elev` – raster value
+#'
+#' The primary use case for this function is to create a climr input table for downscaling 
+#' a digital elevation model in a geographic projection such as Albers Equal Area. 
+#' Since this function conserves the cell centre locations, downstream analysis results 
+#' can be mapped in the original geographic projection. 
+#'
+#' @param dem A `SpatRaster` (terra) digital elevation model
+#' @return A `data.table` with columns `id`, `lon`, `lat`, `elev`
+#' @examples
+#' \dontrun{
+#' library(terra)
+#' dem <- unwrap(climr::dem_vancouver) # read in a digital elevation model
+#' dt <- raster_to_table(dem) #convert the digital elevation model into data table
+#' clim <- downscale(dt) # use the table as input a climr downscaling query
+#' 
+#' X <- dem # use the dem as a template raster
+#' X <- raster::setValues(X,NA) # clear the values from the template raster
+#' values(X)[dt$id] <- clim$Tmax_01 # populate the template raster with a climate variables
+#' terra::plot(X) # plot a map of the climate values
+#' }
+#' @export
+dem_to_table <- function(dem) {
+  if (!inherits(dem, "SpatRaster")) {
+    stop("Input must be a terra SpatRaster.")
+  }
+  
+  cell_ids <- which(!is.na(terra::values(dem))) 
+  vals <- terra::values(dem)[cell_ids]
+  xy <- terra::xyFromCell(dem, cell_ids)
+  pts <- terra::vect(xy, type = "points", crs = terra::crs(dem))
+  xy_ll <- terra::project(pts, "EPSG:4326") # project to lon/lat
+  xy_ll_mat <- terra::crds(xy_ll) # as matrix
+  dt <- data.table::data.table(
+    id    = cell_ids,
+    lon   = xy_ll_mat[,1],
+    lat   = xy_ll_mat[,2],
+    elev = vals
+  )
+  
+  return(dt)
+}
+
+
 #' Create a latitude raster
 #' @param r A SpatRaster.
 #' @param out A file path out for `terra::writeRaster`. Default NULL.

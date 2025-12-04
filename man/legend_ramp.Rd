@@ -2,65 +2,90 @@
 % Please edit documentation in R/legend_ramp.R
 \name{legend_ramp}
 \alias{legend_ramp}
-\title{Legend for color ramp maps}
+\title{Draw a color ramp legend that handles logarithmic scaling}
 \usage{
 legend_ramp(
-  r,
+  r = NULL,
   title,
   ColScheme,
   breaks,
   pos = c(0.2, 0.23, 0.1, 0.5),
   log = NULL,
-  horizontal = FALSE,
-  title.height = 1
+  log.relative = FALSE,
+  horizontal = NULL,
+  title.height = 1,
+  margin = 0.02
 )
 }
 \arguments{
-\item{r}{A spatial raster object, typically from the \code{terra} package.}
+\item{r}{Optional. A \code{terra} SpatRaster. If supplied, \code{pos} is interpreted relative to the raster extent.}
 
-\item{title}{Character. The title for the legend.}
+\item{title}{Character. Title for the legend.}
 
-\item{ColScheme}{Character vector. Specifies the colors used for the legend. Typically corresponds
-to the color scheme applied to the raster data visualization.}
+\item{ColScheme}{Character vector of colors for the legend.}
 
-\item{breaks}{Numeric vector. Defines the breakpoints for the legend, determining how the range
-of the raster is divided into intervals corresponding to the colors in \code{ColScheme}.}
+\item{breaks}{Numeric vector with length = length(ColScheme) + 1.}
 
-\item{pos}{Numeric vector of length 4. Defines the position of the legend as
-proportions of the raster extent. The format is \code{c(xmin, xmax, ymin, ymax)}.}
+\item{pos}{Numeric vector length 4: \code{c(xmin, xmax, ymin, ymax)}.
+Interpreted relative to raster extent if \code{r} is provided; otherwise plot coordinates.}
 
-\item{log}{Numeric or NULL. The base of the logarithm used to compute legend labels.
-If \code{NULL}, values are displayed as-is.}
+\item{log}{Numeric or NULL. Base of logarithm to transform labels.}
 
-\item{horizontal}{Logical. Should the legend be drawn horizontally? Default is \code{FALSE}.}
+\item{log.relative}{Logical. If TRUE, labels show percent change from 1 (useful for relative log scales).}
 
-\item{title.height}{Numeric. Scaling factor for the height of the legend title relative to the legend size.}
+\item{horizontal}{Logical or NULL. If NULL, orientation is chosen automatically based on bounding box shape.}
+
+\item{title.height}{Numeric. Scaling factor for the title offset relative to the legend size.}
+
+\item{margin}{Numeric. Proportion of legend width/height used as padding (default 0.02).}
 }
 \value{
-NULL. A plot of the legend is drawn in the current plotting device. The function does not return any value.
+NULL. Draws a legend on the current plot device.
 }
 \description{
-This function plots a map legend that handles logarithmic scaling
+This function draws a color ramp legend in two modes:
+\enumerate{
+\item \strong{Raster mode}: relative to a raster's spatial extent (if a \code{terra} raster is supplied).
+\item \strong{Device mode}: using plot coordinates if no raster is supplied,
+allowing placement in empty plots or arbitrary plot regions.
+}
 }
 \details{
-The function uses the extent of the raster object to determine the positioning and size of
-the legend. The legend can be oriented either horizontally or vertically, and logarithmic
-scaling is applied to the labels if the \code{log} parameter is specified.
+The function can automatically determine horizontal vs vertical orientation
+and supports optional margins around the legend.
+
+This function can be used to add a legend to maps plotted with \code{terra::plot()} or to any plot window.
 }
 \examples{
-## get the sample digital elevation model (dem) provided with `climr`
+## DEVICE MODE: Empty plot
+plot.new()
+plot.window(xlim=c(0,1), ylim=c(0,1))
+cols <- hcl.colors(20, "GnBu")
+brks <- seq(0,1,length.out=21)
+legend_ramp(
+  r = NULL,
+  title = "Legend",
+  ColScheme = cols,
+  breaks = brks,
+  pos = c(0.1, 0.9, 0.1, 0.18),
+  horizontal = NULL,
+  margin = 0.01
+)
+
+## RASTER MODE: If a raster is available
+# get the sample digital elevation model (dem) provided with `climr`
 dem <- get(data("dem_vancouver")) |> terra::unwrap()
-## A simple climr query.
-## This will return the observed 1961-1990 normals for the raster grid points.
+# A simple climr query.
+# This will return the observed 1961-1990 normals for the raster grid points.
 var <- "MAP"
-clim <- downscale(dem, which_refmap = "refmap_climr", vars = var)
-## log-transform precipitation for more meaningful scaling
+clim <- downscale(dem, which_refmap = "refmap_climr", vars = var, ppt_lr = TRUE)
+# log-transform precipitation for more meaningful scaling
 clim <- log2(clim)
-## increment for the ramp
+# increment for the ramp
 inc=diff(range(terra::values(clim)))/500
-## color breaks
+# color breaks
 breaks=seq(min(terra::values(clim))-inc, max(terra::values(clim))+inc, inc)
-## color scheme
+# color scheme
 ColScheme <- rev(hcl.colors(length(breaks)-1, "GnBu"))
 terra::plot(clim, col=ColScheme, breaks=breaks, legend=FALSE, main="", mar=NA)
 legend_ramp(
@@ -74,4 +99,3 @@ legend_ramp(
 )
 
 }
-\keyword{internal}

@@ -105,7 +105,7 @@ dir <- paste("//objectstore2.nrs.bcgov/ffec/Climatologies/PRISM_BC/", sep="")
 temp <- rast(paste(dir, list.files(dir, pattern=paste(c("tmin", "tmax", "pr")[1],".*._", 1, ".tif", sep="")), sep=""))
 temp <- project(temp, dem)
 
-# create a graduated buffer along the computational divide
+# create a graduated buffer along the continental divide
 d=20 # number of steps
 k=1 # width of steps (km)
 bdy.buffer <- temp
