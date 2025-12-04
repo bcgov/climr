@@ -1,6 +1,54 @@
 library(data.table)
 library(terra)
 library(climr)
+library(rworldmap)
+
+test <- fread("https://github.com/user-attachments/files/23940237/climr_reprex_data.csv")
+
+vars <- c("AHM", "FFP", "CMD_an", "CMI_an", "SHM", "NFFD_an",
+          "MAP","MAT", "MCMT", "MSP", "MWMT", "DD5_an", "DD18_an", "DDsub0_an")
+
+pre_cache(region = "BC")
+
+test_obs_climate <- climr::downscale(xyz = test, obs_years = 1930:2022,
+                                     obs_ts_dataset = "climatena", vars = vars,
+                                     db_option = "local")
+
+
+dem <- rast("../Common_Files/climr_mosaic_2025/climr_mosiac_wlrdem_compressed.tif")
+dem <- dem$northamerica_elevation_cec_2023
+
+temp <- rast("NewFeasDSC_2081_2100_Cw_.tif")
+temp <- disagg(temp, fact = 5)
+t2 <- project(temp, "epsg:3857")
+writeRaster(t2, "TR_Mercator.tif", gdal="COMPRESS=NONE")
+
+gp <- vect("../../Goat_Polygon.gpkg")
+g_temp <- rast(ext(gp), res = 0.000001)
+gp2 <- rasterize(gp, g_temp)
+gp2 <- project(gp2, "epsg:3857")
+coltab(gp2) <- data.frame(val = c(1,2), col = c("purple","yellow"))
+gp3 <- colorize(gp2, to = "rgb")
+writeRaster(gp2, "GP_mercator.tif", gdal="COMPRESS=NONE", overwrite = T)
+
+find /blue/data/WRF/a/SUBSETTED/ -name "COMPRESSED*.nc" -exec sh -c '
+  infile="$1"
+  tmpfile="${infile%.nc}_tmp.nc"
+  cdo -O copy "$infile" "$tmpfile" && mv "$tmpfile" "$infile"
+' _ {} \;
+
+# create the ocean proximity layer
+fact=25
+dem.coarse <- aggregate(dem, fact=fact) # you could use a different aggregation factor if this is too coarse
+plot(dem.coarse)
+data(coastsCoarse)
+coastsCoarse <- vect(coastsCoarse) #convert to spatvector
+plot(coastsCoarse,add=TRUE,col='yellow')
+coastal <- distance(dem.coarse, coastsCoarse, rasterize = TRUE)
+
+coastal <- disagg(coastal, fact=fact, method="bilinear")
+plot(coastal)
+
 
 
 library(terra)
@@ -190,6 +238,8 @@ in_xyz <- data.frame(
   elev = c(291, 296, 626, 377, 424, 591, 723, 633),
   id = 1:8
 )
+
+ds_out <- downscale(xyz = in_xyz, obs_years = 2000:2024, obs_ts_dataset = "cru.gpcc")
 
 ds_out <- downscale(xyz = in_xyz, obs_periods = list_obs_periods(), gcms = list_gcms()[1], ssps = "ssp245", gcm_periods = "2041_2060",
                     vars = c("Tmax_05", "Tmin_05","Tmax_06", "Tmin_06","Tmax_07", "Tmin_07","Tmax_08", "Tmin_08","CMI_05", "CMI_06","CMI_07","CMI_08", "CMD_05", "CMD_06","CMD_07","CMD_08", "PPT_05", "PPT_06","PPT_07","PPT_08" )) 
