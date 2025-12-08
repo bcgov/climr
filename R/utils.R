@@ -108,47 +108,6 @@ tif_folder_gen <- function(dir, overwrite = FALSE) {
   }
 }
 
-#' Extract raster cell centers (lon/lat) and values into a data.table
-#'
-#' This function converts a digital elevation model in `SpatRaster` to a `data.table` containing:
-#' * `id`   – the raster cell index (in terra’s internal order)
-#' * `lon`  – longitude of the cell center (decimal degrees, EPSG:4326)
-#' * `lat`  – latitude of the cell center (decimal degrees, EPSG:4326)
-#' * `elev` – raster values (i.e., elevation)
-#'
-#' The raster is not reprojected. Instead, the native-CRS cell center
-#' coordinates are transformed on the fly to lon/lat, preserving grid alignment.
-#'
-#' @param dem A `SpatRaster` (terra).
-#'
-#' @return A `data.table` with columns `id`, `lon`, `lat`, and `elev`, where
-#'   each row corresponds to a raster cell.
-#'
-#' @examples
-#' \dontrun{
-#' library(terra)
-#' dem <- rast("dem_BC2kmGrid.tif")
-#' dt <- raster_to_table(dem)
-#' head(dt)
-#' }
-#'
-#' @export
-dem_to_table <- function(dem) {
-  if (!inherits(dem, "SpatRaster")) {
-    stop("Input must be a terra SpatRaster.")
-  }
-  n <- terra::ncell(dem)
-  xy_native <- terra::xyFromCell(dem, 1:n) 
-  xy_ll <- terra::project(xy_native, terra::crs("EPSG:4326")) 
-  vals <- terra::values(dem)
-  data.table::data.table(
-    id   = seq_len(n),
-    lon  = xy_ll[, 1],
-    lat  = xy_ll[, 2],
-    elev = vals
-  )
-}
-
 #' Convert a SpatRaster digital elevation model to a data.table with lon/lat and values
 #'
 #' This function converts a digital elevation model in `SpatRaster` format to a 
@@ -169,11 +128,11 @@ dem_to_table <- function(dem) {
 #' \dontrun{
 #' library(terra)
 #' dem <- unwrap(climr::dem_vancouver) # read in a digital elevation model
-#' dt <- raster_to_table(dem) #convert the digital elevation model into data table
+#' dt <- dem_to_table(dem) #convert the digital elevation model into data table
 #' clim <- downscale(dt) # use the table as input a climr downscaling query
 #' 
 #' X <- dem # use the dem as a template raster
-#' X <- raster::setValues(X,NA) # clear the values from the template raster
+#' values(X) <- NA # clear the values from the template raster
 #' values(X)[dt$id] <- clim$Tmax_01 # populate the template raster with a climate variables
 #' terra::plot(X) # plot a map of the climate values
 #' }
