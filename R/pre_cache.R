@@ -51,7 +51,7 @@ pre_cache <- function(region = c("BC","WNA","NA"), bbox = NULL,
   url <- httr::content(res)$url[[1]]
   tmp <- tempfile()
   message("Downloading refmap...")
-  curl::curl_download(content(res)$url[[1]], tmp)
+  curl::curl_download(url, tmp)
   res <- terra::rast(tmp)
   names(res)[73] <- "dem2_WNA"
   
