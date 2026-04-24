@@ -17,7 +17,7 @@ get_station_data(
 \item{x}{Either a data.frame containing point locations with columns \code{id}, \code{lat}, \code{lon} OR a numeric vector of length four
 representing a bounding box to select stations within. This can be created using \code{get_bb()} or it can be a SpatExtent}
 
-\item{dataset}{Character. Which station dataset to use? Currently AHCCD is the only option.}
+\item{dataset}{Character. Which station dataset to use? Current options are \code{AHCCD} or \code{SCDNA}. Default "AHCCD"}
 
 \item{k}{Integer. Number of stations to return for each point. Only used if \code{x} is a data.frame.}
 
