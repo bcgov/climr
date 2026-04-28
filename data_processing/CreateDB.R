@@ -214,7 +214,7 @@ conn <- dbConnect(RPostgres::Postgres(),dbname = 'climr',
 
 dbWriteTable(conn, "historic_layers", metadt, row.names = FALSE)
 
-dbExecute(conn, "grant select on all tables in schema public to readaccess")
+dbExecute(con, "grant select on all tables in schema public to readaccess")
 
 dbExecute(conn,"drop table normal_wna")
 ssh_exec_wait(session, command = c("cd /share",

@@ -138,7 +138,15 @@ downscale_core <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NU
 
   if (!inherits(xyz, "SpatRaster") && isTRUE(nthread > 1L)) {
     message("Parallelising downscaling computations across ", nthread, " threads")
-
+    
+    refmap_w <- packRasters(refmap)
+    gcms_w <- packRasters(gcms)
+    gcm_ssp_ts_w <- packRasters(gcm_ssp_ts)
+    gcm_hist_ts_w <- packRasters(gcm_hist_ts)
+    obs_w <- packRasters(obs)
+    obs_ts_w <- packRasters(obs_ts)
+    
+    
     # initiate cluster
     if (Sys.info()["sysname"] != "Windows") {
       cl <- parallel::makeForkCluster(nthread)
@@ -147,40 +155,43 @@ downscale_core <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NU
     }
     # destroy cluster on exit
     on.exit(parallel::stopCluster(cl), add = TRUE)
-
+    
     # Reordering on y axis for smaller cropped area and faster
     # sequential reads
     xyz <- xyz[order(lat), ]
-
+    n_chunks <- nthread * 4
     # Split before parallel processing
     xyz_chunks <- lapply(
-      parallel::splitIndices(nrow(xyz), length(cl)),
+      parallel::splitIndices(nrow(xyz), n_chunks),
       function(x) {
         xyz[x, ]
       }
     )
     
-    threaded_downscale_fork <- function(xyz) {
+    threaded_downscale_fork <- function(chunk) {
       dt_nt <- data.table::getDTthreads()
       data.table::setDTthreads(1)
       on.exit(data.table::setDTthreads(dt_nt), add = TRUE)
       
-      downscale_(
-        xyz = xyz,
-        refmap,
-        gcms,
-        gcm_ssp_ts,
-        gcm_hist_ts,
-        obs,
-        obs_ts,
-        return_refperiod,
-        vars, ppt_lr
+      res <- downscale_(
+        xyz = chunk,
+        refmap = unwrap(refmap_w),
+        gcms = unpackRasters(gcms_w),
+        gcm_ssp_ts = unpackRasters(gcm_ssp_ts_w),
+        gcm_hist_ts = unpackRasters(gcm_hist_ts_w),
+        obs = unpackRasters(obs_w),
+        obs_ts = unpackRasters(obs_ts_w),
+        return_refperiod = return_refperiod,
+        vars = vars,
+        ppt_lr = ppt_lr
       )
+      gc()
+      res
     }
     
     if (Sys.info()["sysname"] != "Windows") {
       res <- data.table::rbindlist(
-        parallel::parLapply(
+        parallel::parLapplyLB(
           cl = cl,
           X = xyz_chunks,
           fun = threaded_downscale_fork
