@@ -29,12 +29,12 @@ dem <- project(dem, temp, method="mode")
 my_grid <- as.data.frame(dem, cells = TRUE, xy = TRUE)
 climna_grid <- my_grid[,c(1,1,3,2,4)]
 colnames(climna_grid) <- c("id1", "id2", "lat", "lon", "el") # rename column names to what climr expects
-write.csv(climna_grid, "C:/Users/CMAHONY/OneDrive - Government of BC/Data/ClimateNA_v750/noramLow.csv", row.names = F)
+write.csv(climna_grid, "C:/Users/CMAHONY/OneDrive - Government of BC/Data/ClimateNA_v760/noramLow.csv", row.names = F)
 ## Run climateNA and then return to script. 
-ref.climna <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/ClimateNA_v750/noramLow_Normal_1961_1990MP.csv")
-y2001.climna <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/ClimateNA_v750/noramLow_Decade_2001_2010MP.csv")
-y2011.climna <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/ClimateNA_v750/noramLow_Decade_2011_2020MP.csv")
-y1981.climna <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/ClimateNA_v750/noramLow_Normal_1981_2010MP.csv")
+ref.climna <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/ClimateNA_v760/noramLow_Normal_1961_1990MP.csv")
+y2001.climna <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/ClimateNA_v760/noramLow_Decade_2001_2010MP.csv")
+y2011.climna <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/ClimateNA_v760/noramLow_Decade_2011_2020MP.csv")
+y1981.climna <- fread("C:/Users/CMAHONY/OneDrive - Government of BC/Data/ClimateNA_v760/noramLow_Normal_1981_2010MP.csv")
 recent.climna <- (y2001.climna + y2011.climna)/2
 anom.climna <- recent.climna - ref.climna
 ppt_columns <- grep("PPT", names(anom.climna), value = TRUE)
