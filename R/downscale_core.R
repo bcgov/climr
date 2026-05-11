@@ -138,7 +138,15 @@ downscale_core <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NU
 
   if (!inherits(xyz, "SpatRaster") && isTRUE(nthread > 1L)) {
     message("Parallelising downscaling computations across ", nthread, " threads")
-
+    
+    refmap_w <- packRasters(refmap)
+    gcms_w <- packRasters(gcms)
+    gcm_ssp_ts_w <- packRasters(gcm_ssp_ts)
+    gcm_hist_ts_w <- packRasters(gcm_hist_ts)
+    obs_w <- packRasters(obs)
+    obs_ts_w <- packRasters(obs_ts)
+    
+    
     # initiate cluster
     if (Sys.info()["sysname"] != "Windows") {
       cl <- parallel::makeForkCluster(nthread)
@@ -147,52 +155,83 @@ downscale_core <- function(xyz, refmap, gcms = NULL, obs = NULL, gcm_ssp_ts = NU
     }
     # destroy cluster on exit
     on.exit(parallel::stopCluster(cl), add = TRUE)
-
+    
     # Reordering on y axis for smaller cropped area and faster
     # sequential reads
     xyz <- xyz[order(lat), ]
-
+    n_chunks <- nthread * 4
     # Split before parallel processing
-    xyz <- lapply(
-      parallel::splitIndices(nrow(xyz), length(cl)),
+    xyz_chunks <- lapply(
+      parallel::splitIndices(nrow(xyz), n_chunks),
       function(x) {
         xyz[x, ]
       }
     )
-
-    # Parallel processing and recombine
-
-    ## pack rasters for parallelisation
-    refmap <- packRasters(refmap)
-    gcms <- packRasters(gcms)
-    gcm_ssp_ts <- packRasters(gcm_ssp_ts)
-    gcm_hist_ts <- packRasters(gcm_hist_ts)
-    obs <- packRasters(obs)
-    obs_ts <- packRasters(obs_ts)
-
-    ## workaround to export function to nodes
-    unpackRasters <- unpackRasters
-    parallel::clusterExport(cl, c("unpackRasters"), envir = environment())
-
-    res <- rbindlist(
-      parallel::parLapply(
-        cl = cl,
-        X = xyz,
-        fun = threaded_downscale_,
-        # lapply(xyz,  ## testing
-        # FUN = threaded_downscale_,
-        refmap = refmap,
-        gcms = gcms,
-        gcm_ssp_ts = gcm_ssp_ts,
-        gcm_hist_ts = gcm_hist_ts,
-        obs = obs,
-        obs_ts = obs_ts,
+    
+    threaded_downscale_fork <- function(chunk) {
+      dt_nt <- data.table::getDTthreads()
+      data.table::setDTthreads(1)
+      on.exit(data.table::setDTthreads(dt_nt), add = TRUE)
+      
+      res <- downscale_(
+        xyz = chunk,
+        refmap = unwrap(refmap_w),
+        gcms = unpackRasters(gcms_w),
+        gcm_ssp_ts = unpackRasters(gcm_ssp_ts_w),
+        gcm_hist_ts = unpackRasters(gcm_hist_ts_w),
+        obs = unpackRasters(obs_w),
+        obs_ts = unpackRasters(obs_ts_w),
         return_refperiod = return_refperiod,
         vars = vars,
         ppt_lr = ppt_lr
-      ),
-      use.names = TRUE
-    )
+      )
+      gc()
+      res
+    }
+    
+    if (Sys.info()["sysname"] != "Windows") {
+      res <- data.table::rbindlist(
+        parallel::parLapplyLB(
+          cl = cl,
+          X = xyz_chunks,
+          fun = threaded_downscale_fork
+        ),
+        use.names = TRUE
+      )
+    } else {
+      ## pack rasters for parallelisation
+      refmap <- packRasters(refmap)
+      gcms <- packRasters(gcms)
+      gcm_ssp_ts <- packRasters(gcm_ssp_ts)
+      gcm_hist_ts <- packRasters(gcm_hist_ts)
+      obs <- packRasters(obs)
+      obs_ts <- packRasters(obs_ts)
+      
+      ## workaround to export function to nodes
+      unpackRasters <- unpackRasters
+      parallel::clusterExport(cl, c("unpackRasters"), envir = environment())
+      
+      res <- rbindlist(
+        parallel::parLapply(
+          cl = cl,
+          X = xyz_chunks,
+          fun = threaded_downscale_,
+          # lapply(xyz,  ## testing
+          # FUN = threaded_downscale_,
+          refmap = refmap,
+          gcms = gcms,
+          gcm_ssp_ts = gcm_ssp_ts,
+          gcm_hist_ts = gcm_hist_ts,
+          obs = obs,
+          obs_ts = obs_ts,
+          return_refperiod = return_refperiod,
+          vars = vars,
+          ppt_lr = ppt_lr
+        ),
+        use.names = TRUE
+      )
+    }
+    
   } else {
     # Downscale without parallel processing
     res <- downscale_(

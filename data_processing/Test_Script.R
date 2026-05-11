@@ -3,17 +3,90 @@ library(terra)
 library(climr)
 library(rworldmap)
 
+in_xyz <- data.frame(
+  lon = c(-127.7052, -127.6227, -127.5623, -127.7162, -127.1858, -127.125, -126.9495, -126.9550),
+  lat = c(55.3557, 55.38847, 55.28537, 55.25721, 54.88135, 54.65636, 54.6913, 54.61025),
+  elev = c(291, 296, 626, 377, 424, 591, 723, 633),
+  id = 1:8
+)
+data <- downscale(in_xyz, 
+                  ensemble_mean = TRUE,
+                  gcms = list_gcms()[3], 
+                  run_nm = list_runs_ssp(gcm = list_gcms()[3], ssp = list_ssps()[2])[2],
+                  ssps = list_ssps()[2], 
+                  gcm_ssp_years = 2025:2035,
+                  db_option = "local"
+                  )
+
+data <- downscale(in_xyz, 
+                  ensemble_mean = TRUE,
+                  gcms = list_gcms()[3], 
+                  run_nm = list_runs_ssp(gcm = list_gcms()[3], ssp = list_ssps()[2])[8],
+                  ssps = list_ssps()[2], 
+                  gcm_periods = list_gcm_periods()[1:3]
+                  )
+
+
+library(bcmaps)
+bound <- bc_bound()
+dem <- cded(bound, check_tiles = FALSE)
+dem2 <- rast(dem)
+dem3 <- project(dem2, "epsg:3005")
+
+dat <- rast("../../BuMo_template1.tif")
+dat2 <- aggregate(dat, fact = 10)
+dat3 <- project(dat2, "epsg:4326")
+writeCDF(dat3, "BuMo_Template_latlon.nc", overwrite = T)
+
+library(data.table)
 test <- fread("https://github.com/user-attachments/files/23940237/climr_reprex_data.csv")
 
 vars <- c("AHM", "FFP", "CMD_an", "CMI_an", "SHM", "NFFD_an",
           "MAP","MAT", "MCMT", "MSP", "MWMT", "DD5_an", "DD18_an", "DDsub0_an")
 
-pre_cache(region = "BC")
+bb <- get_bb(xyz = test)
+pre_cache(bbox = bb)
 
 test_obs_climate <- climr::downscale(xyz = test, obs_years = 1930:2022,
                                      obs_ts_dataset = "climatena", vars = vars,
                                      db_option = "local")
 
+missingID <- test_obs_climate[is.na(MAT), .N, by = .(id)]
+test_missingObs <- test[id %in% missingID$id,]
+pts <- vect(test_missingObs, geom = c("lon","lat"), crs = "epsg:4326")
+
+climna <- input_obs_ts(dataset = "climatena", bbox = bb, years = 1930:2022)
+plot(climna$climatena$climatena_Tmax_07_1930)
+points(pts)
+
+mapNA <- rworldmap::countriesLow[mapNA$NAME %in% c("Canada", "United States of America")]
+mapNA2 <- vect(mapNA)
+lines(mapNA2)
+
+test <- fread("https://github.com/user-attachments/files/23940237/climr_reprex_data.csv")
+#test <- data.table::as.data.table(test)
+
+vars <- c("AHM", "FFP", "CMD_an", "CMI_an", "SHM", "NFFD_an",
+          "MAP","MAT", "MCMT", "MSP", "MWMT", "DD5_an", "DD18_an", "DDsub0_an")
+
+test_obs <- climr::downscale(xyz = test, obs_years = 1950:2022,
+                             obs_ts_dataset = "mswx.blend", vars = vars,
+                             db_option = "local")
+
+#this successfully runs for all but 5 points 
+
+missingIDs <- unique(test_obs[is.na(MAT)]$id)
+
+test_missingObs <- test[id %in% missingIDs,]
+
+out <- climr::downscale(xyz = test_missingObs, obs_years = 1950:2022,
+                        obs_ts_dataset = "mswx.blend", vars = vars)
+
+pts <- vect(test_missingObs, geom = c("lon","lat"), crs = "epsg:4326")
+
+ref <- input_refmap(bbox = bb)
+plot(ref$Tmax_01, xlim = c(-134.3, -120), ylim = c(50,55))
+points(pts)
 
 dem <- rast("../Common_Files/climr_mosaic_2025/climr_mosiac_wlrdem_compressed.tif")
 dem <- dem$northamerica_elevation_cec_2023

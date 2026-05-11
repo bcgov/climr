@@ -30,6 +30,7 @@ License: Apache License (== 2)
 Depends: 
     R (>= 4.0)
 Imports: 
+    Rcpp,
     data.table,
     DBI,
     magrittr,
@@ -50,6 +51,8 @@ Imports:
     ggplot2,
     curl,
     httr
+LinkingTo:
+    Rcpp
 Suggests: 
     knitr,
     parallel,

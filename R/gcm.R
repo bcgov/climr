@@ -452,8 +452,8 @@ process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run,
     }
     if(length(sel_runs) < 1) stop("max_run must be > 0 if ensemble_mean is FALSE")
   }else{
-    if(!run_nm %in% runs){
-      stop("Run ", run_nm, "doesn't exist for this GCM.")
+    if(!(all(run_nm %in% runs))){
+      stop("Not all selected runs exist for this GCM.")
     }
     sel_runs <- run_nm
   }
@@ -489,14 +489,26 @@ process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run,
     if (length(spat_match) > 0) {
       periods <- fread(file.path(cPath, "meta_period.csv"))
       ssps_cached <- fread(file.path(cPath, "meta_ssp.csv"))
+      runs_cached <- fread(file.path(cPath, "meta_runs.csv"))
+      if(is.null(run_nm)) runs_num <- runs_cached[,.(max_run = .N), by = .(uid)] ## if run_nm is null, need to calculate number
       isin <- FALSE
       for (oldid in spat_match) {
-        if (all(period %in% periods[uid == oldid, period]) &
-          all(ssps %in% ssps_cached[uid == oldid, ssps]) &
-          max_run <= bnds[uid == oldid, max_run]) {
-          isin <- TRUE
-          break
+        if(is.null(run_nm)){
+          if (all(period %in% periods[uid == oldid, period]) &
+              all(ssps %in% ssps_cached[uid == oldid, ssps]) &
+              max_run <= runs_num[uid == oldid, max_run]) {
+            isin <- TRUE
+            break
+          }
+        } else {
+          if (all(period %in% periods[uid == oldid, period]) &
+              all(ssps %in% ssps_cached[uid == oldid, ssps]) &
+              all(sel_runs %in% runs_cached[uid == oldid, runs])) {
+            isin <- TRUE
+            break
+          }
         }
+        
       }
 
       if (isin) {
@@ -543,9 +555,11 @@ process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run,
       )
       t2 <- data.table(uid = rep(uid, length(period)), period = period)
       t3 <- data.table(uid = rep(uid, length(ssps)), ssps = ssps)
+      t4 <- data.table(uid = rep(uid, length(sel_runs)), runs = sel_runs)
       fwrite(t1, file = file.path(cPath, "meta_area.csv"), append = TRUE)
       fwrite(t2, file = file.path(cPath, "meta_period.csv"), append = TRUE)
       fwrite(t3, file = file.path(cPath, "meta_ssp.csv"), append = TRUE)
+      fwrite(t4, file = file.path(cPath, "meta_runs.csv"), append = TRUE)
     }
   }
 
@@ -582,8 +596,8 @@ process_one_gcm3 <- function(gcm_nm, years, bbox, max_run,ensemble_mean, dbnames
       }
       if(length(sel_runs) < 1) stop("max_run must be > 0 if ensemble_mean is FALSE")
     }else{
-      if(!run_nm %in% runs){
-        stop("Run ", run_nm, "doesn't exist for this GCM.")
+      if(!(all(run_nm %in% runs))){
+        stop("Not all selected runs exist for this GCM.")
       }
       sel_runs <- run_nm
     }
@@ -708,8 +722,8 @@ process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, ensemble_mean, dbnam
         }
         if(length(sel_runs) < 1) stop("max_run must be > 0 if ensemble_mean is FALSE")
       }else{
-        if(!run_nm %in% runs){
-          stop("Run ", run_nm, "doesn't exist for this GCM.")
+        if(!(all(run_nm %in% runs))){
+          stop("Not all selected runs exist for this GCM.")
         }
         sel_runs <- run_nm
       }
@@ -744,14 +758,25 @@ process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, ensemble_mean, dbnam
 
         if (length(spat_match) > 0) {
           periods <- fread(file.path(cPath, "meta_period.csv"))
-          ssps_cache <- fread(file.path(cPath, "meta_ssp.csv"))
+          ssps_cached <- fread(file.path(cPath, "meta_ssp.csv"))
+          runs_cached <- fread(file.path(cPath, "meta_runs.csv"))
+          if(is.null(run_nm)) runs_num <- runs_cached[,.(max_run = .N), by = .(uid)] ## if run_nm is null, need to calculate number
           isin <- FALSE
-          for (oldid in spat_match) { ## see if any have all required variables
-            if (all(period %in% periods[uid == oldid, period]) &
-              all(ssps %in% ssps_cache[uid == oldid, ssps]) &
-              max_run <= bnds[uid == oldid, max_run]) {
-              isin <- TRUE
-              break
+          for (oldid in spat_match) {
+            if(is.null(run_nm)){
+              if (all(period %in% periods[uid == oldid, period]) &
+                  all(ssps %in% ssps_cached[uid == oldid, ssps]) &
+                  max_run <= runs_num[uid == oldid, max_run]) {
+                isin <- TRUE
+                break
+              }
+            } else {
+              if (all(period %in% periods[uid == oldid, period]) &
+                  all(ssps %in% ssps_cached[uid == oldid, ssps]) &
+                  all(sel_runs %in% runs_cached[uid == oldid, runs])) {
+                isin <- TRUE
+                break
+              }
             }
           }
 
@@ -813,9 +838,11 @@ process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, ensemble_mean, dbnam
           )
           t2 <- data.table(uid = rep(uid, length(period)), period = period)
           t3 <- data.table(uid = rep(uid, length(ssps)), ssps = ssps)
+          t4 <- data.table(uid = rep(uid, length(sel_runs)), runs = sel_runs)
           fwrite(t1, file = file.path(cPath, "meta_area.csv"), append = TRUE)
           fwrite(t2, file = file.path(cPath, "meta_period.csv"), append = TRUE)
           fwrite(t3, file = file.path(cPath, "meta_ssp.csv"), append = TRUE)
+          fwrite(t4, file = file.path(cPath, "meta_runs.csv"), append = TRUE)
         }
       }
 
@@ -860,8 +887,8 @@ process_one_gcmts_fast <- function(gcm_nm, ssps, period, max_run, dbnames = dbna
       if(is.null(run_nm)){
         sel_runs <- runs[1:(max_run + 1L)]
       }else{
-        if(!run_nm %in% runs){
-          stop("Run ", run_nm, "doesn't exist for this GCM.")
+        if(!(all(run_nm %in% runs))){
+          stop("Not all selected runs exist for this GCM.")
         }
         sel_runs <- run_nm
       }
