@@ -452,8 +452,8 @@ process_one_gcm2 <- function(gcm_nm, ssps, bbox, period, max_run,
     }
     if(length(sel_runs) < 1) stop("max_run must be > 0 if ensemble_mean is FALSE")
   }else{
-    if(!run_nm %in% runs){
-      stop("Run ", run_nm, "doesn't exist for this GCM.")
+    if(!(all(run_nm %in% runs))){
+      stop("Not all selected runs exist for this GCM.")
     }
     sel_runs <- run_nm
   }
@@ -596,8 +596,8 @@ process_one_gcm3 <- function(gcm_nm, years, bbox, max_run,ensemble_mean, dbnames
       }
       if(length(sel_runs) < 1) stop("max_run must be > 0 if ensemble_mean is FALSE")
     }else{
-      if(!run_nm %in% runs){
-        stop("Run ", run_nm, "doesn't exist for this GCM.")
+      if(!(all(run_nm %in% runs))){
+        stop("Not all selected runs exist for this GCM.")
       }
       sel_runs <- run_nm
     }
@@ -722,8 +722,8 @@ process_one_gcm4 <- function(gcm_nm, ssps, period, max_run, ensemble_mean, dbnam
         }
         if(length(sel_runs) < 1) stop("max_run must be > 0 if ensemble_mean is FALSE")
       }else{
-        if(!run_nm %in% runs){
-          stop("Run ", run_nm, "doesn't exist for this GCM.")
+        if(!(all(run_nm %in% runs))){
+          stop("Not all selected runs exist for this GCM.")
         }
         sel_runs <- run_nm
       }
@@ -887,8 +887,8 @@ process_one_gcmts_fast <- function(gcm_nm, ssps, period, max_run, dbnames = dbna
       if(is.null(run_nm)){
         sel_runs <- runs[1:(max_run + 1L)]
       }else{
-        if(!run_nm %in% runs){
-          stop("Run ", run_nm, "doesn't exist for this GCM.")
+        if(!(all(run_nm %in% runs))){
+          stop("Not all selected runs exist for this GCM.")
         }
         sel_runs <- run_nm
       }
