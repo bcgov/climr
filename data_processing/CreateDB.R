@@ -225,7 +225,7 @@ ssh_exec_wait(session, command = c("cd /share",
 allgcms <- list.files("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climr/inputs_pkg/gcm/")
 nms <- c("gcm_access","gcm_bcc","gcm_canesm","gcm_cnrm","gcm_ecearth","gcm_gfdl","gcm_giss","gcm_inm","gcm_ipsl","gcm_miroc6","gcm_mpi1","gcm_mpi2","gcm_ukesm")
 
-t1 <- data.frame(GCM = list_gcm(), dbname = nms)
+t1 <- data.frame(GCM = list_gcms(), dbname = nms)
 
 temp <- rast(paste0("C:\\Users\\kdaust\\AppData\\Local/R/cache/R/climr/inputs_pkg/gcm/",gcm,"/gcmData.",gcm,".deltas.tif"))
 

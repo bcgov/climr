@@ -6,7 +6,7 @@
 #' `list_gcms` lists available global climate models.
 #' 
 #' @details
-#' The eight-gcm ensemble recommended by Mahony et al. (2022) can be specified as `gcms = list_gcm()[c(1,4,5,6,7,10,11,12)]`. 
+#' The eight-gcm ensemble recommended by Mahony et al. (2022) can be specified as `gcms = list_gcms()[c(1,4,5,6,7,10,11,12)]`. 
 #' 
 #'
 #' @rdname data-option-lists
