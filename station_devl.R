@@ -3,6 +3,16 @@ library(climr)
 library(terra)
 library(ranger)
 
+devtools::load_all()
+
+
+
+dat <- fread("../Common_Files/TreeSpecies_Dropdownlist.csv")
+library(glue)
+dat[,code := paste0("'",TreeCode, "': '", EnglishName,"'")]
+paste(dat$code, collapse = ", ")
+
+
 library(ncdf4)
 nc <- nc_open("SCDNA_v1.1.nc4")
 
@@ -140,6 +150,15 @@ in_xyz <- data.frame(
   elev = c(291, 296, 626, 377, 424, 591, 723, 633),
   id = 1:8
 )
+
+dat <- downscale(in_xyz, 
+                 which_refmap = "refmap_climr", 
+                 gcms = list_gcms()[1], 
+                 ssps = list_ssps()[2], 
+                 gcm_periods = "2041_2060", 
+                 run_nm = c("r10i1p1f1","r1i1p1f1" ),
+                 return_refperiod = FALSE)
+
 bb <- get_bb(in_xyz)
 dat <- get_station_data(in_xyz, dataset = "SCDNA", k = 3, only_complete = FALSE)
 dat2 <- get_station_data(bb, dataset = "SCDNA", only_complete = TRUE, vars = c("DD5_an","CMD_07"))

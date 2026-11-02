@@ -18,6 +18,30 @@ calc_RH <- function(tmmin, tmmax) {
   return(100 * es_tmin / es_avg)
 }
 
+#' Calculate Vapour Pressure Deficit (VPD)
+#'
+#' @template tmmin
+#' @template tmmax
+#'
+#' @return numeric. Relative Humidity
+#'
+#' @examples
+#' \dontrun{
+#' climr::calc_VPD(tmmin = 10, tmmax = 40)
+#' }
+#' @export
+#' @rdname climatevar
+calc_VPD <- function(tmmin, tmmax) {
+  es_tmin <- calc_SVP(tmmin)
+  es_tmax <- calc_SVP(tmmax)
+  es_avg <- (es_tmin + es_tmax) / 2
+  RH <- es_tmin / es_avg
+  
+  VPD <- es_avg * (1 - RH)
+  return(VPD)
+}
+
+
 #' Calculate Potential Evapotranspiration
 #'
 #' Based on simplified Penman - Monteith method from Hogg (1997)
