@@ -246,3 +246,20 @@ Tmin_09,September mean daily minimum temperature,Tmin,mean daily minimum tempera
 Tmin_10,October mean daily minimum temperature,Tmin,mean daily minimum temperature,10,October,Monthly,interval,\u00b0C,Tmin10
 Tmin_11,November mean daily minimum temperature,Tmin,mean daily minimum temperature,11,November,Monthly,interval,\u00b0C,Tmin11
 Tmin_12,December mean daily minimum temperature,Tmin,mean daily minimum temperature,12,December,Monthly,interval,\u00b0C,Tmin12
+VPD_01,Monthly vapor pressure deficit,VPD,vapour pressure deficit,01,January,Monthly,interval,kPa,
+VPD_02,Monthly vapor pressure deficit,VPD,vapour pressure deficit,02,February,Monthly,interval,kPa,
+VPD_03,Monthly vapor pressure deficit,VPD,vapour pressure deficit,03,March,Monthly,interval,kPa,
+VPD_04,Monthly vapor pressure deficit,VPD,vapour pressure deficit,04,April,Monthly,interval,kPa,
+VPD_05,Monthly vapor pressure deficit,VPD,vapour pressure deficit,05,May,Monthly,interval,kPa,
+VPD_06,Monthly vapor pressure deficit,VPD,vapour pressure deficit,06,June,Monthly,interval,kPa,
+VPD_07,Monthly vapor pressure deficit,VPD,vapour pressure deficit,07,July,Monthly,interval,kPa,
+VPD_08,Monthly vapor pressure deficit,VPD,vapour pressure deficit,08,August,Monthly,interval,kPa,
+VPD_09,Monthly vapor pressure deficit,VPD,vapour pressure deficit,09,September,Monthly,interval,kPa,
+VPD_10,Monthly vapor pressure deficit,VPD,vapour pressure deficit,10,October,Monthly,interval,kPa,
+VPD_11,Monthly vapor pressure deficit,VPD,vapour pressure deficit,11,November,Monthly,interval,kPa,
+VPD_12,Monthly vapor pressure deficit,VPD,vapour pressure deficit,12,December,Monthly,interval,kPa,
+VPD_wt,Winter vapor pressure deficit,VPD,vapour pressure deficit,wt,Winter,Seasonal,interval,kPa,
+VPD_sp,Spring vapor pressure deficit,VPD,vapour pressure deficit,sp,Spring,Seasonal,interval,kPa,
+VPD_sm,Summer vapor pressure deficit,VPD,vapour pressure deficit,sm,Summer,Seasonal,interval,kPa,
+VPD_at,Autumn vapor pressure deficit,VPD,vapour pressure deficit,at,Autumn,Seasonal,interval,kPa,
+VPD_an,Annual vapor pressure deficit,VPD,vapour pressure deficit,an,Annual,Annual,interval,kPa,
